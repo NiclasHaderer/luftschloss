@@ -1,0 +1,19 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "member-access": true,
+    "no-console": false,
+    "arrow-return-shorthand": true,
+    "typedef": {
+      "options": ["call-signature"]
+    },
+    "member-ordering": {
+      "options": {
+        "alphabetize": true,
+        "order": "instance-sandwich"
+      }
+    },
+    "unified-signatures": false,
+    "max-classes-per-file": false
+  }
+}

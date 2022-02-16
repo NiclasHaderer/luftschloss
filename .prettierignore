@@ -1,0 +1,7 @@
+*.lock
+idea
+vscode
+build
+node_modules
+LICENSE
+dist
