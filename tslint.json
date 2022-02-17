@@ -14,6 +14,8 @@
       }
     },
     "unified-signatures": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "comment-format": false,
+    "no-switch-case-fall-through": true
   }
 }

@@ -3,9 +3,9 @@ import { Observable } from "rxjs"
 import * as http from "http"
 import { RequestPipeline } from "./request-pipeline"
 import { RouterImpl } from "./router"
-import { HTTP_HANDLER } from "../types/http"
 import { ErrorResponseHandler } from "../types/error-response-handler"
 import { defaultErrorHandler } from "./error-response-handler"
+import { RequestExecutorMiddleware } from "../../middleware/request-executor.middleware"
 
 class ServerImpl extends RouterImpl implements Server {
   public readonly handleEnd$: Observable<EventData>
@@ -26,14 +26,6 @@ class ServerImpl extends RouterImpl implements Server {
     })
   }
 
-  public set methodNotAllowed(handler: HTTP_HANDLER) {
-    this.errorResponseHandler.METHOD_NOT_ALLOWED = handler
-  }
-
-  public set notFound(handler: HTTP_HANDLER) {
-    this.errorResponseHandler.NOT_FOUND = handler
-  }
-
   public listen(port: number = 3000): void {
     this._server.listen(port, "0.0.0.0", () => {
       console.log(`Server is listening on http://0.0.0.0:${port}`)
@@ -42,5 +34,9 @@ class ServerImpl extends RouterImpl implements Server {
 }
 
 export const createServer = (): Server => {
-  return new ServerImpl(defaultErrorHandler)
+  const server = new ServerImpl({
+    ...defaultErrorHandler
+  })
+  server.middleware.pipe(RequestExecutorMiddleware)
+  return server
 }
