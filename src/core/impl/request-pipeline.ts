@@ -20,8 +20,7 @@ export class RequestPipeline {
 
   /* tslint:enable:member-ordering */
 
-  constructor(private routingController: ReadonlyRoutingController, private errorHandler: ErrorHandler) {
-  }
+  constructor(private routingController: ReadonlyRoutingController, private errorHandler: ErrorHandler) {}
 
   public queue = async (req: In, res: Out) =>
     // Add request start and end handling
@@ -58,10 +57,11 @@ export class RequestPipeline {
   }
 }
 
-const catchErrors = async (errorHandlers: ErrorHandler, {
-  request,
-  response
-}: { request: Request, response: Response }, callback: () => Promise<void>) => {
+const catchErrors = async (
+  errorHandlers: ErrorHandler,
+  { request, response }: { request: Request; response: Response },
+  callback: () => Promise<void>
+) => {
   try {
     await callback()
   } catch (e) {
@@ -84,7 +84,6 @@ const buildExecutionChain = (route: SuccessfulRouteLookupResult) => {
       // TODO add the middleware execution
       // TODO build the chains after the server was started to improve performance
       route.executor(request, response)
-    }
+    },
   }
-
 }
