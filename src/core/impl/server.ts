@@ -3,8 +3,8 @@ import { Observable } from "rxjs"
 import * as http from "http"
 import { RequestPipeline } from "./request-pipeline"
 import { RouterImpl } from "./router"
-import { ErrorResponseHandler } from "../types/error-response-handler"
-import { defaultErrorHandler } from "./error-response-handler"
+import { ErrorHandler } from "../types/error-handler"
+import { defaultErrorHandler } from "./error-handler"
 import { RequestExecutorMiddleware } from "../../middleware/request-executor.middleware"
 
 class ServerImpl extends RouterImpl implements Server {
@@ -16,7 +16,7 @@ class ServerImpl extends RouterImpl implements Server {
   private _requestPipeline: RequestPipeline
   private readonly _server: http.Server
 
-  constructor(private errorResponseHandler: ErrorResponseHandler) {
+  constructor(private errorResponseHandler: ErrorHandler) {
     super()
     this._requestPipeline = new RequestPipeline(this.routes, errorResponseHandler)
     this.handleStart$ = this._requestPipeline.handleStart$
@@ -26,7 +26,7 @@ class ServerImpl extends RouterImpl implements Server {
     })
   }
 
-  public listen(port: number = 3000): void {
+  public listen(port: number = 3200): void {
     this._server.listen(port, "0.0.0.0", () => {
       console.log(`Server is listening on http://0.0.0.0:${port}`)
     })
@@ -35,8 +35,8 @@ class ServerImpl extends RouterImpl implements Server {
 
 export const createServer = (): Server => {
   const server = new ServerImpl({
-    ...defaultErrorHandler
+    ...defaultErrorHandler,
   })
-  server.middleware.pipe(RequestExecutorMiddleware)
+  server.pipe(RequestExecutorMiddleware)
   return server
 }

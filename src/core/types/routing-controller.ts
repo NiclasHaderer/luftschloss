@@ -1,5 +1,5 @@
-import { HTTP_HANDLER, HTTP_METHODS } from "./http"
-import { Middleware, MiddlewareRepresentation } from "./middleware"
+import { ROUTE_HANDLER, HTTP_METHODS } from "./http"
+import { MiddlewareRepresentation } from "./middleware"
 
 export enum RouteRetrieval {
   NOT_FOUND,
@@ -8,7 +8,7 @@ export enum RouteRetrieval {
 }
 
 export type SuccessfulRouteLookupResult = {
-  executor: HTTP_HANDLER
+  executor: ROUTE_HANDLER
   pipeline: Iterable<MiddlewareRepresentation>
   type: RouteRetrieval.OK
 }
@@ -20,13 +20,14 @@ export type UnSuccessfulRouteLookupResult = {
 export type RouteLookupResult = UnSuccessfulRouteLookupResult | SuccessfulRouteLookupResult
 export type RouteHandler = { method: HTTP_METHODS; path: string; route: Omit<SuccessfulRouteLookupResult, "type"> }
 
-export interface ReadonlyRouteCollector extends Iterable<RouteHandler> {
+export interface ReadonlyRoutingController extends Iterable<RouteHandler> {
   retrieve(path: string, method: HTTP_METHODS): RouteLookupResult
 }
 
-export interface RouteCollector extends ReadonlyRouteCollector {
-  middleware: Middleware
-  add(path: string, method: HTTP_METHODS | "*", callback: HTTP_HANDLER): this
+export interface RoutingController extends ReadonlyRoutingController {
+  middleware: Iterable<MiddlewareRepresentation>
 
-  addMany(routes: RouteCollector, basePath: string): this
+  add(path: string, method: HTTP_METHODS | "*", callback: ROUTE_HANDLER): void
+
+  addMany(routes: RoutingController, basePath: string): void
 }

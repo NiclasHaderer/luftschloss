@@ -1,26 +1,28 @@
-import { HTTP_HANDLER, HTTP_METHODS } from "./http"
-import { Middleware } from "./middleware"
-import { ReadonlyRouteCollector } from "./route-controller"
+import { HTTP_METHODS, ROUTE_HANDLER } from "./http"
+import { MiddleWareInterceptor, MiddlewareRepresentation } from "./middleware"
+import { ReadonlyRoutingController } from "./routing-controller"
 
 export interface MountingOptions {
   basePath?: string
 }
 
 export interface Router {
-  readonly middleware: Middleware
-  readonly routes: ReadonlyRouteCollector
+  readonly middleware: Iterable<MiddlewareRepresentation>
+  readonly routes: ReadonlyRoutingController
 
-  delete(url: string, callback: HTTP_HANDLER): void
+  delete(url: string, callback: ROUTE_HANDLER): void
 
-  get(url: string, callback: HTTP_HANDLER): void
+  get(url: string, callback: ROUTE_HANDLER): void
 
-  handle(method: HTTP_METHODS | "*", url: string, callback: HTTP_HANDLER): void
+  handle(method: HTTP_METHODS | "*", url: string, callback: ROUTE_HANDLER): void
 
   mount(router: Router | Router[], options: MountingOptions): this
 
-  patch(url: string, callback: HTTP_HANDLER): void
+  patch(url: string, callback: ROUTE_HANDLER): void
 
-  post(url: string, callback: HTTP_HANDLER): void
+  pipe(...middleware: MiddleWareInterceptor[]): this
 
-  put(url: string, callback: HTTP_HANDLER): void
+  post(url: string, callback: ROUTE_HANDLER): void
+
+  put(url: string, callback: ROUTE_HANDLER): void
 }

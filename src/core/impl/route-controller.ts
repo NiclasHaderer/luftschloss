@@ -1,22 +1,27 @@
-import { HTTP_HANDLER, HTTP_METHODS } from "../types/http"
-import { Middleware, MiddlewareRepresentation } from "../types/middleware"
-import { MiddlewareImpl } from "./middleware"
+import { HTTP_METHODS, ROUTE_HANDLER } from "../types/http"
 import {
-  ReadonlyRouteCollector,
-  RouteCollector,
+  isClassMiddleware,
+  isHttpMiddleware,
+  MiddleWareInterceptor,
+  MiddlewareRepresentation,
+  MiddlewareType,
+} from "../types/middleware"
+import {
+  ReadonlyRoutingController,
   RouteHandler,
   RouteLookupResult,
   RouteRetrieval,
+  RoutingController,
   SuccessfulRouteLookupResult,
-} from "../types/route-controller"
+} from "../types/routing-controller"
 
 type StoredRoutes = Record<HTTP_METHODS, Omit<SuccessfulRouteLookupResult, "type"> | null>
 
-export class RouteCollectorImpl implements RouteCollector {
+export class RouteingControllerImpl implements RoutingController {
   private _collection = new Map<string, StoredRoutes>()
-  private _middleware = new MiddlewareImpl()
+  private _middleware: MiddlewareRepresentation[] = []
 
-  public get middleware(): Middleware {
+  public get middleware(): MiddlewareRepresentation[] {
     return this._middleware
   }
 
@@ -52,8 +57,8 @@ export class RouteCollectorImpl implements RouteCollector {
     }
   }
 
-  public add(path: string, method: HTTP_METHODS | "*", callback: HTTP_HANDLER): this {
-    path = RouteCollectorImpl.normalize(path)
+  public add(path: string, method: HTTP_METHODS | "*", callback: ROUTE_HANDLER): void {
+    path = RouteingControllerImpl.normalize(path)
 
     if (method === "*") {
       Object.values(HTTP_METHODS).forEach(m => {
@@ -62,23 +67,29 @@ export class RouteCollectorImpl implements RouteCollector {
     } else {
       this._addToCollection(path, method, callback)
     }
-
-    return this
   }
 
-  public addMany(routes: ReadonlyRouteCollector, basePath: string): this {
-    basePath = RouteCollectorImpl.normalize(basePath)
+  public addMany(routes: ReadonlyRoutingController, basePath: string): void {
+    basePath = RouteingControllerImpl.normalize(basePath)
     for (const route of routes) {
-      let path = RouteCollectorImpl.normalize(route.path)
-      path = RouteCollectorImpl.normalize(`${basePath}${path}`)
+      let path = RouteingControllerImpl.normalize(route.path)
+      path = RouteingControllerImpl.normalize(`${basePath}${path}`)
       this._addToCollection(path, route.method, route.route.executor, route.route.pipeline)
     }
+  }
 
-    return this
+  public addMiddleware(...middlewareList: MiddleWareInterceptor[]): void {
+    for (const middleware of middlewareList) {
+      if (isClassMiddleware(middleware)) {
+        this._middleware.push({ type: MiddlewareType.CLASS, rep: middleware })
+      } else if (isHttpMiddleware(middleware)) {
+        this._middleware.push({ type: MiddlewareType.HTTP, rep: middleware })
+      }
+    }
   }
 
   public retrieve(path: string, method: HTTP_METHODS): RouteLookupResult {
-    path = RouteCollectorImpl.normalize(path)
+    path = RouteingControllerImpl.normalize(path)
     if (!this._collection.has(path)) return { type: RouteRetrieval.NOT_FOUND, executor: null, pipeline: null }
     const route = this._collection.get(path)!
     const executor = route[method]
@@ -89,7 +100,7 @@ export class RouteCollectorImpl implements RouteCollector {
   private _addToCollection(
     path: string,
     method: HTTP_METHODS,
-    callback: HTTP_HANDLER,
+    callback: ROUTE_HANDLER,
     pipeline: Iterable<MiddlewareRepresentation> = []
   ): void {
     if (!this._collection.has(path)) {

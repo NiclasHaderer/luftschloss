@@ -1,5 +1,8 @@
 import { ValueOf } from "../types"
 
+/**
+ * See https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+ */
 export const Status = {
   HTTP_100_CONTINUE: {
     code: 100,
