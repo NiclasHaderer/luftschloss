@@ -84,17 +84,13 @@ const buildExecutionChain = (route: SuccessfulRouteLookupResult) => {
   const pipeline = [...route.pipeline]
   return {
     run(request: Request, response: Response): void {
-      if (pipeline.length === 0) {
-        return route.executor(request, response)
-      }
-
-      let index = 0
+      let index = -1
       const t = (request1: Request, response1: Response) => {
         index += 1
         if (index >= pipeline.length) return route.executor(request1, response1)
         executeMiddleware(pipeline[index], request1, response1, t)
       }
-      executeMiddleware(pipeline[index], request, response, t)
+      t(request, response)
     },
   }
 }
