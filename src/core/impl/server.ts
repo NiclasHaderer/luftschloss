@@ -1,20 +1,31 @@
-import { EventData, Server } from "../types/server"
-import { Observable } from "rxjs"
+import { EventData, Server } from "../interfaces/server"
 import * as http from "http"
 import { RequestPipeline } from "./request-pipeline"
 import { RouterImpl } from "./router"
-import { ErrorHandler } from "../types/error-handler"
+import { ErrorHandler } from "../interfaces/error-handler"
 import { defaultErrorHandler } from "./error-handler"
-import { RequestExecutorMiddleware } from "../../middleware/request-executor.middleware"
+import { errorMiddleware } from "../../middleware/error.middleware"
+import { Observable, Subject } from "./subject"
 
 class ServerImpl extends RouterImpl implements Server {
+  // Emits an event which indicates that the server has started
   public readonly handleEnd$: Observable<EventData>
 
+  // Emits an event which indicates that the server has stopped
   public readonly handleStart$: Observable<EventData>
-  public readonly shutdown$ = new Observable<void>()
-  public readonly start$ = new Observable<void>()
+
+  /* tslint:disable:member-ordering */
+  private _shutdown$ = new Subject<void>()
+  private _start$ = new Subject<void>()
+  // Server shutdown event
+  public readonly shutdown$ = this._shutdown$.asObservable()
+
+  // Server start event
+  public readonly start$ = this._start$.asObservable()
   private _requestPipeline: RequestPipeline
   private readonly _server: http.Server
+
+  /* tslint:enable:member-ordering */
 
   constructor(private errorResponseHandler: ErrorHandler) {
     super()
@@ -27,16 +38,18 @@ class ServerImpl extends RouterImpl implements Server {
   }
 
   public listen(port: number = 3200): void {
+    const startTime = Date.now()
     this._server.listen(port, "0.0.0.0", () => {
       console.log(`Server is listening on http://0.0.0.0:${port}`)
+      console.log(`Server startup took ${Date.now() - startTime}ms`)
+      this._start$.next()
     })
   }
 }
 
 export const createServer = (): Server => {
-  const server = new ServerImpl({
-    ...defaultErrorHandler,
-  })
-  server.pipe(RequestExecutorMiddleware)
+  const errorHandler = { ...defaultErrorHandler }
+  const server = new ServerImpl(errorHandler)
+  server.pipe(errorMiddleware(errorHandler))
   return server
 }

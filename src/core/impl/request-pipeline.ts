@@ -1,14 +1,18 @@
 import { IncomingMessage as In, ServerResponse as Out } from "http"
-import { Subject } from "rxjs"
-import { EventData } from "../types/server"
+import { Subject } from "./subject"
+import { EventData } from "../interfaces/server"
 import { RequestImpl } from "./request"
-import { ReadonlyRoutingController, RouteRetrieval, SuccessfulRouteLookupResult } from "../types/routing-controller"
-import { ErrorHandler } from "../types/error-handler"
+import {
+  ReadonlyRoutingController,
+  RouteRetrieval,
+  SuccessfulRouteLookupResult,
+} from "../interfaces/routing-controller"
+import { ErrorHandler } from "../interfaces/error-handler"
 import { HTTPException } from "./http-exception"
 import { Status } from "./status"
-import { Request } from "../types/request"
+import { Request } from "../interfaces/request"
 import { ResponseImpl } from "./response"
-import { Response } from "../types/response"
+import { Response } from "../interfaces/response"
 
 export class RequestPipeline {
   /* tslint:disable:member-ordering */
@@ -29,20 +33,18 @@ export class RequestPipeline {
       const request = new RequestImpl(req)
       const response = new ResponseImpl(res)
 
-      await catchErrors(this.errorHandler, { request, response }, async () => {
-        // Get the request handler for a certain url
-        const requestExecutor = this.routingController.retrieve(request.url, request.method)
-        switch (requestExecutor.type) {
-          case RouteRetrieval.METHOD_NOT_ALLOWED:
-            throw new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED)
-          case RouteRetrieval.NOT_FOUND:
-            throw new HTTPException(Status.HTTP_404_NOT_FOUND)
-          case RouteRetrieval.OK:
-            break
-        }
-        const executionChain = buildExecutionChain(requestExecutor)
-        await executionChain.run(request, response)
-      })
+      // Get the request handler for a certain url
+      const requestExecutor = this.routingController.retrieve(request.url, request.method)
+      switch (requestExecutor.type) {
+        case RouteRetrieval.METHOD_NOT_ALLOWED:
+          throw new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED)
+        case RouteRetrieval.NOT_FOUND:
+          throw new HTTPException(Status.HTTP_404_NOT_FOUND)
+        case RouteRetrieval.OK:
+          break
+      }
+      const executionChain = buildExecutionChain(requestExecutor)
+      await executionChain.run(request, response)
     })
 
   private async withStart(callback: () => Promise<void>): Promise<void> {
@@ -50,31 +52,11 @@ export class RequestPipeline {
     const startEndData = { data: {} }
     this._handleStart$.next(startEndData)
 
+    // Execute the main request
     await callback()
 
     // Message the request end handler
     this._handleEnd$.next(startEndData)
-  }
-}
-
-const catchErrors = async (
-  errorHandlers: ErrorHandler,
-  { request, response }: { request: Request; response: Response },
-  callback: () => Promise<void>
-) => {
-  try {
-    await callback()
-  } catch (e) {
-    if (!(e instanceof HTTPException)) {
-      e = HTTPException.wrap(e as Error, Status.HTTP_500_INTERNAL_SERVER_ERROR)
-    }
-    const error = e as HTTPException
-
-    if (error.status.key in errorHandlers) {
-      errorHandlers[error.status.key]!(error, request, response)
-    } else {
-      errorHandlers.DEFAULT(error, request, response)
-    }
   }
 }
 

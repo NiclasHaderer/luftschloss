@@ -1,8 +1,8 @@
-import { HTTP_METHODS, ROUTE_HANDLER } from "../types/http"
-import { MountingOptions, Router } from "../types/router"
+import { HTTP_METHODS, ROUTE_HANDLER } from "../interfaces/http"
+import { MountingOptions, Router } from "../interfaces/router"
 import { RouteingControllerImpl } from "./route-controller"
-import { ReadonlyRoutingController } from "../types/routing-controller"
-import { MiddleWareInterceptor, MiddlewareRepresentation } from "../types/middleware"
+import { ReadonlyRoutingController } from "../interfaces/routing-controller"
+import { MiddleWareInterceptor, MiddlewareRepresentation } from "../interfaces/middleware"
 
 export class RouterImpl implements Router {
   protected _routingController = new RouteingControllerImpl()

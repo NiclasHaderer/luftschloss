@@ -1,6 +1,6 @@
-import { Request } from "../types/request"
+import { Request } from "../interfaces/request"
 import { IncomingMessage } from "http"
-import { HTTP_METHODS } from "../types/http"
+import { HTTP_METHODS } from "../interfaces/http"
 
 export class RequestImpl<T extends Record<string, any> | unknown = unknown> implements Request<T> {
   private _completed = false

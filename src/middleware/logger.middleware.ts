@@ -1,4 +1,4 @@
-import { MiddleWareInterceptor } from "../core/types/middleware"
+import { MiddleWareInterceptor } from "../core/interfaces/middleware"
 
 export const loggerMiddleware = (): MiddleWareInterceptor => {
   return async (next, request, response) => {

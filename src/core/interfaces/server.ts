@@ -1,5 +1,5 @@
 import { Router } from "./router"
-import { Observable } from "rxjs"
+import { Observable } from "../impl/subject"
 
 export type EventData = {
   data: Record<string, any>

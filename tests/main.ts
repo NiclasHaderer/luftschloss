@@ -1,7 +1,7 @@
-import { createServer } from "./core/impl/server"
-import { createRouter } from "./core/impl/router"
-import { loggerMiddleware } from "./middleware/logger.middleware"
-import { corsMiddleware } from "./middleware/cors.middleware"
+import { corsMiddleware } from "ts-server/middleware/cors.middleware"
+import { createRouter } from "ts-server/core/impl/router"
+import { createServer } from "ts-server/core/impl/server"
+import { loggerMiddleware } from "ts-server/middleware/logger.middleware"
 
 const server = createServer()
 const router = createRouter()

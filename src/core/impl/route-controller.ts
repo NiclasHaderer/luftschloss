@@ -1,11 +1,11 @@
-import { HTTP_METHODS, ROUTE_HANDLER } from "../types/http"
+import { HTTP_METHODS, ROUTE_HANDLER } from "../interfaces/http"
 import {
   isClassMiddleware,
   isHttpMiddleware,
   MiddleWareInterceptor,
   MiddlewareRepresentation,
   MiddlewareType,
-} from "../types/middleware"
+} from "../interfaces/middleware"
 import {
   ReadonlyRoutingController,
   RouteHandler,
@@ -13,7 +13,7 @@ import {
   RouteRetrieval,
   RoutingController,
   SuccessfulRouteLookupResult,
-} from "../types/routing-controller"
+} from "../interfaces/routing-controller"
 
 type StoredRoutes = Record<HTTP_METHODS, Omit<SuccessfulRouteLookupResult, "type"> | null>
 

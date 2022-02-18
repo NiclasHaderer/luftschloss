@@ -1,7 +1,7 @@
-import { ErrorHandler } from "../types/error-handler"
-import { Request } from "../types/request"
+import { ErrorHandler } from "../interfaces/error-handler"
+import { Request } from "../interfaces/request"
 import { HTTPException } from "./http-exception"
-import { Response } from "../types/response"
+import { Response } from "../interfaces/response"
 
 export const defaultErrorHandler: ErrorHandler = {
   DEFAULT(error: HTTPException, request: Request, response: Response): Promise<void> | void {

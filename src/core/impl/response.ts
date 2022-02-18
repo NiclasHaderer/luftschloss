@@ -1,5 +1,5 @@
 import { ServerResponse } from "http"
-import { Response } from "../types/response"
+import { Response } from "../interfaces/response"
 import { Status } from "./status"
 import { ValueOf } from "../types"
 import * as fs from "fs"
