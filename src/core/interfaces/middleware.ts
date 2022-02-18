@@ -17,7 +17,7 @@ export type MiddlewareRepresentation =
       type: MiddlewareType.CLASS
     }
 
-type NextFunction = (request: Request, response: Response) => void | Promise<void>
+export type NextFunction = (request: Request, response: Response) => void | Promise<void>
 
 export type HttpMiddlewareInterceptor = (
   next: NextFunction,

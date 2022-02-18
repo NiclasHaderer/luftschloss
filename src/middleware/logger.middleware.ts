@@ -1,9 +1,11 @@
-import { MiddleWareInterceptor } from "../core/interfaces/middleware"
+import { MiddleWareInterceptor, NextFunction } from "../core/interfaces/middleware"
+import { Request } from "ts-server/core/interfaces/request"
+import { Response } from "ts-server/core/interfaces/response"
 
-export const loggerMiddleware = (): MiddleWareInterceptor => {
-  return async (next, request, response) => {
-    const startTime = Date.now()
-    await next(request, response)
-    console.log(`${new Date().toISOString()} - ${request.url}: ${request.method} took ${Date.now() - startTime}`)
-  }
+const LoggerMiddleware = async (next: NextFunction, request: Request, response: Response) => {
+  const startTime = Date.now()
+  await next(request, response)
+  console.log(`${new Date().toISOString()} - ${request.method}:${request.url} took ${Date.now() - startTime}ms`)
 }
+
+export const loggerMiddleware = (): MiddleWareInterceptor => LoggerMiddleware

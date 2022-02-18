@@ -1,6 +1,6 @@
 import { HTTP_METHODS, ROUTE_HANDLER } from "../interfaces/http"
 import { MountingOptions, Router } from "../interfaces/router"
-import { RouteingControllerImpl } from "./route-controller"
+import { RouteingControllerImpl } from "./routing-controller"
 import { ReadonlyRoutingController } from "../interfaces/routing-controller"
 import { MiddleWareInterceptor, MiddlewareRepresentation } from "../interfaces/middleware"
 

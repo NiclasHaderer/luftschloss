@@ -6,6 +6,7 @@ import { ErrorHandler } from "../interfaces/error-handler"
 import { defaultErrorHandler } from "./error-handler"
 import { errorMiddleware } from "../../middleware/error.middleware"
 import { Observable, Subject } from "./subject"
+import { loggerMiddleware } from "ts-server/middleware/logger.middleware"
 
 class ServerImpl extends RouterImpl implements Server {
   // Emits an event which indicates that the server has started
@@ -50,6 +51,6 @@ class ServerImpl extends RouterImpl implements Server {
 export const createServer = (): Server => {
   const errorHandler = { ...defaultErrorHandler }
   const server = new ServerImpl(errorHandler)
-  server.pipe(errorMiddleware(errorHandler))
+  server.pipe(loggerMiddleware(), errorMiddleware(errorHandler))
   return server
 }

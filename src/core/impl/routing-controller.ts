@@ -49,9 +49,19 @@ export class RouteingControllerImpl implements RoutingController {
       next: (): { done: boolean; value: RouteHandler } => {
         counter += 1
         const done = counter >= handlerCount
+        const handler = handlers[counter]
         return {
           done,
-          value: handlers[counter],
+          value: handler
+            ? {
+                route: {
+                  executor: handler.route.executor,
+                  pipeline: [...this._middleware, ...handler.route.pipeline],
+                },
+                path: handler.path,
+                method: handler.method,
+              }
+            : handler,
         }
       },
     }
@@ -94,7 +104,11 @@ export class RouteingControllerImpl implements RoutingController {
     const route = this._collection.get(path)!
     const executor = route[method]
     if (!executor) return { type: RouteRetrieval.METHOD_NOT_ALLOWED, executor: null, pipeline: null }
-    return { type: RouteRetrieval.OK, executor: executor.executor, pipeline: executor.pipeline }
+    return {
+      type: RouteRetrieval.OK,
+      executor: executor.executor,
+      pipeline: [...this._middleware, ...executor.pipeline],
+    }
   }
 
   private _addToCollection(
@@ -110,7 +124,7 @@ export class RouteingControllerImpl implements RoutingController {
     if (route[method] !== null) {
       throw new Error(`Route ${path} as already a listener for the method ${method}`)
     }
-    route[method] = { executor: callback, pipeline: [...this.middleware, ...pipeline] }
+    route[method] = { executor: callback, pipeline: [...pipeline] }
   }
 
   private static normalize(url: string): string {
