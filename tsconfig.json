@@ -16,9 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
-    "paths": {
-      "ts-server/*": ["src/*"]
-    },
     "downlevelIteration": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,

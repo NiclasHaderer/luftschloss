@@ -1,8 +1,7 @@
-import { Request } from "../interfaces/request"
 import { IncomingMessage } from "http"
-import { HTTP_METHODS } from "../interfaces/http"
+import { HTTP_METHODS } from "./routing-controller.model"
 
-export class RequestImpl<T extends Record<string, any> | unknown = unknown> implements Request<T> {
+export class RequestImpl<T extends Record<string, any> | unknown = unknown> {
   private _completed = false
   private _data = {} as T
 

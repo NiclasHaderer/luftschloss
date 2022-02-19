@@ -1,14 +1,16 @@
-import { EventData, Server } from "../interfaces/server"
 import * as http from "http"
 import { RequestPipeline } from "./request-pipeline"
 import { RouterImpl } from "./router"
-import { ErrorHandler } from "../interfaces/error-handler"
-import { defaultErrorHandler } from "./error-handler"
-import { errorMiddleware } from "../../middleware/error.middleware"
+import { defaultErrorHandler, ErrorHandler } from "./error-handler"
+import { errorMiddleware } from "../middleware/error.middleware"
 import { Observable, Subject } from "./subject"
-import { loggerMiddleware } from "ts-server/middleware/logger.middleware"
+import { loggerMiddleware } from "../middleware/logger.middleware"
 
-class ServerImpl extends RouterImpl implements Server {
+export type EventData = {
+  data: Record<string, any>
+}
+
+class ServerImpl extends RouterImpl {
   // Emits an event which indicates that the server has started
   public readonly handleEnd$: Observable<EventData>
 
@@ -18,6 +20,9 @@ class ServerImpl extends RouterImpl implements Server {
   /* tslint:disable:member-ordering */
   private _shutdown$ = new Subject<void>()
   private _start$ = new Subject<void>()
+
+  private startTime = Date.now()
+
   // Server shutdown event
   public readonly shutdown$ = this._shutdown$.asObservable()
 
@@ -39,16 +44,15 @@ class ServerImpl extends RouterImpl implements Server {
   }
 
   public listen(port: number = 3200): void {
-    const startTime = Date.now()
     this._server.listen(port, "0.0.0.0", () => {
       console.log(`Server is listening on http://0.0.0.0:${port}`)
-      console.log(`Server startup took ${Date.now() - startTime}ms`)
+      console.log(`Server startup took ${Date.now() - this.startTime}ms`)
       this._start$.next()
     })
   }
 }
 
-export const createServer = (): Server => {
+export const createServer = (): ServerImpl => {
   const errorHandler = { ...defaultErrorHandler }
   const server = new ServerImpl(errorHandler)
   server.pipe(loggerMiddleware(), errorMiddleware(errorHandler))

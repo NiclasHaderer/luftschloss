@@ -1,6 +1,7 @@
 // tslint:disable:max-line-length
-import { Request } from "./request"
-import { Response } from "./response"
+
+import { RequestImpl } from "../core/request"
+import { ResponseImpl } from "../core/response"
 
 export enum MiddlewareType {
   HTTP,
@@ -17,15 +18,15 @@ export type MiddlewareRepresentation =
       type: MiddlewareType.CLASS
     }
 
-export type NextFunction = (request: Request, response: Response) => void | Promise<void>
+export type NextFunction = (request: RequestImpl, response: ResponseImpl) => void | Promise<void>
 
 export type HttpMiddlewareInterceptor = (
   next: NextFunction,
-  request: Request,
-  response: Response
+  request: RequestImpl,
+  response: ResponseImpl
 ) => void | Promise<void>
 export type ClassMiddlewareInterceptor = {
-  handle(next: NextFunction, request: Request, response: Response): void | Promise<void>
+  handle(next: NextFunction, request: RequestImpl, response: ResponseImpl): void | Promise<void>
 }
 export type MiddleWareInterceptor = HttpMiddlewareInterceptor | ClassMiddlewareInterceptor
 

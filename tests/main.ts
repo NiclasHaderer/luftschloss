@@ -1,5 +1,5 @@
-import { createRouter } from "ts-server/core/impl/router"
-import { createServer } from "ts-server/core/impl/server"
+import { createServer } from "../src/core/server"
+import { createRouter } from "../src/core/router"
 
 const server = createServer()
 server.get("", (request, response) => response.text("hello world"))

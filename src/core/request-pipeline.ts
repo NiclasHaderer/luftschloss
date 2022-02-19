@@ -1,20 +1,18 @@
 import { IncomingMessage as In, ServerResponse as Out } from "http"
 import { Subject } from "./subject"
-import { EventData } from "../interfaces/server"
 import { RequestImpl } from "./request"
 import {
   ReadonlyRoutingController,
   RouteLookupResult,
   RouteRetrieval,
   SuccessfulRouteLookupResult,
-} from "../interfaces/routing-controller"
-import { ErrorHandler } from "../interfaces/error-handler"
-import { Request } from "../interfaces/request"
+} from "./routing-controller.model"
 import { ResponseImpl } from "./response"
-import { Response } from "../interfaces/response"
-import { HTTPException } from "ts-server/core/impl/http-exception"
-import { Status } from "ts-server/core/impl/status"
-import { MiddlewareRepresentation, MiddlewareType, NextFunction } from "ts-server/core/interfaces/middleware"
+import { Status } from "./status"
+import { ErrorHandler } from "./error-handler"
+import { HTTPException } from "./http-exception"
+import { MiddlewareRepresentation, MiddlewareType, NextFunction } from "../middleware/middleware"
+import { EventData } from "./server"
 
 export class RequestPipeline {
   /* tslint:disable:member-ordering */
@@ -48,8 +46,8 @@ export class RequestPipeline {
 
   private unwrapExecutor(
     routeLookup: RouteLookupResult,
-    request: Request,
-    response: Response
+    request: RequestImpl,
+    response: ResponseImpl
   ): SuccessfulRouteLookupResult | null {
     switch (routeLookup.type) {
       case RouteRetrieval.METHOD_NOT_ALLOWED: {
@@ -83,9 +81,9 @@ export class RequestPipeline {
 const buildExecutionChain = (route: SuccessfulRouteLookupResult) => {
   const pipeline = [...route.pipeline]
   return {
-    run(request: Request, response: Response): void {
+    run(request: RequestImpl, response: ResponseImpl): void {
       let index = -1
-      const t = (request1: Request, response1: Response) => {
+      const t = (request1: RequestImpl, response1: ResponseImpl) => {
         index += 1
         if (index >= pipeline.length) return route.executor(request1, response1)
         executeMiddleware(pipeline[index], request1, response1, t)
@@ -97,8 +95,8 @@ const buildExecutionChain = (route: SuccessfulRouteLookupResult) => {
 
 const executeMiddleware = (
   middleware: MiddlewareRepresentation,
-  request: Request,
-  response: Response,
+  request: RequestImpl,
+  response: ResponseImpl,
   next: NextFunction
 ) => {
   switch (middleware.type) {

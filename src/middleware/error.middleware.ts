@@ -1,12 +1,12 @@
-import { HttpMiddlewareInterceptor, NextFunction } from "ts-server/core/interfaces/middleware"
-import { HTTPException } from "ts-server/core/impl/http-exception"
-import { Status } from "ts-server/core/impl/status"
-import { ErrorHandler } from "ts-server/core/interfaces/error-handler"
-import { Request } from "ts-server/core/interfaces/request"
-import { Response } from "ts-server/core/interfaces/response"
+import { ErrorHandler } from "../core/error-handler"
+import { Status } from "../core/status"
+import { HttpMiddlewareInterceptor, NextFunction } from "./middleware"
+import { HTTPException } from "../core/http-exception"
+import { RequestImpl } from "../core/request"
+import { ResponseImpl } from "../core/response"
 
 export const errorMiddleware = (errorHandlers: ErrorHandler): HttpMiddlewareInterceptor => {
-  const ErrorMiddleware = async (next: NextFunction, request: Request, response: Response) => {
+  const ErrorMiddleware = async (next: NextFunction, request: RequestImpl, response: ResponseImpl) => {
     try {
       await next(request, response)
     } catch (e) {

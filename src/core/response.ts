@@ -1,12 +1,11 @@
 import { ServerResponse } from "http"
-import { Response } from "../interfaces/response"
 import { Status } from "./status"
 import { ValueOf } from "../types"
 import * as fs from "fs"
 import { ReadStream } from "fs"
 import { HTTPException } from "./http-exception"
 
-export class ResponseImpl implements Response {
+export class ResponseImpl {
   private _status: ValueOf<typeof Status> = Status.HTTP_200_OK
 
   constructor(public readonly res: ServerResponse) {}

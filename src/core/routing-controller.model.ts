@@ -1,5 +1,6 @@
-import { ROUTE_HANDLER, HTTP_METHODS } from "./http"
-import { MiddlewareRepresentation } from "./middleware"
+import { MiddlewareRepresentation } from "../middleware/middleware"
+import { RequestImpl } from "./request"
+import { ResponseImpl } from "./response"
 
 export enum RouteRetrieval {
   NOT_FOUND,
@@ -31,3 +32,13 @@ export interface RoutingController extends ReadonlyRoutingController {
 
   addMany(routes: RoutingController, basePath: string): void
 }
+
+export type HTTP_METHODS = "GET" | "POST" | "DELETE" | "PUT" | "PATCH"
+export const HTTP_METHODS: Record<HTTP_METHODS, HTTP_METHODS> = {
+  DELETE: "DELETE",
+  GET: "GET",
+  PATCH: "PATCH",
+  POST: "POST",
+  PUT: "PUT",
+}
+export type ROUTE_HANDLER = (request: RequestImpl, response: ResponseImpl) => Promise<any> | any

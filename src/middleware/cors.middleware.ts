@@ -1,4 +1,4 @@
-import { HttpMiddlewareInterceptor } from "../core/interfaces/middleware"
+import { HttpMiddlewareInterceptor } from "./middleware"
 
 export const corsMiddleware = (): HttpMiddlewareInterceptor => {
   return (next, request, response) => {
