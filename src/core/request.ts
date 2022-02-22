@@ -1,5 +1,5 @@
 import { IncomingMessage } from "http"
-import { HTTP_METHODS } from "./routing-controller.model"
+import { HTTP_METHODS } from "./route-collector.model"
 
 export class RequestImpl<T extends Record<string, any> | unknown = unknown> {
   private _completed = false

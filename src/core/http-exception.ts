@@ -1,9 +1,16 @@
 import { fromCode, Status } from "./status"
 import { ValueOf } from "../types"
 
+/**
+ * Every custom error has to extend the HTTPException. Otherwise, the error will be treated like an 500
+ */
 export class HTTPException extends Error {
   public readonly status: ValueOf<typeof Status>
 
+  /**
+   * @param status An HttpStatus, or the number of a http status.
+   * @param message If the message is empty the default message of the http status will be used
+   */
   constructor(status: ValueOf<typeof Status> | number, message?: string) {
     super()
 
@@ -22,7 +29,10 @@ export class HTTPException extends Error {
     this.message = message || status.message
   }
 
-  public static wrap(error: Error, status: ValueOf<typeof Status>): HTTPException {
+  /**
+   * Wrap every js error object in a HTTPException
+   */
+  public static wrap(error: Error, status: ValueOf<typeof Status> | number): HTTPException {
     const e = new HTTPException(status, error.message)
     e.stack = error.stack
     return e

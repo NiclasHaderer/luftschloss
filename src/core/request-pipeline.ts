@@ -2,11 +2,11 @@ import { IncomingMessage as In, ServerResponse as Out } from "http"
 import { Subject } from "./subject"
 import { RequestImpl } from "./request"
 import {
-  ReadonlyRoutingController,
+  ReadonlyRouteCollector,
   RouteLookupResult,
-  RouteRetrieval,
+  LookupResultStatus,
   SuccessfulRouteLookupResult,
-} from "./routing-controller.model"
+} from "./route-collector.model"
 import { ResponseImpl } from "./response"
 import { Status } from "./status"
 import { ErrorHandler } from "./error-handler"
@@ -15,15 +15,12 @@ import { MiddlewareRepresentation, MiddlewareType, NextFunction } from "../middl
 import { EventData } from "./server"
 
 export class RequestPipeline {
-  /* tslint:disable:member-ordering */
   private readonly _handleEnd$ = new Subject<EventData>()
   private readonly _handleStart$ = new Subject<EventData>()
   public readonly handleEnd$ = this._handleEnd$.asObservable()
   public readonly handleStart$ = this._handleStart$.asObservable()
 
-  /* tslint:enable:member-ordering */
-
-  constructor(private routingController: ReadonlyRoutingController, private errorHandler: ErrorHandler) {}
+  constructor(private routingController: ReadonlyRouteCollector, private errorHandler: ErrorHandler) {}
 
   public queue = async (req: In, res: Out) =>
     // Add request start and end handling
@@ -40,31 +37,39 @@ export class RequestPipeline {
 
       // Not successful, so ignore it
       if (!requestExecutor) return
+
+      // Create chain which will run the middleware and the callback
       const executionChain = buildExecutionChain(requestExecutor)
       await executionChain.run(request, response)
     })
 
+  /**
+   * Unwrap the routeLookup and handle the case that a route was not found, or the wrong method was used
+   */
   private unwrapExecutor(
     routeLookup: RouteLookupResult,
     request: RequestImpl,
     response: ResponseImpl
   ): SuccessfulRouteLookupResult | null {
-    switch (routeLookup.type) {
-      case RouteRetrieval.METHOD_NOT_ALLOWED: {
+    switch (routeLookup.status) {
+      case LookupResultStatus.METHOD_NOT_ALLOWED: {
         const e = this.errorHandler.HTTP_405_METHOD_NOT_ALLOWED || this.errorHandler.DEFAULT
         e(new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED), request, response)
         return null
       }
-      case RouteRetrieval.NOT_FOUND: {
+      case LookupResultStatus.NOT_FOUND: {
         const e = this.errorHandler.HTTP_404_NOT_FOUND || this.errorHandler.DEFAULT
         e(new HTTPException(Status.HTTP_404_NOT_FOUND), request, response)
         return null
       }
-      case RouteRetrieval.OK:
+      case LookupResultStatus.OK:
         return routeLookup
     }
   }
 
+  /**
+   * Call the request start and request end lifecycle hooks
+   */
   private async withStart(callback: () => Promise<void>): Promise<void> {
     // Create data which will be shared between the start and end handler
     const startEndData = { data: {} }
@@ -81,14 +86,14 @@ export class RequestPipeline {
 const buildExecutionChain = (route: SuccessfulRouteLookupResult) => {
   const pipeline = [...route.pipeline]
   return {
-    run(request: RequestImpl, response: ResponseImpl): void {
+    run(req: RequestImpl, res: ResponseImpl): void {
       let index = -1
-      const t = (request1: RequestImpl, response1: ResponseImpl) => {
+      const executionWrapper = (request: RequestImpl, response: ResponseImpl) => {
         index += 1
-        if (index >= pipeline.length) return route.executor(request1, response1)
-        executeMiddleware(pipeline[index], request1, response1, t)
+        if (index >= pipeline.length) return route.executor(request, response)
+        executeMiddleware(pipeline[index], request, response, executionWrapper)
       }
-      t(request, response)
+      executionWrapper(req, res)
     },
   }
 }
