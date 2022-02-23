@@ -2,17 +2,34 @@ import { ServerResponse } from "http"
 import { Status } from "./status"
 import { ValueOf } from "../types"
 import * as fs from "fs"
-import { ReadStream } from "fs"
 import { HTTPException } from "./http-exception"
+import { Headers } from "./headers"
+import { Stream } from "stream"
 
 export class ResponseImpl {
   private _status: ValueOf<typeof Status> = Status.HTTP_200_OK
+  private _headers = new Headers()
+  private _complete = false
+
+  private data: Stream | Buffer | null | string = null
 
   constructor(public readonly res: ServerResponse) {}
 
-  public bytes(byte: Buffer): this {
-    // TODO add headers
-    this.res.end(byte)
+  public bytes(bytes: Buffer): this {
+    this.data = bytes
+    return this
+  }
+
+  public get complete(): boolean {
+    return this._complete
+  }
+
+  public get headers(): Headers {
+    return this._headers
+  }
+
+  public header(name: string, value: string): this {
+    this._headers.append(name, value)
     return this
   }
 
@@ -27,19 +44,20 @@ export class ResponseImpl {
   }
 
   public html(text: string): this {
-    this.res.writeHead(this._status.code, { "Content-Type": "text/html" })
-    this.res.end(text)
+    this.headers.append("Content-Type", "text/html")
+    this.data = text
     return this
   }
 
   public json(object: any): this {
-    this.res.writeHead(this._status.code, { "Content-Type": "application/json" })
-    this.res.end(JSON.stringify(object))
+    this.headers.append("Content-Type", "application/json")
+    this.data = JSON.stringify(object)
     return this
   }
 
   public redirect(url: string | URL): this {
-    // TODO
+    this.status(Status.HTTP_307_TEMPORARY_REDIRECT)
+    this.headers.append("Location", url.toString())
     return this
   }
 
@@ -48,16 +66,25 @@ export class ResponseImpl {
     return this
   }
 
-  public stream(stream: ReadStream | NodeJS.ReadableStream): this {
-    // TODO add stream headers
-    this.res.statusCode = this._status.code
-    stream.pipe(this.res)
+  public stream(stream: Stream): this {
+    this.data = stream
     return this
   }
 
   public text(text: string): this {
-    this.res.writeHead(this._status.code, { "Content-Type": "text/plain" })
-    this.res.end(text)
+    this.headers.append("Content-Type", "text/plain")
+    this.data = text
     return this
+  }
+
+  private end(): void {
+    this.res.writeHead(this._status.code, this.headers.encode())
+    if (this.data instanceof Stream) {
+      this.data.pipe(this.res)
+    } else {
+      this.res.write(this.data)
+    }
+    this._complete = true
+    this.res.end()
   }
 }
