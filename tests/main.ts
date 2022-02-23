@@ -9,5 +9,12 @@ router.get("/html", (request, response) => response.html("<button>hello world</b
 router.get("error", () => {
   throw new Error("why are you not working")
 })
+
 server.mount(router, { basePath: "hello" })
 server.listen()
+server.start$.toPromise().then(() => {
+  server.shutdown()
+})
+server.shutdown$.toPromise().then(() => {
+  console.log("shutdown complete")
+})

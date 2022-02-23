@@ -4,7 +4,7 @@
     "moduleResolution": "node",
     "target": "ES2020",
     "module": "CommonJS",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "dom"],
     "strict": true,
     "noImplicitReturns": true,
     "noImplicitOverride": true,

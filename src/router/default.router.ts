@@ -1,5 +1,5 @@
 import { MountingOptions, Router } from "../core/router.model"
-import { RouteCollectorImpl } from "../core/route-controller"
+import { RouteCollectorImpl } from "../core/route-collector"
 import { MiddleWareInterceptor } from "../middleware/middleware"
 import { HTTP_METHODS, ReadonlyRouteCollector, ROUTE_HANDLER } from "../core/route-collector.model"
 

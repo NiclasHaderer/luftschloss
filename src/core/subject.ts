@@ -6,6 +6,7 @@ export interface Subscription {
 
 export interface Observable<T> {
   subscribe(callback: EventCallback<T>): Subscription
+  toPromise(): Promise<T | null>
 }
 
 export class Subject<T> implements Observable<T> {

@@ -2,9 +2,9 @@ import { IncomingMessage as In, ServerResponse as Out } from "http"
 import { Subject } from "./subject"
 import { RequestImpl } from "./request"
 import {
-  ReadonlyRouteCollector,
-  RouteLookupResult,
   LookupResultStatus,
+  RetrievableRouteCollector,
+  RouteLookupResult,
   SuccessfulRouteLookupResult,
 } from "./route-collector.model"
 import { ResponseImpl } from "./response"
@@ -20,7 +20,7 @@ export class RequestPipeline {
   public readonly handleEnd$ = this._handleEnd$.asObservable()
   public readonly handleStart$ = this._handleStart$.asObservable()
 
-  constructor(private routingController: ReadonlyRouteCollector, private errorHandler: ErrorHandler) {}
+  constructor(private routingController: RetrievableRouteCollector, private errorHandler: ErrorHandler) {}
 
   public queue = async (req: In, res: Out) =>
     // Add request start and end handling
