@@ -4,17 +4,13 @@ import {
   PathValidator,
   RetrievableRouteCollector,
   RouteLookupResult,
-  SuccessfulRouteLookupResult,
 } from "./route-collector.model"
 import { Router } from "./router.model"
-
-type HttpRouteCollection = Record<HTTP_METHODS, Omit<SuccessfulRouteLookupResult, "status"> | null>
-type PathEntry =
-  | { children: RouteCollection; handler: HttpRouteCollection; isWildcard: false; wildcardParser: null }
-  | { children: RouteCollection; handler: HttpRouteCollection; isWildcard: true; wildcardParser: string }
-type RouteCollection = Map<string, PathEntry>
+import { PathEntry, RouteCollection } from "./route-collector"
 
 export class RouteCollectorWrapper implements RetrievableRouteCollector {
+  private _collection: RouteCollection = new Map<string, PathEntry>()
+
   public retrieve(path: string, method: HTTP_METHODS): RouteLookupResult {
     // TODO
     return { status: LookupResultStatus.NOT_FOUND, executor: null, pipeline: null }

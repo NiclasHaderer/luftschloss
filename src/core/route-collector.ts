@@ -15,10 +15,10 @@ import {
 } from "./route-collector.model"
 
 type HttpRouteCollection = Record<HTTP_METHODS, Omit<SuccessfulRouteLookupResult, "status"> | null>
-type PathEntry =
-  | { children: RouteCollection; handler: HttpRouteCollection; isWildcard: false; wildcardParser: null }
-  | { children: RouteCollection; handler: HttpRouteCollection; isWildcard: true; wildcardParser: string }
-type RouteCollection = Map<string, PathEntry>
+export type PathEntry =
+  | { children: RouteCollection; handler: HttpRouteCollection | null; isWildcard: false; wildcardParser: null }
+  | { children: RouteCollection; handler: HttpRouteCollection | null; isWildcard: true; wildcardParser: string }
+export type RouteCollection = Map<string, PathEntry>
 
 export class RouteCollectorImpl extends BaseRouteCollector implements RouteCollector {
   private _collection: RouteCollection = new Map<string, PathEntry>()
@@ -87,8 +87,6 @@ export class RouteCollectorImpl extends BaseRouteCollector implements RouteColle
   }
 
   private addToCollection(path: string, method: HTTP_METHODS, callback: ROUTE_HANDLER): void {
-    const accessor = BaseRouteCollector.toAccessor(path)
-
     // TODO
   }
 }
