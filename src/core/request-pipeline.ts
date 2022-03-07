@@ -30,7 +30,7 @@ export class RequestPipeline {
       const response = new ResponseImpl(res)
 
       // Get the request handler for a certain url
-      const tmp = this.routingController.retrieve(request.url, request.method)
+      const tmp = this.routingController.retrieve(request.path, request.method)
 
       // Get a successful result and if the lookup was not successful send it to the error handler
       const requestExecutor = this.unwrapExecutor(tmp, request, response)
@@ -44,7 +44,7 @@ export class RequestPipeline {
     })
 
   /**
-   * Unwrap the routeLookup and handle the case that a route was not found, or the wrong method was used
+   * Unwrap the routeLookup and handle the case that a handler was not found, or the wrong method was used
    */
   private unwrapExecutor(
     routeLookup: RouteLookupResult,

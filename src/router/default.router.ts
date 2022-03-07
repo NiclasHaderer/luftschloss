@@ -1,19 +1,31 @@
 import { MountingOptions, Router } from "../core/router.model"
 import { RouteCollectorImpl } from "../core/route-collector"
-import { MiddleWareInterceptor } from "../middleware/middleware"
+import {
+  isClassMiddleware,
+  isHttpMiddleware,
+  MiddleWareInterceptor,
+  MiddlewareRepresentation,
+  MiddlewareType,
+  ReadonlyMiddlewares,
+} from "../middleware/middleware"
 import { HTTP_METHODS, ReadonlyRouteCollector, ROUTE_HANDLER } from "../core/route-collector.model"
 
 export class DefaultRouter implements Router {
+  private _middleware: MiddlewareRepresentation[] = []
   private readonly _routeCollector = new RouteCollectorImpl()
-  private readonly subRoutes: { router: Router; options: MountingOptions }[] = []
+  private readonly subRouters: { router: Router; options: MountingOptions }[] = []
   protected locked = false
 
   public get children(): { router: Router; options: MountingOptions }[] {
-    return this.subRoutes
+    return this.subRouters
   }
 
   public get routes(): ReadonlyRouteCollector {
     return this._routeCollector
+  }
+
+  public get middleware(): ReadonlyMiddlewares {
+    return this._middleware
   }
 
   public mount(routers: Router | Router[], options: MountingOptions = {}): this {
@@ -26,7 +38,7 @@ export class DefaultRouter implements Router {
     }
 
     for (const router of routers) {
-      this.subRoutes.push({ router, options })
+      this.subRouters.push({ router, options })
     }
 
     return this
@@ -34,7 +46,7 @@ export class DefaultRouter implements Router {
 
   public lock(): void {
     this.locked = true
-    this.subRoutes.map(r => r.router).forEach(r => r.lock())
+    this.subRouters.map(r => r.router).forEach(r => r.lock())
   }
 
   public pipe(...middleware: MiddleWareInterceptor[]): this {
@@ -42,8 +54,18 @@ export class DefaultRouter implements Router {
       throw new Error("Router has been locked. You cannot add a new middleware")
     }
 
-    this._routeCollector.addMiddleware(...middleware)
+    this.addMiddleware(...middleware)
     return this
+  }
+
+  public addMiddleware(...middlewareList: MiddleWareInterceptor[]): void {
+    for (const middleware of middlewareList) {
+      if (isClassMiddleware(middleware)) {
+        this._middleware.push({ type: MiddlewareType.CLASS, rep: middleware })
+      } else if (isHttpMiddleware(middleware)) {
+        this._middleware.push({ type: MiddlewareType.HTTP, rep: middleware })
+      }
+    }
   }
 
   public handle(method: HTTP_METHODS | "*", url: string, callback: ROUTE_HANDLER): void {

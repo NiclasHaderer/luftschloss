@@ -1,69 +1,31 @@
 import {
-  isClassMiddleware,
-  isHttpMiddleware,
-  MiddleWareInterceptor,
-  MiddlewareRepresentation,
-  MiddlewareType,
-} from "../middleware/middleware"
-import {
   BaseRouteCollector,
   CollectionEntry,
   HTTP_METHODS,
   ROUTE_HANDLER,
   RouteCollector,
-  SuccessfulRouteLookupResult,
 } from "./route-collector.model"
 
-type HttpRouteCollection = Record<HTTP_METHODS, Omit<SuccessfulRouteLookupResult, "status"> | null>
-export type PathEntry =
-  | { children: RouteCollection; handler: HttpRouteCollection | null; isWildcard: false; wildcardParser: null }
-  | { children: RouteCollection; handler: HttpRouteCollection | null; isWildcard: true; wildcardParser: string }
-export type RouteCollection = Map<string, PathEntry>
+export type HttpRouteCollection = Record<HTTP_METHODS, ROUTE_HANDLER | null>
+export type RouteCollection = Map<string, HttpRouteCollection>
 
 export class RouteCollectorImpl extends BaseRouteCollector implements RouteCollector {
-  private _collection: RouteCollection = new Map<string, PathEntry>()
-  private _middleware: MiddlewareRepresentation[] = []
+  private _collection: RouteCollection = new Map<string, HttpRouteCollection>()
 
   private get handlers(): CollectionEntry[] {
     return [...this._collection.entries()].flatMap(([path, routeHandler]) =>
-      Object.entries(routeHandler)
+      (Object.entries(routeHandler) as [HTTP_METHODS, ROUTE_HANDLER | null][])
         .filter(([_, handler]) => !!handler)
-        .map(
-          ([method, handler]) =>
-            ({
-              method,
-              path,
-              route: handler,
-            } as CollectionEntry)
-        )
+        .map(([method, handler]) => ({
+          method,
+          path,
+          handler: handler as ROUTE_HANDLER,
+        }))
     )
   }
 
-  public entries(): Iterator<CollectionEntry> {
-    const handlers = this.handlers
-    const handlerCount = handlers.length
-    let counter = -1
-
-    return {
-      next: (): { done: boolean; value: CollectionEntry } => {
-        counter += 1
-        const done = counter >= handlerCount
-        const handler = handlers[counter]
-        return {
-          done,
-          value: handler
-            ? {
-                ...handler,
-                route: {
-                  ...handler.route,
-                  // Merge the route pipeline with the middleware associated to the route collection
-                  pipeline: [...this._middleware, ...handler.route.pipeline],
-                },
-              }
-            : handler,
-        }
-      },
-    }
+  public entries(): Iterable<CollectionEntry> {
+    return this.handlers
   }
 
   public add(path: string, method: HTTP_METHODS | "*", callback: ROUTE_HANDLER): void {
@@ -76,17 +38,15 @@ export class RouteCollectorImpl extends BaseRouteCollector implements RouteColle
     }
   }
 
-  public addMiddleware(...middlewareList: MiddleWareInterceptor[]): void {
-    for (const middleware of middlewareList) {
-      if (isClassMiddleware(middleware)) {
-        this._middleware.push({ type: MiddlewareType.CLASS, rep: middleware })
-      } else if (isHttpMiddleware(middleware)) {
-        this._middleware.push({ type: MiddlewareType.HTTP, rep: middleware })
-      }
-    }
-  }
-
   private addToCollection(path: string, method: HTTP_METHODS, callback: ROUTE_HANDLER): void {
-    // TODO
+    if (!this._collection.has(path)) {
+      this._collection.set(path, { DELETE: null, GET: null, PATCH: null, POST: null, PUT: null })
+    }
+    const collection = this._collection.get(path)!
+    if (collection[method as HTTP_METHODS]) {
+      throw new Error(`Route ${path} already has a handler registered. Registering handlers twice is not possible`)
+    }
+
+    collection[method as HTTP_METHODS] = callback
   }
 }

@@ -35,7 +35,8 @@ class ServerImpl extends DefaultRouter {
   constructor(private errorResponseHandler: ErrorHandler) {
     super()
     this.routeCollector = new RouteCollectorWrapper()
-    this.routeCollector.addPathValidator(stringPathValidator()).addPathValidator(numberPathValidator())
+      .addPathValidator(stringPathValidator())
+      .addPathValidator(numberPathValidator())
     this._requestPipeline = new RequestPipeline(this.routeCollector, errorResponseHandler)
     this.handleStart$ = this._requestPipeline.handleStart$
     this.handleEnd$ = this._requestPipeline.handleEnd$
@@ -44,13 +45,18 @@ class ServerImpl extends DefaultRouter {
     })
   }
 
-  public withPathValidator(validator: PathValidator<any>): this {
+  public addPathValidator(validator: PathValidator<any>): this {
     this.routeCollector.addPathValidator(validator)
     return this
   }
 
+  public override lock(): void {
+    this.routeCollector.lock()
+    super.lock()
+  }
+
   public async listen(port: number = 3200): Promise<void> {
-    this.routeCollector.mergeIn(this)
+    this.routeCollector.mergeIn(this, { basePath: "/" }, this.middleware)
     this.lock()
 
     this._server.listen(port, "0.0.0.0", () => {

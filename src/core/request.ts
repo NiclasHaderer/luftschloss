@@ -15,11 +15,19 @@ export class RequestImpl<T extends Record<string, any> | unknown = unknown> {
     return this._data
   }
 
+  get parameters(): URLSearchParams {
+    return this.url.searchParams
+  }
+
+  get path(): string {
+    return this.url.pathname
+  }
+
   get method(): HTTP_METHODS {
     return this.req.method as HTTP_METHODS
   }
 
-  get url(): string {
-    return this.req.url as string
+  get url(): URL {
+    return new URL(this.req.url!)
   }
 }

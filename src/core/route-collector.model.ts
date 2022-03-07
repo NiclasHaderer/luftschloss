@@ -37,13 +37,13 @@ export type RouteLookupResult = UnSuccessfulRouteLookupResult | SuccessfulRouteL
 /**
  * An entry with all the necessary information like attached middleware... which can be used to invoke a route handler
  */
-export type CollectionEntry = { method: HTTP_METHODS; path: string; route: Omit<SuccessfulRouteLookupResult, "status"> }
+export type CollectionEntry = { method: HTTP_METHODS; path: string; handler: ROUTE_HANDLER }
 
 /**
  * Collector which can not be modified
  */
 export interface ReadonlyRouteCollector {
-  entries(): Iterator<CollectionEntry>
+  entries(): Iterable<CollectionEntry>
 }
 
 export type PathValidator<T extends {}> = {
@@ -55,8 +55,6 @@ export type PathValidator<T extends {}> = {
  * Interface which has to be implemented by every collector which wants to bundle routes
  */
 export interface RouteCollector extends ReadonlyRouteCollector {
-  addMiddleware(...middlewareList: MiddleWareInterceptor[]): void
-
   add(path: string, method: HTTP_METHODS | "*", callback: ROUTE_HANDLER): void
 }
 
@@ -129,5 +127,5 @@ export abstract class BaseRouteCollector implements ReadonlyRouteCollector {
       })
   }
 
-  public abstract entries(): Iterator<CollectionEntry>
+  public abstract entries(): Iterable<CollectionEntry>
 }

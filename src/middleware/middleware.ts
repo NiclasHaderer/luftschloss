@@ -18,6 +18,8 @@ export type MiddlewareRepresentation =
       type: MiddlewareType.CLASS
     }
 
+export type ReadonlyMiddlewares = Readonly<Readonly<MiddlewareRepresentation>[]>
+
 export type NextFunction = (request: RequestImpl, response: ResponseImpl) => void | Promise<void>
 
 export type HttpMiddlewareInterceptor = (
