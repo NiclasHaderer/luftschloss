@@ -1,15 +1,10 @@
-import {
-  BaseRouteCollector,
-  CollectionEntry,
-  HTTP_METHODS,
-  ROUTE_HANDLER,
-  RouteCollector,
-} from "./route-collector.model"
+import { CollectionEntry, HTTP_METHODS, ROUTE_HANDLER, RouteCollector } from "./route-collector.model"
+import { normalizePath } from "./utils"
 
 export type HttpRouteCollection = Record<HTTP_METHODS, ROUTE_HANDLER | null>
 export type RouteCollection = Map<string, HttpRouteCollection>
 
-export class RouteCollectorImpl extends BaseRouteCollector implements RouteCollector {
+export class RouteCollectorImpl implements RouteCollector {
   private _collection: RouteCollection = new Map<string, HttpRouteCollection>()
 
   private get handlers(): CollectionEntry[] {
@@ -29,6 +24,7 @@ export class RouteCollectorImpl extends BaseRouteCollector implements RouteColle
   }
 
   public add(path: string, method: HTTP_METHODS | "*", callback: ROUTE_HANDLER): void {
+    path = normalizePath(path)
     if (method === "*") {
       Object.values(HTTP_METHODS).forEach(m => {
         this.addToCollection(path, m, callback)

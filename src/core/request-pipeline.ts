@@ -3,9 +3,9 @@ import { Subject } from "./subject"
 import { RequestImpl } from "./request"
 import {
   LookupResultStatus,
-  RetrievableRouteCollector,
   RouteLookupResult,
   SuccessfulRouteLookupResult,
+  UnSuccessfulRouteLookupResult,
 } from "./route-collector.model"
 import { ResponseImpl } from "./response"
 import { Status } from "./status"
@@ -13,16 +13,21 @@ import { ErrorHandler } from "./error-handler"
 import { HTTPException } from "./http-exception"
 import { MiddlewareRepresentation, MiddlewareType, NextFunction } from "../middleware/middleware"
 import { EventData } from "./server"
+import { MergedRoute } from "./router-merger"
 
 export class RequestPipeline {
   private readonly _handleEnd$ = new Subject<EventData>()
   private readonly _handleStart$ = new Subject<EventData>()
   public readonly handleEnd$ = this._handleEnd$.asObservable()
   public readonly handleStart$ = this._handleStart$.asObservable()
+  private locked = false
+  private routes!: Iterator<MergedRoute>
 
-  constructor(private routingController: RetrievableRouteCollector, private errorHandler: ErrorHandler) {}
+  constructor(private errorHandler: ErrorHandler) {}
 
-  public queue = async (req: In, res: Out) =>
+  public async queue(req: In, res: Out): Promise<void> {
+    if (!this.locked) throw new Error("RequestPipeline has not been locked. You have to lock it in order to use it")
+
     // Add request start and end handling
     this.withStart(async () => {
       // Wrap the node request/response in own implementation
@@ -30,23 +35,25 @@ export class RequestPipeline {
       const response = new ResponseImpl(res)
 
       // Get the request handler for a certain url
-      const tmp = this.routingController.retrieve(request.path, request.method)
+      // TODO
+      const tmp: UnSuccessfulRouteLookupResult | SuccessfulRouteLookupResult = null!
 
       // Get a successful result and if the lookup was not successful send it to the error handler
-      const requestExecutor = this.unwrapExecutor(tmp, request, response)
+      const requestExecutor = this.retrieveExecutor(tmp, request, response)
 
       // Not successful, so ignore it
       if (!requestExecutor) return
 
       // Create chain which will run the middleware and the callback
-      const executionChain = buildExecutionChain(requestExecutor)
+      const executionChain = buildMiddlewareExecutionChain(requestExecutor)
       await executionChain.run(request, response)
     })
+  }
 
   /**
    * Unwrap the routeLookup and handle the case that a handler was not found, or the wrong method was used
    */
-  private unwrapExecutor(
+  private retrieveExecutor(
     routeLookup: RouteLookupResult,
     request: RequestImpl,
     response: ResponseImpl
@@ -81,9 +88,15 @@ export class RequestPipeline {
     // Message the request end handler
     this._handleEnd$.next(startEndData)
   }
+
+  public lock(entries: Iterator<MergedRoute>): void {
+    if (this.locked) throw new Error("Cannot lock the request pipeline a second time")
+    this.locked = true
+    this.routes = entries
+  }
 }
 
-const buildExecutionChain = (route: SuccessfulRouteLookupResult) => {
+const buildMiddlewareExecutionChain = (route: SuccessfulRouteLookupResult) => {
   const pipeline = [...route.pipeline]
   return {
     run(req: RequestImpl, res: ResponseImpl): void {

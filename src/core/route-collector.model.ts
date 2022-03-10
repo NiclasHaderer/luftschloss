@@ -52,6 +52,7 @@ export interface ReadonlyRouteCollector {
  */
 export interface RouteCollector extends ReadonlyRouteCollector {
   add(path: string, method: HTTP_METHODS | "*", callback: ROUTE_HANDLER): void
+  entries(): Iterable<CollectionEntry>
 }
 
 /**
@@ -78,50 +79,4 @@ export const HTTP_METHODS: Record<HTTP_METHODS, HTTP_METHODS> = {
   PATCH: "PATCH",
   POST: "POST",
   PUT: "PUT",
-}
-
-export abstract class BaseRouteCollector implements ReadonlyRouteCollector {
-  protected static normalize(url: string): string {
-    if (!url.startsWith("/")) {
-      url = `/${url}`
-    }
-    if (!url.endsWith("/")) {
-      url += "/"
-    }
-    // Replace // with /
-    return url.replaceAll("//", "/")
-  }
-
-  protected static toAccessor(
-    url: string
-  ): (
-    | { path: string; isWildcard: false }
-    | { path: string; isWildcard: true; pathKey: string; extractor: string | null }
-  )[] {
-    url = BaseRouteCollector.normalize(url)
-    const isWildcard = /^{.*}$/
-    const extractorR = /{.*:(.*)}/
-    const pathR = /{(.*):?.*}/
-
-    return url
-      .split("/")
-      .filter(path => !!path)
-      .map(path => {
-        const extractorMatch = path.match(extractorR)
-        const extractor = extractorMatch ? extractorMatch[1] : null
-
-        const pathMatch = path.match(pathR)
-        const pathKey = pathMatch ? pathMatch[1] : null
-        return {
-          path,
-          pathKey,
-          extractor,
-          isWildcard: isWildcard.test(path),
-        } as
-          | { path: string; isWildcard: false }
-          | { path: string; isWildcard: true; pathKey: string; extractor: string | null }
-      })
-  }
-
-  public abstract entries(): Iterable<CollectionEntry>
 }
