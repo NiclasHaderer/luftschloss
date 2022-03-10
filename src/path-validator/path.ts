@@ -1,10 +1,9 @@
-import { PathValidator } from "../core/route-collector.model"
+import { PathValidator } from "./validator"
 
 const PathPathValidator: PathValidator<string> = {
   name: "uuid",
-  validate(value: string): [true, string] | [false, null] {
-    //TODO
-  },
+  regex: /.*/,
+  convert: value => value,
 }
 
 export const pathPathValidator = () => PathPathValidator

@@ -1,6 +1,7 @@
-import { MiddleWareInterceptor, MiddlewareRepresentation } from "../middleware/middleware"
+import { MiddlewareRepresentation } from "../middleware/middleware"
 import { RequestImpl } from "./request"
 import { ResponseImpl } from "./response"
+import { PathValidator } from "../path-validator/validator"
 
 /**
  * Indicate weather the route retrieval was successful
@@ -44,11 +45,6 @@ export type CollectionEntry = { method: HTTP_METHODS; path: string; handler: ROU
  */
 export interface ReadonlyRouteCollector {
   entries(): Iterable<CollectionEntry>
-}
-
-export type PathValidator<T extends {}> = {
-  name: string
-  validate: (value: string) => [true, T] | [false, null]
 }
 
 /**

@@ -1,11 +1,10 @@
-import { PathValidator } from "../core/route-collector.model"
+import { PathValidator } from "./validator"
 
 const NumberPathValidator: PathValidator<number> = {
   name: "number",
-  validate(value: string): [true, number] | [false, null] {
-    const num = parseFloat(value)
-    const isNan = Number.isNaN(num)
-    return [!isNan, isNan ? null : num] as [true, number] | [false, null]
+  regex: /[+-]?(?:[0-9]*[.])?[0-9]+/,
+  convert(value: string): number {
+    return parseFloat(value)
   },
 }
 
