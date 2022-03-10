@@ -12,9 +12,3 @@ router.get("error", () => {
 
 server.mount(router, { basePath: "hello" })
 server.listen()
-server.start$.toPromise().then(() => {
-  server.shutdown()
-})
-server.shutdown$.toPromise().then(() => {
-  console.log("shutdown complete")
-})

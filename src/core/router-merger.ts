@@ -2,28 +2,31 @@ import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
 import { MountingOptions, Router } from "./router.model"
 import { ReadonlyMiddlewares } from "../middleware/middleware"
 import { normalizePath } from "./utils"
+import { PathValidators, toRegex } from "../path-validator/validator"
 
 type FinishedRoute = {
   pipeline: ReadonlyMiddlewares
   executor: ROUTE_HANDLER
 }
 
-// TODO path has to become type regex
-type Path = string
+type Path = RegExp
 export type MergedRoute = [Path, Record<HTTP_METHODS, FinishedRoute | null>]
+export type MergedRoutes = Readonly<Readonly<MergedRoute>[]>
 
 export class RouterMerger {
   private _collection = new Map<string, Record<HTTP_METHODS, FinishedRoute | null>>()
   private locked = false
 
-  public entries(): Iterator<MergedRoute> {
+  constructor(private validators: PathValidators) {}
+
+  public entries(): MergedRoutes {
     if (!this.locked) throw new Error("Cannot retrieve routes because RouteMerger is not locked")
-    return this._collection.entries()
+    return [...this._collection.entries()].map(([path, value]) => {
+      return [toRegex(path, this.validators), value]
+    })
   }
 
   public mergeIn(router: Router, { basePath }: MountingOptions, parentPipeline: ReadonlyMiddlewares): void {
-    // TODO merge into a regex which includes the validators
-    // TODO save which capture group represents which param name
     if (this.locked) throw new Error("Route merger has been locked. You cannot add new routers.")
     for (let { handler, path, method } of router.routes.entries()) {
       path = normalizePath(`${basePath}/${path}`)

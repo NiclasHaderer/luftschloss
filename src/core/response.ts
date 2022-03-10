@@ -61,6 +61,10 @@ export class ResponseImpl {
     return this
   }
 
+  public getStatus(): ValueOf<typeof Status> {
+    return this._status
+  }
+
   public status(status: ValueOf<typeof Status>): this {
     this._status = status
     return this

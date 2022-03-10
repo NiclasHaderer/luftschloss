@@ -1,11 +1,12 @@
 import { IncomingMessage } from "http"
 import { HTTP_METHODS } from "./route-collector.model"
+import { normalizePath } from "./utils"
 
 export class RequestImpl<T extends Record<string, any> | unknown = unknown> {
   private _completed = false
   private _data = {} as T
 
-  constructor(public readonly req: IncomingMessage) {}
+  constructor(private readonly req: IncomingMessage, private readonly port: number) {}
 
   get completed(): boolean {
     return this._completed
@@ -28,6 +29,7 @@ export class RequestImpl<T extends Record<string, any> | unknown = unknown> {
   }
 
   get url(): URL {
-    return new URL(this.req.url!)
+    // TODO http or https
+    return new URL(`http://0.0.0.0:${this.port}${normalizePath(this.req.url!)}`)
   }
 }
