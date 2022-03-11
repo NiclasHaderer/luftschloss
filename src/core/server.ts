@@ -1,6 +1,7 @@
 import * as http from "http"
+import { Server } from "http"
 import { RequestPipeline } from "./request-pipeline"
-import { defaultErrorHandler, ErrorHandler } from "./error-handler"
+import { defaultErrorHandler } from "./error-handler"
 import { errorMiddleware } from "../middleware/error.middleware"
 import { Observable, Subject } from "./subject"
 import { loggerMiddleware } from "../middleware/logger.middleware"
@@ -9,6 +10,7 @@ import { RouterMerger } from "./router-merger"
 import { requestCompleter } from "../middleware/request-completer.middleware"
 import { PathValidator, PathValidators } from "../path-validator/validator"
 import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator } from "../path-validator/default"
+import { Duplex } from "stream"
 
 export type EventData = {
   data: Record<string, any>
@@ -21,6 +23,7 @@ class ServerImpl extends DefaultRouter {
   private readonly requestPipeline: RequestPipeline
   private readonly server: http.Server
   private readonly routeMerger: RouterMerger
+  private readonly openSockets = new Set<Duplex>()
   private validators: PathValidators = {
     [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
   }
@@ -34,10 +37,10 @@ class ServerImpl extends DefaultRouter {
   // Server start event
   public readonly start$ = this._start$.asObservable()
 
-  constructor(private errorResponseHandler: ErrorHandler) {
+  constructor() {
     super()
     this.routeMerger = new RouterMerger(this.validators)
-    this.requestPipeline = new RequestPipeline(errorResponseHandler)
+    this.requestPipeline = new RequestPipeline(this.middleware)
     this.handleStart$ = this.requestPipeline.handleStart$
     this.handleEnd$ = this.requestPipeline.handleEnd$
     this.server = http.createServer(async (req, res) => {
@@ -74,17 +77,21 @@ class ServerImpl extends DefaultRouter {
   }
 
   public async listen(port: number = 3200): Promise<void> {
-    this.routeMerger.mergeIn(this, { basePath: "/" }, this.middleware)
+    this.routeMerger.mergeIn(this, { basePath: "/" }, [])
     this.lock()
     this.requestPipeline.lock(this.routeMerger.entries(), port)
 
-    this.server.listen(port, "0.0.0.0", () => {
+    const runningServer = this.server.listen(port, "0.0.0.0", () => {
       console.log(`Server is listening on http://0.0.0.0:${port}`)
       console.log(`Server startup took ${Date.now() - this.startTime}ms`)
       this._start$.next()
       this._start$.complete()
     })
 
+    // Collect the sockets, so I can gracefully shut down the server
+    this.collectOpenConnections(runningServer)
+
+    // Wait for a server shutdown
     await new Promise<void>(resolve => {
       process.on(`SIGINT`, async () => {
         await this.shutdown()
@@ -92,18 +99,31 @@ class ServerImpl extends DefaultRouter {
       })
       process.on(`exit`, resolve)
     })
+
+    // Inform any shutdown event listener
     await this._shutdown$.nextAsync()
     this._shutdown$.complete()
   }
 
-  public shutdown(): Promise<Error | undefined> {
-    return new Promise(resolve => this.server.close(resolve))
+  private collectOpenConnections(server: Server): void {
+    server.on("connection", socket => {
+      this.openSockets.add(socket)
+      socket.on("close", () => this.openSockets.delete(socket))
+    })
+  }
+
+  public shutdown({ gracePeriod } = { gracePeriod: 100 }): Promise<Error | undefined> {
+    return new Promise(resolve => {
+      this.server.close(resolve)
+      setTimeout(() => {
+        this.openSockets.forEach(s => s.destroy())
+      }, gracePeriod)
+    })
   }
 }
 
 export const defaultServer = (): ServerImpl => {
-  const errorHandler = { ...defaultErrorHandler }
-  const server = new ServerImpl(errorHandler)
-  server.pipe(loggerMiddleware(), requestCompleter(), errorMiddleware(errorHandler))
+  const server = new ServerImpl()
+  server.pipe(loggerMiddleware(), requestCompleter(), errorMiddleware(defaultErrorHandler))
   return server
 }
