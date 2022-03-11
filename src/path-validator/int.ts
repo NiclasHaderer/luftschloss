@@ -1,7 +1,7 @@
 import { PathValidator } from "./validator"
 
 const IntPathValidator: PathValidator<number> = {
-  name: "number",
+  name: "int",
   regex: /[+-]?\d+/,
   convert(value: string): number {
     return parseInt(value, 10)

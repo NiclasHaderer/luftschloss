@@ -30,8 +30,11 @@ export class RequestPipeline {
       const request = new RequestImpl(req, this.port)
       const response = new ResponseImpl(res)
 
+      // TODO default response to options request (middleware?)
+
       // Get the request handler for a certain url
       const route = resolveRoute(request.path, request.method, this.routes)
+      request._setPathParams(route.pathParams || {})
 
       // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
       // method not allowed executor

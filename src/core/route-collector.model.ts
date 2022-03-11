@@ -17,6 +17,7 @@ export enum LookupResultStatus {
  */
 export type SuccessfulRouteLookupResult = {
   executor: ROUTE_HANDLER
+  pathParams: Record<string, unknown>
   pipeline: Iterable<MiddlewareRepresentation>
   status: LookupResultStatus.OK
 }
@@ -27,6 +28,7 @@ export type SuccessfulRouteLookupResult = {
 export type UnSuccessfulRouteLookupResult = {
   executor: null
   pipeline: null
+  pathParams: null
   status: LookupResultStatus.METHOD_NOT_ALLOWED | LookupResultStatus.NOT_FOUND
 }
 

@@ -2,7 +2,7 @@ import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
 import { MountingOptions, Router } from "./router.model"
 import { ReadonlyMiddlewares } from "../middleware/middleware"
 import { normalizePath } from "./utils"
-import { PathValidators, toRegex } from "../path-validator/validator"
+import { PathConverter, PathValidators, toRegex } from "../path-validator/validator"
 
 type FinishedRoute = {
   pipeline: ReadonlyMiddlewares
@@ -10,7 +10,7 @@ type FinishedRoute = {
 }
 
 type Path = RegExp
-export type MergedRoute = [Path, Record<HTTP_METHODS, FinishedRoute | null>]
+export type MergedRoute = [[Path, PathConverter], Record<HTTP_METHODS, FinishedRoute | null>]
 export type MergedRoutes = Readonly<Readonly<MergedRoute>[]>
 
 export class RouterMerger {

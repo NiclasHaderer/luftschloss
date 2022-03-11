@@ -11,6 +11,11 @@ import { requestCompleter } from "../middleware/request-completer.middleware"
 import { PathValidator, PathValidators } from "../path-validator/validator"
 import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator } from "../path-validator/default"
 import { Duplex } from "stream"
+import { intPathValidator } from "../path-validator/int"
+import { numberPathValidator } from "../path-validator/number"
+import { pathPathValidator } from "../path-validator/path"
+import { uuidPathValidator } from "../path-validator/uuid_string"
+import { stringPathValidator } from "../path-validator/string"
 
 export type EventData = {
   data: Record<string, any>
@@ -125,5 +130,11 @@ class ServerImpl extends DefaultRouter {
 export const defaultServer = (): ServerImpl => {
   const server = new ServerImpl()
   server.pipe(loggerMiddleware(), requestCompleter(), errorMiddleware(defaultErrorHandler))
+  server
+    .addPathValidator(intPathValidator())
+    .addPathValidator(numberPathValidator())
+    .addPathValidator(pathPathValidator())
+    .addPathValidator(stringPathValidator())
+    .addPathValidator(uuidPathValidator())
   return server
 }
