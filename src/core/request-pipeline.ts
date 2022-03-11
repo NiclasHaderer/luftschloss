@@ -1,17 +1,11 @@
 import { IncomingMessage as In, ServerResponse as Out } from "http"
 import { Subject } from "./subject"
 import { RequestImpl } from "./request"
-import {
-  LookupResultStatus,
-  RouteLookupResult,
-  SuccessfulRouteLookupResult,
-  UnSuccessfulRouteLookupResult,
-} from "./route-collector.model"
+import { LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
 import { ResponseImpl } from "./response"
 import { Status } from "./status"
-import { ErrorHandler } from "./error-handler"
 import { HTTPException } from "./http-exception"
-import { MiddlewareRepresentation, MiddlewareType, NextFunction } from "../middleware/middleware"
+import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware/middleware"
 import { EventData } from "./server"
 import { MergedRoutes } from "./router-merger"
 import { resolveRoute } from "./resolve-route"
@@ -25,7 +19,7 @@ export class RequestPipeline {
   private routes!: Readonly<MergedRoutes>
   private port!: number
 
-  constructor(private errorHandler: ErrorHandler) {}
+  constructor(private mandatoryMiddleware: ReadonlyMiddlewares) {}
 
   public async queue(req: In, res: Out): Promise<void> {
     if (!this.locked) throw new Error("RequestPipeline has not been locked. You have to lock it in order to use it")
@@ -37,17 +31,11 @@ export class RequestPipeline {
       const response = new ResponseImpl(res)
 
       // Get the request handler for a certain url
-      const tmp: UnSuccessfulRouteLookupResult | SuccessfulRouteLookupResult = resolveRoute(
-        request.path,
-        request.method,
-        this.routes
-      )
+      const route = resolveRoute(request.path, request.method, this.routes)
 
-      // Get a successful result and if the lookup was not successful send it to the error handler
-      const requestExecutor = await this.retrieveExecutor(tmp, request, response)
-
-      // Not successful, so ignore it
-      if (!requestExecutor) return
+      // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
+      // method not allowed executor
+      const requestExecutor = this.retrieveExecutor(route)
 
       // Create chain which will run the middleware and the callback
       const executionChain = buildMiddlewareExecutionChain(requestExecutor)
@@ -58,22 +46,26 @@ export class RequestPipeline {
   /**
    * Unwrap the routeLookup and handle the case that a handler was not found, or the wrong method was used
    */
-  private async retrieveExecutor(
-    routeLookup: RouteLookupResult,
-    request: RequestImpl,
-    response: ResponseImpl
-  ): Promise<SuccessfulRouteLookupResult | null> {
-    // TODO Request does not go through default middleware and gets not logged/completed
+  private retrieveExecutor(routeLookup: RouteLookupResult): {
+    executor: ROUTE_HANDLER
+    pipeline: Iterable<MiddlewareRepresentation>
+  } {
     switch (routeLookup.status) {
       case LookupResultStatus.METHOD_NOT_ALLOWED: {
-        const e = this.errorHandler.HTTP_405_METHOD_NOT_ALLOWED || this.errorHandler.DEFAULT
-        await e(new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED), request, response)
-        return null
+        return {
+          executor: () => {
+            throw new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED)
+          },
+          pipeline: this.mandatoryMiddleware,
+        }
       }
       case LookupResultStatus.NOT_FOUND: {
-        const e = this.errorHandler.HTTP_404_NOT_FOUND || this.errorHandler.DEFAULT
-        await e(new HTTPException(Status.HTTP_404_NOT_FOUND), request, response)
-        return null
+        return {
+          executor: () => {
+            throw new HTTPException(Status.HTTP_404_NOT_FOUND)
+          },
+          pipeline: this.mandatoryMiddleware,
+        }
       }
       case LookupResultStatus.OK:
         return routeLookup
@@ -103,7 +95,10 @@ export class RequestPipeline {
   }
 }
 
-const buildMiddlewareExecutionChain = (route: SuccessfulRouteLookupResult) => {
+const buildMiddlewareExecutionChain = (route: {
+  executor: ROUTE_HANDLER
+  pipeline: Iterable<MiddlewareRepresentation>
+}) => {
   const pipeline = [...route.pipeline]
   return {
     run(req: RequestImpl, res: ResponseImpl): void {
