@@ -1,6 +1,9 @@
 import { IncomingMessage } from "http"
 import { HTTP_METHODS } from "./route-collector.model"
+import { URL } from "url"
 import { normalizePath } from "./utils"
+import { AddressInfo } from "net"
+import { TLSSocket } from "tls"
 
 export class RequestImpl<
   T extends Record<string, any> | unknown = unknown,
@@ -10,7 +13,7 @@ export class RequestImpl<
   private _data = {} as T
   private _pathParams = {} as P
 
-  constructor(private readonly req: IncomingMessage, private readonly port: number) {}
+  constructor(private readonly req: IncomingMessage) {}
 
   get completed(): boolean {
     return this._completed
@@ -44,7 +47,11 @@ export class RequestImpl<
   }
 
   get url(): URL {
-    // TODO http or https
-    return new URL(`http://0.0.0.0:${this.port}${normalizePath(this.req.url!)}`)
+    const { port, address } = this.req.socket.address() as AddressInfo
+    let protocol = "http://"
+    if ("encrypted" in this.req.socket && (this.req.socket as TLSSocket).encrypted) {
+      protocol = "https://"
+    }
+    return new URL(`${protocol}${address}:${port}${normalizePath(this.req.url!)}`)
   }
 }

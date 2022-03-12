@@ -81,13 +81,13 @@ class ServerImpl extends DefaultRouter {
     super.lock()
   }
 
-  public async listen(port: number = 3200): Promise<void> {
+  public async listen(port: number = 3200, hostname: string = "0.0.0.0"): Promise<void> {
     this.routeMerger.mergeIn(this, { basePath: "/" }, [])
     this.lock()
-    this.requestPipeline.lock(this.routeMerger.entries(), port)
+    this.requestPipeline.lock(this.routeMerger.entries())
 
-    const runningServer = this.server.listen(port, "0.0.0.0", () => {
-      console.log(`Server is listening on http://0.0.0.0:${port}`)
+    const runningServer = this.server.listen(port, hostname, () => {
+      console.log(`Server is listening on http://${hostname}:${port}`)
       console.log(`Server startup took ${Date.now() - this.startTime}ms`)
       this._start$.next()
       this._start$.complete()
