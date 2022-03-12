@@ -87,6 +87,10 @@ export class DefaultRouter implements Router {
     this.handle("PATCH", url, callback)
   }
 
+  public options(url: string, callback: ROUTE_HANDLER): void {
+    this.handle("OPTIONS", url, callback)
+  }
+
   public post(url: string, callback: ROUTE_HANDLER): void {
     this.handle("POST", url, callback)
   }

@@ -87,7 +87,7 @@ class ServerImpl extends DefaultRouter {
     this.requestPipeline.lock(this.routeMerger.entries())
 
     const runningServer = this.server.listen(port, hostname, () => {
-      console.log(`Server is listening on http://${hostname}:${port}`)
+      console.log(`Server is listening on http://${hostname}:${port}\n`)
       console.log(`Server startup took ${Date.now() - this.startTime}ms`)
       this._start$.next()
       this._start$.complete()
@@ -102,7 +102,10 @@ class ServerImpl extends DefaultRouter {
         await this.shutdown()
         resolve()
       })
-      process.on(`exit`, resolve)
+      process.on(`exit`, async () => {
+        await this.shutdown()
+        resolve()
+      })
     })
 
     // Inform any shutdown event listener

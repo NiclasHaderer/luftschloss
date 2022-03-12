@@ -1,7 +1,7 @@
 import { IncomingMessage as In, ServerResponse as Out } from "http"
 import { Subject } from "./subject"
 import { RequestImpl } from "./request"
-import { LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
+import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
 import { ResponseImpl } from "./response"
 import { Status } from "./status"
 import { HTTPException } from "./http-exception"
@@ -29,15 +29,15 @@ export class RequestPipeline {
       const request = new RequestImpl(req)
       const response = new ResponseImpl(res)
 
-      // TODO default response to options request (middleware?)
-
       // Get the request handler for a certain url
       const route = resolveRoute(request.path, request.method, this.routes)
+
+      // Set the extracted path params in the request instance
       request._setPathParams(route.pathParams || {})
 
       // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
       // method not allowed executor
-      const requestExecutor = this.retrieveExecutor(route)
+      const requestExecutor = this.retrieveExecutor(route, request.method)
 
       // Create chain which will run the middleware and the callback
       const executionChain = buildMiddlewareExecutionChain(requestExecutor)
@@ -48,10 +48,20 @@ export class RequestPipeline {
   /**
    * Unwrap the routeLookup and handle the case that a handler was not found, or the wrong method was used
    */
-  private retrieveExecutor(routeLookup: RouteLookupResult): {
-    executor: ROUTE_HANDLER
-    pipeline: Iterable<MiddlewareRepresentation>
-  } {
+  private retrieveExecutor(
+    routeLookup: RouteLookupResult,
+    method: HTTP_METHODS
+  ): { executor: ROUTE_HANDLER; pipeline: Iterable<MiddlewareRepresentation> } {
+    // Send default options response
+    if (method === "OPTIONS" && routeLookup.status !== LookupResultStatus.OK) {
+      return {
+        executor: (request, response) => {
+          response.status(Status.HTTP_204_NO_CONTENT).header("Allow", routeLookup.availableMethods.join(", "))
+        },
+        pipeline: this.mandatoryMiddleware,
+      }
+    }
+
     switch (routeLookup.status) {
       case LookupResultStatus.METHOD_NOT_ALLOWED: {
         return {
@@ -107,7 +117,7 @@ const buildMiddlewareExecutionChain = (route: {
       const executionWrapper = (request: RequestImpl, response: ResponseImpl) => {
         index += 1
         if (index >= pipeline.length) return route.executor(request, response)
-        executeMiddleware(pipeline[index], request, response, executionWrapper)
+        executeMiddleware(pipeline[index], executionWrapper, request, response)
       }
       executionWrapper(req, res)
     },
@@ -116,9 +126,9 @@ const buildMiddlewareExecutionChain = (route: {
 
 const executeMiddleware = (
   middleware: MiddlewareRepresentation,
+  next: NextFunction,
   request: RequestImpl,
-  response: ResponseImpl,
-  next: NextFunction
+  response: ResponseImpl
 ) => {
   switch (middleware.type) {
     case MiddlewareType.HTTP:

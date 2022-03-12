@@ -4,7 +4,7 @@ import { ReadonlyMiddlewares } from "../middleware/middleware"
 import { normalizePath } from "./utils"
 import { PathConverter, PathValidators, toRegex } from "../path-validator/validator"
 
-type FinishedRoute = {
+export type FinishedRoute = {
   pipeline: ReadonlyMiddlewares
   executor: ROUTE_HANDLER
 }
@@ -31,7 +31,7 @@ export class RouterMerger {
     for (let { handler, path, method } of router.routes.entries()) {
       path = normalizePath(`${basePath}/${path}`)
       if (!this._collection.has(path)) {
-        this._collection.set(path, { DELETE: null, GET: null, PATCH: null, POST: null, PUT: null })
+        this._collection.set(path, { DELETE: null, GET: null, PATCH: null, POST: null, PUT: null, OPTIONS: null })
       }
       const collection = this._collection.get(path)!
       if (collection[method as HTTP_METHODS]) {

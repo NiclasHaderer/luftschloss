@@ -20,6 +20,7 @@ export type SuccessfulRouteLookupResult = {
   pathParams: Record<string, unknown>
   pipeline: Iterable<MiddlewareRepresentation>
   status: LookupResultStatus.OK
+  availableMethods: HTTP_METHODS[]
 }
 
 /**
@@ -30,6 +31,7 @@ export type UnSuccessfulRouteLookupResult = {
   pipeline: null
   pathParams: null
   status: LookupResultStatus.METHOD_NOT_ALLOWED | LookupResultStatus.NOT_FOUND
+  availableMethods: HTTP_METHODS[]
 }
 
 /**
@@ -54,6 +56,7 @@ export interface ReadonlyRouteCollector {
  */
 export interface RouteCollector extends ReadonlyRouteCollector {
   add(path: string, method: HTTP_METHODS | "*", callback: ROUTE_HANDLER): void
+
   entries(): Iterable<CollectionEntry>
 }
 
@@ -74,11 +77,12 @@ export type ROUTE_HANDLER = (request: RequestImpl, response: ResponseImpl) => Pr
 /**
  * Available HTTP_METHODS To listen for
  */
-export type HTTP_METHODS = "GET" | "POST" | "DELETE" | "PUT" | "PATCH"
+export type HTTP_METHODS = "GET" | "POST" | "DELETE" | "PUT" | "PATCH" | "OPTIONS"
 export const HTTP_METHODS: Record<HTTP_METHODS, HTTP_METHODS> = {
   DELETE: "DELETE",
   GET: "GET",
   PATCH: "PATCH",
   POST: "POST",
   PUT: "PUT",
+  OPTIONS: "OPTIONS",
 }

@@ -86,7 +86,8 @@ export class ResponseImpl {
     if (this.data instanceof Stream) {
       this.data.pipe(this.res)
     } else {
-      this.res.write(this.data)
+      // Null cannot be written to stdout and ?? checks for undefined and null
+      this.res.write(this.data ?? "")
     }
     this._complete = true
     this.res.end()
