@@ -17,7 +17,6 @@ export class RequestPipeline {
   public readonly handleStart$ = this._handleStart$.asObservable()
   private locked = false
   private routes!: Readonly<MergedRoutes>
-  private port!: number
 
   constructor(private mandatoryMiddleware: ReadonlyMiddlewares) {}
 
@@ -27,7 +26,7 @@ export class RequestPipeline {
     // Add request start and end handling
     return this.withStart(async () => {
       // Wrap the node request/response in own implementation
-      const request = new RequestImpl(req, this.port)
+      const request = new RequestImpl(req)
       const response = new ResponseImpl(res)
 
       // TODO default response to options request (middleware?)
@@ -90,11 +89,10 @@ export class RequestPipeline {
     this._handleEnd$.next(startEndData)
   }
 
-  public lock(entries: MergedRoutes, port: number): void {
+  public lock(entries: MergedRoutes): void {
     if (this.locked) throw new Error("Cannot lock the request pipeline a second time")
     this.locked = true
     this.routes = entries
-    this.port = port
   }
 }
 
