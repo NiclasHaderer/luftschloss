@@ -1,5 +1,6 @@
-import { MountingOptions, Router } from "../core/router.model"
-import { RouteCollectorImpl } from "../core/route-collector"
+import { RouteCollectorImpl } from "./core/route-collector"
+import { HTTP_METHODS, ReadonlyRouteCollector, ROUTE_HANDLER } from "./core/route-collector.model"
+import { MountingOptions, Router } from "./core/router.model"
 import {
   isClassMiddleware,
   isHttpMiddleware,
@@ -7,8 +8,7 @@ import {
   MiddlewareRepresentation,
   MiddlewareType,
   ReadonlyMiddlewares,
-} from "../middleware/middleware"
-import { HTTP_METHODS, ReadonlyRouteCollector, ROUTE_HANDLER } from "../core/route-collector.model"
+} from "./middleware/middleware"
 
 export class DefaultRouter implements Router {
   private _middleware: MiddlewareRepresentation[] = []

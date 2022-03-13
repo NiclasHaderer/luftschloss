@@ -1,24 +1,41 @@
+import { PathConverter } from "../path-validator/validator"
 import { HTTP_METHODS, LookupResultStatus, RouteLookupResult } from "./route-collector.model"
 import { FinishedRoute, MergedRoutes } from "./router-merger"
-import { PathConverter } from "../path-validator/validator"
 
 export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedRoutes): RouteLookupResult => {
   let status: LookupResultStatus.NOT_FOUND | LookupResultStatus.METHOD_NOT_ALLOWED = LookupResultStatus.NOT_FOUND
   let availableMethods: HTTP_METHODS[] = []
-  for (const [[routeRegex, pathConverter], methodHandlers] of routes) {
+
+  if (path in routes.lookup) {
+    const endpoint = routes.lookup[path]
+    const handler = endpoint[method]
+    availableMethods = getAvailableMethods(endpoint)
+
+    if (handler) {
+      return {
+        status: LookupResultStatus.OK,
+        executor: handler.executor,
+        pipeline: handler.pipeline,
+        pathParams: {},
+        availableMethods,
+      }
+    } else {
+      status = LookupResultStatus.METHOD_NOT_ALLOWED
+    }
+  }
+
+  for (const [[routeRegex, pathConverter], endpoint] of routes.regex) {
     const match = path.match(routeRegex)
     if (match) {
-      availableMethods = (Object.entries(methodHandlers) as [HTTP_METHODS, FinishedRoute | null][])
-        .filter(([_, h]) => !!h)
-        .map(([m]) => m)
-      const handler = methodHandlers[method]
+      const handler = endpoint[method]
+      availableMethods = getAvailableMethods(endpoint)
       if (handler) {
         return {
           status: LookupResultStatus.OK,
           executor: handler.executor,
           pipeline: handler.pipeline,
           pathParams: extractParamsFromMatch(match, pathConverter),
-          availableMethods: addOptionsToResponse(availableMethods),
+          availableMethods,
         }
       } else {
         status = LookupResultStatus.METHOD_NOT_ALLOWED
@@ -30,14 +47,17 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
     pipeline: null,
     executor: null,
     pathParams: null,
-    availableMethods: addOptionsToResponse(availableMethods),
+    availableMethods,
   }
 }
 
-const addOptionsToResponse = (methods: HTTP_METHODS[]): HTTP_METHODS[] => {
-  if (methods.includes("OPTIONS")) return methods
-  methods.push("OPTIONS")
-  return methods
+const getAvailableMethods = (endpoint: Record<HTTP_METHODS, FinishedRoute | null>) => {
+  const notNullMethods = (Object.entries(endpoint) as [HTTP_METHODS, FinishedRoute | null][])
+    .filter(([_, h]) => !!h)
+    .map(([m]) => m)
+  if (notNullMethods.includes("OPTIONS")) return notNullMethods
+  notNullMethods.push("OPTIONS")
+  return notNullMethods
 }
 
 const extractParamsFromMatch = (match: RegExpMatchArray, pathConverter: PathConverter): Record<string, unknown> => {

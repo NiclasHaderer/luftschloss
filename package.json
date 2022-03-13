@@ -11,6 +11,7 @@
   "description": "",
   "scripts": {
     "build": "turbo run build",
+    "build:w": "yarn workspaces foreach -p run build -w",
     "postinstall": "husky install"
   },
   "keywords": [],

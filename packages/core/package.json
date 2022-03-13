@@ -1,7 +1,8 @@
 {
   "name": "@ts-server/core",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "build:w": "tsc -w"
   },
   "version": "1.0.0",
   "description": "",

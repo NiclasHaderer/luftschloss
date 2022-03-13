@@ -5,7 +5,7 @@ import { defaultErrorHandler } from "./error-handler"
 import { errorMiddleware } from "../middleware/error.middleware"
 import { Observable, Subject } from "./subject"
 import { loggerMiddleware } from "../middleware/logger.middleware"
-import { DefaultRouter } from "../router/default.router"
+import { DefaultRouter } from "../default.router"
 import { RouterMerger } from "./router-merger"
 import { requestCompleter } from "../middleware/request-completer.middleware"
 import { PathValidator, PathValidators } from "../path-validator/validator"
@@ -87,7 +87,7 @@ class ServerImpl extends DefaultRouter {
     this.requestPipeline.lock(this.routeMerger.entries())
 
     const runningServer = this.server.listen(port, hostname, () => {
-      console.log(`Server is listening on http://${hostname}:${port}\n`)
+      console.log(`Server is listening on http://${hostname}:${port}`)
       console.log(`Server startup took ${Date.now() - this.startTime}ms`)
       this._start$.next()
       this._start$.complete()

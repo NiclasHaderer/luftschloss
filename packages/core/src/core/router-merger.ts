@@ -1,8 +1,8 @@
+import { ReadonlyMiddlewares } from "../middleware/middleware"
+import { containsRegex, PathConverter, PathValidators, toRegex } from "../path-validator/validator"
 import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
 import { MountingOptions, Router } from "./router.model"
-import { ReadonlyMiddlewares } from "../middleware/middleware"
 import { normalizePath } from "./utils"
-import { PathConverter, PathValidators, toRegex } from "../path-validator/validator"
 
 export type FinishedRoute = {
   pipeline: ReadonlyMiddlewares
@@ -11,7 +11,10 @@ export type FinishedRoute = {
 
 type Path = RegExp
 export type MergedRoute = [[Path, PathConverter], Record<HTTP_METHODS, FinishedRoute | null>]
-export type MergedRoutes = Readonly<Readonly<MergedRoute>[]>
+export type MergedRoutes = {
+  lookup: Record<string, Record<HTTP_METHODS, FinishedRoute | null>>
+  regex: Readonly<Readonly<MergedRoute>[]>
+}
 
 export class RouterMerger {
   private _collection = new Map<string, Record<HTTP_METHODS, FinishedRoute | null>>()
@@ -21,9 +24,22 @@ export class RouterMerger {
 
   public entries(): MergedRoutes {
     if (!this.locked) throw new Error("Cannot retrieve routes because RouteMerger is not locked")
-    return [...this._collection.entries()].map(([path, value]) => {
-      return [toRegex(path, this.validators), value]
-    })
+
+    const regexPaths: MergedRoute[] = []
+    const lookupPaths: Record<string, Record<HTTP_METHODS, FinishedRoute | null>> = {}
+
+    for (const [path, methods] of this._collection.entries()) {
+      if (containsRegex(path)) {
+        regexPaths.push([toRegex(path, this.validators), methods])
+      } else {
+        lookupPaths[path] = methods
+      }
+    }
+
+    return {
+      lookup: lookupPaths,
+      regex: regexPaths,
+    }
   }
 
   public mergeIn(router: Router, { basePath }: MountingOptions, parentPipeline: ReadonlyMiddlewares): void {

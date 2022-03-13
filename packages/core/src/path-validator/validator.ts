@@ -14,6 +14,11 @@ export type PathValidator<T> = {
 type PathParamName = string
 export type PathConverter = Record<PathParamName, PathValidator<any>["convert"]>
 const IS_EXTRACTOR = /^{([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?}$/
+const CONTAINS_EXTRACTOR = /(?:\/|^){([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?}(?:\/|$)/
+
+export const containsRegex = (path: string): boolean => {
+  return CONTAINS_EXTRACTOR.test(path)
+}
 
 export const toRegex = (path: string, validators: PathValidators): [RegExp, PathConverter] => {
   path = normalizePath(path)

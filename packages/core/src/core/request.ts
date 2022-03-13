@@ -5,6 +5,8 @@ import { normalizePath } from "./utils"
 import { AddressInfo } from "net"
 import { TLSSocket } from "tls"
 
+// TODO hide non public methods behind an interface
+
 export class RequestImpl<
   T extends Record<string, any> | unknown = unknown,
   P extends Record<string, any> = Record<string, unknown>
@@ -20,6 +22,7 @@ export class RequestImpl<
   }
 
   get data(): T {
+    // TODO this is not correct
     return this._data
   }
 
