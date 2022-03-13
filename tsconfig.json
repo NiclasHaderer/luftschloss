@@ -5,6 +5,7 @@
     "target": "ES2020",
     "module": "CommonJS",
     "lib": ["ESNext", "dom"],
+    "outDir": "dist",
     "strict": true,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
@@ -20,9 +21,14 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "outDir": "dist",
-    "typeRoots": ["node_modules/@types"]
+    "emitDecoratorMetadata": true
   },
-  "include": ["./src/**/*", "./tests/**/*"]
+  "references": [
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/openapi"
+    }
+  ]
 }

@@ -1,5 +1,4 @@
-import { defaultServer } from "../src/core/server"
-import { defaultRouter } from "../src/router/default.router"
+import { defaultRouter, defaultServer } from "@ts-server/core"
 
 const server = defaultServer()
 server.get("", (request, response) => response.text("hello world"))
