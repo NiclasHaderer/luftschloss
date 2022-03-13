@@ -1,6 +1,6 @@
 *.lock
-idea
-vscode
+.idea
+.vscode
 build
 node_modules
 LICENSE

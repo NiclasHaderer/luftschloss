@@ -1,5 +1,8 @@
 {
   "name": "@ts-server/core",
+  "scripts": {
+    "build": "tsc"
+  },
   "version": "1.0.0",
   "description": "",
   "keywords": [],

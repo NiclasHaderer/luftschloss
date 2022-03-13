@@ -1,5 +1,8 @@
 {
   "name": "@ts-server/openapi",
+  "scripts": {
+    "build": "tsc"
+  },
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -8,6 +11,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@ts-server/core": "workspace:packages/core",
     "tslib": "^2.3.1"
   }
 }
