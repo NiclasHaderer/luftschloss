@@ -10,7 +10,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "keywords": [],
   "author": "",
