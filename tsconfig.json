@@ -22,13 +22,5 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
-  },
-  "references": [
-    {
-      "path": "packages/core"
-    },
-    {
-      "path": "packages/openapi"
-    }
-  ]
+  }
 }
