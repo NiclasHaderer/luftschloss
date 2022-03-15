@@ -1,4 +1,4 @@
-import { defaultRouter, defaultServer } from "@ts-server/core"
+import { defaultRouter, defaultServer } from "@luftschloss/core"
 
 const server = defaultServer()
 server.get("", (request, response) => response.text("hello world"))

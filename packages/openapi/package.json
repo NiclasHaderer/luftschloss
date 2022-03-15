@@ -1,6 +1,7 @@
 {
-  "name": "@ts-server/openapi",
+  "name": "@luftschloss/openapi",
   "scripts": {
+    "pwd": "pwd",
     "build": "tsc",
     "build:w": "tsc -w"
   },
@@ -12,7 +13,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@ts-server/core": "workspace:packages/core",
+    "@luftschloss/core": "workspace:packages/core",
     "tslib": "^2.3.1"
   }
 }

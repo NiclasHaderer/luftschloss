@@ -1,6 +1,7 @@
 {
-  "name": "@ts-server/core",
+  "name": "@luftschloss/core",
   "scripts": {
+    "pwd": "pwd",
     "build": "tsc",
     "build:w": "tsc -w"
   },

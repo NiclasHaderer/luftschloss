@@ -32,19 +32,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ts-server/core@workspace:packages/core":
+"@luftschloss/core@workspace:packages/core":
   version: 0.0.0-use.local
-  resolution: "@ts-server/core@workspace:packages/core"
+  resolution: "@luftschloss/core@workspace:packages/core"
   dependencies:
     tslib: ^2.3.1
   languageName: unknown
   linkType: soft
 
-"@ts-server/openapi@workspace:packages/openapi":
+"@luftschloss/openapi@workspace:packages/openapi":
   version: 0.0.0-use.local
-  resolution: "@ts-server/openapi@workspace:packages/openapi"
+  resolution: "@luftschloss/openapi@workspace:packages/openapi"
   dependencies:
-    "@ts-server/core": "workspace:packages/core"
+    "@luftschloss/core": "workspace:packages/core"
     tslib: ^2.3.1
   languageName: unknown
   linkType: soft
@@ -56,10 +56,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^17.0.18":
-  version: 17.0.18
-  resolution: "@types/node@npm:17.0.18"
-  checksum: 6c4edfc2b3ba2342a9c3d56e934c5245948ab752f4dc04bd6790b9603e6ebc53bc4f5befc3662e207f7dba2ddd17ccf657f915e319ea7cdd4f77b851079d1611
+"@types/node@npm:^17.0.21":
+  version: 17.0.21
+  resolution: "@types/node@npm:17.0.21"
+  checksum: 89dcd2fe82f21d3634266f8384e9c865cf8af49685639fbdbd799bdd1040480fb1e8eeda2d3b9fce41edbe704d2a4be9f427118c4ae872e8d9bb7cbeb3c41a94
   languageName: node
   linkType: hard
 
@@ -125,13 +125,6 @@ __metadata:
     balanced-match: ^1.0.0
     concat-map: 0.0.1
   checksum: faf34a7bb0c3fcf4b59c7808bc5d2a96a40988addf2e7e09dfbb67a2251800e0d14cd2bfc1aa79174f2f5095c54ff27f46fb1289fe2d77dac755b5eb3434cc07
-  languageName: node
-  linkType: hard
-
-"buffer-from@npm:^1.0.0":
-  version: 1.1.2
-  resolution: "buffer-from@npm:1.1.2"
-  checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
   languageName: node
   linkType: hard
 
@@ -431,6 +424,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"luftschloss@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "luftschloss@workspace:."
+  dependencies:
+    "@types/node": ^17.0.21
+    husky: ^7.0.4
+    prettier: ^2.5.1
+    pretty-quick: ^3.1.3
+    tslib: ^2.3.1
+    tslint: ^6.1.3
+    turbo: ^1.1.6
+    typescript: ^4.6.2
+  languageName: unknown
+  linkType: soft
+
 "merge-stream@npm:^2.0.0":
   version: 2.0.0
   resolution: "merge-stream@npm:2.0.0"
@@ -516,15 +524,6 @@ __metadata:
   dependencies:
     mimic-fn: ^2.1.0
   checksum: 2478859ef817fc5d4e9c2f9e5728512ddd1dbc9fb7829ad263765bb6d3b91ce699d6e2332eef6b7dff183c2f490bd3349f1666427eaba4469fba0ac38dfd0d34
-  languageName: node
-  linkType: hard
-
-"openapi3-ts@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "openapi3-ts@npm:2.0.1"
-  dependencies:
-    yaml: ^1.10.0
-  checksum: 11114b44366c8f9a2466fc2053513286c516681548eac37a57964510bdca95e0a1e625306a0dc6a2457391b770e16d22da88d6e2886bad745e6b990f403f8a09
   languageName: node
   linkType: hard
 
@@ -673,41 +672,6 @@ __metadata:
   version: 3.0.7
   resolution: "signal-exit@npm:3.0.7"
   checksum: a2f098f247adc367dffc27845853e9959b9e88b01cb301658cfe4194352d8d2bb32e18467c786a7fe15f1d44b233ea35633d076d5e737870b7139949d1ab6318
-  languageName: node
-  linkType: hard
-
-"some-arbitary-name@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "some-arbitary-name@workspace:."
-  dependencies:
-    "@ts-server/core": "workspace:packages/core"
-    "@types/node": ^17.0.18
-    husky: ^7.0.4
-    openapi3-ts: ^2.0.1
-    prettier: ^2.5.1
-    pretty-quick: ^3.1.3
-    source-map-support: ^0.5.21
-    tslib: ^2.3.1
-    tslint: ^6.1.3
-    turbo: ^1.1.6
-    typescript: ^4.5.5
-  languageName: unknown
-  linkType: soft
-
-"source-map-support@npm:^0.5.21":
-  version: 0.5.21
-  resolution: "source-map-support@npm:0.5.21"
-  dependencies:
-    buffer-from: ^1.0.0
-    source-map: ^0.6.0
-  checksum: 43e98d700d79af1d36f859bdb7318e601dfc918c7ba2e98456118ebc4c4872b327773e5a1df09b0524e9e5063bb18f0934538eace60cca2710d1fa687645d137
-  languageName: node
-  linkType: hard
-
-"source-map@npm:^0.6.0":
-  version: 0.6.1
-  resolution: "source-map@npm:0.6.1"
-  checksum: 59ce8640cf3f3124f64ac289012c2b8bd377c238e316fb323ea22fbfe83da07d81e000071d7242cad7a23cd91c7de98e4df8830ec3f133cb6133a5f6e9f67bc2
   languageName: node
   linkType: hard
 
@@ -931,23 +895,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.5.5":
-  version: 4.5.5
-  resolution: "typescript@npm:4.5.5"
+"typescript@npm:^4.6.2":
+  version: 4.6.2
+  resolution: "typescript@npm:4.6.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 506f4c919dc8aeaafa92068c997f1d213b9df4d9756d0fae1a1e7ab66b585ab3498050e236113a1c9e57ee08c21ec6814ca7a7f61378c058d79af50a4b1f5a5e
+  checksum: 8a44ed7e6f6c4cb1ebe8cf236ecda2fb119d84dcf0fbd77e707b2dfea1bbcfc4e366493a143513ce7f57203c75da9d4e20af6fe46de89749366351046be7577c
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.5.5#~builtin<compat/typescript>":
-  version: 4.5.5
-  resolution: "typescript@patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=bda367"
+"typescript@patch:typescript@^4.6.2#~builtin<compat/typescript>":
+  version: 4.6.2
+  resolution: "typescript@patch:typescript@npm%3A4.6.2#~builtin<compat/typescript>::version=4.6.2&hash=bda367"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 858c61fa63f7274ca4aaaffeced854d550bf416cff6e558c4884041b3311fb662f476f167cf5c9f8680c607239797e26a2ee0bcc6467fbc05bfcb218e1c6c671
+  checksum: 40b493a71747fb89fa70df104e2c4a5e284b43750af5bea024090a5261cefa387f7a9372411b13030f7bf5555cee4275443d08805642ae5c74ef76740854a4c7
   languageName: node
   linkType: hard
 
@@ -966,12 +930,5 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 159da4805f7e84a3d003d8841557196034155008f817172d4e986bd591f74aa82aa7db55929a54222309e01079a65a92a9e6414da5a6aa4b01ee44a511ac3ee5
-  languageName: node
-  linkType: hard
-
-"yaml@npm:^1.10.0":
-  version: 1.10.2
-  resolution: "yaml@npm:1.10.2"
-  checksum: ce4ada136e8a78a0b08dc10b4b900936912d15de59905b2bf415b4d33c63df1d555d23acb2a41b23cf9fb5da41c256441afca3d6509de7247daa062fd2c5ea5f
   languageName: node
   linkType: hard
