@@ -1,8 +1,8 @@
 import { MiddleWareInterceptor, NextFunction } from "./middleware"
-import { RequestImpl } from "../core/request"
-import { ResponseImpl } from "../core/response"
+import { Request } from "../core/request"
+import { Response } from "../core/response"
 
-const LoggerMiddleware = async (next: NextFunction, request: RequestImpl, response: ResponseImpl) => {
+const LoggerMiddleware = async (next: NextFunction, request: Request, response: Response) => {
   const startTime = Date.now()
   await next(request, response)
   console.log(

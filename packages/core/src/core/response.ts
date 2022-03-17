@@ -1,95 +1,30 @@
-import { ServerResponse } from "http"
+import { URL } from "url"
+import { Headers } from "./headers"
 import { Status } from "./status"
 import { ValueOf } from "../types"
-import * as fs from "fs"
-import { HTTPException } from "./http-exception"
-import { Headers } from "./headers"
 import { Stream } from "stream"
 
-export class ResponseImpl {
-  private _status: ValueOf<typeof Status> = Status.HTTP_200_OK
-  private _headers = new Headers()
-  private _complete = false
+export interface Response {
+  readonly complete: boolean
+  readonly headers: Headers
 
-  private data: Stream | Buffer | null | string = null
+  bytes(bytes: Buffer): this
 
-  constructor(public readonly res: ServerResponse) {}
+  header(name: string, value: string): this
 
-  public bytes(bytes: Buffer): this {
-    this.data = bytes
-    return this
-  }
+  file(path: string): this
 
-  public get complete(): boolean {
-    return this._complete
-  }
+  html(text: string): this
 
-  public get headers(): Headers {
-    return this._headers
-  }
+  json(object: any): this
 
-  public header(name: string, value: string): this {
-    this._headers.append(name, value)
-    return this
-  }
+  redirect(url: string | URL): this
 
-  public file(path: string): this {
-    try {
-      const stream = fs.createReadStream(path)
-      this.stream(stream)
-    } catch {
-      throw new HTTPException(Status.HTTP_404_NOT_FOUND, `File ${path} was not found`)
-    }
-    return this
-  }
+  getStatus(): ValueOf<typeof Status>
 
-  public html(text: string): this {
-    this.headers.append("Content-Type", "text/html")
-    this.data = text
-    return this
-  }
+  status(status: ValueOf<typeof Status>): this
 
-  public json(object: any): this {
-    this.headers.append("Content-Type", "application/json")
-    this.data = JSON.stringify(object)
-    return this
-  }
+  stream(stream: Stream): this
 
-  public redirect(url: string | URL): this {
-    this.status(Status.HTTP_307_TEMPORARY_REDIRECT)
-    this.headers.append("Location", url.toString())
-    return this
-  }
-
-  public getStatus(): ValueOf<typeof Status> {
-    return this._status
-  }
-
-  public status(status: ValueOf<typeof Status>): this {
-    this._status = status
-    return this
-  }
-
-  public stream(stream: Stream): this {
-    this.data = stream
-    return this
-  }
-
-  public text(text: string): this {
-    this.headers.append("Content-Type", "text/plain")
-    this.data = text
-    return this
-  }
-
-  private end(): void {
-    this.res.writeHead(this._status.code, this.headers.encode())
-    if (this.data instanceof Stream) {
-      this.data.pipe(this.res)
-    } else {
-      // Null cannot be written to stdout and ?? checks for undefined and null
-      this.res.write(this.data ?? "")
-    }
-    this._complete = true
-    this.res.end()
-  }
+  text(text: string): this
 }

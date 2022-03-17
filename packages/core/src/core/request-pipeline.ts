@@ -1,14 +1,16 @@
 import { IncomingMessage as In, ServerResponse as Out } from "http"
 import { Subject } from "./subject"
-import { RequestImpl } from "./request"
+import { RequestImpl } from "./request-impl"
 import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
-import { ResponseImpl } from "./response"
+import { ResponseImpl } from "./response-impl"
 import { Status } from "./status"
 import { HTTPException } from "./http-exception"
 import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware/middleware"
 import { EventData } from "./server"
 import { MergedRoutes } from "./router-merger"
 import { resolveRoute } from "./resolve-route"
+import { Request } from "./request"
+import { Response } from "./response"
 
 export class RequestPipeline {
   private readonly _handleEnd$ = new Subject<EventData>()
@@ -33,7 +35,7 @@ export class RequestPipeline {
       const route = resolveRoute(request.path, request.method, this.routes)
 
       // Set the extracted path params in the request instance
-      request._setPathParams(route.pathParams || {})
+      request.pathParams = route.pathParams || {}
 
       // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
       // method not allowed executor
@@ -112,9 +114,9 @@ const buildMiddlewareExecutionChain = (route: {
 }) => {
   const pipeline = [...route.pipeline]
   return {
-    run(req: RequestImpl, res: ResponseImpl): void {
+    run(req: Request, res: Response): void {
       let index = -1
-      const executionWrapper = (request: RequestImpl, response: ResponseImpl) => {
+      const executionWrapper = (request: Request, response: Response) => {
         index += 1
         if (index >= pipeline.length) return route.executor(request, response)
         executeMiddleware(pipeline[index], executionWrapper, request, response)
@@ -127,8 +129,8 @@ const buildMiddlewareExecutionChain = (route: {
 const executeMiddleware = (
   middleware: MiddlewareRepresentation,
   next: NextFunction,
-  request: RequestImpl,
-  response: ResponseImpl
+  request: Request,
+  response: Response
 ) => {
   switch (middleware.type) {
     case MiddlewareType.HTTP:

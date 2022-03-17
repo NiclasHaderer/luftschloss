@@ -1,12 +1,12 @@
 import { NextFunction } from "./middleware"
-import { RequestImpl } from "../core/request"
-import { ResponseImpl } from "../core/response"
+import { ResponseImpl } from "../core/response-impl"
+import { Request } from "../core/request"
+import { Response } from "../core/response"
 
-const RequestCompleterMiddleware = async (next: NextFunction, request: RequestImpl, response: ResponseImpl) => {
+const RequestCompleterMiddleware = async (next: NextFunction, request: Request, response: Response) => {
   await next(request, response)
   if (!response.complete) {
-    // I don't want the user to complete the request. The request should be completed by this middleware
-    ;(response as any).end()
+    ;(response as ResponseImpl).end()
   }
 }
 

@@ -2,11 +2,11 @@ import { ErrorHandler } from "../core/error-handler"
 import { Status } from "../core/status"
 import { HttpMiddlewareInterceptor, NextFunction } from "./middleware"
 import { HTTPException } from "../core/http-exception"
-import { RequestImpl } from "../core/request"
-import { ResponseImpl } from "../core/response"
+import { Request } from "../core/request"
+import { Response } from "../core/response"
 
 export const errorMiddleware = (errorHandlers: ErrorHandler): HttpMiddlewareInterceptor => {
-  const ErrorMiddleware = async (next: NextFunction, request: RequestImpl, response: ResponseImpl) => {
+  const ErrorMiddleware = async (next: NextFunction, request: Request, response: Response) => {
     try {
       await next(request, response)
     } catch (e) {

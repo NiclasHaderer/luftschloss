@@ -1,7 +1,7 @@
 import { MiddlewareRepresentation } from "../middleware/middleware"
-import { RequestImpl } from "./request"
-import { ResponseImpl } from "./response"
+import { Request } from "./request"
 import { PathValidator } from "../path-validator/validator"
+import { Response } from "./response"
 
 /**
  * Indicate weather the route retrieval was successful
@@ -72,7 +72,7 @@ export interface RetrievableRouteCollector {
 /**
  * The callback which gets registered to the collector
  */
-export type ROUTE_HANDLER = (request: RequestImpl, response: ResponseImpl) => Promise<any> | any
+export type ROUTE_HANDLER = (request: Request, response: Response) => Promise<any> | any
 
 /**
  * Available HTTP_METHODS To listen for

@@ -1,9 +1,9 @@
 import { HTTPException } from "./http-exception"
 import { Status } from "./status"
-import { RequestImpl } from "./request"
-import { ResponseImpl } from "./response"
+import { Request } from "./request"
+import { Response } from "./response"
 
-type ErrorHandlerCallback = (error: HTTPException, request: RequestImpl, response: ResponseImpl) => void | Promise<void>
+type ErrorHandlerCallback = (error: HTTPException, request: Request, response: Response) => void | Promise<void>
 
 /**
  * The ErrorHandler Interface consists of a partial list of all HTTP_STATUSES and a default handler which will get
@@ -14,14 +14,11 @@ export type ErrorHandler = Partial<{
 }> & { DEFAULT: ErrorHandlerCallback }
 
 export const defaultErrorHandler: ErrorHandler = {
-  DEFAULT(error: HTTPException, request: RequestImpl, response: ResponseImpl): Promise<void> | void {
+  DEFAULT(error: HTTPException, request: Request, response: Response): Promise<void> | void {
     response.status(error.status).json({ error: error.message })
   },
-  HTTP_500_INTERNAL_SERVER_ERROR(
-    error: HTTPException,
-    request: RequestImpl,
-    response: ResponseImpl
-  ): Promise<void> | void {
+  HTTP_500_INTERNAL_SERVER_ERROR(error: HTTPException, request: Request, response: Response): Promise<void> | void {
+    // TODO check if running in prod and if not don't send the internal server message out
     response.status(error.status).json({ error: error.message, trace: error.stack })
   },
 }
