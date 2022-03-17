@@ -1,21 +1,23 @@
 import * as http from "http"
 import { Server } from "http"
 import { RequestPipeline } from "./request-pipeline"
-import { defaultErrorHandler } from "./error-handler"
-import { errorMiddleware } from "../middleware/error.middleware"
+import { defaultErrorHandler, ErrorHandler } from "./error-handler"
+import { errorMiddleware, loggerMiddleware, requestCompleter } from "../middleware"
 import { Observable, Subject } from "./subject"
-import { loggerMiddleware } from "../middleware/logger.middleware"
-import { DefaultRouter } from "../default.router"
+import { DefaultRouter } from "../router"
 import { RouterMerger } from "./router-merger"
-import { requestCompleter } from "../middleware/request-completer.middleware"
-import { PathValidator, PathValidators } from "../path-validator/validator"
-import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator } from "../path-validator/default"
+import {
+  DEFAULT_PATH_VALIDATOR_NAME,
+  defaultPathValidator,
+  intPathValidator,
+  numberPathValidator,
+  pathPathValidator,
+  PathValidator,
+  PathValidators,
+  stringPathValidator,
+  uuidPathValidator,
+} from "../path-validator"
 import { Duplex } from "stream"
-import { intPathValidator } from "../path-validator/int"
-import { numberPathValidator } from "../path-validator/number"
-import { pathPathValidator } from "../path-validator/path"
-import { uuidPathValidator } from "../path-validator/uuid_string"
-import { stringPathValidator } from "../path-validator/string"
 
 export type EventData = {
   data: Record<string, any>
@@ -130,9 +132,9 @@ class ServerImpl extends DefaultRouter {
   }
 }
 
-export const defaultServer = (): ServerImpl => {
+export const defaultServer = (errorHandlers: Partial<ErrorHandler> = {}): ServerImpl => {
   const server = new ServerImpl()
-  server.pipe(loggerMiddleware(), requestCompleter(), errorMiddleware(defaultErrorHandler))
+  server.pipe(loggerMiddleware(), requestCompleter(), errorMiddleware({ ...defaultErrorHandler, ...errorHandlers }))
   server
     .addPathValidator(intPathValidator())
     .addPathValidator(numberPathValidator())

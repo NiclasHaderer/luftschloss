@@ -5,15 +5,21 @@ import * as fs from "fs"
 import { HTTPException } from "./http-exception"
 import { Headers } from "./headers"
 import { Stream } from "stream"
+import { Response } from "./response"
+import { RequestImpl } from "./request-impl"
 
-export class ResponseImpl {
+export class ResponseImpl implements Response {
   private _status: ValueOf<typeof Status> = Status.HTTP_200_OK
   private _headers = new Headers()
   private _complete = false
 
   private data: Stream | Buffer | null | string = null
 
-  constructor(public readonly res: ServerResponse) {}
+  constructor(private readonly res: ServerResponse, private readonly request: RequestImpl) {}
+
+  public get raw(): ServerResponse {
+    return this.res
+  }
 
   public bytes(bytes: Buffer): this {
     this.data = bytes

@@ -5,7 +5,7 @@ import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } fr
 import { ResponseImpl } from "./response-impl"
 import { Status } from "./status"
 import { HTTPException } from "./http-exception"
-import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware/middleware"
+import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware"
 import { EventData } from "./server"
 import { MergedRoutes } from "./router-merger"
 import { resolveRoute } from "./resolve-route"
@@ -29,7 +29,7 @@ export class RequestPipeline {
     return this.withStart(async () => {
       // Wrap the node request/response in own implementation
       const request = new RequestImpl(req)
-      const response = new ResponseImpl(res)
+      const response = new ResponseImpl(res, request)
 
       // Get the request handler for a certain url
       const route = resolveRoute(request.path, request.method, this.routes)

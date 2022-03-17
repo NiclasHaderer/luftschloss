@@ -1,11 +1,10 @@
 import { HTTP_METHODS } from "./route-collector.model"
 import { URL } from "url"
+import { IncomingMessage } from "http"
 
-export interface Request<
-  T extends Record<string, any> | unknown = unknown,
-  P extends Record<string, any> = Record<string, unknown>
-> {
+export interface Request<T extends object = any, P extends object = any> {
   readonly data: T
+  readonly raw: IncomingMessage
   readonly parameters: URLSearchParams
   readonly pathParams: P
   readonly path: string

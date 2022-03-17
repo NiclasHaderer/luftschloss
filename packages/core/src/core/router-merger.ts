@@ -1,7 +1,7 @@
-import { ReadonlyMiddlewares } from "../middleware/middleware"
-import { containsRegex, PathConverter, PathValidators, toRegex } from "../path-validator/validator"
+import { ReadonlyMiddlewares } from "../middleware"
+import { containsRegex, PathConverter, PathValidators, toRegex } from "../path-validator"
 import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
-import { MountingOptions, Router } from "./router.model"
+import { MountingOptions, Router } from "../router"
 import { normalizePath } from "./utils"
 
 export type FinishedRoute = {

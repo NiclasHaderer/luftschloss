@@ -3,10 +3,12 @@ import { Headers } from "./headers"
 import { Status } from "./status"
 import { ValueOf } from "../types"
 import { Stream } from "stream"
+import { ServerResponse } from "http"
 
 export interface Response {
   readonly complete: boolean
   readonly headers: Headers
+  readonly raw: ServerResponse
 
   bytes(bytes: Buffer): this
 

@@ -1,7 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-node_modules/.bin/tslint --fix -c tslint.json 'core/**/*{.ts,.tsx}'
 node_modules/.bin/pretty-quick --staged core/**/*
 
 node_modules/.bin/tslint --project tsconfig.json

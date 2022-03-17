@@ -6,11 +6,7 @@ import { AddressInfo } from "net"
 import { TLSSocket } from "tls"
 import { Request } from "./request"
 
-export class RequestImpl<
-  T extends Record<string, any> | unknown = unknown,
-  P extends Record<string, any> = Record<string, unknown>
-> implements Request<T, P>
-{
+export class RequestImpl<T extends object = any, P extends object = any> implements Request<T, P> {
   private _data = {} as T
   private _pathParams = {} as P
 
@@ -19,6 +15,10 @@ export class RequestImpl<
   get data(): T {
     // TODO this is not correct
     return this._data
+  }
+
+  get raw(): IncomingMessage {
+    return this.req
   }
 
   get parameters(): URLSearchParams {
