@@ -65,9 +65,18 @@ __metadata:
   resolution: "@luftschloss/static@workspace:packages/static"
   dependencies:
     "@luftschloss/core": "workspace:packages/core"
+    "@types/mime-db": ^1.43.1
+    mime-db: ^1.52.0
     tslib: ^2.3.1
   languageName: unknown
   linkType: soft
+
+"@types/mime-db@npm:^1.43.1":
+  version: 1.43.1
+  resolution: "@types/mime-db@npm:1.43.1"
+  checksum: 1e2f98b0ec87ae9604f12ce6efd32fdf26043fee9bdd4b894b53b5ccf790bdd1cc62b3be06d3d882c99ad3c01355f6336ff9cb67876cb2522fc6e9f6d1233228
+  languageName: node
+  linkType: hard
 
 "@types/minimatch@npm:^3.0.3":
   version: 3.0.5
@@ -463,6 +472,13 @@ __metadata:
   version: 2.0.0
   resolution: "merge-stream@npm:2.0.0"
   checksum: 6fa4dcc8d86629705cea944a4b88ef4cb0e07656ebf223fa287443256414283dd25d91c1cd84c77987f2aec5927af1a9db6085757cb43d90eb170ebf4b47f4f4
+  languageName: node
+  linkType: hard
+
+"mime-db@npm:^1.52.0":
+  version: 1.52.0
+  resolution: "mime-db@npm:1.52.0"
+  checksum: 0d99a03585f8b39d68182803b12ac601d9c01abfa28ec56204fa330bc9f3d1c5e14beb049bafadb3dbdf646dfb94b87e24d4ec7b31b7279ef906a8ea9b6a513f
   languageName: node
   linkType: hard
 

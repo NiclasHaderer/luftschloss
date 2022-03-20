@@ -13,6 +13,10 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@luftschloss/core": "workspace:packages/core",
+    "mime-db": "^1.52.0",
     "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "@types/mime-db": "^1.43.1"
   }
 }

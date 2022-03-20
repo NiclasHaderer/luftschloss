@@ -12,13 +12,17 @@ import path from "path"
 type StaticRouterProps = { followSymLinks: boolean }
 
 class StaticRouter extends BaseRouter implements Router {
-  constructor(private folderPath: string, private options: StaticRouterProps) {
+  private readonly folderPath: string
+
+  constructor(folderPath: string, private options: StaticRouterProps) {
     super()
+    // path.resolve has not trailing / at the end, so add it
+    this.folderPath = `${path.resolve(folderPath)}${path.sep}`
     this._routeCollector.add("{path:path}", "GET", this.handlePath.bind(this))
   }
 
   protected async handlePath(request: Request<object, { path: string }>, response: Response): Promise<void> {
-    // Get the file path and replace a leading / with noting (rootPath already has a leading /)
+    // Get the file path and replace a leading / with noting (folderPath already has a leading /)
     let filePath = request.pathParams.path.replace(/^\//, "")
 
     // Normalize the file path
@@ -55,9 +59,6 @@ class StaticRouter extends BaseRouter implements Router {
 }
 
 export const staticRouter = (folderPath: string, options: Partial<StaticRouterProps> = {}) => {
-  // path.resolve has not trailing / at the end, so add it
-  folderPath = `${path.resolve(folderPath)}${path.sep}`
-
   const stat = fsSync.lstatSync(folderPath)
   if (!stat.isDirectory()) {
     throw new Error(`Cannot serve static files from ${folderPath}. Path is not a directory`)
