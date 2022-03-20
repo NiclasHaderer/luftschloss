@@ -1,5 +1,5 @@
 {
-  "name": "@luftschloss/core",
+  "name": "@luftschloss/static",
   "scripts": {
     "build": "tsc",
     "clean": "rm -r .turbo dist"
@@ -12,6 +12,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@luftschloss/core": "workspace:packages/core",
     "tslib": "^2.3.1"
   }
 }

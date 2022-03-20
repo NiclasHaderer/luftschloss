@@ -1,9 +1,8 @@
 {
   "name": "@luftschloss/openapi",
   "scripts": {
-    "pwd": "pwd",
     "build": "tsc",
-    "build:w": "tsc -w"
+    "clean": "rm -r .turbo dist"
   },
   "version": "1.0.0",
   "description": "",
