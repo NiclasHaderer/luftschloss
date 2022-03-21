@@ -1,12 +1,7 @@
-import { Router } from "@luftschloss/core/dist/router/router"
-import { BaseRouter } from "@luftschloss/core/dist/router/base.router"
-import { Request } from "@luftschloss/core/dist/core/request"
-import { Response } from "@luftschloss/core/dist/core/response"
+import { BaseRouter, fillWithDefaults, HTTPException, Request, Response, Router, Status } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { promises as fs } from "fs"
-import { HTTPException } from "@luftschloss/core/dist/core/http-exception"
-import { Status } from "@luftschloss/core/dist/core/status"
-import { fillWithDefaults } from "@luftschloss/core/dist/core/utils"
+import "./response"
 import path from "path"
 
 type StaticRouterProps = { followSymLinks: boolean }

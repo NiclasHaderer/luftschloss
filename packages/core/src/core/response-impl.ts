@@ -5,8 +5,8 @@ import * as fs from "fs"
 import { HTTPException } from "./http-exception"
 import { Headers } from "./headers"
 import { Stream } from "stream"
-import { Response } from "./response"
-import { RequestImpl } from "./request-impl"
+import type { Response } from "./response"
+import type { Request } from "./request"
 
 export class ResponseImpl implements Response {
   private _status: ValueOf<typeof Status> = Status.HTTP_200_OK
@@ -15,7 +15,7 @@ export class ResponseImpl implements Response {
 
   private data: Stream | Buffer | null | string = null
 
-  constructor(private readonly res: ServerResponse, private readonly request: RequestImpl) {}
+  constructor(private readonly res: ServerResponse, public readonly request: Request) {}
 
   public get raw(): ServerResponse {
     return this.res
