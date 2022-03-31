@@ -4,7 +4,7 @@ import { Observable, Subject } from "./subject"
 import { EventData } from "./server"
 import { RouterMerger } from "./router-merger"
 import { RequestPipeline } from "./request-pipeline"
-import http, { Server } from "http"
+import * as http from "http"
 import { Duplex } from "stream"
 import { Router } from "../router"
 
@@ -124,7 +124,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       })
     }
 
-    private collectOpenConnections(server: Server): void {
+    private collectOpenConnections(server: http.Server): void {
       server.on("connection", socket => {
         this.openSockets.add(socket)
         socket.on("close", () => this.openSockets.delete(socket))

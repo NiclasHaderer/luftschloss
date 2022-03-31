@@ -1,5 +1,5 @@
 import "@luftschloss/core"
-import { extendResponse, Response } from "@luftschloss/core"
+import { addResponseField, Response } from "@luftschloss/core"
 
 declare module "@luftschloss/core" {
   interface Response {
@@ -7,9 +7,8 @@ declare module "@luftschloss/core" {
   }
 }
 
-extendResponse<Response>({
-  file(path: string): Response {
-    // TODO
+addResponseField<Response, "file">("file", {
+  value(fileName: string): Response {
     return this
   },
 })

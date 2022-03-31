@@ -2,6 +2,7 @@ import { HTTPException } from "./http-exception"
 import { Status } from "./status"
 import { Request } from "./request"
 import { Response } from "./response"
+import { isProduction } from "./production"
 
 type ErrorHandlerCallback = (error: HTTPException, request: Request, response: Response) => void | Promise<void>
 
@@ -18,7 +19,10 @@ export const defaultErrorHandler: ErrorHandler = {
     response.status(error.status).json({ error: error.message })
   },
   HTTP_500_INTERNAL_SERVER_ERROR(error: HTTPException, request: Request, response: Response): Promise<void> | void {
-    // TODO check if running in prod and if not don't send the internal server message out
-    response.status(error.status).json({ error: error.message, trace: error.stack })
+    if (isProduction()) {
+      response.status(error.status).json({ error: error.message })
+    } else {
+      response.status(error.status).json({ error: error.message, trace: error.stack })
+    }
   },
 }

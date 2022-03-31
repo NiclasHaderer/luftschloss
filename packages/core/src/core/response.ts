@@ -1,10 +1,11 @@
 import { URL } from "url"
 import { Headers } from "./headers"
 import { Status } from "./status"
-import { ValueOf } from "../types"
+import { CustomPropertyDescriptor, Func, ValueOf } from "../types"
 import { Stream } from "stream"
 import { ServerResponse } from "http"
 import { Request } from "./request"
+import { ResponseImpl } from "./response-impl"
 
 export interface Response {
   readonly complete: boolean
@@ -31,12 +32,19 @@ export interface Response {
   text(text: string): this
 }
 
-export const extendResponse = <R extends Response>(
-  methods: Partial<{
-    [key in keyof R]: R[key] extends (...args: any) => any
-      ? (this: R, ...args: Parameters<R[key]>) => ReturnType<R[key]>
-      : R[key]
-  }>
-): void => {
-  // TODO
+export const addResponseField = <R extends Response, KEY extends PropertyKey>(
+  fieldName: KEY,
+  field: CustomPropertyDescriptor<R, KEY>
+) => {
+  Object.defineProperty(ResponseImpl.prototype, fieldName, field)
+}
+
+export const overwriteResponseMethod = <R extends Response, KEY extends keyof R>(
+  fieldName: KEY,
+  methodFactory: (original: R[KEY] extends Func ? R[KEY] : never) => CustomPropertyDescriptor<R, KEY>
+) => {
+  const originalMethod = (ResponseImpl.prototype as unknown as R)[fieldName]
+  if (!originalMethod) throw new Error(`Cannot override method ${fieldName}`)
+  const newMethod = methodFactory(originalMethod as R[KEY] extends Func ? R[KEY] : never)
+  addResponseField(fieldName, newMethod)
 }

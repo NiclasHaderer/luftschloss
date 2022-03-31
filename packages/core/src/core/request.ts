@@ -1,6 +1,8 @@
 import { HTTP_METHODS } from "./route-collector.model"
 import { URL } from "url"
 import { IncomingMessage } from "http"
+import { CustomPropertyDescriptor, Func } from "../types"
+import { RequestImpl } from "./request-impl"
 
 export interface Request<T extends object = any, P extends object = any> {
   readonly data: T
@@ -10,4 +12,21 @@ export interface Request<T extends object = any, P extends object = any> {
   readonly path: string
   readonly method: HTTP_METHODS
   readonly url: URL
+}
+
+export const addRequestField = <R extends Request, KEY extends PropertyKey>(
+  fieldName: KEY,
+  field: CustomPropertyDescriptor<R, KEY>
+) => {
+  Object.defineProperty(RequestImpl.prototype, fieldName, field)
+}
+
+export const overwriteRequestMethod = <R extends Request, KEY extends keyof R>(
+  fieldName: KEY,
+  methodFactory: (original: R[KEY] extends Func ? R[KEY] : never) => CustomPropertyDescriptor<R, KEY>
+) => {
+  const originalMethod = (RequestImpl.prototype as unknown as R)[fieldName]
+  if (!originalMethod) throw new Error(`Cannot override method ${fieldName}`)
+  const newMethod = methodFactory(originalMethod as R[KEY] extends Func ? R[KEY] : never)
+  addRequestField(fieldName, newMethod)
 }
