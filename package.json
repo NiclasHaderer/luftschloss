@@ -6,9 +6,10 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "build:w": "yarn workspaces foreach -ti --exclude luftschloss run build && yarn workspaces foreach -pi --exclude luftschloss run build -w",
-    "clean": "yarn workspaces foreach -p run clean",
+    "build:c": "turbo run build",
+    "build": "yarn workspaces foreach -ti --exclude luftschloss run build",
+    "build:w": "yarn run build && yarn workspaces foreach -pi --exclude luftschloss run build -w",
+    "clean": "rm -r node_modules/.cache/turbo; yarn workspaces foreach -p run clean",
     "postinstall": "husky install"
   },
   "devDependencies": {

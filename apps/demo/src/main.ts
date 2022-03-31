@@ -1,4 +1,5 @@
 import { defaultRouter, defaultServer } from "@luftschloss/core"
+import "@luftschloss/static"
 
 const server = defaultServer()
 server.get("", (request, response) => response.text("hello world"))
