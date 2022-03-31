@@ -1,6 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-node_modules/.bin/pretty-quick --staged core/**/*
+node_modules/.bin/pretty-quick --staged packages/**/*
+node_modules/.bin/pretty-quick --staged apps/**/*
 
 node_modules/.bin/tslint --project tsconfig.json

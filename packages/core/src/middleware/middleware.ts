@@ -1,20 +1,21 @@
-import { Response } from "../core/response"
-import { Request } from "../core/request"
+import { Request, Response } from "../core"
 
 export enum MiddlewareType {
   HTTP,
   CLASS,
 }
 
-export type MiddlewareRepresentation =
-  | {
-      rep: HttpMiddlewareInterceptor
-      type: MiddlewareType.HTTP
-    }
-  | {
-      rep: ClassMiddlewareInterceptor
-      type: MiddlewareType.CLASS
-    }
+export type HttpMiddlewareRepresentation = {
+  rep: HttpMiddlewareInterceptor
+  type: MiddlewareType.HTTP
+}
+
+export type ClassMiddlewareRepresentation = {
+  rep: ClassMiddlewareInterceptor
+  type: MiddlewareType.CLASS
+}
+
+export type MiddlewareRepresentation = HttpMiddlewareRepresentation | ClassMiddlewareRepresentation
 
 export type ReadonlyMiddlewares = Readonly<Readonly<MiddlewareRepresentation>[]>
 

@@ -1,5 +1,6 @@
-import { RouteCollectorImpl } from "../core/route-collector"
+import { ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
 import {
+  HttpMiddlewareRepresentation,
   isClassMiddleware,
   isHttpMiddleware,
   MiddleWareInterceptor,
@@ -7,7 +8,6 @@ import {
   MiddlewareType,
   ReadonlyMiddlewares,
 } from "../middleware"
-import { ReadonlyRouteCollector } from "../core/route-collector.model"
 import { MountingOptions, Router } from "./router"
 
 export class BaseRouter implements Router {
@@ -67,6 +67,34 @@ export class BaseRouter implements Router {
 
     for (const router of routers) {
       this.subRouters.push({ router, options })
+    }
+
+    return this
+  }
+
+  public unPipe(...middlewareList: MiddleWareInterceptor[]): this {
+    if (this.locked) {
+      throw new Error("Router has been locked. You cannot remove a middleware")
+    }
+
+    for (const middleware of middlewareList) {
+      let middlewareIndex = -1
+
+      if (isClassMiddleware(middleware)) {
+        middlewareIndex = this._middleware
+          .filter(m => m.type === MiddlewareType.CLASS)
+          .findIndex(value => value.rep.constructor.name === middleware.constructor.name)
+      } else if (isHttpMiddleware(middleware)) {
+        middlewareIndex = this._middleware
+          .filter((m): m is HttpMiddlewareRepresentation => m.type === MiddlewareType.HTTP)
+          .findIndex(value => value.rep.name === middleware.name)
+      }
+
+      if (middlewareIndex === -1) {
+        console.warn("Middleware was not found and therefore could not be removed")
+      } else {
+        this._middleware.splice(middlewareIndex - 1, 1)
+      }
     }
 
     return this
