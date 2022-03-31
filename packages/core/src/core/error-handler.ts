@@ -12,7 +12,7 @@ type ErrorHandlerCallback = (error: HTTPException, request: Request, response: R
  */
 export type ErrorHandler = Partial<{
   [STATUS in keyof typeof Status]: ErrorHandlerCallback
-}> & { DEFAULT: ErrorHandlerCallback }
+}> & { DEFAULT: ErrorHandlerCallback } & { HTTP_500_INTERNAL_SERVER_ERROR: ErrorHandlerCallback }
 
 export const defaultErrorHandler: ErrorHandler = {
   DEFAULT(error: HTTPException, request: Request, response: Response): Promise<void> | void {

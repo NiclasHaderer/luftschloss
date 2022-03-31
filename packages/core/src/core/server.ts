@@ -18,7 +18,11 @@ class ServerImpl extends withServerBase(DefaultRouter) {}
 
 export const defaultServer = (errorHandlers: Partial<ErrorHandler> = {}): ServerImpl => {
   const server = new ServerImpl()
-  server.pipe(loggerMiddleware(), requestCompleter(), errorMiddleware({ ...defaultErrorHandler, ...errorHandlers }))
+  server
+    .pipe(loggerMiddleware())
+    .pipe(requestCompleter())
+    .pipe(errorMiddleware({ ...defaultErrorHandler, ...errorHandlers }))
+
   server
     .addPathValidator(intPathValidator())
     .addPathValidator(numberPathValidator())

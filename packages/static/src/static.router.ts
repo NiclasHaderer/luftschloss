@@ -1,4 +1,14 @@
-import { BaseRouter, fillWithDefaults, HTTPException, Request, Response, Router, Status } from "@luftschloss/core"
+import assert from "assert"
+import {
+  BaseRouter,
+  fillWithDefaults,
+  HTTPException,
+  isProduction,
+  Request,
+  Response,
+  Router,
+  Status,
+} from "@luftschloss/core"
 import * as fsSync from "fs"
 import { promises as fs, Stats } from "fs"
 import "./response"
@@ -6,7 +16,7 @@ import path from "path"
 
 type StaticRouterProps = { followSymLinks: boolean }
 
-class StaticRouter extends BaseRouter implements Router {
+export class StaticRouter extends BaseRouter implements Router {
   private readonly folderPath: string
 
   constructor(folderPath: string, private options: StaticRouterProps) {
@@ -14,28 +24,30 @@ class StaticRouter extends BaseRouter implements Router {
     // path.resolve has not trailing / at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`
     this._routeCollector.add("{path:path}", "GET", this.handlePath.bind(this))
+    // TODO HEAD response
+    // TODO not modified response
   }
 
   protected async handlePath(request: Request<object, { path: string }>, response: Response): Promise<void> {
-    // Get the file path and replace a leading / with noting (folderPath already has a leading /)
-    let filePath = request.pathParams.path.replace(/^\//, "")
+    // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
+    const filePath = request.pathParams.path.replace(/^\//, "")
 
-    // Normalize the file path
-    filePath = path.normalize(filePath)
+    // Convert the file path to an absolute path
+    const absPath = this.toAbsPath(path.normalize(filePath))
+
+    // TODO if folder and folder has index.html respond with index.html or whatever the index file is
+
     try {
-      const absPath = this.toAbsPath(filePath)
+      // Throws if file does not exist, so catch...
       const stat = await fs.lstat(absPath)
 
       // Check if the file is a symbolic link and if symbolic links should be followed.
-      if (!this.options.followSymLinks && stat.isSymbolicLink()) {
-        // File is a symbolic link and symlinks should not be followed, so respond with a 404
-        this.respondWithFileNotFound(request, response, filePath)
-        return
-      }
+      assert.strictEqual(!this.options.followSymLinks && stat.isSymbolicLink(), false)
 
-      await fs.access(absPath)
+      // Respond with a file
+      this.respondWithFile(request, response, absPath)
     } catch (e) {
-      this.respondWithFileNotFound(request, response, filePath)
+      this.respondWithFileNotFound(request, response, absPath)
     }
   }
 
@@ -43,11 +55,12 @@ class StaticRouter extends BaseRouter implements Router {
     response.file(absPath)
   }
 
-  protected respondWithFileNotFound(request: Request, response: Response, relPath: string): void {
-    throw new HTTPException(Status.HTTP_404_NOT_FOUND, "File with name was not found")
+  protected respondWithFileNotFound(request: Request, response: Response, absPath: string): void {
+    const message = isProduction() ? "File with name was not found" : `File with name was not found at ${absPath}`
+    throw new HTTPException(Status.HTTP_404_NOT_FOUND, message)
   }
 
-  private toAbsPath(filePath: string): string {
+  protected toAbsPath(filePath: string): string {
     // Simply join the strings. path.join would resolve ".." and you would be able to step out of the folder
     return `${this.folderPath}${filePath}`
   }

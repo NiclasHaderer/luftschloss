@@ -1,19 +1,15 @@
 import { ServerResponse } from "http"
-import { Status } from "./status"
-import { ValueOf } from "../types"
-import * as fs from "fs"
-import { HTTPException } from "./http-exception"
+import { Status, toStatus } from "./status"
 import { Headers } from "./headers"
-import { Stream } from "stream"
 import type { Response } from "./response"
 import type { Request } from "./request"
+import { ReadStream } from "fs"
 
 export class ResponseImpl implements Response {
-  private _status: ValueOf<typeof Status> = Status.HTTP_200_OK
+  private _status: Status = Status.HTTP_200_OK
   private _headers = new Headers()
-  private _complete = false
 
-  private data: Stream | Buffer | null | string = null
+  private data: ReadStream | Buffer | null | string = null
 
   constructor(private readonly res: ServerResponse, public readonly request: Request) {}
 
@@ -27,7 +23,7 @@ export class ResponseImpl implements Response {
   }
 
   public get complete(): boolean {
-    return this._complete
+    return this.res.writableEnded
   }
 
   public get headers(): Headers {
@@ -36,16 +32,6 @@ export class ResponseImpl implements Response {
 
   public header(name: string, value: string): this {
     this._headers.append(name, value)
-    return this
-  }
-
-  public file(path: string): this {
-    try {
-      const stream = fs.createReadStream(path)
-      this.stream(stream)
-    } catch {
-      throw new HTTPException(Status.HTTP_404_NOT_FOUND, `File ${path} was not found`)
-    }
     return this
   }
 
@@ -67,16 +53,16 @@ export class ResponseImpl implements Response {
     return this
   }
 
-  public getStatus(): ValueOf<typeof Status> {
+  public getStatus(): Status {
     return this._status
   }
 
-  public status(status: ValueOf<typeof Status>): this {
-    this._status = status
+  public status(status: Status | number): this {
+    this._status = toStatus(status)
     return this
   }
 
-  public stream(stream: Stream): this {
+  public stream(stream: ReadStream): this {
     this.data = stream
     return this
   }
@@ -87,15 +73,22 @@ export class ResponseImpl implements Response {
     return this
   }
 
-  public end(): void {
+  public async end(): Promise<void> {
     this.res.writeHead(this._status.code, this.headers.encode())
-    if (this.data instanceof Stream) {
-      this.data.pipe(this.res)
+    if (this.data instanceof ReadStream) {
+      await this.streamResponse(this.data)
     } else {
       // Null cannot be written to stdout and ?? checks for undefined and null
       this.res.write(this.data ?? "")
     }
-    this._complete = true
     this.res.end()
+  }
+
+  private streamResponse(stream: ReadStream): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      stream.on("open", () => stream.pipe(this.res))
+      stream.on("close", resolve)
+      stream.on("error", reject)
+    })
   }
 }

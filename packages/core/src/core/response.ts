@@ -1,7 +1,7 @@
 import { URL } from "url"
 import { Headers } from "./headers"
 import { Status } from "./status"
-import { CustomPropertyDescriptor, Func, ValueOf } from "../types"
+import { CustomPropertyDescriptor, Func } from "../types"
 import { Stream } from "stream"
 import { ServerResponse } from "http"
 import { Request } from "./request"
@@ -23,9 +23,9 @@ export interface Response {
 
   redirect(url: string | URL): this
 
-  getStatus(): ValueOf<typeof Status>
+  getStatus(): Status
 
-  status(status: ValueOf<typeof Status>): this
+  status(status: Status | number): this
 
   stream(stream: Stream): this
 

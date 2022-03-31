@@ -4,7 +4,7 @@ import { Observable, Subject } from "./subject"
 import { EventData } from "./server"
 import { RouterMerger } from "./router-merger"
 import { RequestPipeline } from "./request-pipeline"
-import * as http from "http"
+import http from "http"
 import { Duplex } from "stream"
 import { Router } from "../router"
 

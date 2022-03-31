@@ -1,4 +1,5 @@
 import { ValueOf } from "../types"
+import { HTTPException } from "./http-exception"
 
 /**
  * See https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
@@ -321,6 +322,19 @@ export const Status = {
   },
 } as const
 
-export const fromCode = (code: number): ValueOf<typeof Status> | undefined => {
-  return Object.values(Status).find(s => s.code === code)
+export type Status = ValueOf<typeof Status>
+
+export const toStatus = (code: number | Status): Status => {
+  let codeObject: Status
+  if (typeof code === "number") {
+    const tmp = Object.values(Status).find(s => s.code === code)
+    if (!tmp) {
+      throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, `Status code with status ${code} does not exist`)
+    }
+    codeObject = tmp
+  } else {
+    codeObject = code
+  }
+
+  return codeObject
 }
