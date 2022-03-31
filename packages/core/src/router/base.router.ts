@@ -14,10 +14,14 @@ export class BaseRouter implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
   protected readonly _routeCollector = new RouteCollectorImpl()
   protected _middleware: MiddlewareRepresentation[] = []
-  protected locked = false
+  protected _locked = false
 
   public get children(): { router: Router; options: MountingOptions }[] {
     return this.subRouters
+  }
+
+  public get locked(): boolean {
+    return this._locked
   }
 
   public get middleware(): ReadonlyMiddlewares {
@@ -29,7 +33,7 @@ export class BaseRouter implements Router {
   }
 
   public lock(): void {
-    this.locked = true
+    this._locked = true
     this.subRouters.map(r => r.router).forEach(r => r.lock())
   }
 

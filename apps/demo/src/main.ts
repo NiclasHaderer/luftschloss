@@ -1,5 +1,4 @@
 import { defaultRouter, defaultServer } from "@luftschloss/core"
-import { staticRouter } from "@luftschloss/static"
 
 const server = defaultServer()
 server.get("", (request, response) => response.text("hello world"))
@@ -13,5 +12,4 @@ router.get("error", (request, response) => {
 })
 
 server.mount(router, { basePath: "hello" })
-server.mount(staticRouter(""))
 server.listen()

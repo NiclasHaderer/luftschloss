@@ -1,6 +1,6 @@
 import { BaseRouter, fillWithDefaults, HTTPException, Request, Response, Router, Status } from "@luftschloss/core"
 import * as fsSync from "fs"
-import { promises as fs } from "fs"
+import { promises as fs, Stats } from "fs"
 import "./response"
 import path from "path"
 
@@ -54,7 +54,12 @@ class StaticRouter extends BaseRouter implements Router {
 }
 
 export const staticRouter = (folderPath: string, options: Partial<StaticRouterProps> = {}) => {
-  const stat = fsSync.lstatSync(folderPath)
+  let stat: Stats
+  try {
+    stat = fsSync.lstatSync(folderPath)
+  } catch (e) {
+    throw new Error(`Could not access path "${folderPath}"`)
+  }
   if (!stat.isDirectory()) {
     throw new Error(`Cannot serve static files from ${folderPath}. Path is not a directory`)
   }

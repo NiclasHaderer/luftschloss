@@ -13,6 +13,7 @@ export interface Router {
   routes: ReadonlyRouteCollector
 
   readonly middleware: ReadonlyMiddlewares
+  readonly locked: boolean
 
   mount(router: Router[] | Router, options?: MountingOptions): this
 
