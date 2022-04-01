@@ -22,8 +22,8 @@ export interface ServerBase {
 
 export const withServerBase = <T extends Router, ARGS extends []>(
   clazz: Constructor<T, ARGS>
-): Constructor<T & ServerBase, ARGS> => {
-  return class extends (clazz as Constructor<Router, ARGS>) implements ServerBase {
+): Constructor<T & ServerBase, ARGS> =>
+  class extends (clazz as Constructor<Router, ARGS>) implements ServerBase {
     private readonly _shutdown$ = new Subject<void>()
     private readonly _start$ = new Subject<void>()
     private readonly startTime = Date.now()
@@ -44,7 +44,8 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     // Server start event
     public readonly start$ = this._start$.asObservable()
 
-    constructor(...args: ARGS) {
+    public constructor(...args: ARGS) {
+      //eslint-disable-next-line constructor-super
       super(...args)
       this.routeMerger = new RouterMerger(this.validators)
       this.requestPipeline = new RequestPipeline(this.middleware)
@@ -87,7 +88,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       super.lock()
     }
 
-    public async listen(port: number = 3200, hostname: string = "0.0.0.0"): Promise<void> {
+    public async listen(port = 3200, hostname = "0.0.0.0"): Promise<void> {
       this.routeMerger.mergeIn(this, { basePath: "/" }, [])
       this.lock()
       this.requestPipeline.lock(this.routeMerger.entries())
@@ -131,4 +132,3 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       })
     }
   } as unknown as Constructor<T & ServerBase, ARGS>
-}

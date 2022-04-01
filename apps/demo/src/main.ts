@@ -12,4 +12,4 @@ router.get("error", (request, response) => {
 })
 
 server.mount(router, { basePath: "hello" })
-server.listen()
+void server.listen()

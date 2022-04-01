@@ -6,4 +6,4 @@ const UUIDPathValidator: PathValidator<string> = {
   convert: value => value,
 }
 
-export const uuidPathValidator = () => UUIDPathValidator
+export const uuidPathValidator = (): typeof UUIDPathValidator => UUIDPathValidator

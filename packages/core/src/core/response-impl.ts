@@ -11,7 +11,7 @@ export class ResponseImpl implements Response {
 
   private data: ReadStream | Buffer | null | string = null
 
-  constructor(private readonly res: ServerResponse, public readonly request: Request) {}
+  public constructor(private readonly res: ServerResponse, public readonly request: Request) {}
 
   public get raw(): ServerResponse {
     return this.res

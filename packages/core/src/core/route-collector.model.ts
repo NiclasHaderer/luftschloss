@@ -1,6 +1,6 @@
-import { MiddlewareRepresentation } from "../middleware/middleware"
+import { MiddlewareRepresentation } from "../middleware"
 import { Request } from "./request"
-import { PathValidator } from "../path-validator/validator"
+import { PathValidator } from "../path-validator"
 import { Response } from "./response"
 
 /**

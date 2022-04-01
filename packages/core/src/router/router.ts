@@ -5,7 +5,7 @@ import { ReadonlyRouteCollector } from "../core"
 import { MiddleWareInterceptor, ReadonlyMiddlewares } from "../middleware"
 
 export interface MountingOptions {
-  basePath?: string
+  basePath: string
 }
 
 export interface Router {

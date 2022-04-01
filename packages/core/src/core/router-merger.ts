@@ -20,7 +20,7 @@ export class RouterMerger {
   private _collection = new Map<string, Record<HTTP_METHODS, FinishedRoute | null>>()
   private locked = false
 
-  constructor(private validators: PathValidators) {}
+  public constructor(private validators: PathValidators) {}
 
   public entries(): MergedRoutes {
     if (!this.locked) throw new Error("Cannot retrieve routes because RouteMerger is not locked")
@@ -50,11 +50,11 @@ export class RouterMerger {
         this._collection.set(path, { DELETE: null, GET: null, PATCH: null, POST: null, PUT: null, OPTIONS: null })
       }
       const collection = this._collection.get(path)!
-      if (collection[method as HTTP_METHODS]) {
+      if (collection[method]) {
         throw new Error(`Route ${path} already has a handler registered. Registering handlers twice is not possible`)
       }
 
-      collection[method as HTTP_METHODS] = {
+      collection[method] = {
         executor: handler,
         pipeline: [...parentPipeline, ...router.middleware],
       }

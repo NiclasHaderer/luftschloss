@@ -20,9 +20,9 @@ export class RequestPipeline {
   private locked = false
   private routes!: Readonly<MergedRoutes>
 
-  constructor(private mandatoryMiddleware: ReadonlyMiddlewares) {}
+  public constructor(private mandatoryMiddleware: ReadonlyMiddlewares) {}
 
-  public async queue(req: In, res: Out): Promise<void> {
+  public queue(req: In, res: Out): Promise<void> {
     if (!this.locked) throw new Error("RequestPipeline has not been locked. You have to lock it in order to use it")
 
     // Add request start and end handling
@@ -49,6 +49,11 @@ export class RequestPipeline {
 
   /**
    * Unwrap the routeLookup and handle the case that a handler was not found, or the wrong method was used
+   *
+   * @param routeLookup The result of the route lookup. Can be successful or not
+   * @param method The method that should be executed
+   * @returns The executor that will handle the route at the end and the pipeline the request has to pass before being
+   * passed to the executor
    */
   private retrieveExecutor(
     routeLookup: RouteLookupResult,
@@ -88,6 +93,8 @@ export class RequestPipeline {
 
   /**
    * Call the request start and request end lifecycle hooks
+   *
+   * @param callback The callback that will be executed in between
    */
   private async withStart(callback: () => Promise<void>): Promise<void> {
     // Create data which will be shared between the start and end handler
@@ -114,30 +121,31 @@ const buildMiddlewareExecutionChain = (route: {
 }) => {
   const pipeline = [...route.pipeline]
   return {
-    run(req: Request, res: Response): void {
+    run: async (req: Request, res: Response): Promise<void> => {
       let index = -1
-      const executionWrapper = (request: Request, response: Response) => {
+      const executionWrapper = async (request: Request, response: Response): Promise<any> => {
         index += 1
+        //eslint-disable-next-line @typescript-eslint/no-unsafe-return
         if (index >= pipeline.length) return route.executor(request, response)
-        executeMiddleware(pipeline[index], executionWrapper, request, response)
+        await executeMiddleware(pipeline[index], executionWrapper, request, response)
       }
-      executionWrapper(req, res)
+      await executionWrapper(req, res)
     },
   }
 }
 
-const executeMiddleware = (
+const executeMiddleware = async (
   middleware: MiddlewareRepresentation,
   next: NextFunction,
   request: Request,
   response: Response
-) => {
+): Promise<void> => {
   switch (middleware.type) {
     case MiddlewareType.HTTP:
-      middleware.rep(next, request, response)
+      await middleware.rep(next, request, response)
       break
     case MiddlewareType.CLASS:
-      middleware.rep.handle(next, request, response)
+      await middleware.rep.handle(next, request, response)
       break
   }
 }

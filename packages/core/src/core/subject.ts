@@ -6,6 +6,7 @@ export interface Subscription {
 
 export interface Observable<T> {
   subscribe(callback: EventCallback<T>): Subscription
+
   toPromise(): Promise<T | null>
 }
 
@@ -27,7 +28,7 @@ export class Subject<T> implements Observable<T> {
   }
 
   public next(data: T): void {
-    this.nextAsync(data).then()
+    void this.nextAsync(data)
   }
 
   public nextAsync(data: T): Promise<void> {
@@ -57,7 +58,7 @@ export class Subject<T> implements Observable<T> {
 export class BehaviourSubject<T> extends Subject<T> {
   protected override _value: T
 
-  constructor(initialValue: T) {
+  public constructor(initialValue: T) {
     super()
     this._value = initialValue
   }
@@ -67,7 +68,7 @@ export class BehaviourSubject<T> extends Subject<T> {
   }
 
   public override subscribe(callback: EventCallback<T>): Subscription {
-    callback(this._value)
+    void callback(this._value)
     return super.subscribe(callback)
   }
 

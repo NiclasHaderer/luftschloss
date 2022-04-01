@@ -1,4 +1,4 @@
-import { escapeRegexString, normalizePath } from "../core/utils"
+import { escapeRegexString, normalizePath } from "../core"
 import { DEFAULT_PATH_VALIDATOR_NAME } from "./default"
 
 type ValidatorName = string
@@ -8,7 +8,7 @@ export type PathValidators = Record<ValidatorName, PathValidator<any>>
 export type PathValidator<T> = {
   name: ValidatorName
   regex: RegExp
-  convert(value: string): T
+  convert(this: void, value: string): T
 }
 
 type PathParamName = string
@@ -16,9 +16,7 @@ export type PathConverter = Record<PathParamName, PathValidator<any>["convert"]>
 const IS_EXTRACTOR = /^{([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?}$/
 const CONTAINS_EXTRACTOR = /(?:\/|^){([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?}(?:\/|$)/
 
-export const containsRegex = (path: string): boolean => {
-  return CONTAINS_EXTRACTOR.test(path)
-}
+export const containsRegex = (path: string): boolean => CONTAINS_EXTRACTOR.test(path)
 
 export const toRegex = (path: string, validators: PathValidators): [RegExp, PathConverter] => {
   path = normalizePath(path)

@@ -7,4 +7,4 @@ const DefaultPathValidator: PathValidator<string> = {
   name: DEFAULT_PATH_VALIDATOR_NAME,
 }
 
-export const defaultPathValidator = () => DefaultPathValidator
+export const defaultPathValidator = (): typeof DefaultPathValidator => DefaultPathValidator

@@ -3,6 +3,7 @@ import { addResponseField, HTTPException, Response, Status } from "@luftschloss/
 import * as fs from "fs"
 
 declare module "@luftschloss/core" {
+  //eslint-disable-next-line no-shadow
   interface Response {
     file(path: string): Response
   }
@@ -16,6 +17,7 @@ addResponseField<Response, "file">("file", {
     if (!fs.existsSync(path)) {
       throw new HTTPException(Status.HTTP_404_NOT_FOUND, `File ${path} was not found`)
     }
+    //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return
     return this.stream(fs.createReadStream(path))
   },
 })

@@ -17,16 +17,16 @@ export interface Request<T extends object = any, P extends object = any> {
 export const addRequestField = <R extends Request, KEY extends PropertyKey>(
   fieldName: KEY,
   field: CustomPropertyDescriptor<R, KEY>
-) => {
+): void => {
   Object.defineProperty(RequestImpl.prototype, fieldName, field)
 }
 
 export const overwriteRequestMethod = <R extends Request, KEY extends keyof R>(
   fieldName: KEY,
   methodFactory: (original: R[KEY] extends Func ? R[KEY] : never) => CustomPropertyDescriptor<R, KEY>
-) => {
+): void => {
   const originalMethod = (RequestImpl.prototype as unknown as R)[fieldName]
-  if (!originalMethod) throw new Error(`Cannot override method ${fieldName}`)
+  if (!originalMethod) throw new Error(`Cannot override method ${fieldName.toString()}`)
   const newMethod = methodFactory(originalMethod as R[KEY] extends Func ? R[KEY] : never)
   addRequestField(fieldName, newMethod)
 }

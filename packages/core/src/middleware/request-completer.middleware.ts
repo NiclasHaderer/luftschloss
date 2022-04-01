@@ -1,7 +1,8 @@
 import { NextFunction } from "./middleware"
 import { defaultErrorHandler, HTTPException, Request, Response, ResponseImpl, Status } from "../core"
 
-const RequestCompleterMiddleware = async (next: NextFunction, request: Request, response: Response) => {
+// TODO error logging
+const RequestCompleterMiddleware = async (next: NextFunction, request: Request, response: Response): Promise<void> => {
   await next(request, response)
 
   if (response instanceof ResponseImpl) {
@@ -17,7 +18,7 @@ const RequestCompleterMiddleware = async (next: NextFunction, request: Request, 
       )
       try {
         await response.end()
-      } catch (e) {
+      } catch {
         // If this did not work, just send the internal error response
         await response.text("Internal error").end()
       }
@@ -29,4 +30,4 @@ const RequestCompleterMiddleware = async (next: NextFunction, request: Request, 
   }
 }
 
-export const requestCompleter = () => RequestCompleterMiddleware
+export const requestCompleter = (): typeof RequestCompleterMiddleware => RequestCompleterMiddleware

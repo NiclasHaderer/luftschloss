@@ -1,4 +1,4 @@
-import { ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
+import { fillWithDefaults, ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
 import {
   HttpMiddlewareRepresentation,
   isClassMiddleware,
@@ -56,7 +56,9 @@ export class BaseRouter implements Router {
     }
   }
 
-  public mount(routers: Router | Router[], options: MountingOptions = {}): this {
+  public mount(routers: Router | Router[], options: Partial<MountingOptions> = {}): this {
+    const completeOptions = fillWithDefaults<MountingOptions>(options, { basePath: "" })
+
     if (this.locked) {
       throw new Error("Router has been locked. You cannot mount any new routers")
     }
@@ -66,7 +68,7 @@ export class BaseRouter implements Router {
     }
 
     for (const router of routers) {
-      this.subRouters.push({ router, options })
+      this.subRouters.push({ router, options: completeOptions })
     }
 
     return this
@@ -101,6 +103,4 @@ export class BaseRouter implements Router {
   }
 }
 
-export const emptyRouter = () => {
-  return new BaseRouter()
-}
+export const emptyRouter = (): BaseRouter => new BaseRouter()

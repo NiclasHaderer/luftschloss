@@ -19,7 +19,7 @@ type StaticRouterProps = { followSymLinks: boolean }
 export class StaticRouter extends BaseRouter implements Router {
   private readonly folderPath: string
 
-  constructor(folderPath: string, private options: StaticRouterProps) {
+  public constructor(folderPath: string, private options: StaticRouterProps) {
     super()
     // path.resolve has not trailing / at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`
@@ -66,7 +66,7 @@ export class StaticRouter extends BaseRouter implements Router {
   }
 }
 
-export const staticRouter = (folderPath: string, options: Partial<StaticRouterProps> = {}) => {
+export const staticRouter = (folderPath: string, options: Partial<StaticRouterProps> = {}): StaticRouter => {
   let stat: Stats
   try {
     stat = fsSync.lstatSync(folderPath)

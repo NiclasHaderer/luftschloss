@@ -6,4 +6,4 @@ const StringPathValidator: PathValidator<string> = {
   convert: value => value,
 }
 
-export const stringPathValidator = () => StringPathValidator
+export const stringPathValidator = (): typeof StringPathValidator => StringPathValidator

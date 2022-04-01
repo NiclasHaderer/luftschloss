@@ -1,4 +1,4 @@
-import { HTTP_METHODS, ROUTE_HANDLER } from "../core/route-collector.model"
+import { HTTP_METHODS, ROUTE_HANDLER } from "../core"
 import { Router } from "./router"
 import { BaseRouter } from "./base.router"
 
@@ -35,6 +35,4 @@ export class DefaultRouter extends BaseRouter implements Router {
   }
 }
 
-export const defaultRouter = () => {
-  return new DefaultRouter()
-}
+export const defaultRouter = (): DefaultRouter => new DefaultRouter()

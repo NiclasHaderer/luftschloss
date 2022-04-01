@@ -1,5 +1,5 @@
 export class Headers {
-  constructor(private headers: Record<string, string[]> = {}) {}
+  public constructor(private headers: Record<string, string[]> = {}) {}
 
   public append(name: string, value: string): void {
     if (!(name in this.headers)) {

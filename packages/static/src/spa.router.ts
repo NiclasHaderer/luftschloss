@@ -9,7 +9,7 @@ type SPARouterProps = { followSymLinks: boolean; indexFile: string }
 class SPARouter extends StaticRouter implements Router {
   private readonly indexFile: string
 
-  constructor(folderPath: string, options: SPARouterProps) {
+  public constructor(folderPath: string, options: SPARouterProps) {
     super(folderPath, options)
     this.indexFile = options.indexFile
   }
@@ -19,7 +19,7 @@ class SPARouter extends StaticRouter implements Router {
   }
 }
 
-export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> = {}) => {
+export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> = {}): SPARouter => {
   let stat: Stats
   try {
     stat = fsSync.lstatSync(folderPath)

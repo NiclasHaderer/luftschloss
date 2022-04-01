@@ -1,0 +1,5 @@
+packages/core/dist
+packages/openapi/dist
+packages/static/dist
+apps/demo/dist
+.eslintrc.js

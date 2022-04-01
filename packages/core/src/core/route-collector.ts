@@ -10,7 +10,7 @@ export class RouteCollectorImpl implements RouteCollector {
   private get handlers(): CollectionEntry[] {
     return [...this._collection.entries()].flatMap(([path, routeHandler]) =>
       (Object.entries(routeHandler) as [HTTP_METHODS, ROUTE_HANDLER | null][])
-        .filter(([_, handler]) => !!handler)
+        .filter(([, handler]) => !!handler)
         .map(([method, handler]) => ({
           method,
           path,
@@ -39,10 +39,10 @@ export class RouteCollectorImpl implements RouteCollector {
       this._collection.set(path, { DELETE: null, GET: null, PATCH: null, POST: null, PUT: null, OPTIONS: null })
     }
     const collection = this._collection.get(path)!
-    if (collection[method as HTTP_METHODS]) {
+    if (collection[method]) {
       throw new Error(`Route ${path} already has a handler registered. Registering handlers twice is not possible`)
     }
 
-    collection[method as HTTP_METHODS] = callback
+    collection[method] = callback
   }
 }

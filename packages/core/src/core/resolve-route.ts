@@ -1,4 +1,4 @@
-import { PathConverter } from "../path-validator/validator"
+import { PathConverter } from "../path-validator"
 import { HTTP_METHODS, LookupResultStatus, RouteLookupResult } from "./route-collector.model"
 import { FinishedRoute, MergedRoutes } from "./router-merger"
 
@@ -53,7 +53,7 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
 
 const getAvailableMethods = (endpoint: Record<HTTP_METHODS, FinishedRoute | null>) => {
   const notNullMethods = (Object.entries(endpoint) as [HTTP_METHODS, FinishedRoute | null][])
-    .filter(([_, h]) => !!h)
+    .filter(([, h]) => !!h)
     .map(([m]) => m)
   if (notNullMethods.includes("OPTIONS")) return notNullMethods
   notNullMethods.push("OPTIONS")

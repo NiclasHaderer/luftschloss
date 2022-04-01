@@ -20,14 +20,14 @@ async function ErrorMiddleware(
     }
     const error = e as HTTPException
 
-    if (error.status.key in this.errorHandlers) {
-      this.errorHandlers[error.status.key]!(error, request, response)
+    const statusHandler = this.errorHandlers[error.status.key]
+    if (statusHandler) {
+      await statusHandler(error, request, response)
     } else {
-      this.errorHandlers.DEFAULT(error, request, response)
+      await this.errorHandlers.DEFAULT(error, request, response)
     }
   }
 }
 
-export const errorMiddleware = (errorHandlers: ErrorHandler): HttpMiddlewareInterceptor => {
-  return ErrorMiddleware.bind({ errorHandlers })
-}
+export const errorMiddleware = (errorHandlers: ErrorHandler): HttpMiddlewareInterceptor =>
+  ErrorMiddleware.bind({ errorHandlers })

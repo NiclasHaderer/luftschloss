@@ -10,38 +10,38 @@ export class RequestImpl<T extends object = any, P extends object = any> impleme
   private _data = {} as T
   private _pathParams = {} as P
 
-  constructor(private readonly req: IncomingMessage) {}
+  public constructor(private readonly req: IncomingMessage) {}
 
-  get data(): T {
+  public get data(): T {
     // TODO this is not correct
     return this._data
   }
 
-  get raw(): IncomingMessage {
+  public get raw(): IncomingMessage {
     return this.req
   }
 
-  get parameters(): URLSearchParams {
+  public get parameters(): URLSearchParams {
     return this.url.searchParams
   }
 
-  get pathParams(): P {
+  public get pathParams(): P {
     return this._pathParams
   }
 
-  set pathParams(params: P) {
+  public set pathParams(params: P) {
     this._pathParams = params
   }
 
-  get path(): string {
+  public get path(): string {
     return this.url.pathname
   }
 
-  get method(): HTTP_METHODS {
+  public get method(): HTTP_METHODS {
     return this.req.method as HTTP_METHODS
   }
 
-  get url(): URL {
+  public get url(): URL {
     const { port, address } = this.req.socket.address() as AddressInfo
     let protocol = "http://"
     if ("encrypted" in this.req.socket && (this.req.socket as TLSSocket).encrypted) {

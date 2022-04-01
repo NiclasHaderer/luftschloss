@@ -35,16 +35,16 @@ export interface Response {
 export const addResponseField = <R extends Response, KEY extends PropertyKey>(
   fieldName: KEY,
   field: CustomPropertyDescriptor<R, KEY>
-) => {
+): void => {
   Object.defineProperty(ResponseImpl.prototype, fieldName, field)
 }
 
 export const overwriteResponseMethod = <R extends Response, KEY extends keyof R>(
   fieldName: KEY,
   methodFactory: (original: R[KEY] extends Func ? R[KEY] : never) => CustomPropertyDescriptor<R, KEY>
-) => {
+): void => {
   const originalMethod = (ResponseImpl.prototype as unknown as R)[fieldName]
-  if (!originalMethod) throw new Error(`Cannot override method ${fieldName}`)
+  if (!originalMethod) throw new Error(`Cannot override method ${fieldName.toString()}`)
   const newMethod = methodFactory(originalMethod as R[KEY] extends Func ? R[KEY] : never)
   addResponseField(fieldName, newMethod)
 }

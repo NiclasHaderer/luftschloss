@@ -1,8 +1,8 @@
 import { HttpMiddlewareInterceptor } from "./middleware"
 
 export const corsMiddleware = (): HttpMiddlewareInterceptor => {
-  return (next, request, response) => {
+  return async (next, request, response) => {
     // TODO
-    next(request, response)
+    await next(request, response)
   }
 }
