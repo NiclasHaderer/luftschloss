@@ -1,4 +1,4 @@
-import { fillWithDefaults, ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
+import { ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
 import {
   HttpMiddlewareRepresentation,
   isClassMiddleware,
@@ -9,6 +9,7 @@ import {
   ReadonlyMiddlewares,
 } from "../middleware"
 import { MountingOptions, Router } from "./router"
+import { withDefaults } from "../core/with-defaults"
 
 export class BaseRouter implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
@@ -57,7 +58,7 @@ export class BaseRouter implements Router {
   }
 
   public mount(routers: Router | Router[], options: Partial<MountingOptions> = {}): this {
-    const completeOptions = fillWithDefaults<MountingOptions>(options, { basePath: "" })
+    const completeOptions = withDefaults<MountingOptions>(options, { basePath: "" })
 
     if (this.locked) {
       throw new Error("Router has been locked. You cannot mount any new routers")

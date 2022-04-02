@@ -12,10 +12,3 @@ export const normalizePath = (url: string): string => {
  * @returns A regex save string
  */
 export const escapeRegexString = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-
-// TODO deep partial
-export const fillWithDefaults = <T extends object>(partial: Partial<T>, defaults: T): T => {
-  console.log("todo")
-  // TODO
-  return defaults
-}

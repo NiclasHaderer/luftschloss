@@ -4,5 +4,3 @@
 node_modules/.bin/eslint .
 node_modules/.bin/pretty-quick --staged packages/**/*
 node_modules/.bin/pretty-quick --staged apps/**/*
-
-node_modules/.bin/tslint --project tsconfig.json
