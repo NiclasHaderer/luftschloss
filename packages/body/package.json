@@ -1,0 +1,22 @@
+{
+  "name": "@luftschloss/body",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -r .turbo dist"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "@types/content-type": "^1.1.5"
+  },
+  "dependencies": {
+    "@luftschloss/core": "workspace:packages/core",
+    "content-type": "^1.0.4",
+    "tslib": "^2.3.1"
+  }
+}
