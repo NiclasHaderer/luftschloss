@@ -1,13 +1,13 @@
 import assert from "assert"
 import {
   BaseRouter,
-  fillWithDefaults,
   HTTPException,
   isProduction,
   Request,
   Response,
   Router,
   Status,
+  withDefaults,
 } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { promises as fs, Stats } from "fs"
@@ -28,7 +28,7 @@ export class StaticRouter extends BaseRouter implements Router {
     // TODO not modified response
   }
 
-  protected async handlePath(request: Request<object, { path: string }>, response: Response): Promise<void> {
+  protected async handlePath(request: Request<{ path: string }, object>, response: Response): Promise<void> {
     // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
     const filePath = request.pathParams.path.replace(/^\//, "")
 
@@ -77,6 +77,6 @@ export const staticRouter = (folderPath: string, options: Partial<StaticRouterPr
     throw new Error(`Cannot serve static files from ${folderPath}. Path is not a directory`)
   }
 
-  const mergedOptions = fillWithDefaults<StaticRouterProps>(options, { followSymLinks: false })
+  const mergedOptions = withDefaults<StaticRouterProps>(options, { followSymLinks: false })
   return new StaticRouter(folderPath, mergedOptions)
 }

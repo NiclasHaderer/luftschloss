@@ -1,4 +1,4 @@
-import { fillWithDefaults, Request, Response, Router } from "@luftschloss/core"
+import { Request, Response, Router, withDefaults } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { Stats } from "fs"
 import "./response"
@@ -30,6 +30,6 @@ export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> =
     throw new Error(`Cannot serve static files from ${folderPath}. Path is not a directory`)
   }
 
-  const mergedOptions = fillWithDefaults<SPARouterProps>(options, { followSymLinks: false, indexFile: "index.html" })
+  const mergedOptions = withDefaults<SPARouterProps>(options, { followSymLinks: false, indexFile: "index.html" })
   return new SPARouter(folderPath, mergedOptions)
 }
