@@ -4,7 +4,7 @@ import { Observable, Subject } from "./subject"
 import { EventData } from "./server"
 import { RouterMerger } from "./router-merger"
 import { RequestPipeline } from "./request-pipeline"
-import http from "http"
+import http, { IncomingMessage, ServerResponse } from "http"
 import { Duplex } from "stream"
 import { Router } from "../router"
 
@@ -16,6 +16,8 @@ export interface ServerBase {
   listen(port?: number, hostname?: string): Promise<void>
 
   shutdown(options: { gracePeriod: 100 }): Promise<Error | undefined>
+
+  handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void
 
   lock(): void
 }
@@ -51,9 +53,11 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       this.requestPipeline = new RequestPipeline(this.middleware)
       this.handleStart$ = this.requestPipeline.handleStart$
       this.handleEnd$ = this.requestPipeline.handleEnd$
-      this.server = http.createServer(async (req, res) => {
-        await this.requestPipeline.queue(req, res)
-      })
+      this.server = http.createServer(this.handleIncomingRequest.bind(this))
+    }
+
+    public async handleIncomingRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+      await this.requestPipeline.queue(req, res)
     }
 
     public addPathValidator(validator: PathValidator<any>): this {

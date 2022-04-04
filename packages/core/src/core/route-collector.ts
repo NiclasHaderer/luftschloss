@@ -36,7 +36,15 @@ export class RouteCollectorImpl implements RouteCollector {
 
   private addToCollection(path: string, method: HTTP_METHODS, callback: ROUTE_HANDLER): void {
     if (!this._collection.has(path)) {
-      this._collection.set(path, { DELETE: null, GET: null, PATCH: null, POST: null, PUT: null, OPTIONS: null })
+      this._collection.set(path, {
+        HEAD: null,
+        DELETE: null,
+        GET: null,
+        PATCH: null,
+        POST: null,
+        PUT: null,
+        OPTIONS: null,
+      })
     }
     const collection = this._collection.get(path)!
     if (collection[method]) {

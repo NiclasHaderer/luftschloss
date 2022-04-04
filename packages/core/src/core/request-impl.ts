@@ -5,8 +5,9 @@ import { normalizePath } from "./utils"
 import { AddressInfo } from "net"
 import { TLSSocket } from "tls"
 import { Request } from "./request"
+import { Headers } from "./headers"
 
-export class RequestImpl<T extends object = any, P extends object = any> implements Request<T, P> {
+export class RequestImpl<P extends object = any, T extends object = any> implements Request<P, T> {
   private _data = {} as T
   private _pathParams = {} as P
 
@@ -19,6 +20,10 @@ export class RequestImpl<T extends object = any, P extends object = any> impleme
 
   public get raw(): IncomingMessage {
     return this.req
+  }
+
+  public get headers(): Headers {
+    return Headers.create(this.req.headers)
   }
 
   public get parameters(): URLSearchParams {

@@ -18,6 +18,10 @@ export class DefaultRouter extends BaseRouter implements Router {
     this.handle("GET", url, callback)
   }
 
+  public head(url: string, callback: ROUTE_HANDLER): void {
+    this.handle("HEAD", url, callback)
+  }
+
   public patch(url: string, callback: ROUTE_HANDLER): void {
     this.handle("PATCH", url, callback)
   }

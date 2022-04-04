@@ -3,8 +3,9 @@ import { URL } from "url"
 import { IncomingMessage } from "http"
 import { CustomPropertyDescriptor, Func } from "../types"
 import { RequestImpl } from "./request-impl"
+import { Headers } from "./headers"
 
-export interface Request<T extends object = any, P extends object = any> {
+export interface Request<P extends object = any, T extends object = any> {
   readonly data: T
   readonly raw: IncomingMessage
   readonly parameters: URLSearchParams
@@ -12,6 +13,7 @@ export interface Request<T extends object = any, P extends object = any> {
   readonly path: string
   readonly method: HTTP_METHODS
   readonly url: URL
+  readonly headers: Headers
 }
 
 export const addRequestField = <R extends Request, KEY extends PropertyKey>(

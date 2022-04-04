@@ -12,3 +12,9 @@ export const normalizePath = (url: string): string => {
  * @returns A regex save string
  */
 export const escapeRegexString = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+
+export const saveObject = <T extends Record<string, unknown>>(): T => {
+  const tmp = {} as T
+  Object.freeze(tmp.__proto__)
+  return tmp
+}

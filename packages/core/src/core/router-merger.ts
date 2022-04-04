@@ -47,7 +47,15 @@ export class RouterMerger {
     for (let { handler, path, method } of router.routes.entries()) {
       path = normalizePath(`${basePath}/${path}`)
       if (!this._collection.has(path)) {
-        this._collection.set(path, { DELETE: null, GET: null, PATCH: null, POST: null, PUT: null, OPTIONS: null })
+        this._collection.set(path, {
+          HEAD: null,
+          DELETE: null,
+          GET: null,
+          PATCH: null,
+          POST: null,
+          PUT: null,
+          OPTIONS: null,
+        })
       }
       const collection = this._collection.get(path)!
       if (collection[method]) {
