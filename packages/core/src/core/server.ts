@@ -1,5 +1,5 @@
 import { defaultErrorHandler, ErrorHandler } from "./error-handler"
-import { errorMiddleware, loggerMiddleware, requestCompleter } from "../middleware"
+import { errorMiddleware, loggerMiddleware, noContentSniff, poweredBy, requestCompleter } from "../middleware"
 import { DefaultRouter } from "../router"
 import {
   intPathValidator,
@@ -22,6 +22,8 @@ export const defaultServer = (errorHandlers: Partial<ErrorHandler> = {}): Server
     .pipe(loggerMiddleware())
     .pipe(requestCompleter())
     .pipe(errorMiddleware({ ...defaultErrorHandler, ...errorHandlers }))
+    .pipe(noContentSniff())
+    .pipe(poweredBy())
 
   server
     .addPathValidator(intPathValidator())

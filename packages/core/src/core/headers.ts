@@ -6,7 +6,7 @@ export class Headers {
   public append(name: string, value: string): void {
     name = this.cleanHeaderName(name)
 
-    if (this.headers.has(name)) {
+    if (!this.headers.has(name)) {
       this.headers.set(name, new Set())
     }
 
@@ -14,6 +14,7 @@ export class Headers {
       .split(",")
       .map(s => s.trim())
       .filter(s => !!s)
+
     for (const headerValue of headerValues) {
       this.headers.get(name)!.add(headerValue)
     }
