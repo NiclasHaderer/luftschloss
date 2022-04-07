@@ -9,6 +9,7 @@ import {
   uuidPathValidator,
 } from "../path-validator"
 import { withServerBase } from "./server-base"
+import { saveObject } from "./utils"
 
 export type EventData = {
   data: Record<string, any>
@@ -16,7 +17,7 @@ export type EventData = {
 
 class ServerImpl extends withServerBase(DefaultRouter) {}
 
-export const defaultServer = (errorHandlers: Partial<ErrorHandler> = {}): ServerImpl => {
+export const defaultServer = (errorHandlers: Partial<ErrorHandler> = saveObject()): ServerImpl => {
   const server = new ServerImpl()
   server
     .pipe(loggerMiddleware())

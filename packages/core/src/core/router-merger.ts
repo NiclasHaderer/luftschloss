@@ -2,7 +2,7 @@ import { ReadonlyMiddlewares } from "../middleware"
 import { containsRegex, PathConverter, PathValidators, toRegex } from "../path-validator"
 import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
 import { MountingOptions, Router } from "../router"
-import { normalizePath } from "./utils"
+import { normalizePath, saveObject } from "./utils"
 
 export type FinishedRoute = {
   pipeline: ReadonlyMiddlewares
@@ -26,7 +26,7 @@ export class RouterMerger {
     if (!this.locked) throw new Error("Cannot retrieve routes because RouteMerger is not locked")
 
     const regexPaths: MergedRoute[] = []
-    const lookupPaths: Record<string, Record<HTTP_METHODS, FinishedRoute | null>> = {}
+    const lookupPaths: Record<string, Record<HTTP_METHODS, FinishedRoute | null>> = saveObject()
 
     for (const [path, methods] of this._collection.entries()) {
       if (containsRegex(path)) {

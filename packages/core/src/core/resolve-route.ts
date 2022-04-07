@@ -1,6 +1,7 @@
 import { PathConverter } from "../path-validator"
 import { HTTP_METHODS, LookupResultStatus, RouteLookupResult } from "./route-collector.model"
 import { FinishedRoute, MergedRoutes } from "./router-merger"
+import { saveObject } from "./utils"
 
 export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedRoutes): RouteLookupResult => {
   let status: LookupResultStatus.NOT_FOUND | LookupResultStatus.METHOD_NOT_ALLOWED = LookupResultStatus.NOT_FOUND
@@ -16,7 +17,7 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
         status: LookupResultStatus.OK,
         executor: handler.executor,
         pipeline: handler.pipeline,
-        pathParams: {},
+        pathParams: saveObject(),
         availableMethods,
       }
     } else {
@@ -61,7 +62,7 @@ const getAvailableMethods = (endpoint: Record<HTTP_METHODS, FinishedRoute | null
 }
 
 const extractParamsFromMatch = (match: RegExpMatchArray, pathConverter: PathConverter): Record<string, unknown> => {
-  const convertedPathParams: Record<string, unknown> = {}
+  const convertedPathParams: Record<string, unknown> = saveObject()
   for (const [name, converter] of Object.entries(pathConverter)) {
     convertedPathParams[name] = converter(match.groups![name])
   }

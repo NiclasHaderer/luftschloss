@@ -11,6 +11,7 @@ import { MergedRoutes } from "./router-merger"
 import { resolveRoute } from "./resolve-route"
 import { Request } from "./request"
 import { Response } from "./response"
+import { saveObject } from "./utils"
 
 export class RequestPipeline {
   private readonly _handleEnd$ = new Subject<EventData>()
@@ -35,7 +36,7 @@ export class RequestPipeline {
       const route = resolveRoute(request.path, request.method, this.routes)
 
       // Set the extracted path params in the request instance
-      request.pathParams = route.pathParams || {}
+      request.pathParams = route.pathParams || saveObject<Record<string, unknown>>()
 
       // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
       // method not allowed executor
@@ -98,7 +99,7 @@ export class RequestPipeline {
    */
   private async withStart(callback: () => Promise<void>): Promise<void> {
     // Create data which will be shared between the start and end handler
-    const startEndData = { data: {} }
+    const startEndData = { data: saveObject() }
     this._handleStart$.next(startEndData)
 
     // Execute the main request

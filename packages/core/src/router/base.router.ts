@@ -1,4 +1,4 @@
-import { ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
+import { ReadonlyRouteCollector, RouteCollectorImpl, saveObject, withDefaults } from "../core"
 import {
   HttpMiddlewareRepresentation,
   isClassMiddleware,
@@ -9,7 +9,6 @@ import {
   ReadonlyMiddlewares,
 } from "../middleware"
 import { MountingOptions, Router } from "./router"
-import { withDefaults } from "../core/with-defaults"
 
 export class BaseRouter implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
@@ -57,7 +56,7 @@ export class BaseRouter implements Router {
     }
   }
 
-  public mount(routers: Router | Router[], options: Partial<MountingOptions> = {}): this {
+  public mount(routers: Router | Router[], options: Partial<MountingOptions> = saveObject()): this {
     const completeOptions = withDefaults<MountingOptions>(options, { basePath: "" })
 
     if (this.locked) {

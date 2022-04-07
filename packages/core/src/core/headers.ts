@@ -1,4 +1,5 @@
 import { IncomingHttpHeaders } from "http"
+import { saveObject } from "./utils"
 
 export class Headers {
   private headers = new Map<string, Set<string>>()
@@ -60,7 +61,7 @@ export class Headers {
   }
 
   public encode(): Record<string, string> {
-    const encodedHeaders: Record<string, string> = {}
+    const encodedHeaders: Record<string, string> = saveObject()
     for (const [name, [...value]] of this.entries()) {
       encodedHeaders[name] = value.join(", ")
     }

@@ -1,4 +1,4 @@
-import { Request, Response, Router, withDefaults } from "@luftschloss/core"
+import { Request, Response, Router, saveObject, withDefaults } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { Stats } from "fs"
 import "./response"
@@ -19,7 +19,7 @@ class SPARouter extends StaticRouter implements Router {
   }
 }
 
-export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> = {}): SPARouter => {
+export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> = saveObject()): SPARouter => {
   let stat: Stats
   try {
     stat = fsSync.lstatSync(folderPath)
