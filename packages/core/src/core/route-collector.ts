@@ -37,6 +37,7 @@ export class RouteCollectorImpl implements RouteCollector {
   private addToCollection(path: string, method: HTTP_METHODS, callback: ROUTE_HANDLER): void {
     if (!this._collection.has(path)) {
       this._collection.set(path, {
+        TRACE: null,
         HEAD: null,
         DELETE: null,
         GET: null,

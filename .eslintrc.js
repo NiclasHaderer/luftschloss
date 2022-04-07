@@ -14,7 +14,7 @@ module.exports = {
     project: "tsconfig.json",
     sourceType: "module",
   },
-  plugins: ["eslint-plugin-jsdoc", "eslint-plugin-prefer-arrow", "@typescript-eslint"],
+  plugins: ["eslint-plugin-jsdoc", "@typescript-eslint"],
   rules: {
     "jsdoc/require-jsdoc": "off",
     "jsdoc/require-param-type": "off",
@@ -32,14 +32,6 @@ module.exports = {
       "warn",
       {
         args: "none",
-      },
-    ],
-    "prefer-arrow/prefer-arrow-functions": [
-      "error",
-      {
-        disallowPrototype: true,
-        singleReturnOnly: false,
-        classPropertiesAllowed: false,
       },
     ],
   },

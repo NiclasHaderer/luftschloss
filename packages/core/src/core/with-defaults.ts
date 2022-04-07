@@ -6,7 +6,7 @@ const defaultExecutor = <T extends Record<string, any>>(partial: T, defaults: T)
   for (const key of Object.keys(defaults)) {
     // Key is not filled, so fill it with a default value, can be primitive or object
     if (partial[key] === undefined) {
-      //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-extra-semi
       ;(partial as Record<string, any>)[key] = deepCopy(defaults[key])
     }
     // If the not undefined value is an object fill the child object with defaults as well

@@ -15,6 +15,8 @@ export interface ServerBase {
 
   listen(port?: number, hostname?: string): Promise<void>
 
+  _testBootstrap(): void
+
   shutdown(options: { gracePeriod: 100 }): Promise<Error | undefined>
 
   handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void
@@ -89,13 +91,30 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
     public override lock(): void {
       this.routeMerger.lock()
+      this.requestPipeline.lock(this.routeMerger.entries())
       super.lock()
     }
 
-    public async listen(port = 3200, hostname = "0.0.0.0"): Promise<void> {
+    public _testBootstrap(): void {
+      if (this.locked) {
+        throw new Error("Server was already passed to a testing client")
+      }
+
       this.routeMerger.mergeIn(this, { basePath: "/" }, [])
       this.lock()
-      this.requestPipeline.lock(this.routeMerger.entries())
+      //noinspection JSPotentiallyInvalidUsageOfThis
+      this._start$.next()
+      //noinspection JSPotentiallyInvalidUsageOfThis
+      this._start$.complete()
+    }
+
+    public async listen(port = 3200, hostname = "0.0.0.0"): Promise<void> {
+      if (this.locked) {
+        throw new Error("Server was already started")
+      }
+
+      this.routeMerger.mergeIn(this, { basePath: "/" }, [])
+      this.lock()
 
       const runningServer = this.server.listen(port, hostname, () => {
         console.log(`Server is listening on http://${hostname}:${port}`)

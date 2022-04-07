@@ -48,6 +48,7 @@ export class RouterMerger {
       path = normalizePath(`${basePath}/${path}`)
       if (!this._collection.has(path)) {
         this._collection.set(path, {
+          TRACE: null,
           HEAD: null,
           DELETE: null,
           GET: null,

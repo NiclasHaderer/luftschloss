@@ -5,7 +5,7 @@ export const deepCopy = <T>(object: T): T => {
 
   const newObject = {} as T
   for (const key of Object.keys(object)) {
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-extra-semi
     ;(newObject as Record<string, any>)[key] = deepCopy((object as Record<string, any>)[key])
   }
   return newObject

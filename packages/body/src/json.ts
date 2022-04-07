@@ -10,7 +10,6 @@ export type JsonParserOptions = {
 
 export type InternalJsonParserOptions = { contentType: Set<string> } & JsonParserOptions
 
-//eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 async function JsonParserMiddleware(
   this: InternalJsonParserOptions,
   next: NextFunction,

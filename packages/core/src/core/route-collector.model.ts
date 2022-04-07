@@ -77,8 +77,9 @@ export type ROUTE_HANDLER = (request: Request, response: Response) => Promise<an
 /**
  * Available HTTP_METHODS To listen for
  */
-export type HTTP_METHODS = "GET" | "POST" | "DELETE" | "PUT" | "PATCH" | "OPTIONS" | "HEAD"
+export type HTTP_METHODS = "GET" | "HEAD" | "POST" | "PUT" | "DELETE" | "OPTIONS" | "TRACE" | "PATCH"
 export const HTTP_METHODS: Record<HTTP_METHODS, HTTP_METHODS> = {
+  TRACE: "TRACE",
   DELETE: "DELETE",
   GET: "GET",
   HEAD: "HEAD",
