@@ -1,6 +1,6 @@
 import { HTTPException, HttpMiddlewareInterceptor, NextFunction, Request, Response, Status } from "@luftschloss/core"
 import { withDefaults } from "@luftschloss/core/dist/core/with-defaults"
-import { getBodyContentType, getBodyData } from "./common"
+import { getBodyContentType, getBodyData, verifyContentLengthHeader } from "./common"
 import * as Buffer from "buffer"
 
 export type JsonParserOptions = {
@@ -16,14 +16,7 @@ async function JsonParserMiddleware(
   request: Request,
   response: Response
 ) {
-  let length = parseInt(request.headers.get("Content-Length") || "0")
-  if (isNaN(length)) {
-    length = 0
-  }
-
-  if (length > this.maxBodySize) {
-    throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request body to large")
-  }
+  verifyContentLengthHeader(request, this.maxBodySize)
 
   let parsed: object | null = null
   request.body = async <T>(): Promise<T> => {
@@ -56,7 +49,8 @@ export const jsonParser = (
     parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => JSON.parse(buffer.toString(encoding)) as object,
   })
   return JsonParserMiddleware.bind({
-    ...completeOptions,
+    parser: completeOptions.parser,
+    maxBodySize: completeOptions.maxBodySize * 100,
     contentType: new Set(contentType.map(c => c.toLowerCase().trim())),
   })
 }

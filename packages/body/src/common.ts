@@ -1,6 +1,17 @@
 import { HTTPException, Request, Status } from "@luftschloss/core"
 import * as contentType from "content-type"
 
+export const verifyContentLengthHeader = (request: Request, maxBodySize: number) => {
+  let length = parseInt(request.headers.get("Content-Length") || "0")
+  if (isNaN(length)) {
+    length = 0
+  }
+
+  if (length > maxBodySize) {
+    throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request body to large")
+  }
+}
+
 export const getBodyData = ({ raw, headers }: Request, maxBodySize: number) => {
   return new Promise<Buffer>(resolve => {
     const buffers: Buffer[] = []
