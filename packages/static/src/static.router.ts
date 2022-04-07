@@ -28,7 +28,10 @@ export class StaticRouter extends BaseRouter implements Router {
     // TODO not modified response
   }
 
-  protected async handlePath(request: Request<{ path: string }, object>, response: Response): Promise<void> {
+  protected async handlePath(
+    request: Request<{ path: string }, Record<string, unknown>>,
+    response: Response
+  ): Promise<void> {
     // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
     const filePath = request.pathParams.path.replace(/^\//, "")
 

@@ -5,7 +5,7 @@ export class Headers {
   private headers = new Map<string, Set<string>>()
 
   public append(name: string, value: string): void {
-    name = this.cleanHeaderName(name)
+    name = Headers.cleanHeaderName(name)
 
     if (!this.headers.has(name)) {
       this.headers.set(name, new Set())
@@ -28,7 +28,7 @@ export class Headers {
   }
 
   public delete(name: string): void {
-    name = this.cleanHeaderName(name)
+    name = Headers.cleanHeaderName(name)
     this.headers.delete(name)
   }
 
@@ -37,13 +37,13 @@ export class Headers {
   }
 
   public get(name: string): string | null {
-    name = this.cleanHeaderName(name)
+    name = Headers.cleanHeaderName(name)
     const [first] = this.headers.get(name) || []
     return first || null
   }
 
   public getAll(name: string): Set<string> | null {
-    name = this.cleanHeaderName(name)
+    name = Headers.cleanHeaderName(name)
     return this.headers.get(name) || null
   }
 
@@ -68,11 +68,11 @@ export class Headers {
     return encodedHeaders
   }
 
-  private cleanHeaderName(name: string): string {
+  private static cleanHeaderName(name: string): string {
     return name.trim().toLowerCase()
   }
 
-  static create(nodeHeaders: IncomingHttpHeaders): Headers {
+  public static create(nodeHeaders: IncomingHttpHeaders): Headers {
     const headers = new Headers()
     for (const [name, value] of Object.values(nodeHeaders) as [string, string][]) {
       headers.append(name, value)

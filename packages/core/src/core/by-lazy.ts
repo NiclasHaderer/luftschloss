@@ -1,14 +1,23 @@
-export const ByLazy = <VALUE, TARGET>(factory: (self: TARGET) => VALUE) => {
+/* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return */
+
+export const ByLazy = <VALUE, TARGET = never>(factory: (self: TARGET) => VALUE) => {
   return (target: TARGET, propertyKey: string) => {
-    let isSet = false
-    let cache: VALUE
+    const cacheDataSymbol = Symbol("cache_data")
+    const cacheSetSymbol = Symbol("cache_set")
+
     Object.defineProperty(target, propertyKey, {
       get(): VALUE {
-        if (!isSet) {
-          cache = factory(this as TARGET)
-          isSet = true
+        const isSet = (): boolean => !!this[cacheSetSymbol]
+        const setValue = () => {
+          this[cacheSetSymbol] = true
+          this[cacheDataSymbol] = factory(this as TARGET)
         }
-        return cache
+
+        const getValue = (): VALUE => this[cacheDataSymbol]
+
+        if (!isSet()) setValue()
+
+        return getValue()
       },
     })
   }

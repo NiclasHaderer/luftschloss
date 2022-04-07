@@ -1,18 +1,20 @@
 import { HTTP_METHODS } from "./route-collector.model"
-import { URL } from "url"
 import { IncomingMessage } from "http"
 import { CustomPropertyDescriptor, Func } from "../types"
 import { RequestImpl } from "./request-impl"
 import { Headers } from "./headers"
+import { UTF8Url } from "./utf8-url"
+import { Utf8SearchParams } from "./utf8-search-params"
 
-export interface Request<P extends object = any, T extends object = any> {
+export interface Request<P extends object = any, T extends Record<string, unknown> = any> {
   readonly data: T
   readonly raw: IncomingMessage
-  readonly parameters: URLSearchParams
+  // TODO perhaps same arrangement like the urlParams?
+  readonly urlParams: Utf8SearchParams
   readonly pathParams: P
   readonly path: string
   readonly method: HTTP_METHODS
-  readonly url: URL
+  readonly url: UTF8Url
   readonly headers: Headers
 }
 

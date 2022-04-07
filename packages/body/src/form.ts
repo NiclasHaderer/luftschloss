@@ -10,6 +10,7 @@ import {
 } from "@luftschloss/core"
 import Buffer from "buffer"
 import { getBodyContentType, getBodyData, verifyContentLengthHeader } from "./common"
+import { Utf8SearchParams } from "@luftschloss/core/dist/core/utf8-search-params"
 
 export type FormParserOptions = {
   maxBodySize: number
@@ -52,9 +53,9 @@ export const formParser = (
   options: Partial<FormParserOptions>
 ): HttpMiddlewareInterceptor => {
   const completeOptions = withDefaults<FormParserOptions>(options, {
-    parser: (buffer, encoding) => {
+    parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
       const str = buffer.toString(encoding)
-      const url = new URLSearchParams(str)
+      const url = new Utf8SearchParams(str)
       const encodedBody = saveObject()
 
       for (const key of url.values()) {

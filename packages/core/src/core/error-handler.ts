@@ -16,6 +16,7 @@ export type ErrorHandler = Partial<{
 
 export const defaultErrorHandler: ErrorHandler = {
   DEFAULT: (error: HTTPException, request: Request, response: Response): Promise<void> | void => {
+    console.log(request.urlParams)
     response.status(error.status).json({ error: error.message })
   },
   HTTP_500_INTERNAL_SERVER_ERROR: (
