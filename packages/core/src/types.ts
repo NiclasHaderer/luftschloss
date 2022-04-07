@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 export type ValueOf<T> = T[keyof T]
 
 export type Constructor<CLAZZ, ARGS extends []> = new (...args: ARGS) => CLAZZ

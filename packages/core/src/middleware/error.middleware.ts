@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { ErrorHandler, HTTPException, Request, Response, Status } from "../core"
 import { HttpMiddlewareInterceptor, NextFunction } from "./middleware"
 

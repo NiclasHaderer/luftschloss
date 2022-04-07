@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { URL } from "url"
 import { Utf8SearchParams } from "./utf8-search-params"
 

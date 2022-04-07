@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { defaultErrorHandler, ErrorHandler } from "./error-handler"
 import { errorMiddleware, loggerMiddleware, noContentSniff, poweredBy, requestCompleter } from "../middleware"
 import { DefaultRouter } from "../router"

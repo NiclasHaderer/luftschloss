@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 type EventCallback<T> = (data: T) => void | Promise<void>
 
 export interface Subscription {

@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { escapeRegexString, normalizePath, saveObject } from "../core"
 import { DEFAULT_PATH_VALIDATOR_NAME } from "./default"
 

@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import "@luftschloss/core"
 import { addResponseField, HTTPException, Response, Status } from "@luftschloss/core"
 import * as fs from "fs"

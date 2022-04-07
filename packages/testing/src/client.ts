@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { Options, OptionsWithBody, TestingClient, TestingServer } from "./models"
 import LightMyRequest, { DispatchFunc, inject, InjectOptions } from "light-my-request"
 

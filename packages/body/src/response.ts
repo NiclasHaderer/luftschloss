@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { addRequestField, HTTPException, Request, Status } from "@luftschloss/core"
 
 declare module "@luftschloss/core" {

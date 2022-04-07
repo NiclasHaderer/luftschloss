@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { MiddlewareRepresentation } from "../middleware"
 import { Request } from "./request"
 import { PathValidator } from "../path-validator"

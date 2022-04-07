@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { IncomingMessage as In, ServerResponse as Out } from "http"
 import { Subject } from "./subject"
 import { RequestImpl } from "./request-impl"

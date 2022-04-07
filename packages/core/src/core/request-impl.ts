@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { IncomingMessage } from "http"
 import { HTTP_METHODS } from "./route-collector.model"
 import { normalizePath, saveObject } from "./utils"

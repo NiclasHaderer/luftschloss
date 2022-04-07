@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { CollectionEntry, HTTP_METHODS, ROUTE_HANDLER, RouteCollector } from "./route-collector.model"
 import { normalizePath } from "./utils"
 

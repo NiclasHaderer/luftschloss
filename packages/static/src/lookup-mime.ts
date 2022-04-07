@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import * as db from "mime-db"
 import { extname } from "path"
 import { saveObject } from "@luftschloss/core"

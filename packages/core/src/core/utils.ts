@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 export const normalizePath = (url: string): string => {
   url = `/${url}/`
   // Replace // with /

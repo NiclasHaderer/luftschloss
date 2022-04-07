@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 /**
  * Every router has to expose a list of middlewares the callbacks in the routes' property will be wrapped in
  */

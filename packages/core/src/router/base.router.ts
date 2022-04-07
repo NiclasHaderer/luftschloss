@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { ReadonlyRouteCollector, RouteCollectorImpl, saveObject, withDefaults } from "../core"
 import {
   HttpMiddlewareRepresentation,

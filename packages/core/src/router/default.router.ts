@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { HTTP_METHODS, ROUTE_HANDLER } from "../core"
 import { Router } from "./router"
 import { BaseRouter } from "./base.router"

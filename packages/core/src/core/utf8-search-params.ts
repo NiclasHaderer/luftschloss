@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { URLSearchParams } from "url"
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL")

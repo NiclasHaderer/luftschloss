@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { PathValidator } from "./validator"
 
 const IntPathValidator: PathValidator<number> = {

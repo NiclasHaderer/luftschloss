@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { URL } from "url"
 import { Headers } from "./headers"
 import { Status } from "./status"

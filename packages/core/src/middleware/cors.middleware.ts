@@ -1,6 +1,12 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { ClassMiddlewareInterceptor, NextFunction } from "./middleware"
 import { HTTP_METHODS, Request, Response, saveObject } from "../core"
-import { withDefaults } from "../core/with-defaults"
+import { withDefaults } from "../core"
 
 type CorsMiddlewareOptions = {
   allowedMethods: HTTP_METHODS[] | "*"

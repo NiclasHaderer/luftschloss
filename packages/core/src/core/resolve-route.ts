@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { PathConverter } from "../path-validator"
 import { HTTP_METHODS, LookupResultStatus, RouteLookupResult } from "./route-collector.model"
 import { FinishedRoute, MergedRoutes } from "./router-merger"

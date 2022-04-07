@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { Request, Response, Router, saveObject, withDefaults } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { Stats } from "fs"

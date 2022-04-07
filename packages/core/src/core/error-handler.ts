@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { HTTPException } from "./http-exception"
 import { Status } from "./status"
 import { Request } from "./request"

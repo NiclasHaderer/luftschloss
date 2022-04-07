@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { deepCopy } from "./deep-copy"
 
 const isObject = (value: unknown): value is Record<string, any> => value instanceof Object

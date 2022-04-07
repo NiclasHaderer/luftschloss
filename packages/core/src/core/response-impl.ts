@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { ServerResponse } from "http"
 import { Status, toStatus } from "./status"
 import { Headers } from "./headers"

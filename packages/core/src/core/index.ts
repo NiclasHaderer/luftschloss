@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 export * from "./by-lazy"
 export * from "./deep-copy"
 export * from "./error-handler"

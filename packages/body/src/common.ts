@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { HTTPException, Request, Status } from "@luftschloss/core"
 import * as contentType from "content-type"
 

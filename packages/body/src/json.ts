@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { HTTPException, HttpMiddlewareInterceptor, NextFunction, Request, Response, Status } from "@luftschloss/core"
 import { withDefaults } from "@luftschloss/core/dist/core/with-defaults"
 import { getBodyContentType, getBodyData, verifyContentLengthHeader } from "./common"

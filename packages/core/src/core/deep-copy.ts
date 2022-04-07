@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 import { saveObject } from "./utils"
 
 const isObject = (value: unknown): value is Record<string, any> => value instanceof Object
