@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-export * from "./middleware"
+export * from "./static.middleware"
 export * from "./response"
 export * from "./spa.router"
 export * from "./static.router"

@@ -7,8 +7,9 @@
 import { Request, Response, Router, saveObject, withDefaults } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { Stats } from "fs"
-import "./middleware"
+import "./static.middleware"
 import { StaticRouter } from "./static.router"
+import { staticContent } from "./static.middleware"
 
 type SPARouterProps = { followSymLinks: boolean; indexFile: string }
 
@@ -16,12 +17,16 @@ class SPARouter extends StaticRouter implements Router {
   private readonly indexFile: string
 
   public constructor(folderPath: string, options: SPARouterProps) {
-    super(folderPath, options)
+    super(folderPath, { ...options, useIndexFile: true })
     this.indexFile = options.indexFile
   }
 
-  protected override respondWithFileNotFound(request: Request, response: Response, absPath: string): void {
-    response.file(this.toAbsPath(this.indexFile))
+  protected override async respondWithFileNotFound(
+    request: Request,
+    response: Response,
+    absPath: string
+  ): Promise<void> {
+    await response.file(this.mergePaths(this.indexFile))
   }
 }
 
@@ -37,5 +42,7 @@ export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> =
   }
 
   const mergedOptions = withDefaults<SPARouterProps>(options, { followSymLinks: false, indexFile: "index.html" })
-  return new SPARouter(folderPath, mergedOptions)
+  return new SPARouter(folderPath, mergedOptions).pipe(
+    staticContent(folderPath, { followSymlinks: mergedOptions.followSymLinks })
+  )
 }

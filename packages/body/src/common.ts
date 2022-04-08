@@ -47,7 +47,7 @@ export const getBodyContentType = (request: Request): null | { type: string; enc
   const parsed = contentType.parse(contentTypeHeader)
 
   return {
-    type: parsed.type.toLowerCase(),
+    type: parsed.type.toLowerCase().trim(),
     encoding: isBufferEncoding(parsed.parameters.encoding)
       ? (parsed.parameters.encoding.toLowerCase() as BufferEncoding)
       : undefined,

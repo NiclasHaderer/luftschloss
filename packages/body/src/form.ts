@@ -76,6 +76,6 @@ export const formParser = (
   return FormParserMiddleware.bind({
     parser: completeOptions.parser,
     maxBodySize: completeOptions.maxBodySize * 100,
-    contentType: new Set(contentType),
+    contentType: new Set(contentType.map(c => c.toLowerCase().trim())),
   })
 }

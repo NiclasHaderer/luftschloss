@@ -4,7 +4,6 @@
  * MIT Licensed
  */
 
-import assert from "assert"
 import {
   BaseRouter,
   HTTPException,
@@ -17,15 +16,17 @@ import {
 } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { promises as fs, Stats } from "fs"
-import "./middleware"
+import "./static.middleware"
 import path from "path"
+import { staticContent } from "./static.middleware"
 
-type StaticRouterProps = { followSymLinks: boolean }
+type InternalStaticRouterProps = { useIndexFile: boolean; indexFile: string }
+type StaticRouterProps = InternalStaticRouterProps & { followSymLinks: boolean }
 
 export class StaticRouter extends BaseRouter implements Router {
   private readonly folderPath: string
 
-  public constructor(folderPath: string, private options: StaticRouterProps) {
+  public constructor(folderPath: string, private options: InternalStaticRouterProps) {
     super()
     // path.resolve has not trailing / at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`
@@ -39,36 +40,38 @@ export class StaticRouter extends BaseRouter implements Router {
     const filePath = request.pathParams<{ path: string }>().path.replace(/^\//, "")
 
     // Convert the file path to an absolute path
-    const absPath = this.toAbsPath(path.normalize(filePath))
-
-    // TODO if folder and folder has index.html respond with index.html or whatever the index file is
+    let absPath = this.mergePaths(filePath)
 
     try {
       // Throws if file does not exist, so catch...
       const stat = await fs.lstat(absPath)
 
-      // Check if the file is a symbolic link and if symbolic links should be followed.
-      assert.strictEqual(!this.options.followSymLinks && stat.isSymbolicLink(), false)
+      if (stat.isDirectory() && this.options.useIndexFile) {
+        absPath += `${path.sep}${this.options.indexFile}`
+        // Ensure the file system item exists
+        await fs.lstat(absPath)
+      }
 
       // Respond with a file
-      this.respondWithFile(request, response, absPath)
+      await this.respondWithFilesystemItem(request, response, absPath)
     } catch (e) {
-      this.respondWithFileNotFound(request, response, absPath)
+      await this.respondWithFileNotFound(request, response, absPath)
     }
   }
 
-  protected respondWithFile(request: Request, response: Response, absPath: string): void {
-    response.file(absPath)
+  protected async respondWithFilesystemItem(request: Request, response: Response, absPath: string): Promise<void> {
+    await response.file(absPath)
   }
 
-  protected respondWithFileNotFound(request: Request, response: Response, absPath: string): void {
+  //eslint-disable-next-line @typescript-eslint/require-await
+  protected async respondWithFileNotFound(request: Request, response: Response, absPath: string): Promise<void> {
     const message = isProduction() ? "File with name was not found" : `File with name was not found at ${absPath}`
     throw new HTTPException(Status.HTTP_404_NOT_FOUND, message)
   }
 
-  protected toAbsPath(filePath: string): string {
+  protected mergePaths(filePath: string): string {
     // Simply join the strings. path.join would resolve ".." and you would be able to step out of the folder
-    return `${this.folderPath}${filePath}`
+    return `${this.folderPath}${path.normalize(filePath)}`
   }
 }
 
@@ -84,6 +87,12 @@ export const staticRouter = (folderPath: string, options: Partial<StaticRouterPr
     throw new Error(`Cannot serve static files from ${folderPath}. Path is not a directory`)
   }
 
-  const mergedOptions = withDefaults<StaticRouterProps>(options, { followSymLinks: false })
-  return new StaticRouter(folderPath, mergedOptions)
+  const mergedOptions = withDefaults<StaticRouterProps>(options, {
+    followSymLinks: false,
+    indexFile: "index.html",
+    useIndexFile: false,
+  })
+  return new StaticRouter(folderPath, mergedOptions).pipe(
+    staticContent(folderPath, { followSymlinks: mergedOptions.followSymLinks })
+  )
 }
