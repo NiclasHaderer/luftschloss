@@ -13,26 +13,26 @@ import { Request } from "./request"
 import { Headers } from "./headers"
 import { ByLazy } from "./by-lazy"
 import { UTF8Url } from "./utf8-url"
-import { Utf8SearchParams } from "./utf8-search-params"
+import { UTF8SearchParams } from "./utf8-search-params"
 
-export class RequestImpl<P extends object = any, T extends Record<string, unknown> = any> implements Request<P, T> {
-  private _pathParams = saveObject() as P
+export class RequestImpl<DATA extends Record<string, unknown> = never> implements Request<DATA> {
+  private _pathParams!: object
 
   public constructor(private readonly req: IncomingMessage) {}
 
-  @ByLazy<T, RequestImpl>(() => saveObject<T>())
-  public readonly data!: T
+  @ByLazy<UTF8SearchParams, RequestImpl<DATA>>(self => self.url.searchParams)
+  public readonly urlParams!: UTF8SearchParams
 
-  @ByLazy<Headers, RequestImpl>(self => Headers.create(self.req.headers))
+  @ByLazy<DATA, RequestImpl<DATA>>(() => saveObject<DATA>())
+  public readonly data!: DATA
+
+  @ByLazy<Headers, RequestImpl<DATA>>(self => Headers.create(self.req.headers))
   public readonly headers!: Headers
 
-  @ByLazy<Utf8SearchParams, RequestImpl>(self => self.url.searchParams)
-  public readonly urlParams!: Utf8SearchParams
-
-  @ByLazy<string, RequestImpl>(self => decodeURIComponent(self.url.pathname))
+  @ByLazy<string, RequestImpl<DATA>>(self => decodeURIComponent(self.url.pathname))
   public readonly path!: string
 
-  @ByLazy<UTF8Url, RequestImpl>(self => {
+  @ByLazy<UTF8Url, RequestImpl<DATA>>(self => {
     const { port, address } = self.req.socket.address() as AddressInfo
     let protocol = "http://"
     if (self.req.socket instanceof tls.TLSSocket && self.req.socket.encrypted) {
@@ -47,11 +47,11 @@ export class RequestImpl<P extends object = any, T extends Record<string, unknow
     return this.req
   }
 
-  public get pathParams(): P {
-    return this._pathParams
+  public pathParams<T extends object>(): T {
+    return this._pathParams as T
   }
 
-  public set pathParams(value: P) {
+  public setPathParams(value: object) {
     this._pathParams = value
   }
 

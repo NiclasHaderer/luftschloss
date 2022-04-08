@@ -16,7 +16,7 @@ addRequestField<Request, "body">("body", {
   value: () => {
     throw new HTTPException(
       Status.HTTP_500_INTERNAL_SERVER_ERROR,
-      "Please use one of the body parsers as middleware in order to use that function"
+      "Please use one of one of the body parser middlewares in order to use that function"
     )
   },
 })

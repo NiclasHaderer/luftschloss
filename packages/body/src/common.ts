@@ -7,7 +7,7 @@
 import { HTTPException, Request, Status } from "@luftschloss/core"
 import * as contentType from "content-type"
 
-export const verifyContentLengthHeader = (request: Request, maxBodySize: number) => {
+export const assertContentLengthHeader = (request: Request, maxBodySize: number): void => {
   let length = parseInt(request.headers.get("Content-Length") || "0")
   if (isNaN(length)) {
     length = 0

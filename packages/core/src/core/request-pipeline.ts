@@ -42,7 +42,7 @@ export class RequestPipeline {
       const route = resolveRoute(request.path, request.method, this.routes)
 
       // Set the extracted path params in the request instance
-      request.pathParams = route.pathParams || saveObject<Record<string, unknown>>()
+      request.setPathParams(route.pathParams || saveObject<Record<string, unknown>>())
 
       // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
       // method not allowed executor

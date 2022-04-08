@@ -4,9 +4,16 @@
  * MIT Licensed
  */
 
-import { HTTPException, HttpMiddlewareInterceptor, NextFunction, Request, Response, Status } from "@luftschloss/core"
-import { withDefaults } from "@luftschloss/core/dist/core/with-defaults"
-import { getBodyContentType, getBodyData, verifyContentLengthHeader } from "./common"
+import {
+  HTTPException,
+  HttpMiddlewareInterceptor,
+  NextFunction,
+  Request,
+  Response,
+  Status,
+  withDefaults,
+} from "@luftschloss/core"
+import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./common"
 import * as Buffer from "buffer"
 
 export type JsonParserOptions = {
@@ -22,7 +29,7 @@ async function JsonParserMiddleware(
   request: Request,
   response: Response
 ) {
-  verifyContentLengthHeader(request, this.maxBodySize)
+  assertContentLengthHeader(request, this.maxBodySize)
 
   let parsed: object | null = null
   request.body = async <T>(): Promise<T> => {

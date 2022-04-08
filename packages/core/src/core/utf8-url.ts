@@ -5,7 +5,7 @@
  */
 
 import { URL } from "url"
-import { Utf8SearchParams } from "./utf8-search-params"
+import { UTF8SearchParams } from "./utf8-search-params"
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL")
 
@@ -102,8 +102,8 @@ export class UTF8Url implements URL {
     return decodeURIComponent(this.urlDelegate.toString())
   }
 
-  public get searchParams(): Utf8SearchParams {
-    return new Utf8SearchParams(this.urlDelegate.searchParams)
+  public get searchParams(): UTF8SearchParams {
+    return new UTF8SearchParams(this.urlDelegate.searchParams)
   }
 
   public get origin() {

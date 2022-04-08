@@ -10,14 +10,16 @@ import { CustomPropertyDescriptor, Func } from "../types"
 import { RequestImpl } from "./request-impl"
 import { Headers } from "./headers"
 import { UTF8Url } from "./utf8-url"
-import { Utf8SearchParams } from "./utf8-search-params"
+import { UTF8SearchParams } from "./utf8-search-params"
 
-export interface Request<P extends object = any, T extends Record<string, unknown> = any> {
-  readonly data: T
+export interface Request<DATA extends Record<string, unknown> = never> {
+  readonly data: DATA
   readonly raw: IncomingMessage
-  // TODO perhaps same arrangement like the urlParams?
-  readonly urlParams: Utf8SearchParams
-  readonly pathParams: P
+
+  urlParams: UTF8SearchParams
+
+  pathParams<T extends object>(): T
+
   readonly path: string
   readonly method: HTTP_METHODS
   readonly url: UTF8Url

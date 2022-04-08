@@ -17,7 +17,7 @@ import {
 } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { promises as fs, Stats } from "fs"
-import "./response"
+import "./middleware"
 import path from "path"
 
 type StaticRouterProps = { followSymLinks: boolean }
@@ -34,12 +34,9 @@ export class StaticRouter extends BaseRouter implements Router {
     // TODO not modified response
   }
 
-  protected async handlePath(
-    request: Request<{ path: string }, Record<string, unknown>>,
-    response: Response
-  ): Promise<void> {
+  protected async handlePath(request: Request, response: Response): Promise<void> {
     // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
-    const filePath = request.pathParams.path.replace(/^\//, "")
+    const filePath = request.pathParams<{ path: string }>().path.replace(/^\//, "")
 
     // Convert the file path to an absolute path
     const absPath = this.toAbsPath(path.normalize(filePath))
@@ -78,6 +75,7 @@ export class StaticRouter extends BaseRouter implements Router {
 export const staticRouter = (folderPath: string, options: Partial<StaticRouterProps> = {}): StaticRouter => {
   let stat: Stats
   try {
+    folderPath = path.resolve(folderPath)
     stat = fsSync.lstatSync(folderPath)
   } catch (e) {
     throw new Error(`Could not access path "${folderPath}"`)

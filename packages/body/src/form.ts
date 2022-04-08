@@ -12,11 +12,11 @@ import {
   Response,
   saveObject,
   Status,
+  UTF8SearchParams,
   withDefaults,
 } from "@luftschloss/core"
 import Buffer from "buffer"
-import { getBodyContentType, getBodyData, verifyContentLengthHeader } from "./common"
-import { Utf8SearchParams } from "@luftschloss/core/dist/core/utf8-search-params"
+import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./common"
 
 export type FormParserOptions = {
   maxBodySize: number
@@ -31,7 +31,7 @@ async function FormParserMiddleware(
   request: Request,
   response: Response
 ) {
-  verifyContentLengthHeader(request, this.maxBodySize)
+  assertContentLengthHeader(request, this.maxBodySize)
   let parsed: object | null = null
   request.body = async <T>(): Promise<T> => {
     const contentType = getBodyContentType(request)
@@ -61,7 +61,7 @@ export const formParser = (
   const completeOptions = withDefaults<FormParserOptions>(options, {
     parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
       const str = buffer.toString(encoding)
-      const url = new Utf8SearchParams(str)
+      const url = new UTF8SearchParams(str)
       const encodedBody = saveObject()
 
       for (const key of url.values()) {

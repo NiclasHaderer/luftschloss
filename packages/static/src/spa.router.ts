@@ -7,7 +7,7 @@
 import { Request, Response, Router, saveObject, withDefaults } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { Stats } from "fs"
-import "./response"
+import "./middleware"
 import { StaticRouter } from "./static.router"
 
 type SPARouterProps = { followSymLinks: boolean; indexFile: string }

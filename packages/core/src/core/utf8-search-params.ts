@@ -8,7 +8,7 @@ import { URLSearchParams } from "url"
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL")
 
-export class Utf8SearchParams extends URLSearchParams {
+export class UTF8SearchParams extends URLSearchParams {
   public [UTF_8_SYMBOL] = true
 
   public constructor(...init: ConstructorParameters<typeof URLSearchParams>) {
