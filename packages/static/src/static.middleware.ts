@@ -13,17 +13,26 @@ import {
   Request,
   Response,
   Status,
-  withDefaults,
 } from "@luftschloss/core"
-import * as fs from "fs"
+import * as fsSync from "fs"
 import { getMimeType } from "./lookup-mime"
-import * as assert from "assert"
+import { Stats } from "node:fs"
 
-type StaticContentOptions = { allowOutsideBasePath: boolean; followSymlinks: boolean }
-type InternalStaticContentOptions = StaticContentOptions & { basePath: string }
+type StaticContentOptions = { basePath: string; allowOutsideBasePath?: false } | { allowOutsideBasePath: true }
+
+const getContentRange = (
+  request: Request,
+  response: Response,
+  stat: Stats
+): { start: number; end: number } | object => {
+  if (!request.headers.has("range")) return {}
+  const range = request.headers.get("range")!
+  // TODO
+  return {}
+}
 
 export function StaticContentMiddleware(
-  this: InternalStaticContentOptions,
+  this: StaticContentOptions,
   next: NextFunction,
   request: Request,
   response: Response
@@ -35,39 +44,32 @@ export function StaticContentMiddleware(
       filePath = `${this.basePath}${path.sep}${filePath}`
     }
 
+    let stat: Stats
     try {
-      const stat = await fs.promises.stat(filePath)
-
-      // Follow symlinks only if follow symlink is enabled
-      assert.strictEqual(stat.isSymbolicLink() && !this.followSymlinks, true)
-
-      // TODO check if you have to resolve a symlink in order to read the file contents
-      // TODO symlink into nothing
-      // TODO symlink link to symlink
+      stat = await fsSync.promises.lstat(filePath)
     } catch (e) {
-      // TODO this is an internal error
-      throw new HTTPException(Status.HTTP_404_NOT_FOUND, `File ${filePath} was not found`)
+      throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, `File ${filePath} was not found`)
     }
 
     // Get and append mime type
     const mime = getMimeType(filePath)
     if (mime) (response.headers as Headers).append("Content-Type", mime)
 
+    const range = getContentRange(request, response, stat)
+
     //eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
-    return response.stream(fs.createReadStream(filePath))
+    return response.stream(fsSync.createReadStream(filePath, range))
   }
 }
 
-export const staticContent = (basePath: string, options: Partial<StaticContentOptions>): HttpMiddlewareInterceptor => {
-  basePath = path.resolve(basePath)
-  const fullOptions = withDefaults<InternalStaticContentOptions>(
-    { ...options, basePath: path.resolve(basePath) },
-    {
-      allowOutsideBasePath: false,
-      basePath: path.resolve(process.cwd()),
-      followSymlinks: false,
+export const staticContent = ({ ...options }: StaticContentOptions): HttpMiddlewareInterceptor => {
+  if (!options.allowOutsideBasePath) {
+    options.basePath = path.resolve(options.basePath)
+    const stat = fsSync.lstatSync(options.basePath)
+    if (!stat.isDirectory()) {
+      throw new Error(`Cannot serve static files from ${options.basePath}. Path is not a directory`)
     }
-  )
+  }
 
-  return StaticContentMiddleware.bind(fullOptions)
+  return StaticContentMiddleware.bind(options)
 }

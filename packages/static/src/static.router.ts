@@ -14,25 +14,23 @@ import {
   Status,
   withDefaults,
 } from "@luftschloss/core"
-import * as fsSync from "fs"
-import { promises as fs, Stats } from "fs"
+import { promises as fs } from "fs"
 import "./static.middleware"
 import path from "path"
 import { staticContent } from "./static.middleware"
 
-type InternalStaticRouterProps = { useIndexFile: boolean; indexFile: string }
-type StaticRouterProps = InternalStaticRouterProps & { followSymLinks: boolean }
+type StaticRouterProps = { useIndexFile: boolean; indexFile: string }
 
 export class StaticRouter extends BaseRouter implements Router {
   private readonly folderPath: string
 
-  public constructor(folderPath: string, private options: InternalStaticRouterProps) {
+  public constructor(folderPath: string, private options: StaticRouterProps) {
     super()
     // path.resolve has not trailing / at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`
-    this._routeCollector.add("{path:path}", "GET", this.handlePath.bind(this))
     // TODO HEAD response
-    // TODO not modified response
+    this._routeCollector.add("{path:path}", "GET", this.handlePath.bind(this))
+    // TODO not modified response https://www.keycdn.com/support/304-not-modified
   }
 
   protected async handlePath(request: Request, response: Response): Promise<void> {
@@ -76,23 +74,9 @@ export class StaticRouter extends BaseRouter implements Router {
 }
 
 export const staticRouter = (folderPath: string, options: Partial<StaticRouterProps> = {}): StaticRouter => {
-  let stat: Stats
-  try {
-    folderPath = path.resolve(folderPath)
-    stat = fsSync.lstatSync(folderPath)
-  } catch (e) {
-    throw new Error(`Could not access path "${folderPath}"`)
-  }
-  if (!stat.isDirectory()) {
-    throw new Error(`Cannot serve static files from ${folderPath}. Path is not a directory`)
-  }
-
   const mergedOptions = withDefaults<StaticRouterProps>(options, {
-    followSymLinks: false,
     indexFile: "index.html",
     useIndexFile: false,
   })
-  return new StaticRouter(folderPath, mergedOptions).pipe(
-    staticContent(folderPath, { followSymlinks: mergedOptions.followSymLinks })
-  )
+  return new StaticRouter(folderPath, mergedOptions).pipe(staticContent({ basePath: folderPath }))
 }
