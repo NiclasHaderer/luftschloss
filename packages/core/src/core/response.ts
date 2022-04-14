@@ -3,15 +3,15 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
-import { URL } from "url"
-import { Headers } from "./headers"
-import { Status } from "./status"
-import { CustomPropertyDescriptor, Func } from "../types"
+import { ReadStream } from "fs"
 import { ServerResponse } from "http"
+import { URL } from "url"
+
+import { CustomPropertyDescriptor, Func } from "../types"
+import { Headers } from "./headers"
 import { Request } from "./request"
 import { ResponseImpl } from "./response-impl"
-import { ReadStream } from "fs"
+import { Status } from "./status"
 
 export interface Response {
   readonly complete: boolean

@@ -3,20 +3,20 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
 import { IncomingMessage as In, ServerResponse as Out } from "http"
-import { Subject } from "./subject"
-import { RequestImpl } from "./request-impl"
-import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
-import { ResponseImpl } from "./response-impl"
-import { Status } from "./status"
-import { HTTPException } from "./http-exception"
+
 import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware"
-import { EventData } from "./server"
-import { MergedRoutes } from "./router-merger"
-import { resolveRoute } from "./resolve-route"
+import { HTTPException } from "./http-exception"
 import { Request } from "./request"
+import { RequestImpl } from "./request-impl"
+import { resolveRoute } from "./resolve-route"
 import { Response } from "./response"
+import { ResponseImpl } from "./response-impl"
+import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
+import { MergedRoutes } from "./router-merger"
+import { EventData } from "./server"
+import { Status } from "./status"
+import { Subject } from "./subject"
 import { saveObject } from "./utils"
 
 export class RequestPipeline {

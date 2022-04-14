@@ -16,12 +16,13 @@ export class HTTPException extends Error {
    * @param status An HttpStatus, or the number of a http status.
    * @param message If the message is empty the default message of the http status will be used
    */
-  public constructor(status: Status | number, message?: string) {
+  public constructor(status: Status | number, message?: string | Record<string, unknown> | unknown[]) {
     super()
 
     // Get the status code value for a number
     this.status = toStatus(status)
-    this.message = message || this.status.message
+    const tmpMessage = message || this.status.message
+    this.message = typeof tmpMessage === "string" ? tmpMessage : JSON.stringify(tmpMessage)
   }
 
   /**

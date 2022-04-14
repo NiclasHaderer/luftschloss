@@ -3,7 +3,6 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
 import { Request, Response } from "../core"
 
 export enum MiddlewareType {

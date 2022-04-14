@@ -3,14 +3,15 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
-import { ServerResponse } from "http"
-import { Status, toStatus } from "./status"
-import { Headers } from "./headers"
-import type { Response } from "./response"
-import type { Request } from "./request"
 import { ReadStream } from "fs"
+import { ServerResponse } from "http"
 import { pipeline } from "stream/promises"
+
+import { Headers } from "./headers"
+import type { Request } from "./request"
+
+import type { Response } from "./response"
+import { Status, toStatus } from "./status"
 
 export class ResponseImpl implements Response {
   private _status: Status = Status.HTTP_200_OK

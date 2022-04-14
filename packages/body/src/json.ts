@@ -13,8 +13,8 @@ import {
   Status,
   withDefaults,
 } from "@luftschloss/core"
-import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./common"
 import * as Buffer from "buffer"
+import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./common"
 
 export type JsonParserOptions = {
   maxBodySize: number
@@ -55,7 +55,7 @@ async function JsonParserMiddleware(
 
 export const jsonParser = (
   contentType = ["application/json"],
-  options: Partial<JsonParserOptions>
+  options: Partial<JsonParserOptions> = {}
 ): HttpMiddlewareInterceptor => {
   const completeOptions = withDefaults<JsonParserOptions>(options, {
     maxBodySize: 100,

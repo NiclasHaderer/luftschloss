@@ -3,9 +3,8 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
-import { MiddleWareInterceptor, NextFunction } from "./middleware"
 import { Request, Response } from "../core"
+import { MiddleWareInterceptor, NextFunction } from "./middleware"
 
 const LoggerMiddleware = async (next: NextFunction, request: Request, response: Response): Promise<void> => {
   const startTime = Date.now()

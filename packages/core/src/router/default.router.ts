@@ -5,15 +5,19 @@
  */
 
 import { HTTP_METHODS, ROUTE_HANDLER } from "../core"
-import { Router } from "./router"
 import { BaseRouter } from "./base.router"
+import { Router } from "./router"
 
 export class DefaultRouter extends BaseRouter implements Router {
-  public handle(method: HTTP_METHODS | "*", url: string, callback: ROUTE_HANDLER): void {
+  public handle(method: HTTP_METHODS | HTTP_METHODS[] | "*", url: string, callback: ROUTE_HANDLER): void {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot add any new routes")
     }
-    this._routeCollector.add(url, method, callback)
+    if (Array.isArray(method)) {
+      method.forEach(m => this._routeCollector.add(url, m, callback))
+    } else {
+      this._routeCollector.add(url, method, callback)
+    }
   }
 
   public delete(url: string, callback: ROUTE_HANDLER): void {

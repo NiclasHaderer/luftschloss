@@ -1,5 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
 import { defaultRouter, defaultServer } from "@luftschloss/core"
-import "@luftschloss/static"
 
 const server = defaultServer()
 server.get("", (request, response) => response.text("hello world"))
@@ -10,6 +14,6 @@ router.get("/html", (request, response) => response.html("<button>hello world</b
 router.get("error", (request, response) => {
   throw new Error("why are you not working")
 })
-
+//server.pipe(jsonParser())
 server.mount(router, { basePath: "hello" })
 void server.listen()

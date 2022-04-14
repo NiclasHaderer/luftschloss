@@ -3,9 +3,8 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
-import { NextFunction } from "./middleware"
 import { defaultErrorHandler, HTTPException, Request, Response, ResponseImpl, Status } from "../core"
+import { NextFunction } from "./middleware"
 
 const RequestCompleterMiddleware = async (next: NextFunction, request: Request, response: Response): Promise<void> => {
   await next(request, response)

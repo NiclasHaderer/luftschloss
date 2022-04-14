@@ -3,10 +3,9 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
 import { MiddlewareRepresentation } from "../middleware"
-import { Request } from "./request"
 import { PathValidator } from "../path-validator"
+import { Request } from "./request"
 import { Response } from "./response"
 
 /**

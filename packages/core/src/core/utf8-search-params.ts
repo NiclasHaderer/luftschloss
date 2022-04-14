@@ -5,6 +5,7 @@
  */
 
 import { URLSearchParams } from "url"
+import { saveObject } from "./utils"
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL")
 
@@ -52,5 +53,14 @@ export class UTF8SearchParams extends URLSearchParams {
 
   public override values(): IterableIterator<string> {
     return [...super.values()].map(decodeURIComponent)[Symbol.iterator]()
+  }
+
+  public asObject<T extends Record<string, string[]>>(): T {
+    const o = saveObject<T>()
+    for (const key of this.keys()) {
+      //eslint-disable-next-line @typescript-eslint/no-extra-semi
+      ;(o as Record<string, string[]>)[key] = this.getAll(key)
+    }
+    return o
   }
 }

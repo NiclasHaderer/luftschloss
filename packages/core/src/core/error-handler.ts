@@ -3,12 +3,11 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
 import { HTTPException } from "./http-exception"
-import { Status } from "./status"
+import { isProduction } from "./production"
 import { Request } from "./request"
 import { Response } from "./response"
-import { isProduction } from "./production"
+import { Status } from "./status"
 
 type ErrorHandlerCallback = (error: HTTPException, request: Request, response: Response) => void | Promise<void>
 

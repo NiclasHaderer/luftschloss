@@ -3,9 +3,8 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
-import { NextFunction } from "./middleware"
 import { Request, Response } from "../core"
+import { NextFunction } from "./middleware"
 
 const ContentSniffMiddleware = async (next: NextFunction, request: Request, response: Response) => {
   await next(request, response)
