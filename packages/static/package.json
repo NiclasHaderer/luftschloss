@@ -13,7 +13,9 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@luftschloss/core": "workspace:packages/core",
-    "mime-db": "^1.52.0"
+    "@types/range-parser": "^1.2.4",
+    "mime-db": "^1.52.0",
+    "range-parser": "^1.2.1"
   },
   "devDependencies": {
     "@types/mime-db": "^1.43.1"

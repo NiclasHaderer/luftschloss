@@ -17,19 +17,9 @@ import {
 import * as fsSync from "fs"
 import { getMimeType } from "./lookup-mime"
 import { Stats } from "node:fs"
+import { addRangeHeaders, getRange } from "./content-range"
 
 type StaticContentOptions = { basePath: string; allowOutsideBasePath?: false } | { allowOutsideBasePath: true }
-
-const getContentRange = (
-  request: Request,
-  response: Response,
-  stat: Stats
-): { start: number; end: number } | object => {
-  if (!request.headers.has("range")) return {}
-  const range = request.headers.get("range")!
-  // TODO
-  return {}
-}
 
 export function StaticContentMiddleware(
   this: StaticContentOptions,
@@ -55,10 +45,12 @@ export function StaticContentMiddleware(
     const mime = getMimeType(filePath)
     if (mime) (response.headers as Headers).append("Content-Type", mime)
 
-    const range = getContentRange(request, response, stat)
+    const range = getRange(request.headers.get("Range"), stat)
+    addRangeHeaders(request, response, range)
+    const streams = range.map(r => fsSync.createReadStream(filePath, r))
 
     //eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
-    return response.stream(fsSync.createReadStream(filePath, range))
+    return response.stream(streams)
   }
 }
 

@@ -10,12 +10,13 @@ import { Headers } from "./headers"
 import type { Response } from "./response"
 import type { Request } from "./request"
 import { ReadStream } from "fs"
+import { pipeline } from "stream/promises"
 
 export class ResponseImpl implements Response {
   private _status: Status = Status.HTTP_200_OK
   private _headers = new Headers()
 
-  private data: ReadStream | Buffer | null | string = null
+  private data: ReadStream | ReadStream[] | Buffer | null | string = null
 
   public constructor(private readonly res: ServerResponse, public readonly request: Request) {}
 
@@ -68,7 +69,7 @@ export class ResponseImpl implements Response {
     return this
   }
 
-  public stream(stream: ReadStream): this {
+  public stream(stream: ReadStream | ReadStream[]): this {
     this.data = stream
     return this
   }
@@ -81,7 +82,7 @@ export class ResponseImpl implements Response {
 
   public async end(): Promise<void> {
     this.res.writeHead(this._status.code, this.headers.encode())
-    if (this.data instanceof ReadStream) {
+    if (this.data instanceof ReadStream || Array.isArray(this.data)) {
       await this.streamResponse(this.data)
     } else {
       // Null cannot be written to stdout and ?? checks for undefined and null
@@ -90,11 +91,14 @@ export class ResponseImpl implements Response {
     this.res.end()
   }
 
-  private streamResponse(stream: ReadStream): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      stream.on("open", () => stream.pipe(this.res))
-      stream.on("close", resolve)
-      stream.on("error", reject)
-    })
+  private streamResponse(stream: ReadStream | ReadStream[]): Promise<void> {
+    if (stream instanceof ReadStream) {
+      return new Promise<void>((resolve, reject) => {
+        stream.on("open", () => stream.pipe(this.res))
+        stream.on("close", resolve)
+        stream.on("error", reject)
+      })
+    }
+    return pipeline(stream, this.res)
   }
 }

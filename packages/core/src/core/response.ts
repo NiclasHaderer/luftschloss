@@ -8,10 +8,10 @@ import { URL } from "url"
 import { Headers } from "./headers"
 import { Status } from "./status"
 import { CustomPropertyDescriptor, Func } from "../types"
-import { Stream } from "stream"
 import { ServerResponse } from "http"
 import { Request } from "./request"
 import { ResponseImpl } from "./response-impl"
+import { ReadStream } from "fs"
 
 export interface Response {
   readonly complete: boolean
@@ -33,7 +33,7 @@ export interface Response {
 
   status(status: Status | number): this
 
-  stream(stream: Stream): this
+  stream(stream: ReadStream | ReadStream[]): this
 
   text(text: string): this
 }
