@@ -4,7 +4,6 @@
  * MIT Licensed
  */
 
-import * as path from "path"
 import {
   Headers,
   HTTPException,
@@ -15,9 +14,10 @@ import {
   Status,
 } from "@luftschloss/core"
 import * as fsSync from "fs"
-import { getMimeType } from "./lookup-mime"
 import { Stats } from "node:fs"
+import * as path from "path"
 import { addRangeHeaders, getRange } from "./content-range"
+import { getMimeType } from "./lookup-mime"
 
 type StaticContentOptions = { basePath: string; allowOutsideBasePath?: false } | { allowOutsideBasePath: true }
 
@@ -45,10 +45,14 @@ export function StaticContentMiddleware(
     const mime = getMimeType(filePath)
     if (mime) (response.headers as Headers).append("Content-Type", mime)
 
-    const range = getRange(request.headers.get("Range"), stat)
-    addRangeHeaders(request, response, range)
-    const streams = range.map(r => fsSync.createReadStream(filePath, r))
+    // Get content ranges
+    const range = getRange(request, response, stat)
 
+    // Add the response range headers
+    addRangeHeaders(request, response, range, stat)
+
+    // Extract the requested ranges from the file
+    const streams = range.map(r => fsSync.createReadStream(filePath, r))
     //eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
     return response.stream(streams)
   }

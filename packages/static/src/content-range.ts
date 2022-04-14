@@ -4,12 +4,13 @@
  * MIT Licensed
  */
 
-import * as parseRange from "range-parser"
-import { Stats } from "node:fs"
 import { HTTPException, Request, Response, Status } from "@luftschloss/core"
+import { Stats } from "node:fs"
+import * as parseRange from "range-parser"
 import * as RangeParser from "range-parser"
 
-export const getRange = (rangeHeader: string | null, stats: Stats): RangeParser.Ranges => {
+export const getRange = (req: Request, res: Response, stats: Stats): RangeParser.Ranges => {
+  const rangeHeader = req.headers.get("Range")
   if (!rangeHeader) {
     const fullRange = [{ start: 0, end: stats.size }] as RangeParser.Ranges
     fullRange.type = "bytes"
@@ -19,7 +20,9 @@ export const getRange = (rangeHeader: string | null, stats: Stats): RangeParser.
   const result = parseRange.default(stats.size, rangeHeader, { combine: true })
   switch (result) {
     case -1:
-      throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Header range cannot be satisfied")
+      //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+      res.headers.append("Content-Range", `bytes */${stats.size}`)
+      throw new HTTPException(Status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE)
     case -2:
       throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Range header malformed")
   }
@@ -27,9 +30,21 @@ export const getRange = (rangeHeader: string | null, stats: Stats): RangeParser.
   if (result.type !== "bytes") {
     throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Only byte ranges are supported")
   }
+
+  //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+  res.status(Status.HTTP_206_PARTIAL_CONTENT)
   return result
 }
 
-export const addRangeHeaders = (req: Request, res: Response, header: RangeParser.Ranges): void => {
-  // TODO
+export const addRangeHeaders = (req: Request, res: Response, header: RangeParser.Ranges, stats: Stats): void => {
+  const contentLength = header.reduce((previousValue, currentValue) => {
+    return previousValue + currentValue.end - currentValue.start
+  }, 0)
+  //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+  res.headers.append("Content-Length", contentLength.toString())
+
+  for (const responseHeader of header) {
+    //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    res.headers.append("Content-Range", `bytes ${responseHeader.start}-${responseHeader.end}/${stats.size}`)
+  }
 }
