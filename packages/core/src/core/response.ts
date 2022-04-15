@@ -6,7 +6,6 @@
 import { ReadStream } from "fs"
 import { ServerResponse } from "http"
 import { URL } from "url"
-
 import { CustomPropertyDescriptor, Func } from "../types"
 import { Headers } from "./headers"
 import { Request } from "./request"

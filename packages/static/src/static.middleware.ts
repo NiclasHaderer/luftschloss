@@ -4,15 +4,7 @@
  * MIT Licensed
  */
 
-import {
-  Headers,
-  HTTPException,
-  HttpMiddlewareInterceptor,
-  NextFunction,
-  Request,
-  Response,
-  Status,
-} from "@luftschloss/core"
+import { HTTPException, HttpMiddlewareInterceptor, NextFunction, Request, Response, Status } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { Stats } from "node:fs"
 import * as path from "path"
@@ -43,7 +35,7 @@ export function StaticContentMiddleware(
 
     // Get and append mime type
     const mime = getMimeType(filePath)
-    if (mime) (response.headers as Headers).append("Content-Type", mime)
+    if (mime) response.headers.append("Content-Type", mime)
 
     // Get content ranges
     const range = getRange(request, response, stat)
