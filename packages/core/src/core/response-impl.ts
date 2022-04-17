@@ -8,18 +8,18 @@ import { ServerResponse } from "http"
 import { pipeline } from "stream/promises"
 
 import { Headers } from "./headers"
-import type { Request } from "./request"
+import type { LRequest } from "./request"
 
-import type { Response } from "./response"
+import type { LResponse } from "./response"
 import { Status, toStatus } from "./status"
 
-export class ResponseImpl implements Response {
+export class ResponseImpl implements LResponse {
   private _status: Status = Status.HTTP_200_OK
   private _headers = new Headers()
 
   private data: ReadStream | ReadStream[] | Buffer | null | string = null
 
-  public constructor(private readonly res: ServerResponse, public readonly request: Request) {}
+  public constructor(private readonly res: ServerResponse, public readonly request: LRequest) {}
 
   public get raw(): ServerResponse {
     return this.res

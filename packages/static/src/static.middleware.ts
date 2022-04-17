@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { HTTPException, HttpMiddlewareInterceptor, NextFunction, Request, Response, Status } from "@luftschloss/core"
+import { HTTPException, HttpMiddlewareInterceptor, NextFunction, LRequest, LResponse, Status } from "@luftschloss/core"
 import * as fsSync from "fs"
 import { Stats } from "node:fs"
 import * as path from "path"
@@ -16,10 +16,10 @@ type StaticContentOptions = { basePath: string; allowOutsideBasePath?: false } |
 export function StaticContentMiddleware(
   this: StaticContentOptions,
   next: NextFunction,
-  request: Request,
-  response: Response
+  request: LRequest,
+  response: LResponse
 ) {
-  response.file = async (filePath: string): Promise<Response> => {
+  response.file = async (filePath: string): Promise<LResponse> => {
     if (this.allowOutsideBasePath) {
       filePath = path.resolve(filePath)
     } else {

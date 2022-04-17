@@ -4,12 +4,12 @@
  * MIT Licensed
  */
 
-import { HTTPException, Request, Response, Status } from "@luftschloss/core"
+import { HTTPException, LRequest, LResponse, Status } from "@luftschloss/core"
 import { Stats } from "node:fs"
 import * as parseRange from "range-parser"
 import * as RangeParser from "range-parser"
 
-export const getRange = (req: Request, res: Response, stats: Stats): RangeParser.Ranges => {
+export const getRange = (req: LRequest, res: LResponse, stats: Stats): RangeParser.Ranges => {
   const rangeHeader = req.headers.get("Range")
   if (!rangeHeader) {
     const fullRange = [{ start: 0, end: stats.size }] as RangeParser.Ranges
@@ -36,7 +36,7 @@ export const getRange = (req: Request, res: Response, stats: Stats): RangeParser
   return result
 }
 
-export const addRangeHeaders = (req: Request, res: Response, header: RangeParser.Ranges, stats: Stats): void => {
+export const addRangeHeaders = (req: LRequest, res: LResponse, header: RangeParser.Ranges, stats: Stats): void => {
   const contentLength = header.reduce((previousValue, currentValue) => {
     return previousValue + currentValue.end - currentValue.start
   }, 0)

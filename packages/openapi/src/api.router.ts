@@ -6,7 +6,7 @@
 
 import { OpenApiZodAny } from "@anatine/zod-openapi"
 import { jsonParser } from "@luftschloss/body"
-import { BaseRouter, HTTP_METHODS, HTTPException, Request, Response, ROUTE_HANDLER, Status } from "@luftschloss/core"
+import { BaseRouter, HTTP_METHODS, HTTPException, LRequest, LResponse, ROUTE_HANDLER, Status } from "@luftschloss/core"
 import { z } from "zod"
 
 export type OpenApiHandler<
@@ -37,7 +37,7 @@ const wrapWithOpenApi = <URL_PARAMS extends OpenApiZodAny, BODY extends OpenApiZ
   params: RouterParams<URL_PARAMS, BODY, RESPONSE>,
   handler: OpenApiHandler<URL_PARAMS, BODY, RESPONSE>
 ): ROUTE_HANDLER => {
-  return async (request: Request, response: Response): Promise<void> => {
+  return async (request: LRequest, response: LResponse): Promise<void> => {
     const body = await request.body()
     const urlParams = {
       ...request.pathParams(),

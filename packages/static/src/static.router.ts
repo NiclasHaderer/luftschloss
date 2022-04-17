@@ -8,18 +8,19 @@ import {
   BaseRouter,
   HTTPException,
   isProduction,
-  Request,
-  Response,
+  LRequest,
+  LResponse,
   Router,
   Status,
   withDefaults,
 } from "@luftschloss/core"
-import { promises as fs } from "fs"
-import "./static.middleware"
+import {promises as fs} from "fs"
 import path from "path"
-import { staticContent } from "./static.middleware"
+import "./static.middleware"
+import {staticContent} from "./static.middleware"
 
 type StaticRouterProps = { useIndexFile: boolean; indexFile: string }
+
 
 export class StaticRouter extends BaseRouter implements Router {
   private readonly folderPath: string
@@ -33,7 +34,7 @@ export class StaticRouter extends BaseRouter implements Router {
     // TODO not modified response https://www.keycdn.com/support/304-not-modified
   }
 
-  protected async handlePath(request: Request, response: Response): Promise<void> {
+  protected async handlePath(request: LRequest, response: LResponse): Promise<void> {
     // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
     const filePath = request.pathParams<{ path: string }>().path.replace(/^\//, "")
 
@@ -57,12 +58,12 @@ export class StaticRouter extends BaseRouter implements Router {
     }
   }
 
-  protected async respondWithFilesystemItem(request: Request, response: Response, absPath: string): Promise<void> {
+  protected async respondWithFilesystemItem(request: LRequest, response: LResponse, absPath: string): Promise<void> {
     await response.file(absPath)
   }
 
   //eslint-disable-next-line @typescript-eslint/require-await
-  protected async respondWithFileNotFound(request: Request, response: Response, absPath: string): Promise<void> {
+  protected async respondWithFileNotFound(request: LRequest, response: LResponse, absPath: string): Promise<void> {
     const message = isProduction() ? "File with name was not found" : `File with name was not found at ${absPath}`
     throw new HTTPException(Status.HTTP_404_NOT_FOUND, message)
   }

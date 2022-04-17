@@ -3,10 +3,10 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { Request, Response } from "../core"
+import { LRequest, LResponse } from "../core"
 import { MiddleWareInterceptor, NextFunction } from "./middleware"
 
-const LoggerMiddleware = async (next: NextFunction, request: Request, response: Response): Promise<void> => {
+const LoggerMiddleware = async (next: NextFunction, request: LRequest, response: LResponse): Promise<void> => {
   const startTime = Date.now()
   await next(request, response)
   console.log(

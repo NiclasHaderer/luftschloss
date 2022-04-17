@@ -3,7 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { Request, Response } from "../core"
+import { LRequest, LResponse } from "../core"
 
 export enum MiddlewareType {
   HTTP,
@@ -24,15 +24,15 @@ export type MiddlewareRepresentation = HttpMiddlewareRepresentation | ClassMiddl
 
 export type ReadonlyMiddlewares = Readonly<Readonly<MiddlewareRepresentation>[]>
 
-export type NextFunction = (request: Request, response: Response) => void | Promise<void>
+export type NextFunction = (request: LRequest, response: LResponse) => void | Promise<void>
 
 export type HttpMiddlewareInterceptor = (
   next: NextFunction,
-  request: Request,
-  response: Response
+  request: LRequest,
+  response: LResponse
 ) => void | Promise<void>
 export type ClassMiddlewareInterceptor = {
-  handle(next: NextFunction, request: Request, response: Response): void | Promise<void>
+  handle(next: NextFunction, request: LRequest, response: LResponse): void | Promise<void>
 }
 export type MiddleWareInterceptor = HttpMiddlewareInterceptor | ClassMiddlewareInterceptor
 

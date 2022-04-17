@@ -5,22 +5,20 @@
  */
 
 module.exports = {
-  env: {
-    es6: true,
-    node: true,
-  },
   root: true,
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+    project: ["tsconfig.json", "./packages/*/tsconfig.json", "./apps/*/tsconfig.json"],
+  },
   extends: [
+    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:jsdoc/recommended",
+    "plugin:workspaces/recommended",
   ],
-  parser: "@typescript-eslint/parser",
-  parserOptions: {
-    project: "tsconfig.json",
-    sourceType: "module",
-  },
-  plugins: ["eslint-plugin-jsdoc", "@typescript-eslint"],
+  plugins: ["eslint-plugin-jsdoc", "@typescript-eslint", "workspaces"],
   rules: {
     "jsdoc/require-jsdoc": "off",
     "jsdoc/require-param-type": "off",

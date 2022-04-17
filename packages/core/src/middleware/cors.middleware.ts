@@ -3,7 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { HTTP_METHODS, Request, Response, saveObject, withDefaults } from "../core"
+import { HTTP_METHODS, LRequest, LResponse, saveObject, withDefaults } from "../core"
 import { ClassMiddlewareInterceptor, NextFunction } from "./middleware"
 
 type CorsMiddlewareOptions = {
@@ -20,7 +20,7 @@ type CorsMiddlewareOptions = {
       allowOrigins: string[] | "*"
     }
   | {
-      allowOriginFunction: (request: Request) => boolean
+      allowOriginFunction: (request: LRequest) => boolean
     }
 )
 
@@ -29,10 +29,10 @@ class CorsMiddleware implements ClassMiddlewareInterceptor {
     private defaultHeaders: Record<string, string[]>,
     private allowAllHeaders: boolean,
     private allowOriginRegex: RegExp | null,
-    private allowOriginFunction: ((request: Request) => boolean) | null
+    private allowOriginFunction: ((request: LRequest) => boolean) | null
   ) {}
 
-  public async handle(next: NextFunction, request: Request, response: Response): Promise<void> {
+  public async handle(next: NextFunction, request: LRequest, response: LResponse): Promise<void> {
     await next(request, response)
 
     if (request.method === "OPTIONS" && request.headers.has("access-control-request-method")) {
@@ -41,7 +41,7 @@ class CorsMiddleware implements ClassMiddlewareInterceptor {
     }
   }
 
-  private preflightResponse(request: Request, response: Response) {
+  private preflightResponse(request: LRequest, response: LResponse) {
     // Send back all headers if all headers should be allowed
     if (this.allowAllHeaders) {
       const requestedHeaders = request.headers.getAll("access-control-request-headers")
@@ -60,7 +60,7 @@ class CorsMiddleware implements ClassMiddlewareInterceptor {
     }
   }
 
-  private isAllowedOrigin(request: Request): boolean {
+  private isAllowedOrigin(request: LRequest): boolean {
     if (this.allowOriginRegex) {
       //eslint-disable-next-line @typescript-eslint/unbound-method
       const origin = request.headers.get("Origin")

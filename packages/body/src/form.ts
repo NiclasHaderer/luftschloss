@@ -8,8 +8,8 @@ import {
   HTTPException,
   HttpMiddlewareInterceptor,
   NextFunction,
-  Request,
-  Response,
+  LRequest,
+  LResponse,
   saveObject,
   Status,
   UTF8SearchParams,
@@ -28,8 +28,8 @@ export type InternalFormParserOptions = { contentType: Set<string> } & FormParse
 async function FormParserMiddleware(
   this: InternalFormParserOptions,
   next: NextFunction,
-  request: Request,
-  response: Response
+  request: LRequest,
+  response: LResponse
 ) {
   assertContentLengthHeader(request, this.maxBodySize)
   let parsed: object | null = null

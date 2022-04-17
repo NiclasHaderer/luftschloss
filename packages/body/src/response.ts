@@ -4,15 +4,15 @@
  * MIT Licensed
  */
 
-import { addRequestField, HTTPException, Request, Status } from "@luftschloss/core"
+import { addRequestField, HTTPException, LRequest, Status } from "@luftschloss/core"
 
 declare module "@luftschloss/core" {
   //eslint-disable-next-line no-shadow
-  interface Request {
+  interface LRequest {
     body<T>(): Promise<T>
   }
 }
-addRequestField<Request, "body">("body", {
+addRequestField<LRequest, "body">("body", {
   value: () => {
     throw new HTTPException(
       Status.HTTP_500_INTERNAL_SERVER_ERROR,

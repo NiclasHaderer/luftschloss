@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { Request, Response, Router, saveObject, withDefaults } from "@luftschloss/core"
+import { LRequest, LResponse, Router, saveObject, withDefaults } from "@luftschloss/core"
 import "./static.middleware"
 import { StaticRouter } from "./static.router"
 import { staticContent } from "./static.middleware"
@@ -20,8 +20,8 @@ class SPARouter extends StaticRouter implements Router {
   }
 
   protected override async respondWithFileNotFound(
-    request: Request,
-    response: Response,
+    request: LRequest,
+    response: LResponse,
     absPath: string
   ): Promise<void> {
     await response.file(this.mergePaths(this.indexFile))

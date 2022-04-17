@@ -18,7 +18,7 @@ export class UTF8SearchParams extends URLSearchParams {
 
   public [Symbol.iterator](): IterableIterator<[string, string]>
   public [Symbol.iterator](): Iterator<[string, string]>
-  public *[Symbol.iterator](): IterableIterator<[string, string]> | Iterator<[string, string]> {
+  public [Symbol.iterator](): IterableIterator<[string, string]> | Iterator<[string, string]> {
     return this.entries()
   }
 

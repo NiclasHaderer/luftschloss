@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
+    "noEmit": true,
     "baseUrl": ".",
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "target": "ES2021",
     "module": "UMD",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
@@ -27,5 +30,8 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
-  }
+  },
+  "include": [
+    "packages/*/src/**/*"
+  ]
 }

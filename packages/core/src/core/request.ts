@@ -12,7 +12,7 @@ import { Headers } from "./headers"
 import { UTF8Url } from "./utf8-url"
 import { UTF8SearchParams } from "./utf8-search-params"
 
-export interface Request<DATA extends Record<string, unknown> = never> {
+export interface LRequest<DATA extends Record<string, unknown> = never> {
   readonly data: DATA
   readonly raw: IncomingMessage
 
@@ -26,14 +26,14 @@ export interface Request<DATA extends Record<string, unknown> = never> {
   readonly headers: Headers
 }
 
-export const addRequestField = <R extends Request, KEY extends PropertyKey>(
+export const addRequestField = <R extends LRequest, KEY extends PropertyKey>(
   fieldName: KEY,
   field: CustomPropertyDescriptor<R, KEY>
 ): void => {
   Object.defineProperty(RequestImpl.prototype, fieldName, field)
 }
 
-export const overwriteRequestMethod = <R extends Request, KEY extends keyof R>(
+export const overwriteRequestMethod = <R extends LRequest, KEY extends keyof R>(
   fieldName: KEY,
   methodFactory: (original: R[KEY] extends Func ? R[KEY] : never) => CustomPropertyDescriptor<R, KEY>
 ): void => {

@@ -7,10 +7,10 @@ import { IncomingMessage as In, ServerResponse as Out } from "http"
 
 import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware"
 import { HTTPException } from "./http-exception"
-import { Request } from "./request"
+import { LRequest } from "./request"
 import { RequestImpl } from "./request-impl"
 import { resolveRoute } from "./resolve-route"
-import { Response } from "./response"
+import { LResponse } from "./response"
 import { ResponseImpl } from "./response-impl"
 import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
 import { MergedRoutes } from "./router-merger"
@@ -128,9 +128,9 @@ const buildMiddlewareExecutionChain = (route: {
 }) => {
   const pipeline = [...route.pipeline]
   return {
-    run: async (req: Request, res: Response): Promise<void> => {
+    run: async (req: LRequest, res: LResponse): Promise<void> => {
       let index = -1
-      const executionWrapper = async (request: Request, response: Response): Promise<any> => {
+      const executionWrapper = async (request: LRequest, response: LResponse): Promise<any> => {
         index += 1
         //eslint-disable-next-line @typescript-eslint/no-unsafe-return
         if (index >= pipeline.length) return route.executor(request, response)
@@ -144,8 +144,8 @@ const buildMiddlewareExecutionChain = (route: {
 const executeMiddleware = async (
   middleware: MiddlewareRepresentation,
   next: NextFunction,
-  request: Request,
-  response: Response
+  request: LRequest,
+  response: LResponse
 ): Promise<void> => {
   switch (middleware.type) {
     case MiddlewareType.HTTP:

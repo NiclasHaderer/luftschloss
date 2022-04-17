@@ -8,8 +8,8 @@ import {
   HTTPException,
   HttpMiddlewareInterceptor,
   NextFunction,
-  Request,
-  Response,
+  LRequest,
+  LResponse,
   Status,
   withDefaults,
 } from "@luftschloss/core"
@@ -26,8 +26,8 @@ export type InternalJsonParserOptions = { contentType: Set<string> } & JsonParse
 async function JsonParserMiddleware(
   this: InternalJsonParserOptions,
   next: NextFunction,
-  request: Request,
-  response: Response
+  request: LRequest,
+  response: LResponse
 ) {
   assertContentLengthHeader(request, this.maxBodySize)
 

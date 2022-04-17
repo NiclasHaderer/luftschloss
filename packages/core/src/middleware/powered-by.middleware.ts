@@ -3,10 +3,10 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { Request, Response } from "../core"
+import { LRequest, LResponse } from "../core"
 import { NextFunction } from "./middleware"
 
-const PoweredByMiddleware = async (next: NextFunction, request: Request, response: Response) => {
+const PoweredByMiddleware = async (next: NextFunction, request: LRequest, response: LResponse) => {
   await next(request, response)
   response.headers.append("X-Powered-By", "luftschloss")
 }

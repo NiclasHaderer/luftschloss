@@ -3,10 +3,14 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { defaultErrorHandler, HTTPException, Request, Response, ResponseImpl, Status } from "../core"
+import { defaultErrorHandler, HTTPException, LRequest, LResponse, ResponseImpl, Status } from "../core"
 import { NextFunction } from "./middleware"
 
-const RequestCompleterMiddleware = async (next: NextFunction, request: Request, response: Response): Promise<void> => {
+const RequestCompleterMiddleware = async (
+  next: NextFunction,
+  request: LRequest,
+  response: LResponse
+): Promise<void> => {
   await next(request, response)
 
   if (response instanceof ResponseImpl) {

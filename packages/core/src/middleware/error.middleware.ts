@@ -3,7 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { ErrorHandler, HTTPException, Request, Response, Status } from "../core"
+import { ErrorHandler, HTTPException, LRequest, LResponse, Status } from "../core"
 import { HttpMiddlewareInterceptor, NextFunction } from "./middleware"
 
 interface MiddleWareScope {
@@ -13,14 +13,15 @@ interface MiddleWareScope {
 async function ErrorMiddleware(
   this: MiddleWareScope,
   next: NextFunction,
-  request: Request,
-  response: Response
+  request: LRequest,
+  response: LResponse
 ): Promise<void> {
   try {
     await next(request, response)
   } catch (e) {
     if (!(e instanceof HTTPException)) {
       console.error(e)
+      //eslint-disable-next-line no-ex-assign
       e = HTTPException.wrap(e as Error, Status.HTTP_500_INTERNAL_SERVER_ERROR)
     }
     const error = e as HTTPException

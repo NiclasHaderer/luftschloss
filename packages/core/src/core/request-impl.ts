@@ -9,13 +9,13 @@ import { HTTP_METHODS } from "./route-collector.model"
 import { normalizePath, saveObject } from "./utils"
 import { AddressInfo } from "net"
 import * as tls from "tls"
-import { Request } from "./request"
+import { LRequest } from "./request"
 import { Headers } from "./headers"
 import { ByLazy } from "./by-lazy"
 import { UTF8Url } from "./utf8-url"
 import { UTF8SearchParams } from "./utf8-search-params"
 
-export class RequestImpl<DATA extends Record<string, unknown> = never> implements Request<DATA> {
+export class RequestImpl<DATA extends Record<string, unknown> = never> implements LRequest<DATA> {
   private _pathParams!: object
 
   public constructor(private readonly req: IncomingMessage) {}

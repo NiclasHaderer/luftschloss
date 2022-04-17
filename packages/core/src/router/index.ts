@@ -4,6 +4,6 @@
  * MIT Licensed
  */
 
-export * from "./default.router"
 export * from "./base.router"
+export * from "./default.router"
 export * from "./router"

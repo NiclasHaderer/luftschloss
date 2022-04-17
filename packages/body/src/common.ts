@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import { HTTPException, Request, Status } from "@luftschloss/core"
+import { HTTPException, LRequest, Status } from "@luftschloss/core"
 import * as contentType from "content-type"
 
-export const assertContentLengthHeader = (request: Request, maxBodySize: number): void => {
+export const assertContentLengthHeader = (request: LRequest, maxBodySize: number): void => {
   let length = parseInt(request.headers.get("Content-Length") || "0")
   if (isNaN(length)) {
     length = 0
@@ -18,7 +18,7 @@ export const assertContentLengthHeader = (request: Request, maxBodySize: number)
   }
 }
 
-export const getBodyData = ({ raw, headers }: Request, maxBodySize: number) => {
+export const getBodyData = ({ raw, headers }: LRequest, maxBodySize: number) => {
   return new Promise<Buffer>(resolve => {
     const buffers: Buffer[] = []
 
@@ -41,7 +41,9 @@ export const getBodyData = ({ raw, headers }: Request, maxBodySize: number) => {
   })
 }
 
-export const getBodyContentType = (request: Request): null | { type: string; encoding: BufferEncoding | undefined } => {
+export const getBodyContentType = (
+  request: LRequest
+): null | { type: string; encoding: BufferEncoding | undefined } => {
   const contentTypeHeader = request.headers.get("Content-Type")
   if (!contentTypeHeader) return null
   const parsed = contentType.parse(contentTypeHeader)
