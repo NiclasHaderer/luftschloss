@@ -5,15 +5,15 @@
  */
 
 import { IncomingMessage } from "http"
-import { HTTP_METHODS } from "./route-collector.model"
-import { normalizePath, saveObject } from "./utils"
 import { AddressInfo } from "net"
 import * as tls from "tls"
-import { LRequest } from "./request"
-import { Headers } from "./headers"
 import { ByLazy } from "./by-lazy"
-import { UTF8Url } from "./utf8-url"
+import { Headers } from "./headers"
+import { LRequest } from "./request"
+import { HTTP_METHODS } from "./route-collector.model"
 import { UTF8SearchParams } from "./utf8-search-params"
+import { UTF8Url } from "./utf8-url"
+import { normalizePath, saveObject } from "./utils"
 
 export class RequestImpl<DATA extends Record<string, unknown> = never> implements LRequest<DATA> {
   private _pathParams!: object
@@ -33,7 +33,8 @@ export class RequestImpl<DATA extends Record<string, unknown> = never> implement
   public readonly path!: string
 
   @ByLazy<UTF8Url, RequestImpl<DATA>>(self => {
-    const { port, address } = self.req.socket.address() as AddressInfo
+    // Optional chaning is necessary because the mock socket does not have this method
+    const { port, address } = (self.req.socket.address?.() as AddressInfo) || { port: 1234, address: "0.0.0.0" }
     let protocol = "http://"
     if (self.req.socket instanceof tls.TLSSocket && self.req.socket.encrypted) {
       protocol = "https://"

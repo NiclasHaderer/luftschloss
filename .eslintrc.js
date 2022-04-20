@@ -24,8 +24,8 @@ module.exports = {
     "jsdoc/require-param-type": "off",
     "jsdoc/require-returns-type": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
+    "workspaces/require-dependency": "off",
     "prefer-const": [
       "error",
       {

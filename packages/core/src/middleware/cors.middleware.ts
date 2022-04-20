@@ -62,7 +62,6 @@ class CorsMiddleware implements ClassMiddlewareInterceptor {
 
   private isAllowedOrigin(request: LRequest): boolean {
     if (this.allowOriginRegex) {
-      //eslint-disable-next-line @typescript-eslint/unbound-method
       const origin = request.headers.get("Origin")
       return !!(origin ?? this.allowOriginRegex.test(origin!))
     }

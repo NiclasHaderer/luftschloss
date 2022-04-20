@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import "./response"
+import "./request"
 
 export * from "./json"
 export * from "./form"

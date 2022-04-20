@@ -3,6 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
 
 import { HTTPException, LRequest, LResponse, Status } from "@luftschloss/core"
 import { Stats } from "node:fs"
@@ -10,7 +11,7 @@ import * as parseRange from "range-parser"
 import * as RangeParser from "range-parser"
 
 export const getRange = (req: LRequest, res: LResponse, stats: Stats): RangeParser.Ranges => {
-  const rangeHeader = req.headers.get("Range")
+  const rangeHeader: string | null = req.headers.get("Range")
   if (!rangeHeader) {
     const fullRange = [{ start: 0, end: stats.size }] as RangeParser.Ranges
     fullRange.type = "bytes"

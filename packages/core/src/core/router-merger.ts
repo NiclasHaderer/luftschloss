@@ -6,8 +6,10 @@
 
 import { ReadonlyMiddlewares } from "../middleware"
 import { containsRegex, PathConverter, PathValidators, toRegex } from "../path-validator"
-import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
 import { MountingOptions, Router } from "../router"
+import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
+import { ServerBase } from "./server-base"
+import { Subject } from "./subject"
 import { normalizePath, saveObject } from "./utils"
 
 export type FinishedRoute = {
@@ -25,6 +27,7 @@ export type MergedRoutes = {
 export class RouterMerger {
   private _collection = new Map<string, Record<HTTP_METHODS, FinishedRoute | null>>()
   private locked = false
+  public routerMerged$ = new Subject<{ router: Router; basePath: string }>()
 
   public constructor(private validators: PathValidators) {}
 
@@ -48,8 +51,14 @@ export class RouterMerger {
     }
   }
 
-  public mergeIn(router: Router, { basePath }: MountingOptions, parentPipeline: ReadonlyMiddlewares): void {
+  public mergeIn(
+    server: ServerBase,
+    router: Router,
+    { basePath }: MountingOptions,
+    parentPipeline: ReadonlyMiddlewares
+  ): void {
     if (this.locked) throw new Error("Route merger has been locked. You cannot add new routers.")
+    this.routerMerged$.next({ router, basePath: normalizePath(basePath) })
     for (let { handler, path, method } of router.routes.entries()) {
       path = normalizePath(`${basePath}/${path}`)
       if (!this._collection.has(path)) {
@@ -75,8 +84,18 @@ export class RouterMerger {
       }
     }
 
+    // Call router onMount hook
+    router?.onMount?.(server)
+
     for (const { router: childRouter, options } of router.children) {
-      this.mergeIn(childRouter, options, [...parentPipeline, ...router.middleware])
+      this.mergeIn(
+        server,
+        childRouter,
+        {
+          basePath: `${basePath}/${options.basePath}`,
+        },
+        [...parentPipeline, ...router.middleware]
+      )
     }
   }
 

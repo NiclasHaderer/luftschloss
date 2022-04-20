@@ -4,15 +4,14 @@
  * MIT Licensed
  */
 
-import { Constructor } from "../types"
-import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
-import { Observable, Subject } from "./subject"
-import { EventData } from "./server"
-import { RouterMerger } from "./router-merger"
-import { RequestPipeline } from "./request-pipeline"
 import http, { IncomingMessage, ServerResponse } from "http"
 import { Duplex } from "stream"
+import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 import { Router } from "../router"
+import { Constructor } from "../types"
+import { RequestPipeline } from "./request-pipeline"
+import { RouterMerger } from "./router-merger"
+import { Observable, Subject } from "./subject"
 
 export interface ServerBase {
   addPathValidator(validator: PathValidator<any>): this
@@ -28,6 +27,12 @@ export interface ServerBase {
   handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void
 
   lock(): void
+
+  readonly shutdown$: Observable<void>
+
+  readonly start$: Observable<void>
+
+  readonly routerMerged$: Observable<{ router: Router; basePath: string }>
 }
 
 export const withServerBase = <T extends Router, ARGS extends []>(
@@ -38,41 +43,30 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     private readonly _start$ = new Subject<void>()
     private readonly startTime = Date.now()
     private readonly openSockets = new Set<Duplex>()
-    private validators: PathValidators = {
+    private pathValidators: PathValidators = {
       [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
     }
-    private readonly requestPipeline: RequestPipeline
-    private readonly server: http.Server
-    private readonly routeMerger: RouterMerger
+    private readonly requestPipeline = new RequestPipeline(this.middleware)
+    private readonly routeMerger = new RouterMerger(this.pathValidators)
+    private readonly server = http.createServer(this.handleIncomingRequest.bind(this))
 
-    // Emits an event which indicates that the server has started
-    public readonly handleEnd$: Observable<EventData>
-    // Emits an event which indicates that the server has stopped
-    public readonly handleStart$: Observable<EventData>
-    // Server shutdown event
     public readonly shutdown$ = this._shutdown$.asObservable()
-    // Server start event
     public readonly start$ = this._start$.asObservable()
+    public readonly routerMerged$ = this.routeMerger.routerMerged$
 
     public constructor(...args: ARGS) {
-      //eslint-disable-next-line constructor-super
       super(...args)
-      this.routeMerger = new RouterMerger(this.validators)
-      this.requestPipeline = new RequestPipeline(this.middleware)
-      this.handleStart$ = this.requestPipeline.handleStart$
-      this.handleEnd$ = this.requestPipeline.handleEnd$
-      this.server = http.createServer(this.handleIncomingRequest.bind(this))
     }
 
-    public async handleIncomingRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
-      await this.requestPipeline.queue(req, res)
+    public handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void {
+      this.requestPipeline.queue(req, res).then(/**/).catch(console.error)
     }
 
     public addPathValidator(validator: PathValidator<any>): this {
       if (this.locked) {
         throw new Error("Cannot add new validator after server has been started")
       }
-      this.validators[validator.name] = validator
+      this.pathValidators[validator.name] = validator
       return this
     }
 
@@ -85,12 +79,12 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         if (validatorOrName === DEFAULT_PATH_VALIDATOR_NAME) {
           throw new Error("Cannot remove default validator")
         }
-        delete this.validators[validatorOrName]
+        delete this.pathValidators[validatorOrName]
       } else {
         if (validatorOrName.name === DEFAULT_PATH_VALIDATOR_NAME) {
           throw new Error("Cannot remove default validator")
         }
-        delete this.validators[validatorOrName.name]
+        delete this.pathValidators[validatorOrName.name]
       }
       return this
     }
@@ -106,7 +100,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         throw new Error("Server was already passed to a testing client")
       }
 
-      this.routeMerger.mergeIn(this, { basePath: "/" }, [])
+      this.routeMerger.mergeIn(this, this, { basePath: "/" }, [])
       this.lock()
       //noinspection JSPotentiallyInvalidUsageOfThis
       this._start$.next()
@@ -119,7 +113,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         throw new Error("Server was already started")
       }
 
-      this.routeMerger.mergeIn(this, { basePath: "/" }, [])
+      this.routeMerger.mergeIn(this, this, { basePath: "/" }, [])
       this.lock()
 
       const runningServer = this.server.listen(port, hostname, () => {
@@ -134,10 +128,12 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
       // Wait for a server shutdown
       await new Promise<void>(resolve => {
+        //eslint-disable-next-line @typescript-eslint/no-misused-promises
         process.on(`SIGINT`, async () => {
           await this.shutdown()
           resolve()
         })
+        //eslint-disable-next-line @typescript-eslint/no-misused-promises
         process.on(`exit`, async () => {
           await this.shutdown()
           resolve()

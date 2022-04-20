@@ -5,6 +5,7 @@
  */
 
 import { addRequestField, HTTPException, LRequest, Status } from "@luftschloss/core"
+import "@luftschloss/core"
 
 declare module "@luftschloss/core" {
   //eslint-disable-next-line no-shadow
@@ -19,4 +20,5 @@ addRequestField<LRequest, "body">("body", {
       "Please use one of one of the body parser middlewares in order to use that function"
     )
   },
+  writable: true,
 })

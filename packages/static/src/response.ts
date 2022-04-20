@@ -5,6 +5,7 @@
  */
 
 import { addResponseField, HTTPException, LResponse, Status } from "@luftschloss/core"
+import "@luftschloss/core"
 
 declare module "@luftschloss/core" {
   //eslint-disable-next-line no-shadow

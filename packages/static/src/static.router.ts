@@ -3,6 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
 
 import {
   BaseRouter,
@@ -14,13 +15,12 @@ import {
   Status,
   withDefaults,
 } from "@luftschloss/core"
-import {promises as fs} from "fs"
+import { promises as fs } from "fs"
 import path from "path"
 import "./static.middleware"
-import {staticContent} from "./static.middleware"
+import { staticContent } from "./static.middleware"
 
 type StaticRouterProps = { useIndexFile: boolean; indexFile: string }
-
 
 export class StaticRouter extends BaseRouter implements Router {
   private readonly folderPath: string
@@ -36,7 +36,7 @@ export class StaticRouter extends BaseRouter implements Router {
 
   protected async handlePath(request: LRequest, response: LResponse): Promise<void> {
     // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
-    const filePath = request.pathParams<{ path: string }>().path.replace(/^\//, "")
+    const filePath: string = request.pathParams<{ path: string }>().path.replace(/^\//, "")
 
     // Convert the file path to an absolute path
     let absPath = this.mergePaths(filePath)

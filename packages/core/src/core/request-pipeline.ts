@@ -14,44 +14,34 @@ import { LResponse } from "./response"
 import { ResponseImpl } from "./response-impl"
 import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
 import { MergedRoutes } from "./router-merger"
-import { EventData } from "./server"
 import { Status } from "./status"
-import { Subject } from "./subject"
 import { saveObject } from "./utils"
 
 export class RequestPipeline {
-  private readonly _handleEnd$ = new Subject<EventData>()
-  private readonly _handleStart$ = new Subject<EventData>()
-  public readonly handleEnd$ = this._handleEnd$.asObservable()
-  public readonly handleStart$ = this._handleStart$.asObservable()
   private locked = false
   private routes!: Readonly<MergedRoutes>
 
   public constructor(private mandatoryMiddleware: ReadonlyMiddlewares) {}
 
-  public queue(req: In, res: Out): Promise<void> {
+  public async queue(req: In, res: Out): Promise<void> {
     if (!this.locked) throw new Error("RequestPipeline has not been locked. You have to lock it in order to use it")
+    // Wrap the node request/response in own implementation
+    const request = new RequestImpl(req)
+    const response = new ResponseImpl(res, request)
 
-    // Add request start and end handling
-    return this.withStart(async () => {
-      // Wrap the node request/response in own implementation
-      const request = new RequestImpl(req)
-      const response = new ResponseImpl(res, request)
+    // Get the request handler for a certain url
+    const route = resolveRoute(request.path, request.method, this.routes)
 
-      // Get the request handler for a certain url
-      const route = resolveRoute(request.path, request.method, this.routes)
+    // Set the extracted path params in the request instance
+    request.setPathParams(route.pathParams || saveObject<Record<string, unknown>>())
 
-      // Set the extracted path params in the request instance
-      request.setPathParams(route.pathParams || saveObject<Record<string, unknown>>())
+    // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
+    // method not allowed executor
+    const requestExecutor = this.retrieveExecutor(route, request.method)
 
-      // Get a successful result and if an executor could not be resolved wrap it in a default not found executor or
-      // method not allowed executor
-      const requestExecutor = this.retrieveExecutor(route, request.method)
-
-      // Create chain which will run the middleware and the callback
-      const executionChain = buildMiddlewareExecutionChain(requestExecutor)
-      await executionChain.run(request, response)
-    })
+    // Create chain which will run the middleware and the callback
+    const executionChain = buildMiddlewareExecutionChain(requestExecutor)
+    await executionChain.run(request, response)
   }
 
   /**
@@ -98,23 +88,6 @@ export class RequestPipeline {
     }
   }
 
-  /**
-   * Call the request start and request end lifecycle hooks
-   *
-   * @param callback The callback that will be executed in between
-   */
-  private async withStart(callback: () => Promise<void>): Promise<void> {
-    // Create data which will be shared between the start and end handler
-    const startEndData = { data: saveObject() }
-    this._handleStart$.next(startEndData)
-
-    // Execute the main request
-    await callback()
-
-    // Message the request end handler
-    this._handleEnd$.next(startEndData)
-  }
-
   public lock(entries: MergedRoutes): void {
     if (this.locked) throw new Error("Cannot lock the request pipeline a second time")
     this.locked = true
@@ -126,6 +99,7 @@ const buildMiddlewareExecutionChain = (route: {
   executor: ROUTE_HANDLER
   pipeline: Iterable<MiddlewareRepresentation>
 }) => {
+  // TODO next() called multiple times
   const pipeline = [...route.pipeline]
   return {
     run: async (req: LRequest, res: LResponse): Promise<void> => {

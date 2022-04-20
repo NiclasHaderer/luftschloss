@@ -7,9 +7,9 @@
 import {
   HTTPException,
   HttpMiddlewareInterceptor,
-  NextFunction,
   LRequest,
   LResponse,
+  NextFunction,
   Status,
   withDefaults,
 } from "@luftschloss/core"
@@ -21,7 +21,9 @@ export type JsonParserOptions = {
   parser: (body: Buffer, encoding: BufferEncoding | undefined) => object
 }
 
-export type InternalJsonParserOptions = { contentType: Set<string> } & JsonParserOptions
+export type InternalJsonParserOptions =
+  | ({ contentType: Set<string> } & JsonParserOptions)
+  | ({ tryAllContentTypes: true } & JsonParserOptions)
 
 async function JsonParserMiddleware(
   this: InternalJsonParserOptions,
@@ -34,17 +36,20 @@ async function JsonParserMiddleware(
   let parsed: object | null = null
   request.body = async <T>(): Promise<T> => {
     const contentType = getBodyContentType(request)
-    if (!contentType) {
-      throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has not content type header")
-    }
 
-    if (!this.contentType.has(contentType.type)) {
-      throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has wrong content type header")
+    if (!("tryAllContentTypes" in this)) {
+      if (!contentType) {
+        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has not content type header")
+      }
+
+      if (!this.contentType.has(contentType.type)) {
+        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has wrong content type header")
+      }
     }
 
     if (parsed === null) {
       const buffer = await getBodyData(request, this.maxBodySize)
-      parsed = this.parser(buffer, contentType.encoding)
+      parsed = this.parser(buffer, contentType?.encoding)
     }
 
     return parsed as unknown as T
@@ -54,16 +59,28 @@ async function JsonParserMiddleware(
 }
 
 export const jsonParser = (
-  contentType = ["application/json"],
+  contentType: string[] | "*" = ["application/json"],
   options: Partial<JsonParserOptions> = {}
 ): HttpMiddlewareInterceptor => {
   const completeOptions = withDefaults<JsonParserOptions>(options, {
     maxBodySize: 100,
     parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => JSON.parse(buffer.toString(encoding)) as object,
   })
-  return JsonParserMiddleware.bind({
-    parser: completeOptions.parser,
-    maxBodySize: completeOptions.maxBodySize * 100,
-    contentType: new Set(contentType.map(c => c.toLowerCase().trim())),
-  })
+
+  let t: InternalJsonParserOptions
+  if (contentType === "*") {
+    t = {
+      parser: completeOptions.parser,
+      maxBodySize: completeOptions.maxBodySize * 100,
+      tryAllContentTypes: true,
+    }
+  } else {
+    t = {
+      parser: completeOptions.parser,
+      maxBodySize: completeOptions.maxBodySize * 100,
+      contentType: new Set(contentType.map(c => c.toLowerCase().trim())),
+    }
+  }
+
+  return JsonParserMiddleware.bind(t)
 }

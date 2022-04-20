@@ -4,11 +4,12 @@
  * MIT Licensed
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment */
 import { HTTPException, LRequest, Status } from "@luftschloss/core"
 import * as contentType from "content-type"
 
 export const assertContentLengthHeader = (request: LRequest, maxBodySize: number): void => {
-  let length = parseInt(request.headers.get("Content-Length") || "0")
+  let length = parseInt((request.headers.get("Content-Length") as string | null) || "0")
   if (isNaN(length)) {
     length = 0
   }
@@ -44,7 +45,7 @@ export const getBodyData = ({ raw, headers }: LRequest, maxBodySize: number) => 
 export const getBodyContentType = (
   request: LRequest
 ): null | { type: string; encoding: BufferEncoding | undefined } => {
-  const contentTypeHeader = request.headers.get("Content-Type")
+  const contentTypeHeader: string | null = request.headers.get("Content-Type")
   if (!contentTypeHeader) return null
   const parsed = contentType.parse(contentTypeHeader)
 

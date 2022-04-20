@@ -27,7 +27,7 @@ export class Headers {
     }
   }
 
-  public appendAll(name: string, value: string[] | Set<string>) {
+  public appendAll(name: string, value: string[] | Set<string>): void {
     for (const v of value) {
       this.append(name, v)
     }
@@ -46,6 +46,17 @@ export class Headers {
     name = Headers.cleanHeaderName(name)
     const [first] = this.headers.get(name) || []
     return first || null
+  }
+
+  public set(name: string, value: string | string[]): void {
+    name = Headers.cleanHeaderName(name)
+    let valueSet: Set<string>
+    if (Array.isArray(value)) {
+      valueSet = new Set(value)
+    } else {
+      valueSet = new Set([value])
+    }
+    this.headers.set(name, valueSet)
   }
 
   public getAll(name: string): Set<string> | null {
@@ -80,7 +91,7 @@ export class Headers {
 
   public static create(nodeHeaders: IncomingHttpHeaders): Headers {
     const headers = new Headers()
-    for (const [name, value] of Object.values(nodeHeaders) as [string, string][]) {
+    for (const [name, value] of Object.entries(nodeHeaders) as [string, string][]) {
       headers.append(name, value)
     }
 

@@ -12,8 +12,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@luftschloss/body": "workspace:packages/body",
     "@luftschloss/core": "workspace:packages/core",
+    "@luftschloss/mocking": "workspace:packages/mocking",
     "@luftschloss/openapi": "workspace:packages/openapi",
-    "@luftschloss/static": "workspace:packages/static"
+    "@luftschloss/static": "workspace:packages/static",
+    "@luftschloss/testing": "workspace:packages/testing"
   }
 }
