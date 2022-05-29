@@ -13,18 +13,17 @@ import {
   uuidPathValidator,
 } from "../path-validator"
 import { DefaultRouter } from "../router"
-import { defaultErrorHandler, ErrorHandler } from "./error-handler"
-import { withServerBase } from "./server-base"
-import { saveObject } from "./utils"
+import { defaultErrorHandler } from "./error-handler"
+import { ServerBase, withServerBase } from "./server-base"
 
 class ServerImpl extends withServerBase(DefaultRouter) {}
 
-export const defaultServer = (errorHandlers: Partial<ErrorHandler> = saveObject()): ServerImpl => {
+export const defaultServer = (): ServerBase & DefaultRouter => {
   const server = new ServerImpl()
   server
     .pipe(loggerMiddleware())
     .pipe(requestCompleter())
-    .pipe(errorMiddleware({ ...defaultErrorHandler, ...errorHandlers }))
+    .pipe(errorMiddleware({ ...defaultErrorHandler }))
     .pipe(noContentSniff())
     .pipe(poweredBy())
 

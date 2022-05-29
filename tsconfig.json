@@ -6,9 +6,7 @@
     "skipLibCheck": true,
     "target": "ES2021",
     "module": "UMD",
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
@@ -31,7 +29,5 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": [
-    "packages/*/src/**/*"
-  ]
+  "include": ["packages/*/src/**/*"]
 }

@@ -21,7 +21,7 @@ export type ErrorHandler = Partial<{
 
 export const defaultErrorHandler: ErrorHandler = {
   DEFAULT: (error: HTTPException, request: LRequest, response: LResponse): Promise<void> | void => {
-    response.status(error.status).json({ error: error.message })
+    response.status(error.status).json({ error: error.messageJson })
   },
   HTTP_500_INTERNAL_SERVER_ERROR: (
     error: HTTPException,
@@ -29,9 +29,9 @@ export const defaultErrorHandler: ErrorHandler = {
     response: LResponse
   ): Promise<void> | void => {
     if (isProduction()) {
-      response.status(error.status).json({ error: error.message })
+      response.status(error.status).json({ error: error.messageJson })
     } else {
-      response.status(error.status).json({ error: error.message, trace: error.stack })
+      response.status(error.status).json({ error: error.messageJson, trace: error.stack })
     }
   },
 }

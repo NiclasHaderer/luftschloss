@@ -34,22 +34,24 @@ async function JsonParserMiddleware(
   assertContentLengthHeader(request, this.maxBodySize)
 
   let parsed: object | null = null
+  //eslint-disable-next-line @typescript-eslint/no-this-alias
+  const self = this
   request.body = async <T>(): Promise<T> => {
     const contentType = getBodyContentType(request)
 
-    if (!("tryAllContentTypes" in this)) {
+    if (!("tryAllContentTypes" in self)) {
       if (!contentType) {
         throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has not content type header")
       }
 
-      if (!this.contentType.has(contentType.type)) {
+      if (!self.contentType.has(contentType.type)) {
         throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has wrong content type header")
       }
     }
 
     if (parsed === null) {
-      const buffer = await getBodyData(request, this.maxBodySize)
-      parsed = this.parser(buffer, contentType?.encoding)
+      const buffer = await getBodyData(request, self.maxBodySize)
+      parsed = self.parser(buffer, contentType?.encoding)
     }
 
     return parsed as unknown as T

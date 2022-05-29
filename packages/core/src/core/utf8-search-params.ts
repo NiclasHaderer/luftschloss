@@ -44,6 +44,8 @@ export class UTF8SearchParams extends URLSearchParams {
   }
 
   public override getAll(name: string): string[] {
+    console.log(super.getAll(name).map(decodeURIComponent))
+    console.log(super.getAll(name))
     return super.getAll(name).map(decodeURIComponent)
   }
 

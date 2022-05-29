@@ -29,18 +29,18 @@ export class RequestImpl<DATA extends Record<string, unknown> = never> implement
   @ByLazy<Headers, RequestImpl<DATA>>(self => Headers.create(self.req.headers))
   public readonly headers!: Headers
 
-  @ByLazy<string, RequestImpl<DATA>>(self => decodeURIComponent(self.url.pathname))
+  @ByLazy<string, RequestImpl<DATA>>(self => normalizePath(decodeURIComponent(self.url.pathname)))
   public readonly path!: string
 
   @ByLazy<UTF8Url, RequestImpl<DATA>>(self => {
-    // Optional chaning is necessary because the mock socket does not have this method
+    // Optional chaining is necessary because the mock socket does not have this method
     const { port, address } = (self.req.socket.address?.() as AddressInfo) || { port: 1234, address: "0.0.0.0" }
     let protocol = "http://"
     if (self.req.socket instanceof tls.TLSSocket && self.req.socket.encrypted) {
       protocol = "https://"
     }
 
-    return new UTF8Url(`${protocol}${address}:${port}${normalizePath(self.req.url!)}`)
+    return new UTF8Url(`${protocol}${address}:${port}${self.req.url!}`)
   })
   public readonly url!: UTF8Url
 

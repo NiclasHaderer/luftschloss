@@ -11,6 +11,7 @@ import { Status, toStatus } from "./status"
  */
 export class HTTPException extends Error {
   public readonly status: Status
+  public readonly messageJson: string | Record<string, unknown> | unknown[]
 
   /**
    * @param status An HttpStatus, or the number of a http status.
@@ -22,6 +23,7 @@ export class HTTPException extends Error {
     // Get the status code value for a number
     this.status = toStatus(status)
     const tmpMessage = message || this.status.message
+    this.messageJson = tmpMessage
     this.message = typeof tmpMessage === "string" ? tmpMessage : JSON.stringify(tmpMessage)
   }
 
