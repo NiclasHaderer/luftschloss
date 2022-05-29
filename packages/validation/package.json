@@ -1,0 +1,15 @@
+{
+  "name": "@luftschloss/validation",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -r .turbo dist"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {}
+}

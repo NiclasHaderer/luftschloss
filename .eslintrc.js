@@ -26,6 +26,7 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "workspaces/require-dependency": "off",
+    "@typescript-eslint/explicit-member-accessibility": ["error", { accessibility: "explicit" }],
     "prefer-const": [
       "error",
       {
