@@ -30,7 +30,7 @@ export interface RouterParams<
 }
 
 export class ApiRoute<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType> {
-  constructor(
+  public constructor(
     private router: ApiRouter,
     private collector: RouteCollector,
     private method: HTTP_METHODS | HTTP_METHODS[] | "*",

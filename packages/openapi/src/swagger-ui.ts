@@ -21,7 +21,7 @@ export class SwaggerRouter extends DefaultRouter {
   @ByLazy<string, SwaggerRouter>(self => self.server.openapi.getSpecAsYaml())
   private yaml!: string
 
-  constructor(private docsUrl: string, private openApiUrl: string) {
+  public constructor(private docsUrl: string, private openApiUrl: string) {
     super()
     this.get(this.docsUrl, this.handleDocs.bind(this))
     this.get(this.openApiUrl, this.handleJsonSchema.bind(this))

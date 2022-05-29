@@ -30,7 +30,7 @@ type ApiServerArgs = { generateOpenApi: boolean }
 export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {
   public openapi = new OpenApiBuilder()
 
-  constructor(private generateOpenApi: boolean) {
+  public constructor(private generateOpenApi: boolean) {
     super()
     this.routerMerged$.subscribe(({ router, basePath }) => {
       if (router instanceof ApiRouter && this.generateOpenApi) {

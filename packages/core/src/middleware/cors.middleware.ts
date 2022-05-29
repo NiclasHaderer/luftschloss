@@ -25,7 +25,7 @@ type CorsMiddlewareOptions = {
 )
 
 class CorsMiddleware implements ClassMiddlewareInterceptor {
-  constructor(
+  public constructor(
     private defaultHeaders: Record<string, string[]>,
     private allowAllHeaders: boolean,
     private allowOriginRegex: RegExp | null,
