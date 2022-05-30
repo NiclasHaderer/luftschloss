@@ -10,6 +10,5 @@
   "author": "",
   "license": "MIT",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "dependencies": {}
+  "types": "dist/index.d.ts"
 }

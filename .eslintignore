@@ -4,5 +4,6 @@ packages/mocking/dist
 packages/openapi/dist
 packages/static/dist
 packages/testing/dist
+packages/validation/dist
 apps/demo/dist
 .eslintrc.js
