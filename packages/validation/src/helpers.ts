@@ -30,3 +30,9 @@ export const toListString = (list: unknown[], separator = ", "): string => {
     return previousValue
   }, "") as string
 }
+
+export const saveObject = <T extends Record<string, unknown>>(): T => {
+  const tmp = {} as T
+  Object.freeze(tmp.__proto__)
+  return tmp
+}

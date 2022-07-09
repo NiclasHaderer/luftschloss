@@ -8,13 +8,14 @@ import { getTypeOf, toListString, uniqueList } from "../helpers"
 import { LuftParsingError, ParsingIssue } from "../parsing-error"
 import { LuftTypeOf } from "../types"
 
-type InternalParsingResult<T> =
+export type InternalParsingResult<T> =
   | {
       success: true
       data: T
     }
   | {
       success: false
+      data?: never
     }
 
 type ParsingResult<T> =
@@ -27,7 +28,7 @@ type ParsingResult<T> =
       issues: ParsingIssue[]
     }
 
-class ParsingContext {
+export class ParsingContext {
   private _issues: ParsingIssue[] = []
   public readonly path: Readonly<string | number[]> = []
 
@@ -45,12 +46,16 @@ class ParsingContext {
   }
 }
 
-type UnpackNullish<T extends LuftBaseType<any>, LIMIT extends number> = __Asdf<T, LIMIT, []>
+type UnpackNullish<T extends LuftBaseType<any>, LIMIT extends number> = _UnpackNullish<T, LIMIT, []>
 
-type __Asdf<T extends LuftBaseType<any>, LIMIT extends number, CURR extends null[]> = CURR["length"] extends LIMIT
+type _UnpackNullish<
+  T extends LuftBaseType<any>,
+  LIMIT extends number,
+  CURR extends null[]
+> = CURR["length"] extends LIMIT
   ? T
   : T extends LuftNull<any> | LuftUndefined<any>
-  ? __Asdf<T["schema"], LIMIT, [null, ...CURR]>
+  ? _UnpackNullish<T["schema"], LIMIT, [null, ...CURR]>
   : T
 
 export type InternalLuftBaseType<OUT_TYPE> = {
@@ -103,7 +108,7 @@ export abstract class LuftBaseType<T> {
     }
 
     throw new Error(
-      "Context has issues, but the parsing result is marked as a result. Please check you parsers for errors"
+      "Context has issues, but the parsing result is marked as valid. Please check you parsers for errors"
     )
   }
 
@@ -132,7 +137,7 @@ export abstract class LuftBaseType<T> {
       }
     }
 
-    const resultData = this._coerce(data, context)
+    const resultData = this._coerce ? this._coerce(data, context) : this._validate(data, context)
 
     if (context.hasIssues && !resultData.success) {
       return {
@@ -149,11 +154,11 @@ export abstract class LuftBaseType<T> {
     }
 
     throw new Error(
-      "Context has issues, but the parsing result is marked as a result. Please check you parsers for errors"
+      "Context has issues, but the parsing result is marked as valid. Please check you parsers for errors"
     )
   }
 
-  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T>
+  protected abstract _coerce?(data: unknown, context: ParsingContext): InternalParsingResult<T>
 
   public optional() {
     return new LuftUndefined<T>(this)
