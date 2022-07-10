@@ -5,6 +5,7 @@
  */
 
 import { getTypeOf } from "../helpers"
+import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
 export class LuftDate extends LuftBaseType<Date> {
@@ -47,7 +48,7 @@ export class LuftDate extends LuftBaseType<Date> {
     }
 
     context.addIssue({
-      code: "INCOMPATIBLE_TYPE",
+      code: LuftErrorCodes.INVALID_TYPE,
       message: `Expected type date, but got ${getTypeOf(data)}`,
       path: [...context.path],
       expectedType: "date",

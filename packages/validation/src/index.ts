@@ -4,7 +4,4 @@
  * MIT Licensed
  */
 
-// TODO missing: literal, set, ?enum?
-// TODO missing string min, max len
-// TODO missing number min, max
-// TODO missing array/set min, max len
+// TODO check if modifiers like ignoreCase should apply to validate to and if yes, what is the difference between coerce and validate. Does coerce only return on of the allowed values and fixes the case in this example?

@@ -5,6 +5,7 @@
  */
 
 import { getTypeOf, saveObject } from "../helpers"
+import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
 const getAdditionalKeys = (actualKeys: string[], targetKeys: string[]): string[] =>
@@ -35,6 +36,7 @@ export class LuftRecord<T extends Record<string, LuftBaseType<unknown>>> extends
   }
 
   protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T> {
+    // TODO perhaps if string try json.parse and then validate
     return this._validate(data, context, "_coerce")
   }
 
@@ -45,7 +47,7 @@ export class LuftRecord<T extends Record<string, LuftBaseType<unknown>>> extends
   ): InternalParsingResult<T> {
     if (typeof data !== "object" || data === null) {
       context.addIssue({
-        code: "INCOMPATIBLE_TYPE",
+        code: LuftErrorCodes.INVALID_TYPE,
         message: `Expected type record, but got ${getTypeOf(data)}`,
         path: [...context.path],
         receivedType: getTypeOf(data),
@@ -60,7 +62,7 @@ export class LuftRecord<T extends Record<string, LuftBaseType<unknown>>> extends
     const schemaKeys = Object.keys(this.schema)
     if (!this._ignoreUnknownKeys && dataKeys.length > schemaKeys.length) {
       context.addIssue({
-        code: "ADDITIONAL_KEYS",
+        code: LuftErrorCodes.TO_MANY_KEYS,
         path: [...context.path],
         message: "Object keys do not match",
         additionalKeys: getAdditionalKeys(dataKeys, schemaKeys),
@@ -75,7 +77,7 @@ export class LuftRecord<T extends Record<string, LuftBaseType<unknown>>> extends
         failAtEnd = true
         detectedMissingKeys = true
         context.addIssue({
-          code: "MISSING_KEYS",
+          code: LuftErrorCodes.MISSING_KEYS,
           path: [...context.path],
           message: "Object keys do not match",
           missingKeys: getMissingKeys(dataKeys, schemaKeys),

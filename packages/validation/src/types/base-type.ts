@@ -5,7 +5,7 @@
  */
 
 import { getTypeOf, toListString, uniqueList } from "../helpers"
-import { LuftParsingError, ParsingIssue } from "../parsing-error"
+import { LuftErrorCodes, LuftParsingError, ParsingIssue } from "../parsing-error"
 import { LuftTypeOf } from "../types"
 
 export type InternalParsingResult<T> =
@@ -303,7 +303,7 @@ export class LuftUnion<T extends LuftBaseType<any>[]> extends LuftBaseType<LuftT
     const receivedType = getTypeOf(data)
     context.addIssue({
       message: `Expected one of the supported types ${toListString(supportedTypes)}, but got ${receivedType}`,
-      code: "INVALID_UNION",
+      code: LuftErrorCodes.INVALID_TYPE,
       path: [...context.path],
       expectedType: supportedTypes,
       receivedType: receivedType,

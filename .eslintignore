@@ -2,6 +2,7 @@ packages/body/dist
 packages/core/dist
 packages/mocking/dist
 packages/openapi/dist
+packages/schema-generator/dist
 packages/static/dist
 packages/testing/dist
 packages/validation/dist
