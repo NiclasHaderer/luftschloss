@@ -68,6 +68,7 @@ export abstract class LuftBaseType<T> {
   public readonly schema: unknown
   public abstract readonly supportedTypes: string[]
   private beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
+  private beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
 
   public validate(data: unknown): T {
     const result = this.validateSave(data)
@@ -125,7 +126,7 @@ export abstract class LuftBaseType<T> {
   public coerceSave(data: unknown): ParsingResult<T> {
     const context = new ParsingContext()
 
-    for (const coerceBeforeHook of this.beforeValidateHooks) {
+    for (const coerceBeforeHook of this.beforeCoerceHooks) {
       const result = coerceBeforeHook(data, context)
       if (result.success) {
         data = result.data
@@ -188,10 +189,11 @@ export abstract class LuftBaseType<T> {
   }
 
   public default(defaultValue: T): this {
-    if (this instanceof LuftUndefined) {
+    if (this instanceof LuftUndefined || this instanceof LuftNull) {
       throw new Error("You should not set a default value for an optional type")
     }
-    this.beforeValidate(coerceValue => {
+
+    const addDefaultFun = (coerceValue: unknown): InternalParsingResult<unknown> => {
       if (coerceValue === undefined || coerceValue === null) {
         return {
           success: true,
@@ -199,12 +201,21 @@ export abstract class LuftBaseType<T> {
         }
       }
       return { success: true, data: coerceValue }
-    })
+    }
+
+    this.beforeValidate(addDefaultFun)
+    this.beforeCoerce(addDefaultFun)
     return this
   }
 
-  public beforeValidate(cb: (value: unknown, context: ParsingContext) => InternalParsingResult<unknown>) {
+  public beforeValidate(cb: (value: unknown, context: ParsingContext) => InternalParsingResult<unknown>): this {
     this.beforeValidateHooks.push(cb)
+    return this
+  }
+
+  public beforeCoerce(cb: (value: unknown, context: ParsingContext) => InternalParsingResult<unknown>): this {
+    this.beforeCoerceHooks.push(cb)
+    return this
   }
 }
 
