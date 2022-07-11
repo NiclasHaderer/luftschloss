@@ -1,16 +1,20 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "_apps/demo/src",
+  "sourceRoot": "apps/demo/src",
   "projectType": "application",
   "targets": {
     "build": {
       "executor": "@nrwl/node:webpack",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/_apps/demo",
-        "main": "_apps/demo/src/main.ts",
-        "tsConfig": "_apps/demo/tsconfig.app.json",
-        "assets": ["_apps/demo/src/assets"]
+        "outputPath": "dist/apps/demo",
+        "main": "apps/demo/src/main.ts",
+        "tsConfig": "apps/demo/tsconfig.app.json",
+        "assets": [
+          "apps/demo/src/assets"
+        ]
       },
       "configurations": {
         "production": {
@@ -19,8 +23,8 @@
           "inspect": false,
           "fileReplacements": [
             {
-              "replace": "_apps/demo/src/environments/environment.ts",
-              "with": "_apps/demo/src/environments/environment.prod.ts"
+              "replace": "apps/demo/src/environments/environment.ts",
+              "with": "apps/demo/src/environments/environment.prod.ts"
             }
           ]
         }
@@ -39,16 +43,22 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["_apps/demo/**/*.ts"]
+        "lintFilePatterns": [
+          "apps/demo/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/_apps/demo"],
+      "outputs": [
+        "coverage/apps/demo"
+      ],
       "options": {
-        "jestConfig": "_apps/demo/jest.config.ts",
+        "jestConfig": "apps/demo/jest.config.ts",
         "passWithNoTests": true
       }
     }

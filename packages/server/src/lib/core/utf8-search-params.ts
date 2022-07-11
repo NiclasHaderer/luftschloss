@@ -28,10 +28,10 @@ export class UTF8SearchParams extends URLSearchParams {
     }
   }
 
-  public override forEach<TThis = this>(
-    callback: (this: TThis, value: string, name: string, searchParams: URLSearchParams) => void,
-    thisArg: TThis = this as unknown as TThis
-  ): void {
+  forEach<TThis = this>(
+    callback: (this: TThis, value: string, name: string, searchParams: this) => void,
+    thisArg?: TThis
+  ) {
     super.forEach((value, name, searchParams) => {
       callback.apply(thisArg, [decodeURIComponent(value), decodeURIComponent(name), searchParams])
     })

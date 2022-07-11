@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 /* eslint-disable */
 export default {
   displayName: "demo",
@@ -12,5 +18,5 @@ export default {
     "^.+\\.[tj]s$": "ts-jest",
   },
   moduleFileExtensions: ["ts", "js", "html"],
-  coverageDirectory: "../../coverage/_apps/demo",
+  coverageDirectory: "../../coverage/apps/demo",
 }

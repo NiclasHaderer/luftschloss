@@ -1,31 +1,41 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "_packages/openapi/src",
+  "sourceRoot": "packages/openapi/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/_packages/openapi",
-        "tsConfig": "_packages/openapi/tsconfig.lib.json",
-        "packageJson": "_packages/openapi/package.json",
-        "main": "_packages/openapi/src/index.ts",
-        "assets": ["_packages/openapi/*.md"]
+        "outputPath": "dist/packages/openapi",
+        "tsConfig": "packages/openapi/tsconfig.lib.json",
+        "packageJson": "packages/openapi/package.json",
+        "main": "packages/openapi/src/index.ts",
+        "assets": [
+          "packages/openapi/*.md"
+        ]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["_packages/openapi/**/*.ts"]
+        "lintFilePatterns": [
+          "packages/openapi/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/_packages/openapi"],
+      "outputs": [
+        "coverage/packages/openapi"
+      ],
       "options": {
-        "jestConfig": "_packages/openapi/jest.config.ts",
+        "jestConfig": "packages/openapi/jest.config.ts",
         "passWithNoTests": true
       }
     }

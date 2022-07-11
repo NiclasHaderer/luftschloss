@@ -1,3 +1,9 @@
+/*
+ * luftschloss
+ * Copyright (c) 2022. Niclas
+ * MIT Licensed
+ */
+
 /* eslint-disable */
 export default {
   displayName: "openapi",
@@ -12,5 +18,5 @@ export default {
     "^.+\\.[tj]sx?$": "ts-jest",
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
-  coverageDirectory: "../../coverage/_packages/openapi",
+  coverageDirectory: "../../coverage/packages/openapi",
 }

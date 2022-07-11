@@ -8,24 +8,52 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "es2021",
     "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es2021",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "paths": {
-      "@luftschloss/body": ["_packages/body/src/index.ts"],
-      "@luftschloss/client": ["_packages/client/src/index.ts"],
-      "@luftschloss/mocking": ["_packages/mocking/src/index.ts"],
-      "@luftschloss/openapi": ["_packages/openapi/src/index.ts"],
-      "@luftschloss/proxy": ["_packages/proxy/src/index.ts"],
-      "@luftschloss/schema-generator": ["_packages/schema-generator/src/index.ts"],
-      "@luftschloss/server": ["_packages/server/src/index.ts"],
-      "@luftschloss/static": ["_packages/static/src/index.ts"],
-      "@luftschloss/testing": ["_packages/testing/src/index.ts"],
-      "@luftschloss/validation": ["_packages/validation/src/index.ts"]
+      "@luftschloss/body": [
+        "packages/body/src/index.ts"
+      ],
+      "@luftschloss/client": [
+        "packages/client/src/index.ts"
+      ],
+      "@luftschloss/mocking": [
+        "packages/mocking/src/index.ts"
+      ],
+      "@luftschloss/openapi": [
+        "packages/openapi/src/index.ts"
+      ],
+      "@luftschloss/proxy": [
+        "packages/proxy/src/index.ts"
+      ],
+      "@luftschloss/schema-generator": [
+        "packages/schema-generator/src/index.ts"
+      ],
+      "@luftschloss/server": [
+        "packages/server/src/index.ts"
+      ],
+      "@luftschloss/static": [
+        "packages/static/src/index.ts"
+      ],
+      "@luftschloss/testing": [
+        "packages/testing/src/index.ts"
+      ],
+      "@luftschloss/validation": [
+        "packages/validation/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

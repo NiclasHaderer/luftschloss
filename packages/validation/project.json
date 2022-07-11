@@ -1,30 +1,40 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "_packages/validation/src",
+  "sourceRoot": "packages/validation/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/_packages/validation",
-        "main": "_packages/validation/src/index.ts",
-        "tsConfig": "_packages/validation/tsconfig.lib.json",
-        "assets": ["_packages/validation/*.md"]
+        "outputPath": "dist/packages/validation",
+        "main": "packages/validation/src/index.ts",
+        "tsConfig": "packages/validation/tsconfig.lib.json",
+        "assets": [
+          "packages/validation/*.md"
+        ]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["_packages/validation/**/*.ts"]
+        "lintFilePatterns": [
+          "packages/validation/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/_packages/validation"],
+      "outputs": [
+        "coverage/packages/validation"
+      ],
       "options": {
-        "jestConfig": "_packages/validation/jest.config.ts",
+        "jestConfig": "packages/validation/jest.config.ts",
         "passWithNoTests": true
       }
     }

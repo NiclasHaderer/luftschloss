@@ -14,6 +14,10 @@ import { RouterMerger } from "./router-merger"
 import { Observable, Subject } from "./subject"
 
 export interface ServerBase {
+  readonly shutdown$: Observable<void>
+  readonly start$: Observable<void>
+  readonly routerMerged$: Observable<{ router: Router; basePath: string }>
+
   addPathValidator(validator: PathValidator<any>): this
 
   removePathValidator(validatorOrName: PathValidator<any> | PathValidator<any>["name"]): this
@@ -27,12 +31,6 @@ export interface ServerBase {
   handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void
 
   lock(): void
-
-  readonly shutdown$: Observable<void>
-
-  readonly start$: Observable<void>
-
-  readonly routerMerged$: Observable<{ router: Router; basePath: string }>
 }
 
 export const withServerBase = <T extends Router, ARGS extends []>(
@@ -40,7 +38,9 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 ): Constructor<T & ServerBase, ARGS> =>
   class extends (clazz as Constructor<Router, ARGS>) implements ServerBase {
     private readonly _shutdown$ = new Subject<void>()
+    public readonly shutdown$ = this._shutdown$.asObservable()
     private readonly _start$ = new Subject<void>()
+    public readonly start$ = this._start$.asObservable()
     private readonly startTime = Date.now()
     private readonly openSockets = new Set<Duplex>()
     private pathValidators: PathValidators = {
@@ -48,11 +48,8 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     }
     private readonly requestPipeline = new RequestPipeline(this.middleware)
     private readonly routeMerger = new RouterMerger(this.pathValidators)
-    private readonly server = http.createServer(this.handleIncomingRequest.bind(this))
-
-    public readonly shutdown$ = this._shutdown$.asObservable()
-    public readonly start$ = this._start$.asObservable()
     public readonly routerMerged$ = this.routeMerger.routerMerged$
+    private readonly server = http.createServer(this.handleIncomingRequest.bind(this))
 
     public constructor(...args: ARGS) {
       super(...args)
@@ -102,9 +99,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
       this.routeMerger.mergeIn(this, this, { basePath: "/" }, [])
       this.lock()
-      //noinspection JSPotentiallyInvalidUsageOfThis
       this._start$.next()
-      //noinspection JSPotentiallyInvalidUsageOfThis
       this._start$.complete()
     }
 
