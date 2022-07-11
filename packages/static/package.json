@@ -1,23 +1,4 @@
 {
   "name": "@luftschloss/static",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -r .turbo dist"
-  },
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "dependencies": {
-    "@luftschloss/server": "workspace:packages/server",
-    "@types/range-parser": "^1.2.4",
-    "mime-db": "^1.52.0",
-    "range-parser": "^1.2.1"
-  },
-  "devDependencies": {
-    "@types/mime-db": "^1.43.1"
-  }
+  "version": "0.0.1"
 }

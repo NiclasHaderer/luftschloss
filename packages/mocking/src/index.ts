@@ -1,7 +1,1 @@
-/*
- * luftschloss
- * Copyright (c) 2022. Niclas
- * MIT Licensed
- */
-
-export const _ = ""
+export type __$__ = "todo"

@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "body": "packages/body",
+    "client": "packages/client",
+    "demo": "apps/demo",
+    "mocking": "packages/mocking",
+    "openapi": "packages/openapi",
+    "proxy": "packages/proxy",
+    "schema-generator": "packages/schema-generator",
+    "server": "packages/server",
+    "static": "packages/static",
+    "testing": "packages/testing",
+    "validation": "packages/validation"
+  }
+}

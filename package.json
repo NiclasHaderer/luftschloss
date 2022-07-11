@@ -1,29 +1,35 @@
 {
   "name": "luftschloss",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {},
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
-  "scripts": {
-    "build:c": "turbo run build",
-    "build": "yarn workspaces foreach -ti --exclude luftschloss run build",
-    "build:w": "yarn run build && yarn workspaces foreach -pi --exclude luftschloss run build -w",
-    "clean": "rm -r node_modules/.cache/turbo; yarn workspaces foreach -p run clean",
-    "postinstall": "husky install"
+  "dependencies": {
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.36",
-    "@typescript-eslint/eslint-plugin": "^5.19.0",
-    "@typescript-eslint/parser": "^5.26.0",
-    "eslint": "^8.12.0",
-    "eslint-plugin-jsdoc": "^39.3.2",
-    "eslint-plugin-workspaces": "^0.7.0",
-    "husky": "^7.0.4",
+    "@nrwl/cli": "14.4.2",
+    "@nrwl/eslint-plugin-nx": "14.4.2",
+    "@nrwl/jest": "14.4.2",
+    "@nrwl/js": "14.4.2",
+    "@nrwl/linter": "14.4.2",
+    "@nrwl/node": "14.4.2",
+    "@nrwl/web": "14.4.2",
+    "@nrwl/nx-cloud": "latest",
+    "@nrwl/workspace": "14.4.2",
+    "@types/jest": "27.4.1",
+    "@types/node": "16.11.7",
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
+    "eslint": "~8.15.0",
+    "eslint-config-prettier": "8.1.0",
+    "jest": "27.5.1",
+    "nx": "14.4.2",
     "prettier": "^2.6.2",
     "pretty-quick": "^3.1.3",
-    "turbo": "^1.1.10",
-    "typescript": "^4.7.2"
-  },
-  "packageManager": "yarn@3.2.0"
+    "husky": "^7.0.4",
+    "ts-jest": "27.1.4",
+    "ts-node": "~10.8.0",
+    "typescript": "~4.7.2"
+  }
 }

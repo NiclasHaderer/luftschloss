@@ -1,6 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-node_modules/.bin/eslint .
-node_modules/.bin/pretty-quick --staged packages/**/*
-node_modules/.bin/pretty-quick --staged apps/**/*
+node_modules/.bin/nx affected:lint --parallel=8
+node_modules/.bin/pretty-quick --staged packages/**/src/**/*
+node_modules/.bin/pretty-quick --staged apps/**/src/*

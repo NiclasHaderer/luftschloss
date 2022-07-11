@@ -1,7 +1,5 @@
-*.lock
-.idea
-.vscode
-build
-node_modules
-LICENSE
-dist
+# Add files here to ignore them from prettier formatting
+
+/dist
+/coverage
+yarn.lock

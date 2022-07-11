@@ -1,21 +1,4 @@
 {
   "name": "@luftschloss/mocking",
-  "scripts": {
-    "build": "tsc",
-    "clean": "rm -r .turbo dist"
-  },
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "dependencies": {
-    "@anatine/zod-mock": "^3.1.1",
-    "@faker-js/faker": "^6.1.1",
-    "@luftschloss/openapi": "workspace:packages/openapi",
-    "@luftschloss/server": "workspace:packages/server",
-    "zod": "^3.14.3"
-  }
+  "version": "0.0.1"
 }
