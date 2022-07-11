@@ -21,7 +21,7 @@ import {
   uuidPathValidator,
   withDefaults,
   withServerBase,
-} from "@luftschloss/core"
+} from "@luftschloss/server"
 import { OpenApiBuilder, PathItemObject } from "openapi3-ts"
 import { ApiRouter } from "./api.router"
 

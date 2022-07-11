@@ -1,5 +1,5 @@
 packages/body/dist
-packages/core/dist
+packages/server/dist
 packages/mocking/dist
 packages/openapi/dist
 packages/schema-generator/dist

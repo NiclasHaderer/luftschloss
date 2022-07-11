@@ -14,7 +14,7 @@
   "dependencies": {
     "@anatine/zod-openapi": "^1.3.0",
     "@luftschloss/body": "workspace:packages/body",
-    "@luftschloss/core": "workspace:packages/core",
+    "@luftschloss/server": "workspace:packages/server",
     "openapi3-ts": "^2.0.2",
     "zod": "^3.14.3"
   }

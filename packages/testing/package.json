@@ -12,7 +12,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@luftschloss/core": "workspace:packages/core",
+    "@luftschloss/server": "workspace:packages/server",
     "light-my-request": "^4.9.0"
   }
 }

@@ -4,7 +4,14 @@
  * MIT Licensed
  */
 
-import { HTTPException, HttpMiddlewareInterceptor, NextFunction, LRequest, LResponse, Status } from "@luftschloss/core"
+import {
+  HTTPException,
+  HttpMiddlewareInterceptor,
+  NextFunction,
+  LRequest,
+  LResponse,
+  Status,
+} from "@luftschloss/server"
 import * as fsSync from "fs"
 import { Stats } from "node:fs"
 import * as path from "path"

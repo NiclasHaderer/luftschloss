@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import { addRequestField, HTTPException, LRequest, Status } from "@luftschloss/core"
-import "@luftschloss/core"
+import { addRequestField, HTTPException, LRequest, Status } from "@luftschloss/server"
+import "@luftschloss/server"
 
-declare module "@luftschloss/core" {
+declare module "@luftschloss/server" {
   //eslint-disable-next-line no-shadow
   interface LRequest {
     body<T>(): Promise<T>

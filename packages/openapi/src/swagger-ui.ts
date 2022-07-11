@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { ByLazy, DefaultRouter, LRequest, LResponse, ServerBase } from "@luftschloss/core"
+import { ByLazy, DefaultRouter, LRequest, LResponse, ServerBase } from "@luftschloss/server"
 import { ApiServer } from "./api.server"
 
 interface SwaggerRouterProps {

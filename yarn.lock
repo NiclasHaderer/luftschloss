@@ -98,17 +98,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@luftschloss/body@workspace:packages/body"
   dependencies:
-    "@luftschloss/core": "workspace:packages/core"
+    "@luftschloss/server": "workspace:packages/server"
     "@types/content-type": ^1.1.5
     content-type: ^1.0.4
-  languageName: unknown
-  linkType: soft
-
-"@luftschloss/core@workspace:packages/core":
-  version: 0.0.0-use.local
-  resolution: "@luftschloss/core@workspace:packages/core"
-  dependencies:
-    tslib: ^2.3.1
   languageName: unknown
   linkType: soft
 
@@ -117,9 +109,9 @@ __metadata:
   resolution: "@luftschloss/demo@workspace:apps/demo"
   dependencies:
     "@luftschloss/body": "workspace:packages/body"
-    "@luftschloss/core": "workspace:packages/core"
     "@luftschloss/mocking": "workspace:packages/mocking"
     "@luftschloss/openapi": "workspace:packages/openapi"
+    "@luftschloss/server": "workspace:packages/server"
     "@luftschloss/static": "workspace:packages/static"
     "@luftschloss/testing": "workspace:packages/testing"
   languageName: unknown
@@ -131,8 +123,8 @@ __metadata:
   dependencies:
     "@anatine/zod-mock": ^3.1.1
     "@faker-js/faker": ^6.1.1
-    "@luftschloss/core": "workspace:packages/core"
     "@luftschloss/openapi": "workspace:packages/openapi"
+    "@luftschloss/server": "workspace:packages/server"
     zod: ^3.14.3
   languageName: unknown
   linkType: soft
@@ -143,9 +135,23 @@ __metadata:
   dependencies:
     "@anatine/zod-openapi": ^1.3.0
     "@luftschloss/body": "workspace:packages/body"
-    "@luftschloss/core": "workspace:packages/core"
+    "@luftschloss/server": "workspace:packages/server"
     openapi3-ts: ^2.0.2
     zod: ^3.14.3
+  languageName: unknown
+  linkType: soft
+
+"@luftschloss/schema-generator@workspace:packages/schema-generator":
+  version: 0.0.0-use.local
+  resolution: "@luftschloss/schema-generator@workspace:packages/schema-generator"
+  languageName: unknown
+  linkType: soft
+
+"@luftschloss/server@workspace:packages/server":
+  version: 0.0.0-use.local
+  resolution: "@luftschloss/server@workspace:packages/server"
+  dependencies:
+    tslib: ^2.3.1
   languageName: unknown
   linkType: soft
 
@@ -153,7 +159,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@luftschloss/static@workspace:packages/static"
   dependencies:
-    "@luftschloss/core": "workspace:packages/core"
+    "@luftschloss/server": "workspace:packages/server"
     "@types/mime-db": ^1.43.1
     "@types/range-parser": ^1.2.4
     mime-db: ^1.52.0
@@ -165,7 +171,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@luftschloss/testing@workspace:packages/testing"
   dependencies:
-    "@luftschloss/core": "workspace:packages/core"
+    "@luftschloss/server": "workspace:packages/server"
     light-my-request: ^4.9.0
   languageName: unknown
   linkType: soft

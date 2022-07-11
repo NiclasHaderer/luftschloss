@@ -15,7 +15,7 @@
     "@types/content-type": "^1.1.5"
   },
   "dependencies": {
-    "@luftschloss/core": "workspace:packages/core",
+    "@luftschloss/server": "workspace:packages/server",
     "content-type": "^1.0.4"
   }
 }

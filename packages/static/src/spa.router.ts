@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { LRequest, LResponse, Router, saveObject, withDefaults } from "@luftschloss/core"
+import { LRequest, LResponse, Router, saveObject, withDefaults } from "@luftschloss/server"
 import "./static.middleware"
 import { StaticRouter } from "./static.router"
 import { staticContent } from "./static.middleware"

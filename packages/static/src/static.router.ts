@@ -14,7 +14,7 @@ import {
   Router,
   Status,
   withDefaults,
-} from "@luftschloss/core"
+} from "@luftschloss/server"
 import { promises as fs } from "fs"
 import path from "path"
 import "./static.middleware"

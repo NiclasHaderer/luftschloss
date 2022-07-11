@@ -14,8 +14,8 @@
   "dependencies": {
     "@anatine/zod-mock": "^3.1.1",
     "@faker-js/faker": "^6.1.1",
-    "@luftschloss/core": "workspace:packages/core",
     "@luftschloss/openapi": "workspace:packages/openapi",
+    "@luftschloss/server": "workspace:packages/server",
     "zod": "^3.14.3"
   }
 }

@@ -5,7 +5,7 @@
  */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
 
-import { HTTPException, LRequest, LResponse, Status } from "@luftschloss/core"
+import { HTTPException, LRequest, LResponse, Status } from "@luftschloss/server"
 import { Stats } from "node:fs"
 import * as parseRange from "range-parser"
 import * as RangeParser from "range-parser"

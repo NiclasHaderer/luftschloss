@@ -12,7 +12,7 @@ import {
   NextFunction,
   Status,
   withDefaults,
-} from "@luftschloss/core"
+} from "@luftschloss/server"
 import * as Buffer from "buffer"
 import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./common"
 

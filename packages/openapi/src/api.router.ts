@@ -5,7 +5,7 @@
  */
 
 import { jsonParser } from "@luftschloss/body"
-import { BaseRouter, HTTP_METHODS } from "@luftschloss/core"
+import { BaseRouter, HTTP_METHODS } from "@luftschloss/server"
 import { PathsObject } from "openapi3-ts"
 import { z, ZodNever, ZodObject } from "zod"
 import { ApiRoute, RouterParams } from "./api.route"

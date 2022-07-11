@@ -5,7 +5,7 @@
  */
 
 import { jsonParser } from "@luftschloss/body"
-import { defaultRouter, defaultServer, LRequest, LResponse } from "@luftschloss/core"
+import { defaultRouter, defaultServer, LRequest, LResponse } from "@luftschloss/server"
 
 const server = defaultServer().pipe(jsonParser())
 server.get("", (request, response) => response.text("hello world"))

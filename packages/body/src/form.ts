@@ -14,7 +14,7 @@ import {
   Status,
   UTF8SearchParams,
   withDefaults,
-} from "@luftschloss/core"
+} from "@luftschloss/server"
 import Buffer from "buffer"
 import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./common"
 

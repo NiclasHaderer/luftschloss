@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import { addResponseField, HTTPException, LResponse, Status } from "@luftschloss/core"
-import "@luftschloss/core"
+import { addResponseField, HTTPException, LResponse, Status } from "@luftschloss/server"
+import "@luftschloss/server"
 
-declare module "@luftschloss/core" {
+declare module "@luftschloss/server" {
   //eslint-disable-next-line no-shadow
   interface LResponse {
     file(path: string): Promise<LResponse>

@@ -1,5 +1,5 @@
 {
-  "name": "@luftschloss/core",
+  "name": "@luftschloss/server",
   "scripts": {
     "build": "tsc",
     "clean": "rm -r .turbo dist"

@@ -13,7 +13,7 @@ import {
   ROUTE_HANDLER,
   RouteCollector,
   Status,
-} from "@luftschloss/core"
+} from "@luftschloss/server"
 import { TypeOf, ZodArray, ZodNever, ZodObject, ZodSet, ZodTuple } from "zod"
 import { ZodRawShape } from "zod/lib/types"
 import { ApiRouter, OpenApiHandler } from "./api.router"
