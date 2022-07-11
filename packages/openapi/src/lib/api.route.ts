@@ -101,13 +101,13 @@ export class ApiRoute<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RE
       if (parseBody) {
         body = await request.body()
         const reqBodyParsed = params.body.safeParse(body)
-        if (!reqBodyParsed.success) {
+        if (reqBodyParsed.success === false) {
           throw new HTTPException(Status.HTTP_400_BAD_REQUEST, reqBodyParsed.error.errors)
         }
       }
       const responseBody = await handler(urlParams, body as TypeOf<BODY>)
       const resBodyParsed = params.response.safeParse(responseBody)
-      if (!resBodyParsed.success) {
+      if (resBodyParsed.success === false) {
         throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, resBodyParsed.error.errors)
       }
       response.json(resBodyParsed.data)
