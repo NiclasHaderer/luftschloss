@@ -12,6 +12,10 @@ declare module "@luftschloss/server" {
   interface LRequest {
     body<T>(): Promise<T>
   }
+
+  interface RequestImpl {
+    body<T>(): Promise<T>
+  }
 }
 addRequestField<LRequest, "body">("body", {
   value: () => {

@@ -18,8 +18,10 @@ import { ServerBase, withServerBase } from "./server-base"
 
 class ServerImpl extends withServerBase(DefaultRouter) {}
 
-export const defaultServer = (): ServerBase & DefaultRouter => {
+export const defaultServer = ({ timeout = 5000, maxConnections = Infinity } = {}): ServerBase & DefaultRouter => {
   const server = new ServerImpl()
+  server.raw.setTimeout(timeout)
+  server.raw.maxConnections = maxConnections
   server
     .pipe(loggerMiddleware())
     .pipe(requestCompleter())

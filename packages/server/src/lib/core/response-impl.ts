@@ -5,29 +5,26 @@
  */
 import { ReadStream } from "fs"
 import { ServerResponse } from "http"
-import { pipeline } from "stream/promises"
 
 import { Headers } from "./headers"
+import { HTTPException } from "./http-exception"
 import type { LRequest } from "./request"
 
 import type { LResponse } from "./response"
 import { Status, toStatus } from "./status"
 
+const NOT_COMPLETED = Symbol("NOT_COMPLETED")
+
 export class ResponseImpl implements LResponse {
   private _status: Status = Status.HTTP_200_OK
   private _headers = new Headers()
 
-  private data: ReadStream | ReadStream[] | Buffer | null | string = null
+  private data: ReadStream | ReadStream[] | Buffer | typeof NOT_COMPLETED | string = NOT_COMPLETED
 
   public constructor(private readonly res: ServerResponse, public readonly request: LRequest) {}
 
   public get raw(): ServerResponse {
     return this.res
-  }
-
-  public bytes(bytes: Buffer): this {
-    this.data = bytes
-    return this
   }
 
   public get complete(): boolean {
@@ -36,6 +33,11 @@ export class ResponseImpl implements LResponse {
 
   public get headers(): Headers {
     return this._headers
+  }
+
+  public bytes(bytes: Buffer): this {
+    this.data = bytes
+    return this
   }
 
   public header(name: string, value: string): this {
@@ -49,7 +51,13 @@ export class ResponseImpl implements LResponse {
     return this
   }
 
-  public json(object: any): this {
+  public empty(): this {
+    this.data = ""
+    this.status(Status.HTTP_204_NO_CONTENT)
+    return this
+  }
+
+  public json(object: object): this {
     this.headers.append("Content-Type", "application/json")
     this.data = JSON.stringify(object)
     return this
@@ -86,6 +94,12 @@ export class ResponseImpl implements LResponse {
     if (this.data instanceof ReadStream || Array.isArray(this.data)) {
       await this.streamResponse(this.data)
     } else {
+      if (this.data === NOT_COMPLETED) {
+        throw new HTTPException(
+          Status.HTTP_500_INTERNAL_SERVER_ERROR,
+          "Server did not not send a response. Did you or one of your middlewares forget to await an async call?"
+        )
+      }
       // Null cannot be written to stdout and ?? checks for undefined and null
       this.res.write(this.data ?? "")
     }
@@ -100,6 +114,6 @@ export class ResponseImpl implements LResponse {
         stream.on("error", reject)
       })
     }
-    return pipeline(stream, this.res)
+    return Promise.all(stream.map(s => this.streamResponse(s))).then(() => void 0)
   }
 }

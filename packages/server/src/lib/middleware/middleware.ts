@@ -24,6 +24,7 @@ export type MiddlewareRepresentation = HttpMiddlewareRepresentation | ClassMiddl
 
 export type ReadonlyMiddlewares = Readonly<Readonly<MiddlewareRepresentation>[]>
 
+// TODO make async for every request
 export type NextFunction = (request: LRequest, response: LResponse) => void | Promise<void>
 
 export type HttpMiddlewareInterceptor = (

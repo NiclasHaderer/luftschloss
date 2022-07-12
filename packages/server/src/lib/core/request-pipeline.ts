@@ -44,6 +44,12 @@ export class RequestPipeline {
     await executionChain.run(request, response)
   }
 
+  public lock(entries: MergedRoutes): void {
+    if (this.locked) throw new Error("Cannot lock the request pipeline a second time")
+    this.locked = true
+    this.routes = entries
+  }
+
   /**
    * Unwrap the routeLookup and handle the case that a handler was not found, or the wrong method was used
    *
@@ -87,12 +93,6 @@ export class RequestPipeline {
         return routeLookup
     }
   }
-
-  public lock(entries: MergedRoutes): void {
-    if (this.locked) throw new Error("Cannot lock the request pipeline a second time")
-    this.locked = true
-    this.routes = entries
-  }
 }
 
 const buildMiddlewareExecutionChain = (route: {
@@ -106,8 +106,9 @@ const buildMiddlewareExecutionChain = (route: {
       let index = -1
       const executionWrapper = async (request: LRequest, response: LResponse): Promise<any> => {
         index += 1
-        //eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        if (index >= pipeline.length) return route.executor(request, response)
+        if (index >= pipeline.length) {
+          return route.executor(request, response)
+        }
         await executeMiddleware(pipeline[index], executionWrapper, request, response)
       }
       await executionWrapper(req, res)

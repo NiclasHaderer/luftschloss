@@ -3,7 +3,6 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
 
 import { HTTPException, LRequest, LResponse, Status } from "@luftschloss/server"
 import { Stats } from "node:fs"
@@ -21,7 +20,6 @@ export const getRange = (req: LRequest, res: LResponse, stats: Stats): RangePars
   const result = parseRange.default(stats.size, rangeHeader, { combine: true })
   switch (result) {
     case -1:
-      //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       res.headers.append("Content-Range", `bytes */${stats.size}`)
       throw new HTTPException(Status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE)
     case -2:
@@ -32,7 +30,6 @@ export const getRange = (req: LRequest, res: LResponse, stats: Stats): RangePars
     throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Only byte ranges are supported")
   }
 
-  //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
   res.status(Status.HTTP_206_PARTIAL_CONTENT)
   return result
 }
@@ -41,11 +38,9 @@ export const addRangeHeaders = (req: LRequest, res: LResponse, header: RangePars
   const contentLength = header.reduce((previousValue, currentValue) => {
     return previousValue + currentValue.end - currentValue.start
   }, 0)
-  //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-  res.headers.append("Content-Length", contentLength.toString())
+  res.headers.append("Content-Length", contentLength)
 
-  for (const responseHeader of header) {
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-    res.headers.append("Content-Range", `bytes ${responseHeader.start}-${responseHeader.end}/${stats.size}`)
+  for (const { start, end } of header) {
+    res.headers.append("Content-Range", `bytes ${start}-${end}/${stats.size}`)
   }
 }

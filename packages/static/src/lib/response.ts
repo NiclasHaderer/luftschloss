@@ -12,6 +12,10 @@ declare module "@luftschloss/server" {
   interface LResponse {
     file(path: string): Promise<LResponse>
   }
+
+  interface ResponseImpl {
+    file(path: string): Promise<LResponse>
+  }
 }
 
 addResponseField<LResponse, "file">("file", {
@@ -21,4 +25,5 @@ addResponseField<LResponse, "file">("file", {
       "Please use one of the static content middleware in order to use that function"
     )
   },
+  writable: true,
 })

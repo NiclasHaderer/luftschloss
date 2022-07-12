@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import http, { IncomingMessage, ServerResponse } from "http"
+import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
 import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 import { Router } from "../router"
@@ -17,6 +17,7 @@ export interface ServerBase {
   readonly shutdown$: Observable<void>
   readonly start$: Observable<void>
   readonly routerMerged$: Observable<{ router: Router; basePath: string }>
+  readonly raw: Server
 
   addPathValidator(validator: PathValidator<any>): this
 
@@ -26,7 +27,7 @@ export interface ServerBase {
 
   _testBootstrap(): void
 
-  shutdown(options: { gracePeriod: 100 }): Promise<Error | undefined>
+  shutdown(options: { gracePeriod: 100 }): Promise<void>
 
   handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void
 
@@ -53,6 +54,10 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
     public constructor(...args: ARGS) {
       super(...args)
+    }
+
+    public get raw(): Server {
+      return this.server
     }
 
     public handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void {
@@ -123,24 +128,31 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
       // Wait for a server shutdown
       await new Promise<void>(resolve => {
-        //eslint-disable-next-line @typescript-eslint/no-misused-promises
         process.on(`SIGINT`, async () => {
           await this.shutdown()
+          console.log("Server shutdown successfully")
           resolve()
         })
-        //eslint-disable-next-line @typescript-eslint/no-misused-promises
         process.on(`exit`, async () => {
           await this.shutdown()
+          console.log("Server shutdown successfully")
           resolve()
         })
       })
     }
 
-    public shutdown({ gracePeriod } = { gracePeriod: 100 }): Promise<Error | undefined> {
-      return new Promise(resolve => {
-        this.server.close(resolve)
+    public shutdown({ gracePeriod = 1000 } = {}): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this.server.close(err => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve()
+          }
+        })
         setTimeout(() => {
           this.openSockets.forEach(s => s.destroy())
+          resolve(undefined)
         }, gracePeriod)
       })
     }

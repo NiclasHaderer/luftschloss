@@ -62,7 +62,6 @@ export class StaticRouter extends BaseRouter implements Router {
     await response.file(absPath)
   }
 
-  //eslint-disable-next-line @typescript-eslint/require-await
   protected async respondWithFileNotFound(request: LRequest, response: LResponse, absPath: string): Promise<void> {
     const message = isProduction() ? "File with name was not found" : `File with name was not found at ${absPath}`
     throw new HTTPException(Status.HTTP_404_NOT_FOUND, message)

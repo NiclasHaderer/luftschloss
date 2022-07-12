@@ -10,7 +10,20 @@ import { saveObject } from "./utils"
 export class Headers {
   private headers = new Map<string, Set<string>>()
 
-  public append(name: string, value: string): void {
+  public static create(nodeHeaders: IncomingHttpHeaders): Headers {
+    const headers = new Headers()
+    for (const [name, value] of Object.entries(nodeHeaders) as [string, string][]) {
+      headers.append(name, value)
+    }
+
+    return headers
+  }
+
+  private static cleanHeaderName(name: string): string {
+    return name.trim().toLowerCase()
+  }
+
+  public append(name: string, value: string | number): void {
     name = Headers.cleanHeaderName(name)
 
     if (!this.headers.has(name)) {
@@ -18,16 +31,17 @@ export class Headers {
     }
 
     const headerValues = value
+      .toString()
       .split(",")
       .map(s => s.trim())
       .filter(s => !!s)
 
     for (const headerValue of headerValues) {
-      this.headers.get(name)!.add(headerValue)
+      this.headers.get(name).add(headerValue)
     }
   }
 
-  public appendAll(name: string, value: string[] | Set<string>): void {
+  public appendAll(name: string, value: Iterable<string | number>): void {
     for (const v of value) {
       this.append(name, v)
     }
@@ -83,18 +97,5 @@ export class Headers {
       encodedHeaders[name] = value.join(", ")
     }
     return encodedHeaders
-  }
-
-  private static cleanHeaderName(name: string): string {
-    return name.trim().toLowerCase()
-  }
-
-  public static create(nodeHeaders: IncomingHttpHeaders): Headers {
-    const headers = new Headers()
-    for (const [name, value] of Object.entries(nodeHeaders) as [string, string][]) {
-      headers.append(name, value)
-    }
-
-    return headers
   }
 }

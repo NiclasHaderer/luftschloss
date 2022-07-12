@@ -6,9 +6,9 @@
 import { LRequest, LResponse } from "../core"
 import { NextFunction } from "./middleware"
 
-const ContentSniffMiddleware = async (next: NextFunction, request: LRequest, response: LResponse) => {
+const NoContentSniffMiddleware = async (next: NextFunction, request: LRequest, response: LResponse) => {
   await next(request, response)
   response.headers.append("X-Content-Type-Options", "nosniff")
 }
 
-export const noContentSniff = () => ContentSniffMiddleware
+export const noContentSniff = () => NoContentSniffMiddleware
