@@ -4,6 +4,7 @@
  * MIT Licensed
  */
 
+import { withDefaults } from "@luftschloss/core"
 import {
   HTTPException,
   HttpMiddlewareInterceptor,
@@ -11,7 +12,6 @@ import {
   LResponse,
   NextFunction,
   Status,
-  withDefaults,
 } from "@luftschloss/server"
 import * as Buffer from "buffer"
 import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./common"

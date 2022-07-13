@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
+import { saveObject } from "@luftschloss/core"
 import { IncomingHttpHeaders } from "http"
-import { saveObject } from "./utils"
 
 export class Headers {
   private headers = new Map<string, Set<string>>()
@@ -37,7 +37,7 @@ export class Headers {
       .filter(s => !!s)
 
     for (const headerValue of headerValues) {
-      this.headers.get(name).add(headerValue)
+      this.headers.get(name)!.add(headerValue)
     }
   }
 

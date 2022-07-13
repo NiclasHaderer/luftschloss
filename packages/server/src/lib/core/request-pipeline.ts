@@ -3,6 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
+import { saveObject } from "@luftschloss/core"
 import { IncomingMessage as In, ServerResponse as Out } from "http"
 
 import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware"
@@ -15,7 +16,6 @@ import { ResponseImpl } from "./response-impl"
 import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
 import { MergedRoutes } from "./router-merger"
 import { Status } from "./status"
-import { saveObject } from "./utils"
 
 export class RequestPipeline {
   private locked = false

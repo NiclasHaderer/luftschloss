@@ -4,7 +4,8 @@
  * MIT Licensed
  */
 
-import { ReadonlyRouteCollector, RouteCollectorImpl, saveObject, withDefaults } from "../core"
+import { saveObject, withDefaults } from "@luftschloss/core"
+import { ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
 import {
   HttpMiddlewareRepresentation,
   isClassMiddleware,
@@ -54,20 +55,6 @@ export class BaseRouter implements Router {
 
   // TODO create something like pipeOnly to be able to add a middleware which will only able to be used by one handler.
 
-  protected addMiddleware(...middlewareList: MiddleWareInterceptor[]): void {
-    for (const middleware of middlewareList) {
-      if (isClassMiddleware(middleware)) {
-        this._middleware.push({ type: MiddlewareType.CLASS, rep: middleware })
-      } else if (isHttpMiddleware(middleware)) {
-        if (!middleware.name) {
-          throw new Error("A middleware function has to be a named function")
-        }
-
-        this._middleware.push({ type: MiddlewareType.HTTP, rep: middleware })
-      }
-    }
-  }
-
   public mount(routers: Router | Router[], options: Partial<MountingOptions> = saveObject()): this {
     const completeOptions = withDefaults<MountingOptions>(options, { basePath: "" })
 
@@ -114,6 +101,20 @@ export class BaseRouter implements Router {
     }
 
     return this
+  }
+
+  protected addMiddleware(...middlewareList: MiddleWareInterceptor[]): void {
+    for (const middleware of middlewareList) {
+      if (isClassMiddleware(middleware)) {
+        this._middleware.push({ type: MiddlewareType.CLASS, rep: middleware })
+      } else if (isHttpMiddleware(middleware)) {
+        if (!middleware.name) {
+          throw new Error("A middleware function has to be a named function")
+        }
+
+        this._middleware.push({ type: MiddlewareType.HTTP, rep: middleware })
+      }
+    }
   }
 }
 

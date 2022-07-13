@@ -5,16 +5,8 @@
  */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
 
-import {
-  BaseRouter,
-  HTTPException,
-  isProduction,
-  LRequest,
-  LResponse,
-  Router,
-  Status,
-  withDefaults,
-} from "@luftschloss/server"
+import { withDefaults } from "@luftschloss/core"
+import { BaseRouter, HTTPException, isProduction, LRequest, LResponse, Router, Status } from "@luftschloss/server"
 import { promises as fs } from "fs"
 import path from "path"
 import "./static.middleware"

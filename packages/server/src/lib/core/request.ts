@@ -4,26 +4,25 @@
  * MIT Licensed
  */
 
-import { HTTP_METHODS } from "./route-collector.model"
+import { CustomPropertyDescriptor, Func } from "@luftschloss/core"
 import { IncomingMessage } from "http"
-import { CustomPropertyDescriptor, Func } from "../types"
-import { RequestImpl } from "./request-impl"
 import { Headers } from "./headers"
-import { UTF8Url } from "./utf8-url"
+import { RequestImpl } from "./request-impl"
+import { HTTP_METHODS } from "./route-collector.model"
 import { UTF8SearchParams } from "./utf8-search-params"
+import { UTF8Url } from "./utf8-url"
 
 export interface LRequest<DATA extends Record<string, unknown> = never> {
   readonly data: DATA
   readonly raw: IncomingMessage
 
   urlParams: UTF8SearchParams
-
-  pathParams<T extends object>(): T
-
   readonly path: string
   readonly method: HTTP_METHODS
   readonly url: UTF8Url
   readonly headers: Headers
+
+  pathParams<T extends object>(): T
 }
 
 export const addRequestField = <R extends LRequest, KEY extends PropertyKey>(

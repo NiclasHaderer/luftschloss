@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
+import { saveObject } from "@luftschloss/core"
 import { URLSearchParams } from "url"
-import { saveObject } from "./utils"
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL")
 
@@ -32,8 +32,8 @@ export class UTF8SearchParams extends URLSearchParams {
     callback: (this: TThis, value: string, name: string, searchParams: this) => void,
     thisArg?: TThis
   ) {
-    super.forEach((value, name, searchParams) => {
-      callback.apply(thisArg, [decodeURIComponent(value), decodeURIComponent(name), searchParams])
+    super.forEach((value, name) => {
+      callback.apply(thisArg!, [decodeURIComponent(value), decodeURIComponent(name), this])
     })
   }
 

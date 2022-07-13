@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
+import { saveObject } from "@luftschloss/core"
 import * as db from "mime-db"
 import { extname } from "path"
-import { saveObject } from "@luftschloss/server"
 
 type Extension = string
 type MimeType = string

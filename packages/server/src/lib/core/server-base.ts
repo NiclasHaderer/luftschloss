@@ -4,19 +4,22 @@
  * MIT Licensed
  */
 
+import { Constructor, GenericEventEmitter } from "@luftschloss/core"
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
 import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 import { Router } from "../router"
-import { Constructor } from "../types"
 import { RequestPipeline } from "./request-pipeline"
 import { RouterMerger } from "./router-merger"
-import { Observable, Subject } from "./subject"
 
-export interface ServerBase {
-  readonly shutdown$: Observable<void>
-  readonly start$: Observable<void>
-  readonly routerMerged$: Observable<{ router: Router; basePath: string }>
+export type LuftServerEvents = {
+  start: void
+  shutdown: void
+  routerMerged: { router: Router; basePath: string }
+  lock: void
+}
+
+export interface ServerBase extends Pick<GenericEventEmitter<LuftServerEvents>, "onComplete" | "on"> {
   readonly raw: Server
 
   addPathValidator(validator: PathValidator<any>): this
@@ -39,18 +42,16 @@ export const withServerBase = <T extends Router, ARGS extends []>(
   clazz: Constructor<T, ARGS>
 ): Constructor<T & ServerBase, ARGS> =>
   class extends (clazz as Constructor<Router, ARGS>) implements ServerBase {
-    private readonly _shutdown$ = new Subject<void>()
-    public readonly shutdown$ = this._shutdown$.asObservable()
-    private readonly _start$ = new Subject<void>()
-    public readonly start$ = this._start$.asObservable()
+    protected eventDelegate = new GenericEventEmitter<LuftServerEvents>()
+    public on = this.eventDelegate.on.bind(this.eventDelegate)
+    public onComplete = this.eventDelegate.onComplete.bind(this.eventDelegate)
     private readonly startTime = Date.now()
     private readonly openSockets = new Set<Duplex>()
     private pathValidators: PathValidators = {
       [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
     }
     private readonly requestPipeline = new RequestPipeline(this.middleware)
-    private readonly routeMerger = new RouterMerger(this.pathValidators)
-    public readonly routerMerged$ = this.routeMerger.routerMerged$
+    private readonly routeMerger = new RouterMerger(this.pathValidators, this.eventDelegate)
     private readonly server = http.createServer(this.handleIncomingRequest.bind(this))
 
     public constructor(...args: ARGS) {
@@ -105,8 +106,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
       this.routeMerger.mergeIn(this, this, { basePath: "/" }, [])
       this.lock()
-      this._start$.next()
-      this._start$.complete()
+      this.eventDelegate.complete("start", undefined)
     }
 
     public async listen(port = 3200, hostname = "0.0.0.0"): Promise<void> {
@@ -120,8 +120,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       const runningServer = this.server.listen(port, hostname, () => {
         console.log(`Server is listening on http://${hostname}:${port}`)
         console.log(`Server startup took ${Date.now() - this.startTime}ms`)
-        this._start$.next()
-        this._start$.complete()
+        this.eventDelegate.complete("start", undefined)
       })
 
       // Collect the sockets, so I can gracefully shut down the server
@@ -132,11 +131,13 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         process.on(`SIGINT`, async () => {
           await this.shutdown()
           console.log("Server shutdown successfully")
+          this.eventDelegate.complete("shutdown", undefined)
           resolve()
         })
         process.on(`exit`, async () => {
           await this.shutdown()
           console.log("Server shutdown successfully")
+          this.eventDelegate.complete("shutdown", undefined)
           resolve()
         })
       })

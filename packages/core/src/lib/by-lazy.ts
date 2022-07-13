@@ -4,8 +4,6 @@
  * MIT Licensed
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return */
-
 export const ByLazy = <VALUE, TARGET = never>(factory: (self: TARGET) => VALUE) => {
   return (target: TARGET, propertyKey: string) => {
     const cacheDataSymbol = Symbol("cache_data")

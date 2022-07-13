@@ -4,8 +4,6 @@
  * MIT Licensed
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call */
-
 export const Cache = () => {
   const cache = new Map<string, any>()
   return function (target: object, propertyKey: string, descriptor: PropertyDescriptor) {

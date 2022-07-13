@@ -3,7 +3,8 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { HTTP_METHODS, LRequest, LResponse, saveObject, withDefaults } from "../core"
+import { saveObject, withDefaults } from "@luftschloss/core"
+import { HTTP_METHODS, LRequest, LResponse } from "../core"
 import { ClassMiddlewareInterceptor, NextFunction } from "./middleware"
 
 type CorsMiddlewareOptions = {

@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
+import { normalizePath } from "@luftschloss/core"
 import { CollectionEntry, HTTP_METHODS, ROUTE_HANDLER, RouteCollector } from "./route-collector.model"
-import { normalizePath } from "./utils"
 
 export type HttpRouteCollection = Record<HTTP_METHODS, ROUTE_HANDLER | null>
 export type RouteCollection = Map<string, HttpRouteCollection>

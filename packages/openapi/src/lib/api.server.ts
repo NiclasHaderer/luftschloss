@@ -4,22 +4,20 @@
  * MIT Licensed
  */
 import { jsonParser } from "@luftschloss/body"
+import { normalizePath, saveObject, withDefaults } from "@luftschloss/core"
 import {
   defaultErrorHandler,
   errorMiddleware,
   intPathValidator,
   loggerMiddleware,
   noContentSniff,
-  normalizePath,
   numberPathValidator,
   pathPathValidator,
   poweredBy,
   requestCompleter,
-  saveObject,
   ServerBase,
   stringPathValidator,
   uuidPathValidator,
-  withDefaults,
   withServerBase,
 } from "@luftschloss/server"
 import { OpenApiBuilder, PathItemObject } from "openapi3-ts"
@@ -32,7 +30,7 @@ export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {
 
   public constructor(private generateOpenApi: boolean) {
     super()
-    this.routerMerged$.subscribe(({ router, basePath }) => {
+    this.on("routerMerged", ({ router, basePath }) => {
       if (router instanceof ApiRouter && this.generateOpenApi) {
         this.collectOpenApiDefinitions({ router, basePath })
       }

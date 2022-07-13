@@ -4,13 +4,12 @@
  * MIT Licensed
  */
 
+import { GenericEventEmitter, normalizePath, saveObject } from "@luftschloss/core"
 import { ReadonlyMiddlewares } from "../middleware"
 import { containsRegex, PathConverter, PathValidators, toRegex } from "../path-validator"
 import { MountingOptions, Router } from "../router"
 import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
-import { ServerBase } from "./server-base"
-import { Subject } from "./subject"
-import { normalizePath, saveObject } from "./utils"
+import { LuftServerEvents, ServerBase } from "./server-base"
 
 export type FinishedRoute = {
   pipeline: ReadonlyMiddlewares
@@ -27,9 +26,8 @@ export type MergedRoutes = {
 export class RouterMerger {
   private _collection = new Map<string, Record<HTTP_METHODS, FinishedRoute | null>>()
   private locked = false
-  public routerMerged$ = new Subject<{ router: Router; basePath: string }>()
 
-  public constructor(private validators: PathValidators) {}
+  public constructor(private validators: PathValidators, private events: GenericEventEmitter<LuftServerEvents>) {}
 
   public entries(): MergedRoutes {
     if (!this.locked) throw new Error("Cannot retrieve routes because RouteMerger is not locked")
@@ -58,7 +56,9 @@ export class RouterMerger {
     parentPipeline: ReadonlyMiddlewares
   ): void {
     if (this.locked) throw new Error("Route merger has been locked. You cannot add new routers.")
-    this.routerMerged$.next({ router, basePath: normalizePath(basePath) })
+    // TODO
+    this.events.emit("routerMerged  ", { router, basePath: normalizePath(basePath) })
+
     for (let { handler, path, method } of router.routes.entries()) {
       path = normalizePath(`${basePath}/${path}`)
       if (!this._collection.has(path)) {

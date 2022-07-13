@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
+import { saveObject } from "@luftschloss/core"
 import { PathConverter } from "../path-validator"
 import { HTTP_METHODS, LookupResultStatus, RouteLookupResult } from "./route-collector.model"
 import { FinishedRoute, MergedRoutes } from "./router-merger"
-import { saveObject } from "./utils"
 
 export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedRoutes): RouteLookupResult => {
   let status: LookupResultStatus.NOT_FOUND | LookupResultStatus.METHOD_NOT_ALLOWED = LookupResultStatus.NOT_FOUND

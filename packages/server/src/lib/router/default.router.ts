@@ -20,7 +20,7 @@ export class DefaultRouter extends BaseRouter implements Router {
     }
   }
 
-  public onMount(): void {
+  public onMount(server: ServerBase): void {
     // Mounting event is not relevant for the server
   }
 
