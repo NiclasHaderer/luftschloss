@@ -12,6 +12,7 @@ import type { LRequest } from "./request"
 
 import type { LResponse } from "./response"
 import { Status, toStatus } from "./status"
+import * as util from "util"
 
 const NOT_COMPLETED = Symbol("NOT_COMPLETED")
 
@@ -101,12 +102,12 @@ export class ResponseImpl implements LResponse {
         )
       }
       // Null cannot be written to stdout and ?? checks for undefined and null
-      this.res.write(this.data ?? "")
+      await new Promise(resolve => this.res.write(this.data ?? "", resolve))
     }
     this.res.end()
   }
 
-  private streamResponse(stream: ReadStream | ReadStream[]): Promise<void> {
+  private async streamResponse(stream: ReadStream | ReadStream[]): Promise<void> {
     if (stream instanceof ReadStream) {
       return new Promise<void>((resolve, reject) => {
         stream.on("open", () => stream.pipe(this.res))
@@ -114,6 +115,8 @@ export class ResponseImpl implements LResponse {
         stream.on("error", reject)
       })
     }
-    return Promise.all(stream.map(s => this.streamResponse(s))).then(() => void 0)
+    for (const readStream of stream) {
+      await this.streamResponse(readStream)
+    }
   }
 }

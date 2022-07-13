@@ -20,8 +20,8 @@ export class DefaultRouter extends BaseRouter implements Router {
     }
   }
 
-  public onMount(server: ServerBase): void {
-    // No op
+  public onMount(): void {
+    // Mounting event is not relevant for the server
   }
 
   public delete(url: string, callback: ROUTE_HANDLER): void {

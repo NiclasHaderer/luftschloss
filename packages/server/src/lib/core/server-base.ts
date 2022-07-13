@@ -34,6 +34,7 @@ export interface ServerBase {
   lock(): void
 }
 
+// noinspection JSPotentiallyInvalidUsageOfThis
 export const withServerBase = <T extends Router, ARGS extends []>(
   clazz: Constructor<T, ARGS>
 ): Constructor<T & ServerBase, ARGS> =>
