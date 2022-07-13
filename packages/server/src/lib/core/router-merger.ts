@@ -56,8 +56,7 @@ export class RouterMerger {
     parentPipeline: ReadonlyMiddlewares
   ): void {
     if (this.locked) throw new Error("Route merger has been locked. You cannot add new routers.")
-    // TODO
-    this.events.emit("routerMerged  ", { router, basePath: normalizePath(basePath) })
+    this.events.emit("routerMerged", { router, basePath: normalizePath(basePath) })
 
     for (let { handler, path, method } of router.routes.entries()) {
       path = normalizePath(`${basePath}/${path}`)
