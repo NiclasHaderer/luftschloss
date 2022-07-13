@@ -17,6 +17,7 @@ class SPARouter extends StaticRouter implements Router {
 
   public constructor(folderPath: string, options: SPARouterProps) {
     super(folderPath, { ...options, useIndexFile: true })
+    this.pipe(staticContent({ basePath: folderPath }))
     this.indexFile = options.indexFile
   }
 
@@ -31,5 +32,5 @@ class SPARouter extends StaticRouter implements Router {
 
 export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> = saveObject()): SPARouter => {
   const mergedOptions = withDefaults<SPARouterProps>(options, { indexFile: "index.html" })
-  return new SPARouter(folderPath, mergedOptions).pipe(staticContent({ basePath: folderPath }))
+  return new SPARouter(folderPath, mergedOptions)
 }

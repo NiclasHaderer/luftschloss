@@ -19,6 +19,12 @@ export class StaticRouter extends BaseRouter implements Router {
 
   public constructor(folderPath: string, private options: StaticRouterProps) {
     super()
+    this.pipe(
+      staticContent({
+        basePath: folderPath,
+        allowOutsideBasePath: false,
+      })
+    )
     // path.resolve has not trailing / at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`
     // TODO HEAD response
@@ -55,7 +61,7 @@ export class StaticRouter extends BaseRouter implements Router {
   }
 
   protected async respondWithFileNotFound(request: LRequest, response: LResponse, absPath: string): Promise<void> {
-    const message = isProduction() ? "File with name was not found" : `File with name was not found at ${absPath}`
+    const message = isProduction() ? "Requested file was not found" : `Requested file was not found at ${absPath}`
     throw new HTTPException(Status.HTTP_404_NOT_FOUND, message)
   }
 
@@ -70,5 +76,5 @@ export const staticRouter = (folderPath: string, options: Partial<StaticRouterPr
     indexFile: "index.html",
     useIndexFile: false,
   })
-  return new StaticRouter(folderPath, mergedOptions).pipe(staticContent({ basePath: folderPath }))
+  return new StaticRouter(folderPath, mergedOptions)
 }

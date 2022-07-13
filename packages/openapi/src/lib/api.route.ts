@@ -99,15 +99,15 @@ export class ApiRoute<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RE
 
       let body = null
       if (parseBody) {
-        body = await request.body()
+        body = await request.json()
         const reqBodyParsed = params.body.safeParse(body)
-        if (reqBodyParsed.success === false) {
+        if (!reqBodyParsed.success) {
           throw new HTTPException(Status.HTTP_400_BAD_REQUEST, reqBodyParsed.error.errors)
         }
       }
       const responseBody = await handler(urlParams, body as TypeOf<BODY>)
       const resBodyParsed = params.response.safeParse(responseBody)
-      if (resBodyParsed.success === false) {
+      if (!resBodyParsed.success) {
         throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, resBodyParsed.error.errors)
       }
       response.json(resBodyParsed.data)

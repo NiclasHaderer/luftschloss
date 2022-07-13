@@ -7,14 +7,13 @@
 import { HTTPException, LRequest, LResponse, Status } from "@luftschloss/server"
 import { Stats } from "node:fs"
 import * as parseRange from "range-parser"
-import * as RangeParser from "range-parser"
 
-export const getRange = (req: LRequest, res: LResponse, stats: Stats): RangeParser.Ranges => {
-  const rangeHeader: string | null = req.headers.get("Range")
+type ContentRange = { type: string; parts: { start: number; end: number }[]; partial: boolean }
+
+export const getRange = (req: LRequest, res: LResponse, stats: Stats): ContentRange => {
+  const rangeHeader = req.headers.get("Range")
   if (!rangeHeader) {
-    const fullRange = [{ start: 0, end: stats.size }] as RangeParser.Ranges
-    fullRange.type = "bytes"
-    return fullRange
+    return { type: "bytes", parts: [{ start: 0, end: stats.size }], partial: false }
   }
 
   const result = parseRange.default(stats.size, rangeHeader, { combine: true })
@@ -30,17 +29,20 @@ export const getRange = (req: LRequest, res: LResponse, stats: Stats): RangePars
     throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Only byte ranges are supported")
   }
 
-  res.status(Status.HTTP_206_PARTIAL_CONTENT)
-  return result
+  return {
+    partial: true,
+    parts: [...result],
+    type: "bytes",
+  }
 }
 
-export const addRangeHeaders = (req: LRequest, res: LResponse, header: RangeParser.Ranges, stats: Stats): void => {
-  const contentLength = header.reduce((previousValue, currentValue) => {
+export const addRangeHeaders = (req: LRequest, res: LResponse, header: ContentRange, stats: Stats): void => {
+  const contentLength = header.parts.reduce((previousValue, currentValue) => {
     return previousValue + currentValue.end - currentValue.start
   }, 0)
   res.headers.append("Content-Length", contentLength)
 
-  for (const { start, end } of header) {
+  for (const { start, end } of header.parts) {
     res.headers.append("Content-Range", `bytes ${start}-${end}/${stats.size}`)
   }
 }

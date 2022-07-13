@@ -8,7 +8,6 @@ import { addResponseField, HTTPException, LResponse, Status } from "@luftschloss
 import "@luftschloss/server"
 
 declare module "@luftschloss/server" {
-  //eslint-disable-next-line no-shadow
   interface LResponse {
     file(path: string): Promise<LResponse>
   }
