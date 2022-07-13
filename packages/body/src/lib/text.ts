@@ -9,16 +9,16 @@ import { HttpMiddlewareInterceptor, UTF8SearchParams } from "@luftschloss/server
 import Buffer from "buffer"
 import { commonFormParserFactory } from "./common"
 
-export type FormParserOptions = {
+export type TextParserOptions = {
   maxBodySize: number
   parser: (body: Buffer, encoding: BufferEncoding | undefined) => object
 }
 
-export const formParser = (
-  contentType: string[] | "*" | string = "application/x-www-form-urlencoded",
-  options: Partial<FormParserOptions>
+export const textParser = (
+  contentType: string[] | "*" | string = "text/plain",
+  options: Partial<TextParserOptions>
 ): HttpMiddlewareInterceptor => {
-  const completeOptions = withDefaults<FormParserOptions>(options, {
+  const completeOptions = withDefaults<TextParserOptions>(options, {
     parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
       const str = buffer.toString(encoding)
       return new UTF8SearchParams(str).asObject()
@@ -26,5 +26,5 @@ export const formParser = (
     maxBodySize: 100,
   })
 
-  return commonFormParserFactory(contentType, { ...completeOptions, methodName: "form" })
+  return commonFormParserFactory(contentType, { ...completeOptions, methodName: "text" })
 }

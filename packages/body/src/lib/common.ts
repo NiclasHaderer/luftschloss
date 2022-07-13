@@ -4,73 +4,81 @@
  * MIT Licensed
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment */
-import { HTTPException, LRequest, Status } from "@luftschloss/server"
-import * as contentType from "content-type"
+import { HTTPException, LRequest, LResponse, NextFunction, Status } from "@luftschloss/server"
+import Buffer from "buffer"
+import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./utils"
 
-export const assertContentLengthHeader = (request: LRequest, maxBodySize: number): void => {
-  let length = parseInt((request.headers.get("Content-Length") as string | null) || "0")
-  if (isNaN(length)) {
-    length = 0
-  }
-
-  if (length > maxBodySize) {
-    throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request body to large")
-  }
+export type CommonParserOptions = {
+  maxBodySize: number
+  parser: (body: Buffer, encoding: BufferEncoding | undefined) => object
+  methodName: "json" | "form" | "text"
 }
 
-export const getBodyData = ({ raw, headers }: LRequest, maxBodySize: number) => {
-  return new Promise<Buffer>(resolve => {
-    const buffers: Buffer[] = []
+export type InternalCommonParserOptions =
+  | ({ contentTypes: Set<string>; tryAllContentTypes: false } & CommonParserOptions & {
+        methodName: "json" | "form" | "text"
+      })
+  | ({ tryAllContentTypes: true } & CommonParserOptions & { methodName: "json" | "form" | "text" })
 
-    const currentBodySize = () => {
-      return buffers.reduce((previousValue, currentValue) => {
-        return previousValue + currentValue.length
-      }, 0)
-    }
+async function commonFormParserMiddleware(
+  this: InternalCommonParserOptions,
+  next: NextFunction,
+  request: LRequest,
+  response: LResponse
+) {
+  assertContentLengthHeader(request, this.maxBodySize)
 
-    const concatBuffer = (b: Buffer) => {
-      if (currentBodySize() > maxBodySize) {
-        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request body to large")
+  let parsed: object | null = null
+  request[this.methodName] = async <T>(): Promise<T> => {
+    const contentType = getBodyContentType(request)
+
+    if (!this.tryAllContentTypes) {
+      if (!contentType) {
+        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has not content type header")
       }
-      buffers.push(b)
+
+      if (!this.contentTypes.has(contentType.type)) {
+        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has wrong content type header")
+      }
     }
 
-    raw.on("data", concatBuffer)
+    if (parsed === null) {
+      const buffer = await getBodyData(request, this.maxBodySize)
+      parsed = this.parser(buffer, contentType?.encoding)
+    }
 
-    raw.on("end", () => resolve(Buffer.concat(buffers)))
-  })
-}
-
-export const getBodyContentType = (
-  request: LRequest
-): null | { type: string; encoding: BufferEncoding | undefined } => {
-  const contentTypeHeader: string | null = request.headers.get("Content-Type")
-  if (!contentTypeHeader) return null
-  const parsed = contentType.parse(contentTypeHeader)
-
-  return {
-    type: parsed.type.toLowerCase().trim(),
-    encoding: isBufferEncoding(parsed.parameters.encoding)
-      ? (parsed.parameters.encoding.toLowerCase() as BufferEncoding)
-      : undefined,
+    return parsed as unknown as T
   }
+
+  await next(request, response)
 }
 
-const isBufferEncoding = (encoding: string): encoding is BufferEncoding => {
-  encoding = (encoding || "").toLowerCase()
-  return (
-    encoding === "ascii" ||
-    encoding === "ascii" ||
-    encoding === "utf8" ||
-    encoding === "utf-8" ||
-    encoding === "utf16le" ||
-    encoding === "ucs2" ||
-    encoding === "ucs-8" ||
-    encoding === "base64" ||
-    encoding === "base64url" ||
-    encoding === "latin1" ||
-    encoding === "binary" ||
-    encoding === "hex"
-  )
+export const commonFormParserFactory = (contentType: string[] | string | "*", options: CommonParserOptions) => {
+  let completeOptions: InternalCommonParserOptions
+  if (contentType === "*") {
+    completeOptions = {
+      parser: options.parser,
+      maxBodySize: options.maxBodySize * 100,
+      tryAllContentTypes: true,
+      methodName: options.methodName,
+    }
+  } else if (typeof contentType === "string") {
+    completeOptions = {
+      parser: options.parser,
+      maxBodySize: options.maxBodySize * 100,
+      tryAllContentTypes: false,
+      contentTypes: new Set([contentType.toLowerCase().trim()]),
+      methodName: options.methodName,
+    }
+  } else {
+    completeOptions = {
+      parser: options.parser,
+      maxBodySize: options.maxBodySize * 100,
+      tryAllContentTypes: false,
+      contentTypes: new Set(contentType.map(c => c.toLowerCase().trim())),
+      methodName: options.methodName,
+    }
+  }
+
+  return commonFormParserMiddleware.bind(completeOptions)
 }
