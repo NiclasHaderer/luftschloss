@@ -36,12 +36,12 @@ export class SwaggerRouter extends DefaultRouter {
     this.server = server
   }
 
-  private handleJsonSchema(_: LRequest, response: LResponse): void {
-    response.json(this.json)
+  private async handleJsonSchema(_: LRequest, response: LResponse): Promise<void> {
+    response.text(this.json).headers.set("Content-Type", "application/json")
+    await response.end()
   }
 
   private handleYmlSchema(_: LRequest, response: LResponse): void {
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-call
     response.headers.set("Content-Type", "text/yaml")
     response.text(this.yaml)
   }

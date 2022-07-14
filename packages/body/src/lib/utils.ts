@@ -4,7 +4,6 @@
  * MIT Licensed
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment */
 import { HTTPException, LRequest, Status } from "@luftschloss/server"
 import * as contentType from "content-type"
 

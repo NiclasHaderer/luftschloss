@@ -17,14 +17,6 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
     super()
   }
 
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T[]> {
-    if (typeof data === "object" && data && Symbol.iterator in data && !Array.isArray(data)) {
-      data = [...(data as Iterable<unknown>)]
-    }
-    // TODO perhaps if string try json.parse and then validate
-    return this._validate(data, context, "_coerce")
-  }
-
   public minLength(minLength: number): LuftArray<T> {
     this._minLength = minLength
     return this
@@ -33,6 +25,14 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
   public maxLength(minLength: number): LuftArray<T> {
     this._maxLength = minLength
     return this
+  }
+
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T[]> {
+    if (typeof data === "object" && data && Symbol.iterator in data && !Array.isArray(data)) {
+      data = [...(data as Iterable<unknown>)]
+    }
+    // TODO perhaps if string try json.parse and then validate
+    return this._validate(data, context, "_coerce")
   }
 
   protected _validate(
@@ -70,7 +70,6 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
       }
 
       let failAtEnd = false
-      //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       data = [...data]
       for (let i = 0; i < (data as unknown[]).length; ++i) {
         const result = (this.schema as InternalLuftBaseType<unknown>)[mode]((data as unknown[])[i], context)

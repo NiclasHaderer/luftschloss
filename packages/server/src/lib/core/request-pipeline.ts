@@ -6,7 +6,7 @@
 import { saveObject } from "@luftschloss/core"
 import { IncomingMessage as In, ServerResponse as Out } from "http"
 
-import { MiddlewareRepresentation, MiddlewareType, NextFunction, ReadonlyMiddlewares } from "../middleware"
+import { Middleware, ReadonlyMiddlewares } from "../middleware"
 import { HTTPException } from "./http-exception"
 import { LRequest } from "./request"
 import { RequestImpl } from "./request-impl"
@@ -61,7 +61,7 @@ export class RequestPipeline {
   private retrieveExecutor(
     routeLookup: RouteLookupResult,
     method: HTTP_METHODS
-  ): { executor: ROUTE_HANDLER; pipeline: Iterable<MiddlewareRepresentation> } {
+  ): { executor: ROUTE_HANDLER; pipeline: Iterable<Middleware> } {
     // Send default options response
     if (method === "OPTIONS" && routeLookup.status !== LookupResultStatus.OK) {
       return {
@@ -95,39 +95,21 @@ export class RequestPipeline {
   }
 }
 
-const buildMiddlewareExecutionChain = (route: {
-  executor: ROUTE_HANDLER
-  pipeline: Iterable<MiddlewareRepresentation>
-}) => {
+const buildMiddlewareExecutionChain = (route: { executor: ROUTE_HANDLER; pipeline: Iterable<Middleware> }) => {
   // TODO next() called multiple times
   const pipeline = [...route.pipeline]
   return {
     run: async (req: LRequest, res: LResponse): Promise<void> => {
       let index = -1
+      //eslint-disable-next-line @typescript-eslint/no-explicit-any
       const executionWrapper = async (request: LRequest, response: LResponse): Promise<any> => {
         index += 1
         if (index >= pipeline.length) {
           return route.executor(request, response)
         }
-        await executeMiddleware(pipeline[index], executionWrapper, request, response)
+        await pipeline[index].handle(executionWrapper, req, res)
       }
       await executionWrapper(req, res)
     },
-  }
-}
-
-const executeMiddleware = async (
-  middleware: MiddlewareRepresentation,
-  next: NextFunction,
-  request: LRequest,
-  response: LResponse
-): Promise<void> => {
-  switch (middleware.type) {
-    case MiddlewareType.HTTP:
-      await middleware.rep(next, request, response)
-      break
-    case MiddlewareType.CLASS:
-      await middleware.rep.handle(next, request, response)
-      break
   }
 }

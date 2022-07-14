@@ -8,7 +8,7 @@
  * Every router has to expose a list of middlewares the callbacks in the routes' property will be wrapped in
  */
 import { ReadonlyRouteCollector, ServerBase } from "../core"
-import { MiddleWareInterceptor, ReadonlyMiddlewares } from "../middleware"
+import { Middleware, ReadonlyMiddlewares } from "../middleware"
 
 export interface MountingOptions {
   basePath: string
@@ -17,17 +17,16 @@ export interface MountingOptions {
 export interface Router {
   children: Readonly<{ router: Router; options: MountingOptions }[]>
   routes: ReadonlyRouteCollector
+  readonly middlewares: ReadonlyMiddlewares
+  readonly locked: boolean
 
   onMount?(server: ServerBase): void
 
-  readonly middleware: ReadonlyMiddlewares
-  readonly locked: boolean
-
   mount(router: Router[] | Router, options?: MountingOptions): this
 
-  pipe(...middleware: MiddleWareInterceptor[]): this
+  pipe(...middleware: Middleware[]): this
 
-  unPipe(...middleware: MiddleWareInterceptor[]): this
+  unPipe(...middleware: Middleware[]): this
 
   lock(): void
 }

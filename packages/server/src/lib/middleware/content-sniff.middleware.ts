@@ -4,11 +4,13 @@
  * MIT Licensed
  */
 import { LRequest, LResponse } from "../core"
-import { NextFunction } from "./middleware"
+import { Middleware, NextFunction } from "./middleware"
 
-const NoContentSniffMiddleware = async (next: NextFunction, request: LRequest, response: LResponse) => {
-  await next(request, response)
-  response.headers.append("X-Content-Type-Options", "nosniff")
-}
-
-export const noContentSniff = () => NoContentSniffMiddleware
+export const noContentSniff = (): Middleware => ({
+  name: "no-content-sniff",
+  version: "1.0.0",
+  handle: async (next: NextFunction, request: LRequest, response: LResponse) => {
+    await next(request, response)
+    response.headers.append("X-Content-Type-Options", "nosniff")
+  },
+})

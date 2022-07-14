@@ -14,7 +14,6 @@ import {
   numberPathValidator,
   pathPathValidator,
   poweredBy,
-  requestCompleter,
   ServerBase,
   stringPathValidator,
   uuidPathValidator,
@@ -51,7 +50,6 @@ export const apiServer = (args: Partial<ApiServerArgs> = saveObject()) => {
   const server = new ApiServer(generateOpenApi)
   server
     .pipe(loggerMiddleware())
-    .pipe(requestCompleter())
     .pipe(errorMiddleware({ ...defaultErrorHandler }))
     .pipe(noContentSniff())
     .pipe(jsonParser())

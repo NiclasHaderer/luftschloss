@@ -5,7 +5,7 @@
  */
 
 import { withDefaults } from "@luftschloss/core"
-import { HttpMiddlewareInterceptor, UTF8SearchParams } from "@luftschloss/server"
+import { Middleware, UTF8SearchParams } from "@luftschloss/server"
 import Buffer from "buffer"
 import { commonFormParserFactory } from "./common"
 
@@ -17,7 +17,7 @@ export type FormParserOptions = {
 export const formParser = (
   contentType: string[] | "*" | string = "application/x-www-form-urlencoded",
   options: Partial<FormParserOptions>
-): HttpMiddlewareInterceptor => {
+): Middleware => {
   const completeOptions = withDefaults<FormParserOptions>(options, {
     parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
       const str = buffer.toString(encoding)
@@ -26,5 +26,10 @@ export const formParser = (
     maxBodySize: 100,
   })
 
-  return commonFormParserFactory(contentType, { ...completeOptions, methodName: "form" })
+  return commonFormParserFactory(contentType, {
+    ...completeOptions,
+    methodName: "form",
+    version: "1.0.0",
+    name: "form-parser",
+  })
 }

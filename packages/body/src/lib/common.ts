@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { HTTPException, LRequest, LResponse, NextFunction, Status } from "@luftschloss/server"
+import { HTTPException, LRequest, LResponse, Middleware, NextFunction, Status } from "@luftschloss/server"
 import Buffer from "buffer"
 import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./utils"
 
@@ -12,73 +12,71 @@ export type CommonParserOptions = {
   maxBodySize: number
   parser: (body: Buffer, encoding: BufferEncoding | undefined) => object
   methodName: "json" | "form" | "text"
+  name: string
+  version: string
 }
 
 export type InternalCommonParserOptions =
-  | ({ contentTypes: Set<string>; tryAllContentTypes: false } & CommonParserOptions & {
-        methodName: "json" | "form" | "text"
-      })
-  | ({ tryAllContentTypes: true } & CommonParserOptions & { methodName: "json" | "form" | "text" })
+  | ({ contentTypes: Set<string>; tryAllContentTypes: false } & CommonParserOptions)
+  | ({ tryAllContentTypes: true } & CommonParserOptions)
 
-async function commonFormParserMiddleware(
-  this: InternalCommonParserOptions,
-  next: NextFunction,
-  request: LRequest,
-  response: LResponse
-) {
-  assertContentLengthHeader(request, this.maxBodySize)
+const commonFormParserMiddleware = (options: InternalCommonParserOptions): Middleware => {
+  return {
+    name: options.name,
+    version: options.version,
+    handle: async (next: NextFunction, request: LRequest, response: LResponse) => {
+      assertContentLengthHeader(request, options.maxBodySize)
 
-  let parsed: object | null = null
-  request[this.methodName] = async <T>(): Promise<T> => {
-    const contentType = getBodyContentType(request)
+      let parsed: object | null = null
+      request[options.methodName] = async <T>(): Promise<T> => {
+        const contentType = getBodyContentType(request)
 
-    if (!this.tryAllContentTypes) {
-      if (!contentType) {
-        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has not content type header")
+        if (!options.tryAllContentTypes) {
+          if (!contentType) {
+            throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has not content type header")
+          }
+
+          if (!options.contentTypes.has(contentType.type)) {
+            throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has wrong content type header")
+          }
+        }
+
+        if (parsed === null) {
+          const buffer = await getBodyData(request, options.maxBodySize)
+          parsed = options.parser(buffer, contentType?.encoding)
+        }
+
+        return parsed as unknown as T
       }
 
-      if (!this.contentTypes.has(contentType.type)) {
-        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Request has wrong content type header")
-      }
-    }
-
-    if (parsed === null) {
-      const buffer = await getBodyData(request, this.maxBodySize)
-      parsed = this.parser(buffer, contentType?.encoding)
-    }
-
-    return parsed as unknown as T
+      await next(request, response)
+    },
   }
-
-  await next(request, response)
 }
 
 export const commonFormParserFactory = (contentType: string[] | string | "*", options: CommonParserOptions) => {
   let completeOptions: InternalCommonParserOptions
   if (contentType === "*") {
     completeOptions = {
-      parser: options.parser,
+      ...options,
       maxBodySize: options.maxBodySize * 100,
       tryAllContentTypes: true,
-      methodName: options.methodName,
     }
   } else if (typeof contentType === "string") {
     completeOptions = {
-      parser: options.parser,
+      ...options,
       maxBodySize: options.maxBodySize * 100,
       tryAllContentTypes: false,
       contentTypes: new Set([contentType.toLowerCase().trim()]),
-      methodName: options.methodName,
     }
   } else {
     completeOptions = {
-      parser: options.parser,
+      ...options,
       maxBodySize: options.maxBodySize * 100,
       tryAllContentTypes: false,
       contentTypes: new Set(contentType.map(c => c.toLowerCase().trim())),
-      methodName: options.methodName,
     }
   }
 
-  return commonFormParserMiddleware.bind(completeOptions)
+  return commonFormParserMiddleware(completeOptions)
 }

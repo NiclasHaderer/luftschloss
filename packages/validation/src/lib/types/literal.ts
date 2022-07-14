@@ -14,15 +14,15 @@ export class LuftLiteral<T extends (string | number)[]> extends LuftBaseType<T[n
   private nonSensitiveSchema: CaseInsensitiveSet<T[number]>
   private sensitiveSchema: Set<T[number]>
 
-  public get supportedTypes() {
-    return this.schema.map(s => s.toString())
-  }
-
   public constructor(...schema: T) {
     super()
     this.schema = schema
     this.nonSensitiveSchema = new CaseInsensitiveSet(schema)
     this.sensitiveSchema = new Set(schema)
+  }
+
+  public get supportedTypes() {
+    return this.schema.map(s => s.toString())
   }
 
   public ignoreCase(ignoreCase: boolean): LuftLiteral<T> {
@@ -57,8 +57,6 @@ export class LuftLiteral<T extends (string | number)[]> extends LuftBaseType<T[n
     }
 
     //eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const valueDisplay = (data?.toString?.() as string) || "unknown"
     context.addIssue({
       code: LuftErrorCodes.INVALID_VALUE,

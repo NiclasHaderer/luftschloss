@@ -3,7 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { MiddlewareRepresentation } from "../middleware"
+import { Middleware } from "../middleware"
 import { PathValidator } from "../path-validator"
 import { LRequest } from "./request"
 import { LResponse } from "./response"
@@ -23,7 +23,7 @@ export enum LookupResultStatus {
 export type SuccessfulRouteLookupResult = {
   executor: ROUTE_HANDLER
   pathParams: Record<string, unknown>
-  pipeline: Iterable<MiddlewareRepresentation>
+  pipeline: Iterable<Middleware>
   status: LookupResultStatus.OK
   availableMethods: HTTP_METHODS[]
 }
@@ -69,7 +69,7 @@ export interface RouteCollector extends ReadonlyRouteCollector {
  * Adds the ability to look up a route
  */
 export interface RetrievableRouteCollector {
-  addPathValidator(validator: PathValidator<any>): this
+  addPathValidator(validator: PathValidator<unknown>): this
 
   retrieve(path: string, method: HTTP_METHODS): RouteLookupResult
 }
@@ -77,7 +77,7 @@ export interface RetrievableRouteCollector {
 /**
  * The callback which gets registered to the collector
  */
-export type ROUTE_HANDLER = (request: LRequest, response: LResponse) => Promise<any> | any
+export type ROUTE_HANDLER = (request: LRequest, response: LResponse) => Promise<unknown> | unknown
 
 /**
  * Available HTTP_METHODS To listen for

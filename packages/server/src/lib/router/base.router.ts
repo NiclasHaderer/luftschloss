@@ -6,21 +6,13 @@
 
 import { saveObject, withDefaults } from "@luftschloss/core"
 import { ReadonlyRouteCollector, RouteCollectorImpl } from "../core"
-import {
-  HttpMiddlewareRepresentation,
-  isClassMiddleware,
-  isHttpMiddleware,
-  MiddleWareInterceptor,
-  MiddlewareRepresentation,
-  MiddlewareType,
-  ReadonlyMiddlewares,
-} from "../middleware"
+import { Middleware, ReadonlyMiddlewares } from "../middleware"
 import { MountingOptions, Router } from "./router"
 
 export class BaseRouter implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
   protected readonly _routeCollector = new RouteCollectorImpl()
-  protected _middleware: MiddlewareRepresentation[] = []
+  protected _middlewares: Middleware[] = []
   protected _locked = false
 
   public get children(): { router: Router; options: MountingOptions }[] {
@@ -31,8 +23,8 @@ export class BaseRouter implements Router {
     return this._locked
   }
 
-  public get middleware(): ReadonlyMiddlewares {
-    return this._middleware
+  public get middlewares(): ReadonlyMiddlewares {
+    return this._middlewares
   }
 
   public get routes(): ReadonlyRouteCollector {
@@ -44,7 +36,7 @@ export class BaseRouter implements Router {
     this.subRouters.map(r => r.router).forEach(r => r.lock())
   }
 
-  public pipe(...middleware: MiddleWareInterceptor[]): this {
+  public pipe(...middleware: Middleware[]): this {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot add a new middleware")
     }
@@ -73,47 +65,30 @@ export class BaseRouter implements Router {
     return this
   }
 
-  public unPipe(...middlewareList: MiddleWareInterceptor[]): this {
+  public unPipe(...middlewaresToRemove: Middleware[]): this {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot remove a middleware")
     }
 
-    for (const middleware of middlewareList) {
-      let middlewareIndex = -1
-
-      if (isClassMiddleware(middleware)) {
-        middlewareIndex = this._middleware
-          .filter(m => m.type === MiddlewareType.CLASS)
-          .findIndex(value => value.rep.constructor.name === middleware.constructor.name)
-      } else if (isHttpMiddleware(middleware)) {
-        middlewareIndex = this._middleware
-          .filter((m): m is HttpMiddlewareRepresentation => m.type === MiddlewareType.HTTP)
-          .findIndex(value => value.rep.name === middleware.name)
-      }
+    // Reverse the middleware list to remove the last middleware with the name that was added
+    const reversedMiddlewares = this._middlewares.reverse()
+    for (const middleware of middlewaresToRemove) {
+      const middlewareIndex = reversedMiddlewares.findIndex(m => m.name === middleware.name)
 
       if (middlewareIndex === -1) {
-        console.warn(
-          "Middleware was not found and therefore could not be removed. A middleware has to be a named function!"
-        )
+        console.warn("Middleware was not found and therefore could not be removed.")
       } else {
-        this._middleware.splice(middlewareIndex - 1, 1)
+        this._middlewares.splice(middlewareIndex - 1, 1)
       }
     }
 
     return this
   }
 
-  protected addMiddleware(...middlewareList: MiddleWareInterceptor[]): void {
+  protected addMiddleware(...middlewareList: Middleware[]): void {
     for (const middleware of middlewareList) {
-      if (isClassMiddleware(middleware)) {
-        this._middleware.push({ type: MiddlewareType.CLASS, rep: middleware })
-      } else if (isHttpMiddleware(middleware)) {
-        if (!middleware.name) {
-          throw new Error("A middleware function has to be a named function")
-        }
-
-        this._middleware.push({ type: MiddlewareType.HTTP, rep: middleware })
-      }
+      this._middlewares.push(middleware)
+      // TODO call lifecycle hooks
     }
   }
 }

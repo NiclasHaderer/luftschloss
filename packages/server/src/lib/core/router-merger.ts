@@ -79,7 +79,7 @@ export class RouterMerger {
 
       collection[method] = {
         executor: handler,
-        pipeline: [...parentPipeline, ...router.middleware],
+        pipeline: [...parentPipeline, ...router.middlewares],
       }
     }
 
@@ -93,7 +93,7 @@ export class RouterMerger {
         {
           basePath: `${basePath}/${options.basePath}`,
         },
-        [...parentPipeline, ...router.middleware]
+        [...parentPipeline, ...router.middlewares]
       )
     }
   }

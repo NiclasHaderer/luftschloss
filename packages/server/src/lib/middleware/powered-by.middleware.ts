@@ -4,11 +4,13 @@
  * MIT Licensed
  */
 import { LRequest, LResponse } from "../core"
-import { NextFunction } from "./middleware"
+import { Middleware, NextFunction } from "./middleware"
 
-const PoweredByMiddleware = async (next: NextFunction, request: LRequest, response: LResponse) => {
-  await next(request, response)
-  response.headers.append("X-Powered-By", "luftschloss")
-}
-
-export const poweredBy = () => PoweredByMiddleware
+export const poweredBy = (): Middleware => ({
+  name: "powered-by",
+  version: "1.0.0",
+  handle: async (next: NextFunction, request: LRequest, response: LResponse) => {
+    await next(request, response)
+    response.headers.append("X-Powered-By", "luftschloss")
+  },
+})

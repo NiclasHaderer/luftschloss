@@ -24,7 +24,7 @@ export interface LResponse {
 
   html(text: string): this
 
-  json(object: any): this
+  json(object: object): this
 
   redirect(url: string | URL): this
 
@@ -35,6 +35,8 @@ export interface LResponse {
   stream(stream: ReadStream | ReadStream[]): this
 
   text(text: string): this
+
+  end(): Promise<void>
 }
 
 export const addResponseField = <R extends LResponse, KEY extends PropertyKey>(

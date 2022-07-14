@@ -4,10 +4,11 @@
  * MIT Licensed
  */
 
+import { Func } from "./types"
 import { saveObject } from "./utils"
 
-const isObject = (value: unknown): value is Record<string, any> => value instanceof Object
-const isFunction = (value: unknown): value is Record<string, any> => typeof value === "function"
+const isObject = (value: unknown): value is Record<string, unknown> => value instanceof Object
+const isFunction = (value: unknown): value is Func => typeof value === "function"
 
 export const deepCopy = <T>(object: T): T => {
   if (isFunction(object)) return object
@@ -15,8 +16,7 @@ export const deepCopy = <T>(object: T): T => {
 
   const newObject = saveObject() as T
   for (const key of Object.keys(object)) {
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-extra-semi
-    ;(newObject as Record<string, any>)[key] = deepCopy((object as Record<string, any>)[key])
+    ;(newObject as Record<string, unknown>)[key] = deepCopy((object as Record<string, unknown>)[key])
   }
   return newObject
 }

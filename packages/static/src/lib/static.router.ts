@@ -3,7 +3,6 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
 
 import { withDefaults } from "@luftschloss/core"
 import { BaseRouter, HTTPException, isProduction, LRequest, LResponse, Router, Status } from "@luftschloss/server"

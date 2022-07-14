@@ -3,7 +3,6 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-/* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment */
 
 import {
   HTTP_METHODS,
@@ -93,7 +92,6 @@ export class ApiRoute<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RE
 
       const reqUrlParsed = params.url.parse(urlParams)
       if (!reqUrlParsed.success) {
-        //eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         throw new HTTPException(Status.HTTP_400_BAD_REQUEST, reqUrlParsed.error.errors)
       }
 

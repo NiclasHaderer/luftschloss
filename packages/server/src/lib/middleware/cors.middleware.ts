@@ -5,7 +5,7 @@
  */
 import { saveObject, withDefaults } from "@luftschloss/core"
 import { HTTP_METHODS, LRequest, LResponse } from "../core"
-import { ClassMiddlewareInterceptor, NextFunction } from "./middleware"
+import { Middleware, NextFunction } from "./middleware"
 
 type CorsMiddlewareOptions = {
   allowedMethods: HTTP_METHODS[] | "*"
@@ -25,7 +25,10 @@ type CorsMiddlewareOptions = {
     }
 )
 
-class CorsMiddleware implements ClassMiddlewareInterceptor {
+class CorsMiddleware implements Middleware {
+  public readonly name = "cors"
+  public readonly version = "1.0.0"
+
   public constructor(
     private defaultHeaders: Record<string, string[]>,
     private allowAllHeaders: boolean,
@@ -101,7 +104,7 @@ const getDefaultHeaders = (options: CorsMiddlewareOptions): Record<string, strin
   return headers
 }
 
-export const corsMiddleware = (options: Partial<CorsMiddlewareOptions>): ClassMiddlewareInterceptor => {
+export const corsMiddleware = (options: Partial<CorsMiddlewareOptions>): Middleware => {
   const completeOptions = withDefaults(options, {
     allowOrigins: [],
     exposeHeaders: [],

@@ -22,9 +22,9 @@ export type LuftServerEvents = {
 export interface ServerBase extends Pick<GenericEventEmitter<LuftServerEvents>, "onComplete" | "on"> {
   readonly raw: Server
 
-  addPathValidator(validator: PathValidator<any>): this
+  addPathValidator(validator: PathValidator<unknown>): this
 
-  removePathValidator(validatorOrName: PathValidator<any> | PathValidator<any>["name"]): this
+  removePathValidator(validatorOrName: PathValidator<unknown> | PathValidator<unknown>["name"]): this
 
   listen(port?: number, hostname?: string): Promise<void>
 
@@ -50,7 +50,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     private pathValidators: PathValidators = {
       [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
     }
-    private readonly requestPipeline = new RequestPipeline(this.middleware)
+    private readonly requestPipeline = new RequestPipeline(this.middlewares)
     private readonly routeMerger = new RouterMerger(this.pathValidators, this.eventDelegate)
     private readonly server = http.createServer(this.handleIncomingRequest.bind(this))
 
@@ -66,7 +66,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       this.requestPipeline.queue(req, res).then(/**/).catch(console.error)
     }
 
-    public addPathValidator(validator: PathValidator<any>): this {
+    public addPathValidator(validator: PathValidator<unknown>): this {
       if (this.locked) {
         throw new Error("Cannot add new validator after server has been started")
       }
@@ -74,7 +74,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       return this
     }
 
-    public removePathValidator(validatorOrName: PathValidator<any> | PathValidator<any>["name"]): this {
+    public removePathValidator(validatorOrName: PathValidator<unknown> | PathValidator<unknown>["name"]): this {
       if (this.locked) {
         throw new Error("Cannot remove validator after server has been started")
       }
