@@ -22,7 +22,8 @@ const defaultExecutor = <T extends Record<string, unknown>>(filledPartial: T, de
   return filledPartial
 }
 
-export const withDefaults = <T extends Record<string, unknown>>(partial: Partial<T>, defaults: T): T => {
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const withDefaults = <T extends Record<string, any>>(partial: Partial<T>, defaults: T): T => {
   partial = deepCopy(partial)
   return defaultExecutor(partial as T, defaults)
 }

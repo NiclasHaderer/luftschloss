@@ -105,7 +105,7 @@ export class ResponseImpl implements LResponse {
         )
         await this._end()
       } catch (e) {
-        console.error(e)
+        console.trace(e)
         // If this did not work, just send the internal error response
         await this.text("Internal error")._end()
       }

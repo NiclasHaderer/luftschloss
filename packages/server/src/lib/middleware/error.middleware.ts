@@ -15,7 +15,7 @@ export const errorMiddleware = (errorHandlers: ErrorHandler): Middleware => {
         await next(request, response)
       } catch (e) {
         if (!(e instanceof HTTPException)) {
-          console.error(e)
+          console.trace(e)
           //eslint-disable-next-line no-ex-assign
           e = HTTPException.wrap(e as Error, Status.HTTP_500_INTERNAL_SERVER_ERROR)
         }

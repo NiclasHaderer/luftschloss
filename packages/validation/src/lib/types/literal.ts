@@ -56,8 +56,7 @@ export class LuftLiteral<T extends (string | number)[]> extends LuftBaseType<T[n
       }
     }
 
-    //eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    const valueDisplay = (data?.toString?.() as string) || "unknown"
+    const valueDisplay = ((data as object | undefined)?.toString?.() as string | undefined) || "unknown"
     context.addIssue({
       code: LuftErrorCodes.INVALID_VALUE,
       message: `Could not match value ${valueDisplay} to one of ${this.schema.join(", ")}`,

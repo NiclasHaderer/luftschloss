@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-export const ByLazy = <VALUE, TARGET = never>(factory: (self: TARGET) => VALUE) => {
+export const ByLazy = <VALUE, TARGET extends object = never>(factory: (self: TARGET) => VALUE) => {
   return (target: TARGET, propertyKey: string) => {
-    const cacheDataSymbol = Symbol("cache_data")
-    const cacheSetSymbol = Symbol("cache_set")
+    const cacheDataSymbol = Symbol(`CACHE_DATA_${propertyKey}`)
+    const cacheSetSymbol = Symbol(`CACHE_SET_${propertyKey}`)
 
     Object.defineProperty(target, propertyKey, {
       get(): VALUE {

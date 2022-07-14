@@ -20,18 +20,14 @@ export type ErrorHandler = Partial<{
 }> & { DEFAULT: ErrorHandlerCallback } & { HTTP_500_INTERNAL_SERVER_ERROR: ErrorHandlerCallback }
 
 export const defaultErrorHandler: ErrorHandler = {
-  DEFAULT: (error: HTTPException, request: LRequest, response: LResponse): Promise<void> | void => {
-    response.status(error.status).json({ error: error.messageJson })
+  DEFAULT: (error: HTTPException, request: LRequest, response: LResponse): Promise<void> => {
+    return response.status(error.status).json({ error: error.messageJson }).end()
   },
-  HTTP_500_INTERNAL_SERVER_ERROR: (
-    error: HTTPException,
-    request: LRequest,
-    response: LResponse
-  ): Promise<void> | void => {
+  HTTP_500_INTERNAL_SERVER_ERROR: (error: HTTPException, request: LRequest, response: LResponse): Promise<void> => {
     if (isProduction()) {
-      response.status(error.status).json({ error: error.messageJson })
+      return response.status(error.status).json({ error: error.messageJson }).end()
     } else {
-      response.status(error.status).json({ error: error.messageJson, trace: error.stack })
+      return response.status(error.status).json({ error: error.messageJson, trace: error.stack }).end()
     }
   },
 }
