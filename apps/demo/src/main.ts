@@ -4,13 +4,11 @@
  * MIT Licensed
  */
 
-//import { jsonParser } from "@luftschloss/body"
-//import { defaultRouter, defaultServer, LRequest, LResponse } from "@luftschloss/server"
-//import { staticContent } from "@luftschloss/static"
-//
-//const server = defaultServer().pipe(jsonParser(), staticContent({ allowOutsideBasePath: true }))
-//
-//server.get("", (request, response) => response.text("hello world").end())
+import { defaultServer } from "@luftschloss/server"
+
+const server = defaultServer()
+
+server.get("", (request, response) => response.text("hello world").end())
 //
 //const router = defaultRouter()
 //router.get("/json", async (request: LRequest, response: LResponse) => {
@@ -25,11 +23,4 @@
 //router.mount(router2, { basePath: "test" })
 //
 //server.mount(router, { basePath: "hello" })
-//server.listen().then(console.log).catch(console.trace)
-
-import { RequestImpl } from "@luftschloss/server"
-import { IncomingMessage } from "http"
-import { Socket } from "net"
-
-const req = new RequestImpl(new IncomingMessage(new Socket()))
-console.log(req.url)
+server.listen()

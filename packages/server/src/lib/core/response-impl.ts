@@ -105,7 +105,7 @@ export class ResponseImpl implements LResponse {
         )
         await this._end()
       } catch (e) {
-        console.trace(e)
+        console.trace("Error in request completer", e)
         // If this did not work, just send the internal error response
         await this.text("Internal error")._end()
       }
@@ -113,20 +113,27 @@ export class ResponseImpl implements LResponse {
   }
 
   private async _end() {
+    // Write headers and status code
     this.res.writeHead(this._status.code, this.headers.encode())
+
+    // Write the body of the response
     if (this.data instanceof ReadStream || Array.isArray(this.data)) {
       await this.streamResponse(this.data)
-    } else {
-      if (this.data === NOT_COMPLETED) {
-        throw new HTTPException(
-          Status.HTTP_500_INTERNAL_SERVER_ERROR,
-          "Server did not not send a response. Did you or one of your middlewares forget to await an async call?"
-        )
-      }
+      this.res.end()
+    } else if (this.data === NOT_COMPLETED) {
+      // Pass to the error handler and the error handler will call end with the right data
+      throw new HTTPException(
+        Status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "Server did not not send a response. Did you or one of your middlewares forget to await an async call?"
+      )
+    } else if (this.data instanceof Buffer) {
       // Null cannot be written to stdout and ?? checks for undefined and null
-      await new Promise(resolve => this.res.write(this.data ?? "", resolve))
+      await new Promise(resolve => this.res.write(this.data, resolve))
+      this.res.end()
+    } else {
+      // Just in case a undefined or null is passed accidentally
+      this.res.end(this.data ?? "")
     }
-    this.res.end()
   }
 
   private async streamResponse(stream: ReadStream | ReadStream[]): Promise<void> {
