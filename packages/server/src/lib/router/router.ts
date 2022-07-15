@@ -19,10 +19,14 @@ export interface Router {
   routes: ReadonlyRouteCollector
   readonly middlewares: ReadonlyMiddlewares
   readonly locked: boolean
+  readonly parentRouter: Router | undefined
+  readonly server: ServerBase | undefined
+  readonly path: string | undefined
+  readonly completePath: string | undefined
 
-  onMount?(server: ServerBase): void
+  onMount(server: ServerBase, parentRouter: Router, completePath: string): void
 
-  mount(router: Router[] | Router, options?: MountingOptions): this
+  mount(router: Router[] | Router, options?: Partial<MountingOptions>): this
 
   pipe(...middleware: Middleware[]): this
 

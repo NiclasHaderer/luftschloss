@@ -4,11 +4,11 @@
  * MIT Licensed
  */
 
-import { Constructor, GenericEventEmitter } from "@luftschloss/core"
+import { Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaults } from "@luftschloss/core"
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
 import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
-import { Router } from "../router"
+import { MountingOptions, Router } from "../router"
 import { RequestPipeline } from "./request-pipeline"
 import { RouterMerger } from "./router-merger"
 
@@ -52,14 +52,14 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     }
     private readonly requestPipeline = new RequestPipeline(this.middlewares)
     private readonly routeMerger = new RouterMerger(this.pathValidators, this.eventDelegate)
-    private readonly server = http.createServer(this.handleIncomingRequest.bind(this))
+    private readonly _server = http.createServer(this.handleIncomingRequest.bind(this))
 
     public constructor(...args: ARGS) {
       super(...args)
     }
 
     public get raw(): Server {
-      return this.server
+      return this._server
     }
 
     public handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void {
@@ -99,6 +99,29 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       super.lock()
     }
 
+    /**
+     * The server triggers the on mount event which will cause the mountEvent of all other routers which have been attached
+     * to the server to get triggered
+     * @param routers The router or the router you want to attach to the server
+     * @param options Some options for the mounting the router
+     */
+    public override mount(routers: Router[] | Router, options: Partial<MountingOptions> = saveObject()): this {
+      const completeOptions = withDefaults<MountingOptions>(options, { basePath: "/" })
+
+      if (this.locked) {
+        throw new Error("Router has been locked. You cannot mount any new routers")
+      }
+      super.mount(routers, completeOptions)
+
+      if (!Array.isArray(routers)) {
+        routers = [routers]
+      }
+
+      // the complete path is in our case the base path, because the server is the root router
+      routers.forEach(r => r.onMount(this, this, normalizePath(completeOptions.basePath)))
+      return this
+    }
+
     public _testBootstrap(): void {
       if (this.locked) {
         throw new Error("Server was already passed to a testing client")
@@ -117,7 +140,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       this.routeMerger.mergeIn(this, this, { basePath: "/" }, [])
       this.lock()
 
-      const runningServer = this.server.listen(port, hostname, () => {
+      const runningServer = this._server.listen(port, hostname, () => {
         console.log(`Server is listening on http://${hostname}:${port}`)
         console.log(`Server startup took ${Date.now() - this.startTime}ms`)
         this.eventDelegate.complete("start", undefined)
@@ -145,7 +168,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
     public shutdown({ gracePeriod = 1000 } = {}): Promise<void> {
       return new Promise((resolve, reject) => {
-        this.server.close(err => {
+        this._server.close(err => {
           if (err) {
             reject(err)
           } else {

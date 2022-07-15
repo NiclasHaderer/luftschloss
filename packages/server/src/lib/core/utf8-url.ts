@@ -4,6 +4,7 @@
  * MIT Licensed
  */
 
+import { normalizePath } from "@luftschloss/core"
 import { URL } from "url"
 import { UTF8SearchParams } from "./utf8-search-params"
 
@@ -51,7 +52,7 @@ export class UTF8Url implements URL {
   }
 
   public get pathname(): string {
-    return decodeURIComponent(this.urlDelegate.pathname)
+    return normalizePath(decodeURIComponent(this.urlDelegate.pathname))
   }
 
   public set pathname(value: string) {

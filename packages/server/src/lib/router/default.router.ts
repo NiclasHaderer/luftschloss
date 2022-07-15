@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { HTTP_METHODS, ROUTE_HANDLER, ServerBase } from "../core"
+import { HTTP_METHODS, ROUTE_HANDLER } from "../core"
 import { BaseRouter } from "./base.router"
 import { Router } from "./router"
 
@@ -18,10 +18,6 @@ export class DefaultRouter extends BaseRouter implements Router {
     } else {
       this._routeCollector.add(url, method, callback)
     }
-  }
-
-  public onMount(server: ServerBase): void {
-    // Mounting event is not relevant for the server
   }
 
   public delete(url: string, callback: ROUTE_HANDLER): void {
@@ -50,6 +46,10 @@ export class DefaultRouter extends BaseRouter implements Router {
 
   public put(url: string, callback: ROUTE_HANDLER): void {
     this.handle("PUT", url, callback)
+  }
+
+  public all(url: string, callback: ROUTE_HANDLER): void {
+    this.handle("*", url, callback)
   }
 }
 

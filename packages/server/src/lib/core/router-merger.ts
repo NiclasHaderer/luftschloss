@@ -83,9 +83,6 @@ export class RouterMerger {
       }
     }
 
-    // Call router onMount hook
-    router?.onMount?.(server)
-
     for (const { router: childRouter, options } of router.children) {
       this.mergeIn(
         server,

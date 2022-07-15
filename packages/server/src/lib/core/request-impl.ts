@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { ByLazy, normalizePath, saveObject } from "@luftschloss/core"
+import { ByLazy, saveObject } from "@luftschloss/core"
 import { IncomingMessage } from "http"
 import { AddressInfo } from "net"
 import * as tls from "tls"
@@ -28,7 +28,7 @@ export class RequestImpl<DATA extends Record<string, unknown> = never> implement
   @ByLazy<Headers, RequestImpl<DATA>>(self => Headers.create(self.req.headers))
   public readonly headers!: Headers
 
-  @ByLazy<string, RequestImpl<DATA>>(self => normalizePath(self.url.pathname))
+  @ByLazy<string, RequestImpl<DATA>>(self => self.url.pathname)
   public readonly path!: string
 
   @ByLazy<UTF8Url, RequestImpl<DATA>>(self => {
