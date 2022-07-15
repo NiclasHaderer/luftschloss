@@ -5,7 +5,7 @@
  */
 import { ReadStream } from "fs"
 import { ServerResponse } from "http"
-import { defaultErrorHandler } from "./error-handler"
+import { DefaultErrorHandler } from "./error-handler"
 
 import { Headers } from "./headers"
 import { HTTPException } from "./http-exception"
@@ -98,7 +98,7 @@ export class ResponseImpl implements LResponse {
       try {
         // TODO get the error middleware and send it through it
         // Try to complete with the default internal server error handler
-        await defaultErrorHandler.HTTP_500_INTERNAL_SERVER_ERROR(
+        await DefaultErrorHandler.HTTP_500_INTERNAL_SERVER_ERROR(
           HTTPException.wrap(e as Error, Status.HTTP_500_INTERNAL_SERVER_ERROR),
           this.request,
           this

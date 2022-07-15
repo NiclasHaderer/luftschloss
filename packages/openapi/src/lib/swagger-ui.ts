@@ -5,7 +5,7 @@
  */
 
 import { ByLazy } from "@luftschloss/core"
-import { DefaultRouter, LRequest, LResponse, ServerBase } from "@luftschloss/server"
+import { DefaultRouter, LRequest, LResponse, Router, ServerBase } from "@luftschloss/server"
 import { ApiServer } from "./api.server"
 
 interface SwaggerRouterProps {
@@ -14,12 +14,15 @@ interface SwaggerRouterProps {
 }
 
 export class SwaggerRouter extends DefaultRouter {
-  private server!: ApiServer
+  public get server(): ApiServer | undefined {
+    // We can cast here, because the onMount method throws an error if the server is not an openapi Server
+    return super._server as ApiServer
+  }
 
-  @ByLazy<string, SwaggerRouter>(self => self.server.openapi.getSpecAsJson())
+  @ByLazy<string, SwaggerRouter>(self => self.server!.openapi.getSpecAsJson())
   private json!: string
 
-  @ByLazy<string, SwaggerRouter>(self => self.server.openapi.getSpecAsYaml())
+  @ByLazy<string, SwaggerRouter>(self => self.server!.openapi.getSpecAsYaml())
   private yaml!: string
 
   public constructor(private docsUrl: string, private openApiUrl: string) {
@@ -28,12 +31,12 @@ export class SwaggerRouter extends DefaultRouter {
     this.get(this.openApiUrl, this.handleJsonSchema.bind(this))
   }
 
-  public override onMount(server: ServerBase): void {
+  public override onMount(server: ServerBase, parentRouter: Router, completePath: string): void {
     if (!(server instanceof ApiServer)) {
       throw new Error("The swagger router can only be used with the ApiServer")
     }
 
-    this.server = server
+    super.onMount(server, parentRouter, completePath)
   }
 
   private async handleJsonSchema(_: LRequest, response: LResponse): Promise<void> {

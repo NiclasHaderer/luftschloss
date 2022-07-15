@@ -10,20 +10,30 @@ import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingConte
 
 export class LuftArray<T> extends LuftBaseType<T[]> {
   public readonly supportedTypes = ["array"]
-  private _minLength = -Infinity
-  private _maxLength = Infinity
 
-  public constructor(public override readonly schema: LuftBaseType<unknown>) {
+  public constructor(
+    public override readonly schema: {
+      parser: "json" | "csv" | undefined
+      maxLength: number
+      minLength: number
+      type: LuftBaseType<unknown>
+    }
+  ) {
     super()
   }
 
   public minLength(minLength: number): LuftArray<T> {
-    this._minLength = minLength
+    this.schema.minLength = minLength
     return this
   }
 
   public maxLength(minLength: number): LuftArray<T> {
-    this._maxLength = minLength
+    this.schema.maxLength = minLength
+    return this
+  }
+
+  public parseWith(parser: "json" | "csv"): LuftArray<T> {
+    this.schema.parser = parser
     return this
   }
 
@@ -31,7 +41,23 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
     if (typeof data === "object" && data && Symbol.iterator in data && !Array.isArray(data)) {
       data = [...(data as Iterable<unknown>)]
     }
-    // TODO perhaps if string try json.parse and then validate
+
+    if (typeof data === "string" && this.schema.parser) {
+      switch (this.schema.parser) {
+        case "json": {
+          try {
+            data = JSON.parse(data as string)
+          } catch {
+            // Ignore because the "validate" function will send the error message
+          }
+          break
+        }
+        case "csv":
+          data = data.split(",")
+          break
+      }
+    }
+
     return this._validate(data, context, "_coerce")
   }
 
@@ -41,13 +67,13 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
     mode: "_coerce" | "_validate" = "_validate"
   ): InternalParsingResult<T[]> {
     if (Array.isArray(data)) {
-      if (data.length > this._maxLength) {
+      if (data.length > this.schema.maxLength) {
         context.addIssue({
           code: LuftErrorCodes.INVALID_LENGTH,
           path: [...context.path],
-          message: `Array length cannot be larger than ${this._maxLength}, but it actually was ${data.length}`,
-          maxLen: this._maxLength,
-          minLen: this._minLength,
+          message: `Array length cannot be larger than ${this.schema.maxLength}, but it actually was ${data.length}`,
+          maxLen: this.schema.maxLength,
+          minLen: this.schema.minLength,
           actualLen: data.length,
         })
         return {
@@ -55,13 +81,13 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
         }
       }
 
-      if (data.length < this._minLength) {
+      if (data.length < this.schema.minLength) {
         context.addIssue({
           code: LuftErrorCodes.INVALID_LENGTH,
           path: [...context.path],
-          message: `Array length cannot be smaller than ${this._minLength}, but it actually was ${data.length}`,
-          maxLen: this._maxLength,
-          minLen: this._minLength,
+          message: `Array length cannot be smaller than ${this.schema.minLength}, but it actually was ${data.length}`,
+          maxLen: this.schema.maxLength,
+          minLen: this.schema.minLength,
           actualLen: data.length,
         })
         return {
@@ -72,7 +98,7 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
       let failAtEnd = false
       data = [...data]
       for (let i = 0; i < (data as unknown[]).length; ++i) {
-        const result = (this.schema as InternalLuftBaseType<unknown>)[mode]((data as unknown[])[i], context)
+        const result = (this.schema.type as InternalLuftBaseType<unknown>)[mode]((data as unknown[])[i], context)
         if (result.success) {
           //eslint-disable-next-line @typescript-eslint/no-extra-semi
           ;(data as unknown[])[i] = result.data

@@ -49,6 +49,7 @@ export type RouteLookupResult = UnSuccessfulRouteLookupResult | SuccessfulRouteL
  */
 export type CollectionEntry = { method: HTTP_METHODS; path: string; handler: ROUTE_HANDLER }
 
+// TODO remove everything that has something todo with the collector
 /**
  * Collector which can not be modified
  */

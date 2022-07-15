@@ -9,11 +9,14 @@ import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
 export class LuftRegexp extends LuftBaseType<string> {
-  protected _coerce = undefined
   public readonly supportedTypes = ["string"]
 
   public constructor(public override readonly schema: RegExp) {
     super()
+  }
+
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
+    return this._validate(data, context)
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {

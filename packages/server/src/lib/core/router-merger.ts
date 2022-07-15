@@ -23,6 +23,7 @@ export type MergedRoutes = {
   regex: Readonly<Readonly<MergedRoute>[]>
 }
 
+// TODO remove
 export class RouterMerger {
   private _collection = new Map<string, Record<HTTP_METHODS, FinishedRoute | null>>()
   private locked = false

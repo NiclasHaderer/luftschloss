@@ -13,7 +13,7 @@ import {
   uuidPathValidator,
 } from "../path-validator"
 import { DefaultRouter } from "../router"
-import { defaultErrorHandler } from "./error-handler"
+import { DefaultErrorHandler } from "./error-handler"
 import { ServerBase, withServerBase } from "./server-base"
 
 class ServerImpl extends withServerBase(DefaultRouter) {}
@@ -24,7 +24,7 @@ export const defaultServer = ({ timeout = 5000, maxConnections = Infinity } = {}
   server.raw.maxConnections = maxConnections
   server
     .pipe(loggerMiddleware())
-    .pipe(errorMiddleware({ ...defaultErrorHandler }))
+    .pipe(errorMiddleware({ ...DefaultErrorHandler }))
     .pipe(noContentSniff())
     .pipe(poweredBy())
 

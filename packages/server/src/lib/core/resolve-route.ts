@@ -9,6 +9,7 @@ import { PathConverter } from "../path-validator"
 import { HTTP_METHODS, LookupResultStatus, RouteLookupResult } from "./route-collector.model"
 import { FinishedRoute, MergedRoutes } from "./router-merger"
 
+// TODO remove
 export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedRoutes): RouteLookupResult => {
   let status: LookupResultStatus.NOT_FOUND | LookupResultStatus.METHOD_NOT_ALLOWED = LookupResultStatus.NOT_FOUND
   let availableMethods: HTTP_METHODS[] = []

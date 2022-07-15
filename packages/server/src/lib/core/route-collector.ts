@@ -10,6 +10,7 @@ import { CollectionEntry, HTTP_METHODS, ROUTE_HANDLER, RouteCollector } from "./
 export type HttpRouteCollection = Record<HTTP_METHODS, ROUTE_HANDLER | null>
 export type RouteCollection = Map<string, HttpRouteCollection>
 
+// TODO remove
 export class RouteCollectorImpl implements RouteCollector {
   private _collection: RouteCollection = new Map<string, HttpRouteCollection>()
 

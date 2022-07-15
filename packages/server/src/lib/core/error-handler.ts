@@ -19,7 +19,7 @@ export type ErrorHandler = Partial<{
   [STATUS in keyof typeof Status]: ErrorHandlerCallback
 }> & { DEFAULT: ErrorHandlerCallback } & { HTTP_500_INTERNAL_SERVER_ERROR: ErrorHandlerCallback }
 
-export const defaultErrorHandler: ErrorHandler = {
+export const DefaultErrorHandler: ErrorHandler = {
   DEFAULT: (error: HTTPException, request: LRequest, response: LResponse): Promise<void> => {
     return response.status(error.status).json({ error: error.messageJson }).end()
   },

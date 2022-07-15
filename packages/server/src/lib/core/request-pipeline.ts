@@ -17,6 +17,7 @@ import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } fr
 import { MergedRoutes } from "./router-merger"
 import { Status } from "./status"
 
+// TODO remove
 export class RequestPipeline {
   private locked = false
   private routes!: Readonly<MergedRoutes>

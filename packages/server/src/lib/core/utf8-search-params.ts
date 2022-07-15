@@ -28,7 +28,7 @@ export class UTF8SearchParams extends URLSearchParams {
     }
   }
 
-  forEach<TThis = this>(
+  public forEach<TThis = this>(
     callback: (this: TThis, value: string, name: string, searchParams: this) => void,
     thisArg?: TThis
   ) {
@@ -47,12 +47,16 @@ export class UTF8SearchParams extends URLSearchParams {
     return super.getAll(name).map(decodeURIComponent)
   }
 
-  public override keys(): IterableIterator<string> {
-    return [...super.keys()].map(decodeURIComponent)[Symbol.iterator]()
+  public override *keys(): IterableIterator<string> {
+    for (const key of super.keys()) {
+      yield decodeURIComponent(key)
+    }
   }
 
-  public override values(): IterableIterator<string> {
-    return [...super.values()].map(decodeURIComponent)[Symbol.iterator]()
+  public override *values(): IterableIterator<string> {
+    for (const value of super.values()) {
+      yield decodeURIComponent(value)
+    }
   }
 
   public asObject<T extends Record<string, string[]>>(): T {

@@ -46,18 +46,6 @@ export class ParsingContext {
   }
 }
 
-type UnpackNullish<T extends LuftBaseType<any>, LIMIT extends number> = _UnpackNullish<T, LIMIT, []>
-
-type _UnpackNullish<
-  T extends LuftBaseType<any>,
-  LIMIT extends number,
-  CURR extends null[]
-> = CURR["length"] extends LIMIT
-  ? T
-  : T extends LuftNull<any> | LuftUndefined<any>
-  ? _UnpackNullish<T["schema"], LIMIT, [null, ...CURR]>
-  : T
-
 export type InternalLuftBaseType<OUT_TYPE> = {
   _validate(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
 
@@ -159,40 +147,26 @@ export abstract class LuftBaseType<T> {
     )
   }
 
-  protected abstract _coerce?(data: unknown, context: ParsingContext): InternalParsingResult<T>
+  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T>
 
-  public optional() {
-    return new LuftUndefined<T>(this)
-  }
-
-  public nullable() {
-    return new LuftNull<T>(this)
-  }
-
-  public nullish(): LuftNull<LuftTypeOf<LuftUndefined<T>>> {
-    const optional = new LuftUndefined<T>(this)
-    return new LuftNull<LuftTypeOf<typeof optional>>(optional)
-  }
-
-  public required(): UnpackNullish<this, 100> {
-    //eslint-disable-next-line @typescript-eslint/no-this-alias
-    let type: LuftBaseType<unknown> = this
-    while (type instanceof LuftUndefined || type instanceof LuftNull) {
-      type = type.schema
-    }
-
-    return type as UnpackNullish<this, 100>
-  }
+  // TODO fix type
+  //public optional() {
+  //  return new LuftUnion(this, new LuftUndefined())
+  //}
+  //
+  //public nullable() {
+  //  return new LuftUnion(this, new LuftNull())
+  //}
+  //
+  //public nullish(): LuftNull<LuftTypeOf<LuftUndefined<T>>> {
+  //  return new LuftUnion(this, new LuftNull(), new LuftUndefined())
+  //}
 
   public or<T extends LuftBaseType<unknown>>(type: LuftBaseType<T>): LuftUnion<[T, this]> {
     return new LuftUnion(this, type)
   }
 
   public default(defaultValue: T): this {
-    if (this instanceof LuftUndefined || this instanceof LuftNull) {
-      throw new Error("You should not set a default value for an optional type")
-    }
-
     const addDefaultFun = (coerceValue: unknown): InternalParsingResult<unknown> => {
       if (coerceValue === undefined || coerceValue === null) {
         return {
@@ -219,66 +193,48 @@ export abstract class LuftBaseType<T> {
   }
 }
 
-export class LuftUndefined<OUT_TYPE> extends LuftBaseType<OUT_TYPE | undefined> {
-  public constructor(public override schema: LuftBaseType<OUT_TYPE>) {
-    super()
+export class LuftUndefined extends LuftBaseType<undefined> {
+  public supportedTypes = ["undefined"]
+
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
+    return this._validate(data, context)
   }
 
-  public get supportedTypes() {
-    return uniqueList([...this.schema.supportedTypes, "undefined"])
-  }
-
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE | undefined> {
-    return this.validateAndCoerce(data, context, "coerce")
-  }
-
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE | undefined> {
-    return this.validateAndCoerce(data, context, "validate")
-  }
-
-  private validateAndCoerce(
-    data: unknown,
-    context: ParsingContext,
-    mode: "validate" | "coerce"
-  ): InternalParsingResult<OUT_TYPE | undefined> {
+  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
     if (data === undefined) return { success: true, data }
-    const schema = this.schema as unknown as InternalLuftBaseType<OUT_TYPE>
-    const cb = mode === "coerce" ? schema._coerce.bind(this) : schema._validate.bind(this)
-    return cb(data, context)
+    context.addIssue({
+      code: "INVALID_TYPE",
+      message: `Expected undefined, got ${getTypeOf(data)}`,
+      path: [...context.path],
+      expectedType: "undefined",
+      receivedType: getTypeOf(data),
+    })
+    return { success: false }
   }
 }
 
-export class LuftNull<OUT_TYPE> extends LuftBaseType<OUT_TYPE | null> {
-  public constructor(public override schema: LuftBaseType<OUT_TYPE>) {
-    super()
+export class LuftNull extends LuftBaseType<null> {
+  public supportedTypes = ["null"]
+
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
+    return this._validate(data, context)
   }
 
-  public get supportedTypes() {
-    return uniqueList([...this.schema.supportedTypes, "null"])
-  }
-
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE | null> {
-    return this.validateAndCoerce(data, context, "coerce")
-  }
-
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE | null> {
-    return this.validateAndCoerce(data, context, "validate")
-  }
-
-  private validateAndCoerce(
-    data: unknown,
-    context: ParsingContext,
-    mode: "validate" | "coerce"
-  ): InternalParsingResult<OUT_TYPE | null> {
+  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<null> {
     if (data === null) return { success: true, data }
-    const schema = this.schema as unknown as InternalLuftBaseType<OUT_TYPE>
-    const cb = mode === "coerce" ? schema._coerce.bind(this) : schema._validate.bind(this)
-    return cb(data, context)
+    context.addIssue({
+      code: "INVALID_TYPE",
+      message: `Expected null, got ${getTypeOf(data)}`,
+      path: [...context.path],
+      expectedType: "null",
+      receivedType: getTypeOf(data),
+    })
+    return { success: false }
   }
 }
 
-export class LuftUnion<T extends LuftBaseType<any>[]> extends LuftBaseType<LuftTypeOf<T[number]>> {
-  public override readonly schema: LuftBaseType<any>[]
+export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftTypeOf<T[number]>> {
+  public override readonly schema: LuftBaseType<unknown>[]
 
   public constructor(...schema: LuftBaseType<unknown>[]) {
     super()

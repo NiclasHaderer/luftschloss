@@ -8,31 +8,25 @@ import { CaseInsensitiveSet } from "../CaseInsensitiveSet"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
-export class LuftLiteral<T extends (string | number)[]> extends LuftBaseType<T[number]> {
-  public override readonly schema: T
-  private _ignoreCase = true
+export class LuftLiteral<T extends (string | number | boolean)[]> extends LuftBaseType<T[number]> {
   private nonSensitiveSchema: CaseInsensitiveSet<T[number]>
   private sensitiveSchema: Set<T[number]>
+  public readonly supportedTypes = this.schema.types.map(t => t.toString())
 
-  public constructor(...schema: T) {
+  public constructor(public readonly schema: { types: T; ignoreCase: boolean }) {
     super()
-    this.schema = schema
-    this.nonSensitiveSchema = new CaseInsensitiveSet(schema)
-    this.sensitiveSchema = new Set(schema)
-  }
-
-  public get supportedTypes() {
-    return this.schema.map(s => s.toString())
+    this.nonSensitiveSchema = new CaseInsensitiveSet(schema.types)
+    this.sensitiveSchema = new Set(schema.types)
   }
 
   public ignoreCase(ignoreCase: boolean): LuftLiteral<T> {
-    this._ignoreCase = ignoreCase
+    this.schema.ignoreCase = ignoreCase
     return this
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T[number]> {
     const result = this._validate(data, context)
-    if (result.success && this._ignoreCase) {
+    if (result.success && this.schema.ignoreCase) {
       return {
         success: true,
         data: this.nonSensitiveSchema.getCorresponding(data as T[number]),
@@ -42,7 +36,7 @@ export class LuftLiteral<T extends (string | number)[]> extends LuftBaseType<T[n
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<T[number]> {
-    if (this._ignoreCase) {
+    if (this.schema.ignoreCase) {
       if (this.nonSensitiveSchema.has(data as T[number])) {
         return {
           success: true,
@@ -59,9 +53,9 @@ export class LuftLiteral<T extends (string | number)[]> extends LuftBaseType<T[n
     const valueDisplay = ((data as object | undefined)?.toString?.() as string | undefined) || "unknown"
     context.addIssue({
       code: LuftErrorCodes.INVALID_VALUE,
-      message: `Could not match value ${valueDisplay} to one of ${this.schema.join(", ")}`,
+      message: `Could not match value ${valueDisplay} to one of ${this.schema.types.join(", ")}`,
       path: [...context.path],
-      allowedValues: this.schema.map(v => v.toString()),
+      allowedValues: this.schema.types.map(v => v.toString()),
       receivedValue: valueDisplay,
     })
     return {

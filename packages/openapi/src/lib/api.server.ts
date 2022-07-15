@@ -6,7 +6,7 @@
 import { jsonParser } from "@luftschloss/body"
 import { normalizePath, saveObject, withDefaults } from "@luftschloss/core"
 import {
-  defaultErrorHandler,
+  DefaultErrorHandler,
   errorMiddleware,
   intPathValidator,
   loggerMiddleware,
@@ -50,7 +50,7 @@ export const apiServer = (args: Partial<ApiServerArgs> = saveObject()) => {
   const server = new ApiServer(generateOpenApi)
   server
     .pipe(loggerMiddleware())
-    .pipe(errorMiddleware({ ...defaultErrorHandler }))
+    .pipe(errorMiddleware({ ...DefaultErrorHandler }))
     .pipe(noContentSniff())
     .pipe(jsonParser())
     .pipe(poweredBy())
