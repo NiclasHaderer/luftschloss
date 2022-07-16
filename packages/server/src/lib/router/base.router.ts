@@ -8,8 +8,9 @@ import { normalizePath, saveObject, withDefaults } from "@luftschloss/core"
 import { ReadonlyRouteCollector, RouteCollectorImpl, ServerBase } from "../core"
 import { Middleware, ReadonlyMiddlewares } from "../middleware"
 import { MountingOptions, Router } from "./router"
+import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 
-export class BaseRouter implements Router {
+export class RouterBase implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
   protected readonly _routeCollector = new RouteCollectorImpl()
   protected _middlewares: Middleware[] = []
@@ -18,6 +19,9 @@ export class BaseRouter implements Router {
   protected _server?: ServerBase
   protected _mountPath?: string
   protected _completePath?: string
+  protected pathValidators: PathValidators = {
+    [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
+  }
 
   public get children(): { router: Router; options: MountingOptions }[] {
     return this.subRouters
@@ -51,17 +55,43 @@ export class BaseRouter implements Router {
     return this._server
   }
 
+  public get completeMiddlewares(): ReadonlyMiddlewares {
+    return [...this.parentMiddlewares, ...this.middlewares]
+  }
+
+  public get parentMiddlewares(): ReadonlyMiddlewares {
+    let parentRouter = this.parentRouter
+    let parentMiddlewares: ReadonlyMiddlewares = []
+    while (parentRouter) {
+      parentMiddlewares = parentMiddlewares.concat(parentRouter.middlewares)
+      parentRouter = parentRouter.parentRouter
+    }
+    return parentMiddlewares
+  }
+
   public lock(): void {
     this._locked = true
+
+    const routerParentMiddlewares = this.parentMiddlewares
+    // Server is defined, because only the server can lock the router
+    this._middlewares.forEach((m, index) => {
+      let parentMiddlewares = routerParentMiddlewares
+      if (index > 0) {
+        parentMiddlewares = [...routerParentMiddlewares, ...this.middlewares.slice(0, index - 1)]
+      }
+
+      m.onStartup?.(this.server!, this, parentMiddlewares)
+    })
     this.subRouters.map(r => r.router).forEach(r => r.lock())
   }
 
-  public pipe(...middleware: Middleware[]): this {
+  public pipe(...middlewares: Middleware[]): this {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot add a new middleware")
     }
-
-    this.addMiddleware(...middleware)
+    for (const middleware of middlewares) {
+      this._middlewares.push(middleware)
+    }
     return this
   }
 
@@ -81,11 +111,11 @@ export class BaseRouter implements Router {
   // TODO create something like pipeOnly to be able to add a middleware which will only able to be used by one handler.
 
   public mount(routers: Router | Router[], options: Partial<MountingOptions> = saveObject()): this {
-    const completeOptions = withDefaults<MountingOptions>(options, { basePath: "/" })
-
     if (this.locked) {
       throw new Error("Router has been locked. You cannot mount any new routers")
     }
+
+    const completeOptions = withDefaults<MountingOptions>(options, { basePath: "/" })
     this._mountPath = completeOptions.basePath
 
     if (!Array.isArray(routers)) {
@@ -93,15 +123,16 @@ export class BaseRouter implements Router {
     }
 
     for (const router of routers) {
+      // Add the routers as child router
       this.subRouters.push({ router, options: completeOptions })
-    }
+      // Add "this" routers' path validators to the children
+      Object.values(this.pathValidators).forEach(validator => router.addPathValidator(validator))
 
-    // Call the on mount method only if this router has been mounted to the server and the server property is therefore
-    // not null. If this is not the case here the uncalled onMount functions will be called in "this" routers onMount method
-    if (this.server && this.completePath) {
-      routers.forEach(router =>
+      // Call the on mount method only if this router has been mounted to the server and the server property is therefore
+      // not null. If this is not the case here the uncalled onMount functions will be called in "this" routers onMount method
+      if (this.server && this.completePath) {
         router.onMount(this.server!, this, normalizePath(`${this.completePath}/${completeOptions.basePath}`))
-      )
+      }
     }
 
     return this
@@ -127,12 +158,37 @@ export class BaseRouter implements Router {
     return this
   }
 
-  protected addMiddleware(...middlewareList: Middleware[]): void {
-    for (const middleware of middlewareList) {
-      this._middlewares.push(middleware)
-      // TODO call lifecycle hooks
+  public addPathValidator(validator: PathValidator<unknown>): this {
+    if (this.locked) {
+      throw new Error("Cannot add new validator after server has been started")
     }
+    this.pathValidators[validator.name] = validator
+    this.children.forEach(({ router }) => router.addPathValidator(validator))
+    return this
+  }
+
+  public removePathValidator(validatorOrName: PathValidator<unknown> | string, skipChildren = false): this {
+    if (this.locked) {
+      throw new Error("Cannot remove validator after server has been started")
+    }
+
+    if (typeof validatorOrName === "string") {
+      if (validatorOrName === DEFAULT_PATH_VALIDATOR_NAME) {
+        throw new Error("Cannot remove default validator")
+      }
+      delete this.pathValidators[validatorOrName]
+    } else {
+      if (validatorOrName.name === DEFAULT_PATH_VALIDATOR_NAME) {
+        throw new Error("Cannot remove default validator")
+      }
+      delete this.pathValidators[validatorOrName.name]
+    }
+
+    !skipChildren && this.children.forEach(({ router }) => router.removePathValidator(validatorOrName))
+    return this
+  }
+
+  public resolvePath() {
+    // TODO
   }
 }
-
-export const emptyRouter = (): BaseRouter => new BaseRouter()

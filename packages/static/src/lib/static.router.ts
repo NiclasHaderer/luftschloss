@@ -5,7 +5,7 @@
  */
 
 import { withDefaults } from "@luftschloss/core"
-import { BaseRouter, HTTPException, isProduction, LRequest, LResponse, Router, Status } from "@luftschloss/server"
+import { RouterBase, HTTPException, isProduction, LRequest, LResponse, Router, Status } from "@luftschloss/server"
 import { promises as fs } from "fs"
 import path from "path"
 import "./static.middleware"
@@ -13,7 +13,7 @@ import { staticContent } from "./static.middleware"
 
 type StaticRouterProps = { useIndexFile: boolean; indexFile: string }
 
-export class StaticRouter extends BaseRouter implements Router {
+export class StaticRouter extends RouterBase implements Router {
   private readonly folderPath: string
 
   public constructor(folderPath: string, private options: StaticRouterProps) {

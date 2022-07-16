@@ -5,10 +5,10 @@
  */
 
 import { HTTP_METHODS, ROUTE_HANDLER } from "../core"
-import { BaseRouter } from "./base.router"
+import { RouterBase } from "./base.router"
 import { Router } from "./router"
 
-export class DefaultRouter extends BaseRouter implements Router {
+export class DefaultRouter extends RouterBase implements Router {
   public handle(method: HTTP_METHODS | HTTP_METHODS[] | "*", url: string, callback: ROUTE_HANDLER): void {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot add any new routes")

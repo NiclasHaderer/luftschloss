@@ -12,7 +12,7 @@ export type Middleware = {
   readonly name: string
   readonly version: string
   readonly handle: (next: NextFunction, req: LRequest, res: LResponse) => Promise<void>
-  readonly onMount?: (server: ServerBase, router: Router, parentMiddlewares: ReadonlyMiddlewares) => Promise<void>
+  readonly onStartup?: (server: ServerBase, router: Router, parentMiddlewares: ReadonlyMiddlewares) => Promise<void>
 }
 
 export type ReadonlyMiddlewares = ReadonlyArray<Readonly<Middleware>>

@@ -7,7 +7,6 @@
 import { Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaults } from "@luftschloss/core"
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
-import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 import { MountingOptions, Router } from "../router"
 import { RequestPipeline } from "./request-pipeline"
 import { RouterMerger } from "./router-merger"
@@ -21,10 +20,6 @@ export type LuftServerEvents = {
 
 export interface ServerBase extends Pick<GenericEventEmitter<LuftServerEvents>, "onComplete" | "on"> {
   readonly raw: Server
-
-  addPathValidator(validator: PathValidator<unknown>): this
-
-  removePathValidator(validatorOrName: PathValidator<unknown> | PathValidator<unknown>["name"]): this
 
   listen(port?: number, hostname?: string): Promise<void>
 
@@ -47,11 +42,8 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     public onComplete = this.eventDelegate.onComplete.bind(this.eventDelegate)
     private readonly startTime = Date.now()
     private readonly openSockets = new Set<Duplex>()
-    private pathValidators: PathValidators = {
-      [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
-    }
     private readonly requestPipeline = new RequestPipeline(this.middlewares)
-    private readonly routeMerger = new RouterMerger(this.pathValidators, this.eventDelegate)
+    private readonly routeMerger = new RouterMerger({}, this.eventDelegate)
     private readonly _server = http.createServer(this.handleIncomingRequest.bind(this))
 
     public constructor(...args: ARGS) {
@@ -64,33 +56,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
     public handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void {
       this.requestPipeline.queue(req, res).then(/**/).catch(console.error)
-    }
-
-    public addPathValidator(validator: PathValidator<unknown>): this {
-      if (this.locked) {
-        throw new Error("Cannot add new validator after server has been started")
-      }
-      this.pathValidators[validator.name] = validator
-      return this
-    }
-
-    public removePathValidator(validatorOrName: PathValidator<unknown> | PathValidator<unknown>["name"]): this {
-      if (this.locked) {
-        throw new Error("Cannot remove validator after server has been started")
-      }
-
-      if (typeof validatorOrName === "string") {
-        if (validatorOrName === DEFAULT_PATH_VALIDATOR_NAME) {
-          throw new Error("Cannot remove default validator")
-        }
-        delete this.pathValidators[validatorOrName]
-      } else {
-        if (validatorOrName.name === DEFAULT_PATH_VALIDATOR_NAME) {
-          throw new Error("Cannot remove default validator")
-        }
-        delete this.pathValidators[validatorOrName.name]
-      }
-      return this
     }
 
     public override lock(): void {
