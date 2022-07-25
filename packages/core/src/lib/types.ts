@@ -29,3 +29,5 @@ export type CustomPropertyDescriptor<THIS extends object, KEY extends PropertyKe
       get(): KEY extends keyof THIS ? THIS[KEY] : any
       set(v: KEY extends keyof THIS ? THIS[KEY] : any): void
     }
+
+export type Promisable<T> = T | Promise<T>
