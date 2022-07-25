@@ -14,9 +14,9 @@ export class DefaultRouter extends RouterBase implements Router {
       throw new Error("Router has been locked. You cannot add any new routes")
     }
     if (Array.isArray(method)) {
-      method.forEach(m => this._routeCollector.add(url, m, callback))
+      method.forEach(m => this.routeCollector.add(url, m, callback))
     } else {
-      this._routeCollector.add(url, method, callback)
+      this.routeCollector.add(url, method, callback)
     }
   }
 

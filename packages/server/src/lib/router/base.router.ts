@@ -5,14 +5,22 @@
  */
 
 import { normalizePath, saveObject, withDefaults } from "@luftschloss/core"
-import { ReadonlyRouteCollector, RouteCollectorImpl, ServerBase } from "../core"
+import {
+  HTTP_METHODS,
+  LookupResultStatus,
+  MethodNotAllowedLookupResult,
+  resolveRoute,
+  RouteCollector,
+  RouteLookupResult,
+  ServerBase,
+} from "../core"
 import { Middleware, ReadonlyMiddlewares } from "../middleware"
 import { MountingOptions, Router } from "./router"
 import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 
 export class RouterBase implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
-  protected readonly _routeCollector = new RouteCollectorImpl()
+  protected readonly routeCollector = new RouteCollector()
   protected _middlewares: Middleware[] = []
   protected _locked = false
   protected _parentRouter?: Router
@@ -35,8 +43,8 @@ export class RouterBase implements Router {
     return this._middlewares
   }
 
-  public get routes(): ReadonlyRouteCollector {
-    return this._routeCollector
+  public get routes(): RouteCollector {
+    return this.routeCollector
   }
 
   public get path(): string | undefined {
@@ -60,10 +68,11 @@ export class RouterBase implements Router {
   }
 
   public get parentMiddlewares(): ReadonlyMiddlewares {
+    const parentMiddlewares: Readonly<Middleware>[] = []
+
     let parentRouter = this.parentRouter
-    let parentMiddlewares: ReadonlyMiddlewares = []
     while (parentRouter) {
-      parentMiddlewares = parentMiddlewares.concat(parentRouter.middlewares)
+      parentMiddlewares.push(...parentRouter.middlewares)
       parentRouter = parentRouter.parentRouter
     }
     return parentMiddlewares
@@ -71,7 +80,15 @@ export class RouterBase implements Router {
 
   public lock(): void {
     this._locked = true
+    // Call different startup hooks
+    this.propagateStartup()
+    // Lock the route collector and provide it with the necessary information which it needs to build a lookup table
+    this.routeCollector.lock(this._completePath!, this.pathValidators)
+    // Call the sub-routers and lock them
+    this.subRouters.map(r => r.router).forEach(r => r.lock())
+  }
 
+  private propagateStartup(): void {
     const routerParentMiddlewares = this.parentMiddlewares
     // Server is defined, because only the server can lock the router
     this._middlewares.forEach((m, index) => {
@@ -82,7 +99,6 @@ export class RouterBase implements Router {
 
       m.onStartup?.(this.server!, this, parentMiddlewares)
     })
-    this.subRouters.map(r => r.router).forEach(r => r.lock())
   }
 
   public pipe(...middlewares: Middleware[]): this {
@@ -107,8 +123,6 @@ export class RouterBase implements Router {
       router.onMount(server, this, normalizePath(`${completePath}/${options.basePath}`))
     )
   }
-
-  // TODO create something like pipeOnly to be able to add a middleware which will only able to be used by one handler.
 
   public mount(routers: Router | Router[], options: Partial<MountingOptions> = saveObject()): this {
     if (this.locked) {
@@ -188,7 +202,49 @@ export class RouterBase implements Router {
     return this
   }
 
-  public resolvePath() {
-    // TODO
+  /**
+   * Resolve a certain path and return a route handler including all the middlewares up until this point.
+   * Parent router are responsible to add their own middlewares to the lookup result
+   * @param path The *complete* path of the request. This includes the parent path of the request
+   * @param method The method of the request
+   */
+  public resolveRoute(path: string, method: HTTP_METHODS): RouteLookupResult & { middlewares: Readonly<Middleware>[] } {
+    // TODO optimize by leaving out request resolution if the base path of the router does not match already
+
+    // Used to save the earliest appearance of a route not found lookup result in case the only result will be this one
+    let wrongMethod: (MethodNotAllowedLookupResult & { middlewares: Readonly<Middleware>[] }) | undefined
+
+    // Lookup routes in the router
+    const route = resolveRoute(path, method, this.routeCollector.completeRoutes())
+
+    // In case the route was found here, return
+    if (route.status === LookupResultStatus.OK) {
+      return { ...route, middlewares: [...this.middlewares] }
+    } else if (route.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
+      // Save the wrong method here
+      wrongMethod = { ...route, middlewares: [...this.middlewares] }
+    } else {
+      // Iterate over the sub routes and call the resolveRoute method in them
+      for (const { router } of this.subRouters) {
+        const childRoute = router.resolveRoute(path, method)
+        if (childRoute.status === LookupResultStatus.OK) {
+          // Add the routers own middlewares to the resolution
+          childRoute.middlewares.push(...this.middlewares)
+          return childRoute
+        } else if (!wrongMethod && childRoute.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
+          // Save the route not found result if there has not been a route not found result earlier
+          childRoute.middlewares.push(...this.middlewares)
+          wrongMethod = childRoute
+        }
+      }
+    }
+
+    // Return wrong method result if there has been one
+    if (wrongMethod) {
+      return { ...wrongMethod, middlewares: [...this.middlewares] }
+    }
+
+    // Nothing matched so return the notFound method of this router
+    return { ...route, middlewares: [...this.middlewares] }
   }
 }

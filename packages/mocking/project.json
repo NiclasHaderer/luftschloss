@@ -5,35 +5,25 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/mocking",
         "tsConfig": "packages/mocking/tsconfig.lib.json",
         "packageJson": "packages/mocking/package.json",
         "main": "packages/mocking/src/index.ts",
-        "assets": [
-          "packages/mocking/*.md"
-        ]
+        "assets": ["packages/mocking/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "packages/mocking/**/*.ts"
-        ]
+        "lintFilePatterns": ["packages/mocking/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/packages/mocking"
-      ],
+      "outputs": ["coverage/packages/mocking"],
       "options": {
         "jestConfig": "packages/mocking/jest.config.ts",
         "passWithNoTests": true

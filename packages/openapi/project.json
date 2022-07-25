@@ -5,35 +5,25 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/openapi",
         "tsConfig": "packages/openapi/tsconfig.lib.json",
         "packageJson": "packages/openapi/package.json",
         "main": "packages/openapi/src/index.ts",
-        "assets": [
-          "packages/openapi/*.md"
-        ]
+        "assets": ["packages/openapi/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "packages/openapi/**/*.ts"
-        ]
+        "lintFilePatterns": ["packages/openapi/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/packages/openapi"
-      ],
+      "outputs": ["coverage/packages/openapi"],
       "options": {
         "jestConfig": "packages/openapi/jest.config.ts",
         "passWithNoTests": true

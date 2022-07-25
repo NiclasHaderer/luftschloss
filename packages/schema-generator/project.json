@@ -5,34 +5,24 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/schema-generator",
         "main": "packages/schema-generator/src/index.ts",
         "tsConfig": "packages/schema-generator/tsconfig.lib.json",
-        "assets": [
-          "packages/schema-generator/*.md"
-        ]
+        "assets": ["packages/schema-generator/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "packages/schema-generator/**/*.ts"
-        ]
+        "lintFilePatterns": ["packages/schema-generator/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/packages/schema-generator"
-      ],
+      "outputs": ["coverage/packages/schema-generator"],
       "options": {
         "jestConfig": "packages/schema-generator/jest.config.ts",
         "passWithNoTests": true

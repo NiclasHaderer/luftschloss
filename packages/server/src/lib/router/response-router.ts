@@ -1,6 +1,5 @@
 import { RouterBase } from "./base.router"
-import { HTTP_METHODS } from "../core"
-import { LResponse, LRequest } from "../core"
+import { HTTP_METHODS, LRequest, LResponse } from "../core"
 import { Promisable } from "@luftschloss/core"
 
 export type RESPONSE_ROUTE_HANDLER = (
@@ -64,6 +63,6 @@ export class ResponseRouter extends RouterBase {
       }
     }
 
-    this._routeCollector.add(url, method, handler)
+    this.routeCollector.add(url, method, handler)
   }
 }

@@ -5,34 +5,24 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/validation",
         "main": "packages/validation/src/index.ts",
         "tsConfig": "packages/validation/tsconfig.lib.json",
-        "assets": [
-          "packages/validation/*.md"
-        ]
+        "assets": ["packages/validation/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "packages/validation/**/*.ts"
-        ]
+        "lintFilePatterns": ["packages/validation/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/packages/validation"
-      ],
+      "outputs": ["coverage/packages/validation"],
       "options": {
         "jestConfig": "packages/validation/jest.config.ts",
         "passWithNoTests": true

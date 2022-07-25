@@ -8,8 +8,6 @@ import { Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaul
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
 import { MountingOptions, Router } from "../router"
-import { RequestPipeline } from "./request-pipeline"
-import { RouterMerger } from "./router-merger"
 
 export type LuftServerEvents = {
   start: void
@@ -42,8 +40,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     public onComplete = this.eventDelegate.onComplete.bind(this.eventDelegate)
     private readonly startTime = Date.now()
     private readonly openSockets = new Set<Duplex>()
-    private readonly requestPipeline = new RequestPipeline(this.middlewares)
-    private readonly routeMerger = new RouterMerger({}, this.eventDelegate)
     private readonly _server = http.createServer(this.handleIncomingRequest.bind(this))
 
     public constructor(...args: ARGS) {
@@ -55,12 +51,10 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     }
 
     public handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void {
-      this.requestPipeline.queue(req, res).then(/**/).catch(console.error)
+      // TODO
     }
 
-    public override lock(): void {
-      this.routeMerger.lock()
-      this.requestPipeline.lock(this.routeMerger.entries())
+    public lock(): void {
       super.lock()
     }
 
@@ -92,7 +86,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         throw new Error("Server was already passed to a testing client")
       }
 
-      this.routeMerger.mergeIn(this, this, { basePath: "/" }, [])
+      // TODO call some lifecycle hooks (or is lock enough?)
       this.lock()
       this.eventDelegate.complete("start", undefined)
     }
@@ -102,7 +96,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         throw new Error("Server was already started")
       }
 
-      this.routeMerger.mergeIn(this, this, { basePath: "/" }, [])
       this.lock()
 
       const runningServer = this._server.listen(port, hostname, () => {

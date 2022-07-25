@@ -5,7 +5,7 @@
  */
 
 import { withDefaults } from "@luftschloss/core"
-import { RouterBase, HTTPException, isProduction, LRequest, LResponse, Router, Status } from "@luftschloss/server"
+import { HTTPException, isProduction, LRequest, LResponse, Router, RouterBase, Status } from "@luftschloss/server"
 import { promises as fs } from "fs"
 import path from "path"
 import "./static.middleware"
@@ -27,7 +27,7 @@ export class StaticRouter extends RouterBase implements Router {
     // path.resolve has not trailing / at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`
     // TODO HEAD response
-    this._routeCollector.add("{path:path}", "GET", this.handlePath.bind(this))
+    this.routeCollector.add("{path:path}", "GET", this.handlePath.bind(this))
     // TODO not modified response https://www.keycdn.com/support/304-not-modified
   }
 

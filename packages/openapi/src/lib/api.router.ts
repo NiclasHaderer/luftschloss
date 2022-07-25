@@ -5,7 +5,7 @@
  */
 
 import { jsonParser } from "@luftschloss/body"
-import { RouterBase, HTTP_METHODS } from "@luftschloss/server"
+import { HTTP_METHODS, RouterBase } from "@luftschloss/server"
 import { PathsObject } from "openapi3-ts"
 import { z, ZodNever, ZodObject } from "zod"
 import { ApiRoute, RouterParams } from "./api.route"
@@ -33,7 +33,7 @@ export class ApiRouter extends RouterBase {
       throw new Error("Router has been locked. You cannot add any new routes")
     }
 
-    return new ApiRoute<URL_PARAMS, BODY, RESPONSE>(this, this._routeCollector, method, url, params)
+    return new ApiRoute<URL_PARAMS, BODY, RESPONSE>(this, this.routeCollector, method, url, params)
   }
 
   public delete<

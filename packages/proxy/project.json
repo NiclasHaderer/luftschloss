@@ -5,35 +5,25 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/proxy",
         "tsConfig": "packages/proxy/tsconfig.lib.json",
         "packageJson": "packages/proxy/package.json",
         "main": "packages/proxy/src/index.ts",
-        "assets": [
-          "packages/proxy/*.md"
-        ]
+        "assets": ["packages/proxy/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "packages/proxy/**/*.ts"
-        ]
+        "lintFilePatterns": ["packages/proxy/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/packages/proxy"
-      ],
+      "outputs": ["coverage/packages/proxy"],
       "options": {
         "jestConfig": "packages/proxy/jest.config.ts",
         "passWithNoTests": true

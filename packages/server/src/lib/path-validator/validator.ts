@@ -9,7 +9,7 @@ import { DEFAULT_PATH_VALIDATOR_NAME } from "./default"
 
 type ValidatorName = string
 
-export type PathValidators = Record<ValidatorName, PathValidator<any>>
+export type PathValidators = Record<ValidatorName, PathValidator<unknown>>
 
 export type PathValidator<T> = {
   name: ValidatorName
@@ -18,16 +18,16 @@ export type PathValidator<T> = {
 }
 
 type PathParamName = string
-export type PathConverter = Record<PathParamName, PathValidator<any>["convert"]>
-const IS_EXTRACTOR = /^{([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?}$/
-const CONTAINS_EXTRACTOR = /(?:\/|^){([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?}(?:\/|$)/
+export type PathConverter = Record<PathParamName, PathValidator<unknown>["convert"]>
+const IS_EXTRACTOR = /^{(\w+)(?::(\w+))?}$/
+const CONTAINS_EXTRACTOR = /(?:\/|^){(\w+)(?::(\w+))?}(?:\/|$)/
 
 export const containsRegex = (path: string): boolean => CONTAINS_EXTRACTOR.test(path)
 
-export const toRegex = (path: string, validators: PathValidators): [RegExp, PathConverter] => {
+export const pathToRegex = (path: string, validators: PathValidators): [RegExp, PathConverter] => {
   path = normalizePath(path)
 
-  const pathConverters: Record<PathParamName, PathValidator<any>["convert"]> = saveObject()
+  const pathConverters: Record<PathParamName, PathValidator<unknown>["convert"]> = saveObject()
 
   const regexString = path
     .split("/")

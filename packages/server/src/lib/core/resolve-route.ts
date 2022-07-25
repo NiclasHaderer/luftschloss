@@ -6,10 +6,9 @@
 
 import { saveObject } from "@luftschloss/core"
 import { PathConverter } from "../path-validator"
-import { HTTP_METHODS, LookupResultStatus, RouteLookupResult } from "./route-collector.model"
-import { FinishedRoute, MergedRoutes } from "./router-merger"
+import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
+import type { MergedRoutes } from "./route-collector"
 
-// TODO remove
 export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedRoutes): RouteLookupResult => {
   let status: LookupResultStatus.NOT_FOUND | LookupResultStatus.METHOD_NOT_ALLOWED = LookupResultStatus.NOT_FOUND
   let availableMethods: HTTP_METHODS[] = []
@@ -22,8 +21,7 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
     if (handler) {
       return {
         status: LookupResultStatus.OK,
-        executor: handler.executor,
-        pipeline: handler.pipeline,
+        executor: handler,
         pathParams: saveObject(),
         availableMethods,
       }
@@ -40,8 +38,7 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
       if (handler) {
         return {
           status: LookupResultStatus.OK,
-          executor: handler.executor,
-          pipeline: handler.pipeline,
+          executor: handler,
           pathParams: extractParamsFromMatch(match, pathConverter),
           availableMethods,
         }
@@ -52,15 +49,12 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
   }
   return {
     status,
-    pipeline: null,
-    executor: null,
-    pathParams: null,
     availableMethods,
   }
 }
 
-const getAvailableMethods = (endpoint: Record<HTTP_METHODS, FinishedRoute | null>) => {
-  const notNullMethods = (Object.entries(endpoint) as [HTTP_METHODS, FinishedRoute | null][])
+export const getAvailableMethods = (endpoint: Record<HTTP_METHODS, ROUTE_HANDLER | null>) => {
+  const notNullMethods = (Object.entries(endpoint) as [HTTP_METHODS, ROUTE_HANDLER | null][])
     .filter(([, h]) => !!h)
     .map(([m]) => m)
   if (notNullMethods.includes("OPTIONS")) return notNullMethods
@@ -68,7 +62,10 @@ const getAvailableMethods = (endpoint: Record<HTTP_METHODS, FinishedRoute | null
   return notNullMethods
 }
 
-const extractParamsFromMatch = (match: RegExpMatchArray, pathConverter: PathConverter): Record<string, unknown> => {
+export const extractParamsFromMatch = (
+  match: RegExpMatchArray,
+  pathConverter: PathConverter
+): Record<string, unknown> => {
   const convertedPathParams: Record<string, unknown> = saveObject()
   for (const [name, converter] of Object.entries(pathConverter)) {
     convertedPathParams[name] = converter(match.groups![name])
