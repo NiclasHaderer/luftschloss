@@ -7,12 +7,19 @@
 /**
  * Every router has to expose a list of middlewares the callbacks in the routes' property will be wrapped in
  */
-import { HTTP_METHODS, RouteLookupResult, ServerBase } from "../core"
-import { Middleware, ReadonlyMiddlewares } from "../middleware"
-import { PathValidator } from "../path-validator"
+import {HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, ServerBase} from "../core"
+import {Middleware, ReadonlyMiddlewares} from "../middleware"
+import {PathValidator} from "../path-validator"
 
 export interface MountingOptions {
   basePath: string
+}
+
+export type ResolvedRoute = {
+  availableMethods: HTTP_METHODS[]
+  middlewares: Readonly<Middleware>[]
+  executor: ROUTE_HANDLER
+  status: LookupResultStatus
 }
 
 export interface Router {
@@ -24,7 +31,7 @@ export interface Router {
   readonly path: string | undefined
   readonly completePath: string | undefined
 
-  onMount(server: ServerBase, parentRouter: Router, completePath: string): void
+  onMount(server: ServerBase, parentRouter: Router | undefined, completePath: string): void
 
   mount(router: Router[] | Router, options?: Partial<MountingOptions>): this
 
@@ -36,7 +43,7 @@ export interface Router {
 
   removePathValidator(validatorOrName: PathValidator<unknown> | string): this
 
-  resolveRoute(path: string, method: HTTP_METHODS): RouteLookupResult & { middlewares: Readonly<Middleware>[] }
+  resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute
 
   lock(): void
 }
