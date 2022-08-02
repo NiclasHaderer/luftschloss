@@ -41,7 +41,7 @@ const staticContentMiddleware = (options: InternalStaticContentOptions): Middlew
         try {
           stat = await fsSync.promises.lstat(filePath)
         } catch (e) {
-          options.pathNotFound(request, response, filePath)
+          await options.pathNotFound(request, response, filePath)
           return response
         }
 

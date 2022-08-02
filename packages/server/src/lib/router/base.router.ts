@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import {normalizePath, saveObject, withDefaults} from "@luftschloss/core"
+import { normalizePath, saveObject, withDefaults } from "@luftschloss/core"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -14,9 +14,9 @@ import {
   ServerBase,
   Status,
 } from "../core"
-import {Middleware, ReadonlyMiddlewares} from "../middleware"
-import {MountingOptions, ResolvedRoute, Router} from "./router"
-import {DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators} from "../path-validator"
+import { Middleware, ReadonlyMiddlewares } from "../middleware"
+import { MountingOptions, ResolvedRoute, Router } from "./router"
+import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 
 export class RouterBase implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
@@ -112,7 +112,6 @@ export class RouterBase implements Router {
   }
 
   public onMount(server: ServerBase, parentRouter: Router | undefined, completePath: string): void {
-
     this._parentRouter = parentRouter
     this._server = server
     this._completePath = completePath
@@ -120,7 +119,7 @@ export class RouterBase implements Router {
     // This means that the router has been mounted by the server or has at least a connection to the server through
     // other mounted routers.
     // We can now call the onMount method of all the already mounted sub-routers.
-    this.subRouters.forEach(({router, options}) =>
+    this.subRouters.forEach(({ router, options }) =>
       router.onMount(server, this, normalizePath(`${completePath}/${options.basePath}`))
     )
   }
@@ -130,7 +129,7 @@ export class RouterBase implements Router {
       throw new Error("Router has been locked. You cannot mount any new routers")
     }
 
-    const completeOptions = withDefaults<MountingOptions>(options, {basePath: "/"})
+    const completeOptions = withDefaults<MountingOptions>(options, { basePath: "/" })
     this._mountPath = completeOptions.basePath
 
     if (!Array.isArray(routers)) {
@@ -139,7 +138,7 @@ export class RouterBase implements Router {
 
     for (const router of routers) {
       // Add the routers as child router
-      this.subRouters.push({router, options: completeOptions})
+      this.subRouters.push({ router, options: completeOptions })
       // Add "this" routers' path validators to the children
       Object.values(this.pathValidators).forEach(validator => router.addPathValidator(validator))
 
@@ -178,7 +177,7 @@ export class RouterBase implements Router {
       throw new Error("Cannot add new validator after server has been started")
     }
     this.pathValidators[validator.name] = validator
-    this.children.forEach(({router}) => router.addPathValidator(validator))
+    this.children.forEach(({ router }) => router.addPathValidator(validator))
     return this
   }
 
@@ -201,7 +200,7 @@ export class RouterBase implements Router {
       delete this.pathValidators[validatorOrName.name]
     }
 
-    this.children.forEach(({router}) => router.removePathValidator(validatorOrName))
+    this.children.forEach(({ router }) => router.removePathValidator(validatorOrName))
     return this
   }
 
@@ -215,20 +214,20 @@ export class RouterBase implements Router {
     // TODO optimize by leaving out request resolution if the base path of the router does not match already
 
     // Used to save the earliest appearance of a route not found lookup result in case the only result will be this one
-    let wrongMethod: Omit<ResolvedRoute, "executor"> | undefined;
+    let wrongMethod: Omit<ResolvedRoute, "executor"> | undefined
 
     // Lookup routes in the router
     const route = resolveRoute(path, method, this.routeCollector.completeRoutes())
 
     // In case the route was found here, return
     if (route.status === LookupResultStatus.OK) {
-      return {...route, middlewares: [...this.middlewares]}
+      return { ...route, middlewares: [...this.middlewares] }
     } else if (route.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
       // Save the wrong method here
-      wrongMethod = {...route, middlewares: [...this.middlewares]}
+      wrongMethod = { ...route, middlewares: [...this.middlewares] }
     } else {
       // Iterate over the sub routes and call the resolveRoute method in them
-      for (const {router} of this.subRouters) {
+      for (const { router } of this.subRouters) {
         const childRoute = router.resolveRoute(path, method)
         if (childRoute.status === LookupResultStatus.OK) {
           // Add the routers own middlewares to the resolution

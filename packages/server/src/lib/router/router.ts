@@ -7,9 +7,9 @@
 /**
  * Every router has to expose a list of middlewares the callbacks in the routes' property will be wrapped in
  */
-import {HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, ServerBase} from "../core"
-import {Middleware, ReadonlyMiddlewares} from "../middleware"
-import {PathValidator} from "../path-validator"
+import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, ServerBase } from "../core"
+import { Middleware, ReadonlyMiddlewares } from "../middleware"
+import { PathValidator } from "../path-validator"
 
 export interface MountingOptions {
   basePath: string

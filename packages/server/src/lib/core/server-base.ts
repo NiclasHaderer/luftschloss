@@ -4,15 +4,15 @@
  * MIT Licensed
  */
 
-import {Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaults} from "@luftschloss/core"
-import http, {IncomingMessage, Server, ServerResponse} from "http"
-import {Duplex} from "stream"
-import {MountingOptions, Router} from "../router"
-import {RequestImpl} from "./request-impl"
-import {ResponseImpl} from "./response-impl"
-import {ReadonlyMiddlewares} from "../middleware"
-import {LRequest} from "./request"
-import {LResponse} from "./response"
+import { Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaults } from "@luftschloss/core"
+import http, { IncomingMessage, Server, ServerResponse } from "http"
+import { Duplex } from "stream"
+import { MountingOptions, Router } from "../router"
+import { RequestImpl } from "./request-impl"
+import { ResponseImpl } from "./response-impl"
+import { ReadonlyMiddlewares } from "../middleware"
+import { LRequest } from "./request"
+import { LResponse } from "./response"
 
 export type LuftServerEvents = {
   start: void
@@ -50,7 +50,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     public constructor(...args: ARGS) {
       super(...args)
       // Call *this* routers onMount method, so that the lifecycle chain can begin
-      this.onMount(this, undefined, "");
+      this.onMount(this, undefined, "")
     }
 
     /**
@@ -118,7 +118,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      * @param options Some options for the mounting the router
      */
     public override mount(routers: Router[] | Router, options: Partial<MountingOptions> = saveObject()): this {
-      const completeOptions = withDefaults<MountingOptions>(options, {basePath: "/"})
+      const completeOptions = withDefaults<MountingOptions>(options, { basePath: "/" })
 
       if (this.locked) {
         throw new Error("Router has been locked. You cannot mount any new routers")
@@ -183,7 +183,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      * Shut down the server. After the gracePeriod of 1s every open connection will be destroyed
      * @param gracePeriod How long should the server wait until forcefully shutting down open connections
      */
-    public shutdown({gracePeriod = 1000} = {}): Promise<void> {
+    public shutdown({ gracePeriod = 1000 } = {}): Promise<void> {
       return new Promise((resolve, reject) => {
         this.nodeServer.close(err => {
           if (err) {

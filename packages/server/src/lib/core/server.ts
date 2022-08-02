@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import {errorMiddleware, loggerMiddleware, noContentSniff, poweredBy} from "../middleware"
+import { errorMiddleware, loggerMiddleware, noContentSniff, poweredBy } from "../middleware"
 import {
   intPathValidator,
   numberPathValidator,
@@ -12,22 +12,20 @@ import {
   stringPathValidator,
   uuidPathValidator,
 } from "../path-validator"
-import {DefaultRouter} from "../router"
-import {DefaultErrorHandler} from "./error-handler"
-import {ServerBase, withServerBase} from "./server-base"
+import { DefaultRouter } from "../router"
+import { DefaultErrorHandler } from "./error-handler"
+import { ServerBase, withServerBase } from "./server-base"
 
-class ServerImpl extends withServerBase(DefaultRouter) {
-}
+class ServerImpl extends withServerBase(DefaultRouter) {}
 
-export const defaultServer = ({timeout = 5000, maxConnections = Infinity} = {}): ServerBase & DefaultRouter => {
+export const defaultServer = ({ timeout = 5000, maxConnections = Infinity } = {}): ServerBase & DefaultRouter => {
   const server = new ServerImpl()
-
 
   server.raw.setTimeout(timeout)
   server.raw.maxConnections = maxConnections
   server
     .pipe(loggerMiddleware())
-    .pipe(errorMiddleware({...DefaultErrorHandler}))
+    .pipe(errorMiddleware({ ...DefaultErrorHandler }))
     .pipe(noContentSniff())
     .pipe(poweredBy())
 
