@@ -5,13 +5,13 @@
  */
 
 import { normalizePath, saveObject } from "@luftschloss/core"
+import { containsRegex, pathToRegex, PathValidators } from "../path-validator"
 import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
-import { containsRegex, PathConverter, pathToRegex, PathValidators } from "../path-validator"
 
 export type CollectionEntry = { method: HTTP_METHODS; path: string; handler: ROUTE_HANDLER }
 type Path = string
 
-export type MergedRoute = [[RegExp, PathConverter], Record<HTTP_METHODS, ROUTE_HANDLER | null>]
+export type MergedRoute = [RegExp, Record<HTTP_METHODS, ROUTE_HANDLER | null>]
 export type MergedRoutes = {
   lookup: Record<string, Record<HTTP_METHODS, ROUTE_HANDLER | null>>
   regex: ReadonlyArray<Readonly<MergedRoute>>

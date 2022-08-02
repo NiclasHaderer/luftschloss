@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { normalizePath, saveObject, withDefaults } from "@luftschloss/core"
+import { ByLazy, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/core"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -15,8 +15,15 @@ import {
   Status,
 } from "../core"
 import { Middleware, ReadonlyMiddlewares } from "../middleware"
+import {
+  containsRegex,
+  DEFAULT_PATH_VALIDATOR_NAME,
+  defaultPathValidator,
+  pathToRegex,
+  PathValidator,
+  PathValidators,
+} from "../path-validator"
 import { MountingOptions, ResolvedRoute, Router } from "./router"
-import { DEFAULT_PATH_VALIDATOR_NAME, defaultPathValidator, PathValidator, PathValidators } from "../path-validator"
 
 export class RouterBase implements Router {
   protected readonly subRouters: { router: Router; options: MountingOptions }[] = []
@@ -30,6 +37,17 @@ export class RouterBase implements Router {
   protected pathValidators: PathValidators = {
     [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
   }
+
+  @ByLazy<RegExp | undefined, RouterBase>(self => {
+    // Setup not complete, do not cache value
+    if (!self.completePath) return [SKIP_CACHE, undefined]
+    // Does not contain regex, so just return undefined
+    if (!containsRegex(self.completePath)) return undefined
+    // Build the regex with an open end, because the router is not an actual handler. It just has to match the beginning
+    // of the requested path.
+    return pathToRegex(self.completePath, self.pathValidators, true)
+  })
+  public readonly completePathRegex: RegExp | undefined
 
   public get children(): { router: Router; options: MountingOptions }[] {
     return this.subRouters
@@ -47,10 +65,17 @@ export class RouterBase implements Router {
     return this.routeCollector
   }
 
-  public get path(): string | undefined {
+  /**
+   * This returns only the routers mounting path and can be incomplete if the router is mounted to another router which
+   * itself has a base path. In this example the `path` would only be the routers one path.
+   */
+  public get mountPath(): string | undefined {
     return this._mountPath ? normalizePath(this._mountPath) : undefined
   }
 
+  /**
+   * The complete path to the router including the routers mouning path
+   */
   public get completePath(): string | undefined {
     return this._completePath ? normalizePath(this._completePath) : undefined
   }
@@ -86,6 +111,20 @@ export class RouterBase implements Router {
     this.routeCollector.lock(this._completePath!, this.pathValidators)
     // Call the sub-routers and lock them
     this.subRouters.map(r => r.router).forEach(r => r.lock())
+  }
+
+  /**
+   * Check if the router can handle the path. This is done by comparing the base path of the router to the path of the
+   * request
+   * @param path The path of the request
+   * @returns True if the router can handle the path, false otherwise
+   */
+  public canHandle(path: string): boolean {
+    if (this.completePathRegex) {
+      return this.completePathRegex.test(path)
+    }
+    // Can be assumed as not null, because the router has to be locked before it can be used
+    return this.completePath!.startsWith(path)
   }
 
   private propagateStartup(): void {
@@ -211,8 +250,6 @@ export class RouterBase implements Router {
    * @param method The method of the request
    */
   public resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute {
-    // TODO optimize by leaving out request resolution if the base path of the router does not match already
-
     // Used to save the earliest appearance of a route not found lookup result in case the only result will be this one
     let wrongMethod: Omit<ResolvedRoute, "executor"> | undefined
 
@@ -228,6 +265,10 @@ export class RouterBase implements Router {
     } else {
       // Iterate over the sub routes and call the resolveRoute method in them
       for (const { router } of this.subRouters) {
+        // If the request path does not start with the complete path of the router we can skip it.
+        const skipRouter = !router.canHandle(path)
+        if (skipRouter) continue
+
         const childRoute = router.resolveRoute(path, method)
         if (childRoute.status === LookupResultStatus.OK) {
           // Add the routers own middlewares to the resolution

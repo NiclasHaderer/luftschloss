@@ -105,7 +105,7 @@ export class ResponseImpl implements LResponse {
         )
         await this._end()
       } catch (e) {
-        console.trace("Error in request completer", e)
+        console.error("Error in request completer", e)
         // If this did not work, just send the internal error response
         await this.text("Internal error")._end()
       }
@@ -131,7 +131,7 @@ export class ResponseImpl implements LResponse {
       await new Promise(resolve => this.res.write(this.data, resolve))
       this.res.end()
     } else {
-      // Just in case a undefined or null is passed accidentally
+      // Just in case an undefined or null is passed accidentally
       this.res.end(this.data ?? "")
     }
   }

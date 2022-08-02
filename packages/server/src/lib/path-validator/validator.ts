@@ -18,7 +18,7 @@ export type PathValidator<T> = {
 }
 
 type PathParamName = string
-export type PathConverter = Record<PathParamName, PathValidator<unknown>["convert"]>
+export type PathConverters = Record<PathParamName, PathValidator<unknown>["convert"]>
 const IS_EXTRACTOR = /^{(\w+)(?::(\w+))?}$/
 const CONTAINS_EXTRACTOR = /(?:\/|^){(\w+)(?::(\w+))?}(?:\/|$)/
 
@@ -30,8 +30,9 @@ export const containsRegex = (path: string): boolean => CONTAINS_EXTRACTOR.test(
  * `normalizePath` method
  * @param validators An object with the different path validators in it. The keys of the object are the names of the path
  * validators
+ * @param openEnd If the regex should contain an open end the $ operator will not be placed at the end of it
  */
-export const pathToRegex = (path: string, validators: PathValidators): [RegExp, PathConverter] => {
+export const pathToRegex = (path: string, validators: PathValidators, openEnd = false): RegExp => {
   path = normalizePath(path)
 
   const pathConverters: Record<PathParamName, PathValidator<unknown>["convert"]> = saveObject()
@@ -61,5 +62,5 @@ export const pathToRegex = (path: string, validators: PathValidators): [RegExp, 
     .join("/")
 
   // Finished regex. We do not care about the case in this case
-  return [new RegExp(`^${regexString}$`, "i"), pathConverters]
+  return new RegExp(`^${regexString}${openEnd ? "" : "$"}`, "i")
 }

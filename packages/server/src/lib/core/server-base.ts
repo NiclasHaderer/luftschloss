@@ -18,7 +18,7 @@ export type LuftServerEvents = {
   start: void
   shutdown: void
   routerMerged: { router: Router; basePath: string }
-  lock: void
+  locked: void
 }
 
 export interface ServerBase extends Pick<GenericEventEmitter<LuftServerEvents>, "onComplete" | "on"> {
@@ -107,8 +107,9 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      * This has to be done in order to not allow non-reproducible behaviour and to make some optimizations internally.
      */
     public lock(): void {
-      // TODO call some hooks?
+      // Call the routers lock method
       super.lock()
+      this.eventDelegate.emit("locked", undefined)
     }
 
     /**
@@ -139,7 +140,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         throw new Error("Server was already passed to a testing client")
       }
 
-      // TODO call some lifecycle hooks (or is lock enough?)
       this.lock()
       this.eventDelegate.complete("start", undefined)
     }

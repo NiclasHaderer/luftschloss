@@ -28,8 +28,9 @@ export interface Router {
   readonly locked: boolean
   readonly parentRouter: Router | undefined
   readonly server: ServerBase | undefined
-  readonly path: string | undefined
+  readonly mountPath: string | undefined
   readonly completePath: string | undefined
+  readonly completePathRegex: RegExp | undefined
 
   onMount(server: ServerBase, parentRouter: Router | undefined, completePath: string): void
 
@@ -44,6 +45,8 @@ export interface Router {
   removePathValidator(validatorOrName: PathValidator<unknown> | string): this
 
   resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute
+
+  canHandle(path: string): boolean
 
   lock(): void
 }
