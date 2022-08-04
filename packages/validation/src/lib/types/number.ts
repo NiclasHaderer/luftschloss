@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { getTypeOf } from "../helpers"
+import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
@@ -13,6 +13,10 @@ export class LuftNumber extends LuftBaseType<number> {
 
   constructor(public override readonly schema: { min: number; max: number; allowNan: boolean }) {
     super()
+  }
+
+  public clone(): LuftNumber {
+    return new LuftNumber({ ...this.schema })
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
@@ -89,13 +93,7 @@ export class LuftNumber extends LuftBaseType<number> {
       }
     }
 
-    context.addIssue({
-      code: LuftErrorCodes.INVALID_TYPE,
-      message: `Expected type string, but got ${getTypeOf(data)}`,
-      path: [...context.path],
-      expectedType: "string",
-      receivedType: getTypeOf(data),
-    })
+    createInvalidTypeIssue(data, this.supportedTypes, context)
     return {
       success: false,
     }

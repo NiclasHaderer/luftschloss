@@ -4,8 +4,9 @@
  * MIT Licensed
  */
 
-import { getTypeOf, toListString, uniqueList } from "../helpers"
-import { LuftErrorCodes, LuftParsingError, ParsingIssue } from "../parsing-error"
+import { uniqueList } from "@luftschloss/core"
+import { createInvalidTypeIssue } from "../helpers"
+import { LuftParsingError, ParsingIssue } from "../parsing-error"
 import { LuftTypeOf } from "../types"
 
 export type InternalParsingResult<T> =
@@ -53,7 +54,8 @@ export type InternalLuftBaseType<OUT_TYPE> = {
 } & LuftBaseType<OUT_TYPE>
 
 export abstract class LuftBaseType<T> {
-  public readonly schema: unknown
+  public readonly schema: Record<string, unknown> = {}
+
   public abstract readonly supportedTypes: string[]
   private beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
   private beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
@@ -149,6 +151,8 @@ export abstract class LuftBaseType<T> {
 
   protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T>
 
+  public abstract clone(): LuftBaseType<T>
+
   // TODO fix type
   //public optional() {
   //  return new LuftUnion(this, new LuftUndefined())
@@ -196,19 +200,17 @@ export abstract class LuftBaseType<T> {
 export class LuftUndefined extends LuftBaseType<undefined> {
   public supportedTypes = ["undefined"]
 
+  public clone(): LuftUndefined {
+    return new LuftUndefined()
+  }
+
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
     return this._validate(data, context)
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
     if (data === undefined) return { success: true, data }
-    context.addIssue({
-      code: "INVALID_TYPE",
-      message: `Expected undefined, got ${getTypeOf(data)}`,
-      path: [...context.path],
-      expectedType: "undefined",
-      receivedType: getTypeOf(data),
-    })
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
     return { success: false }
   }
 }
@@ -216,33 +218,35 @@ export class LuftUndefined extends LuftBaseType<undefined> {
 export class LuftNull extends LuftBaseType<null> {
   public supportedTypes = ["null"]
 
+  public clone(): LuftNull {
+    return new LuftNull()
+  }
+
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
     return this._validate(data, context)
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<null> {
     if (data === null) return { success: true, data }
-    context.addIssue({
-      code: "INVALID_TYPE",
-      message: `Expected null, got ${getTypeOf(data)}`,
-      path: [...context.path],
-      expectedType: "null",
-      receivedType: getTypeOf(data),
-    })
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
     return { success: false }
   }
 }
 
 export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftTypeOf<T[number]>> {
-  public override readonly schema: LuftBaseType<unknown>[]
+  public override readonly schema: { types: LuftBaseType<unknown>[] }
 
-  public constructor(...schema: LuftBaseType<unknown>[]) {
+  public constructor(...types: LuftBaseType<unknown>[]) {
     super()
-    this.schema = schema
+    this.schema = { types: types }
+  }
+
+  public clone(): LuftUnion<T> {
+    return new LuftUnion(...this.schema.types.map(type => type.clone()))
   }
 
   public get supportedTypes() {
-    return uniqueList(this.schema.flatMap(s => s.supportedTypes))
+    return uniqueList(this.schema.types.flatMap(s => s.supportedTypes))
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<LuftTypeOf<T[number]>> {
@@ -266,15 +270,7 @@ export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<L
       if (result.success) return result
     }
 
-    const supportedTypes = this.supportedTypes
-    const receivedType = getTypeOf(data)
-    context.addIssue({
-      message: `Expected one of the supported types ${toListString(supportedTypes)}, but got ${receivedType}`,
-      code: LuftErrorCodes.INVALID_TYPE,
-      path: [...context.path],
-      expectedType: supportedTypes,
-      receivedType: receivedType,
-    })
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
     return { success: false }
   }
 }

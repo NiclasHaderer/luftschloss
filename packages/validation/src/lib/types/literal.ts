@@ -19,6 +19,10 @@ export class LuftLiteral<T extends (string | number | boolean)[]> extends LuftBa
     this.sensitiveSchema = new Set(schema.types)
   }
 
+  public clone(): LuftLiteral<T> {
+    return new LuftLiteral({ ...this.schema, types: [...this.schema.types] as T })
+  }
+
   public ignoreCase(ignoreCase: boolean): LuftLiteral<T> {
     this.schema.ignoreCase = ignoreCase
     return this

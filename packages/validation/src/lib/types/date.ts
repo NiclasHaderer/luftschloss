@@ -4,35 +4,65 @@
  * MIT Licensed
  */
 
-import { getTypeOf } from "../helpers"
+import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
 export class LuftDate extends LuftBaseType<Date> {
-  public readonly supportedTypes = ["date", "string", "number"]
+  public readonly supportedTypes = ["date"]
+
+  constructor(
+    public readonly schema: {
+      after: number | undefined
+      before: number | undefined
+    }
+  ) {
+    super()
+  }
+
+  public clone(): LuftDate {
+    return new LuftDate({ ...this.schema })
+  }
+
+  public after(date: Date | number | string): LuftDate {
+    this.schema.after = this.toDateNumber(date)
+    return this
+  }
+
+  public before(date: Date | number | string): LuftDate {
+    this.schema.before = this.toDateNumber(date)
+    return this
+  }
+
+  private toDateNumber(date: Date | number | string): number {
+    if (typeof date === "number") {
+      return date
+    }
+
+    if (typeof date === "string") {
+      const parsedDate = Date.parse(date)
+      if (isNaN(parsedDate)) throw new Error(`Could not parse date: ${date}`)
+      return parsedDate
+    }
+
+    return date.getTime()
+  }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<Date> {
-    if (data instanceof Date) {
-      return {
-        success: true,
-        data: data,
-      }
-    }
-
+    // Coerce from number to date
     if (typeof data === "number") {
-      return {
-        success: true,
-        data: new Date(data),
-      }
+      data = new Date(data)
     }
 
+    // Try to parse the date
     if (typeof data === "string") {
-      const parsedDate = Date.parse(data)
-      if (isNaN(parsedDate)) return this._validate(data, context)
-
-      return {
-        success: true,
-        data: new Date(parsedDate),
+      const newData = Date.parse(data)
+      // The date is invalid, therefore just validate the non-parsed string
+      if (isNaN(newData)) {
+        return this._validate(data, context)
+      } else {
+        // Valid date, so pass it on to the validation function
+        data = new Date(newData)
       }
     }
 
@@ -40,22 +70,40 @@ export class LuftDate extends LuftBaseType<Date> {
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<Date> {
-    if (data instanceof Date) {
+    if (!(data instanceof Date)) {
+      createInvalidTypeIssue(data, this.supportedTypes, context)
       return {
-        success: true,
-        data: data,
+        success: false,
       }
     }
 
-    context.addIssue({
-      code: LuftErrorCodes.INVALID_TYPE,
-      message: `Expected type date, but got ${getTypeOf(data)}`,
-      path: [...context.path],
-      expectedType: "date",
-      receivedType: getTypeOf(data),
-    })
+    if (this.schema.after !== undefined && data.getTime() < this.schema.after) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_RANGE,
+        message: `Expected date after ${this.schema.after}, but got ${data.getTime()}`,
+        path: [...context.path],
+        max: this.schema.before ?? Infinity,
+        min: this.schema.after,
+        actual: data.getTime(),
+      })
+      return { success: false }
+    }
+
+    if (this.schema.before !== undefined && data.getTime() > this.schema.before) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_RANGE,
+        message: `Expected date before ${this.schema.before}, but got ${data.getTime()}`,
+        path: [...context.path],
+        max: this.schema.before,
+        min: this.schema.after ?? -Infinity,
+        actual: data.getTime(),
+      })
+      return { success: false }
+    }
+
     return {
-      success: false,
+      success: true,
+      data: data,
     }
   }
 }

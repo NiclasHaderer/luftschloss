@@ -4,15 +4,20 @@
  * MIT Licensed
  */
 
-import { getTypeOf } from "../helpers"
-import { LuftErrorCodes } from "../parsing-error"
+import { createInvalidTypeIssue } from "../helpers"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
 export class LuftRegexp extends LuftBaseType<string> {
-  public readonly supportedTypes = ["string"]
-
-  public constructor(public override readonly schema: RegExp) {
+  public constructor(public override readonly schema: { regex: RegExp }) {
     super()
+  }
+
+  public get supportedTypes() {
+    return [`/${this.schema.regex.source}/${this.schema.regex.flags}`, "string"]
+  }
+
+  public clone(): LuftRegexp {
+    return new LuftRegexp({ regex: new RegExp(this.schema.regex.source, this.schema.regex.flags) })
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
@@ -21,19 +26,13 @@ export class LuftRegexp extends LuftBaseType<string> {
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {
     if (typeof data !== "string") {
-      context.addIssue({
-        code: LuftErrorCodes.INVALID_TYPE,
-        message: "A regex type can only be match a string",
-        path: [...context.path],
-        expectedType: "string",
-        receivedType: getTypeOf(data),
-      })
+      context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return {
         success: false,
       }
     }
 
-    const matches = this.schema.test(data)
+    const matches = this.schema.regex.test(data)
     if (matches) {
       return {
         success: true,
@@ -41,13 +40,7 @@ export class LuftRegexp extends LuftBaseType<string> {
       }
     }
 
-    context.addIssue({
-      code: LuftErrorCodes.INVALID_TYPE,
-      message: `Expected string which matches ${this.schema.toString()}, but got ${data}`,
-      path: [...context.path],
-      expectedType: this.schema.toString(),
-      receivedType: "string",
-    })
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
     return {
       success: false,
     }

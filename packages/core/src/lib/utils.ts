@@ -24,3 +24,12 @@ export const saveObject = <T extends Record<string, unknown>>(): T => {
   Object.freeze(tmp.__proto__)
   return tmp
 }
+
+export const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && !Array.isArray(value)
+
+export const isArray = (value: unknown): value is unknown[] => Array.isArray(value)
+
+export const uniqueList = <T>(list: T[]): T[] => {
+  return [...new Set(list)]
+}

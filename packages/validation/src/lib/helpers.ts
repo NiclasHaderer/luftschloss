@@ -4,35 +4,33 @@
  * MIT Licensed
  */
 
+import { isArray } from "@luftschloss/core"
+import { InvalidTypeParsingIssue, LuftErrorCodes } from "./parsing-error"
+import { ParsingContext } from "./types/base-type"
+
 export const getTypeOf = (value: unknown) => {
   const type = typeof value
   if (type === "object") {
     if (isArray(value)) return "array" as const
+    if (value === null) return "null" as const
     if (type.constructor.name === "Object") return "object" as const
     return type.constructor.name
   }
   return type
 }
 
-export const isObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && !Array.isArray(value)
-
-export const isArray = (value: unknown): value is unknown[] => Array.isArray(value)
-
-export const uniqueList = <T>(list: T[]): T[] => {
-  return [...new Set(list)]
-}
-
-export const toListString = (list: unknown[], separator = ", "): string => {
-  return list.reduce((previousValue, currentValue) => {
-    //eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    previousValue += `${currentValue}${separator}`
-    return previousValue
-  }, "") as string
-}
-
-export const saveObject = <T extends Record<string, unknown>>(): T => {
-  const tmp = {} as T
-  Object.freeze(tmp.__proto__)
-  return tmp
+export const createInvalidTypeIssue = (
+  data: unknown,
+  expectedType: string[],
+  context: ParsingContext,
+  message?: string
+): InvalidTypeParsingIssue => {
+  const receivedType = getTypeOf(data)
+  return {
+    message: message ?? `Expected ${expectedType.join(", ")}, but got ${receivedType}`,
+    code: LuftErrorCodes.INVALID_TYPE,
+    path: [...context.path],
+    expectedType: expectedType,
+    receivedType: receivedType,
+  }
 }

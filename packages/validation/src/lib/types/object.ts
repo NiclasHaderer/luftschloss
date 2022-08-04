@@ -4,7 +4,8 @@
  * MIT Licensed
  */
 
-import { getTypeOf, saveObject } from "../helpers"
+import { saveObject } from "@luftschloss/core"
+import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
@@ -23,6 +24,15 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     public override readonly schema: { type: T; treatMissingKeyAs: "error" | "undefined"; ignoreUnknownKeys: boolean }
   ) {
     super()
+  }
+
+  public clone(): LuftObject<T> {
+    const clonedType = Object.keys(this.schema.type).reduce((acc, key) => {
+      ;(acc as Record<string, LuftBaseType<unknown>>)[key] = this.schema.type[key].clone()
+      return acc
+    }, {} as T)
+
+    return new LuftObject({ ...this.schema, type: clonedType })
   }
 
   public ignoreUnknownKeys(ignore: boolean): LuftObject<T> {
@@ -48,13 +58,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     mode: "_coerce" | "_validate" = "_validate"
   ): InternalParsingResult<T> {
     if (typeof data !== "object" || data === null) {
-      context.addIssue({
-        code: LuftErrorCodes.INVALID_TYPE,
-        message: `Expected type object, but got ${getTypeOf(data)}`,
-        path: [...context.path],
-        receivedType: getTypeOf(data),
-        expectedType: this.supportedTypes[0],
-      })
+      createInvalidTypeIssue(data, this.supportedTypes, context)
       return { success: false }
     }
 

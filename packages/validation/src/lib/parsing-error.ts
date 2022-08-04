@@ -22,54 +22,53 @@ type BaseParsingIssues = {
   path: (string | number)[]
   message: string
 }
-type UnionParsingIssue = BaseParsingIssues & {
+export type UnionParsingIssue = BaseParsingIssues & {
   code: "INVALID_UNION"
   expectedType: string[]
   receivedType: string
 }
 
-type IncompatibleTypeParsingIssue = BaseParsingIssues & {
+export type InvalidTypeParsingIssue = BaseParsingIssues & {
   code: "INVALID_TYPE"
-  expectedType: string
+  expectedType: string[]
   receivedType: string
 }
 
-type IncompatibleValueParsingIssue = BaseParsingIssues & {
+export type InvalidValueParsingIssue = BaseParsingIssues & {
   code: "INVALID_VALUE"
   allowedValues: string[]
   receivedValue: string
 }
-type InvalidLengthParsingIssue = BaseParsingIssues & {
+export type InvalidLengthParsingIssue = BaseParsingIssues & {
   code: "INVALID_LENGTH"
   maxLen: number
   minLen: number
   actualLen: number
 }
 
-type MissingKeysIssue = BaseParsingIssues & {
+export type MissingKeysIssue = BaseParsingIssues & {
   code: "MISSING_KEYS"
   missingKeys: string[]
 }
 
-type InvalidRangeIssue = BaseParsingIssues & {
+export type InvalidRangeIssue = BaseParsingIssues & {
   code: "INVALID_RANGE"
   min: number
   max: number
   actual: number
 }
 
-type AdditionalKeysIssue = BaseParsingIssues & {
+export type AdditionalKeysIssue = BaseParsingIssues & {
   code: "TO_MANY_KEYS"
   additionalKeys: string[]
 }
 
 export type ParsingIssue =
-  | BaseParsingIssues
   | UnionParsingIssue
-  | IncompatibleTypeParsingIssue
+  | InvalidTypeParsingIssue
   | MissingKeysIssue
   | AdditionalKeysIssue
-  | IncompatibleValueParsingIssue
+  | InvalidValueParsingIssue
   | InvalidLengthParsingIssue
   | InvalidRangeIssue
 
