@@ -5,11 +5,13 @@
  */
 
 import { createInvalidTypeIssue } from "../helpers"
+import { LuftInfer } from "../infer"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
-export class LuftArray<T> extends LuftBaseType<T[]> {
+export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
   public readonly supportedTypes = ["array"]
+  protected readonly returnType!: LuftInfer<ARRAY_TYPE>[]
 
   public constructor(
     public override readonly schema: {
@@ -17,25 +19,25 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
       maxLength: number
       minLength: number
       nonEmpty: boolean
-      type: LuftBaseType<unknown>
+      type: ARRAY_TYPE
     }
   ) {
     super()
   }
 
-  public clone(): LuftArray<T> {
-    return new LuftArray<T>({
+  public clone() {
+    return new LuftArray<ARRAY_TYPE>({
       ...this.schema,
-      type: this.schema.type.clone(),
+      type: this.schema.type.clone() as ARRAY_TYPE,
     })
   }
 
-  public minLength(minLength: number): LuftArray<T> {
+  public minLength(minLength: number): LuftArray<ARRAY_TYPE> {
     this.schema.minLength = minLength
     return this
   }
 
-  public maxLength(minLength: number): LuftArray<T> {
+  public maxLength(minLength: number): LuftArray<ARRAY_TYPE> {
     this.schema.maxLength = minLength
     return this
   }
@@ -45,12 +47,15 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
     return this
   }
 
-  public parseWith(parser: "json" | "csv"): LuftArray<T> {
+  public parseWith(parser: "json" | "csv"): LuftArray<ARRAY_TYPE> {
     this.schema.parser = parser
     return this
   }
 
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T[]> {
+  protected _coerce(
+    data: unknown,
+    context: ParsingContext
+  ): InternalParsingResult<LuftArray<ARRAY_TYPE>["returnType"]> {
     if (typeof data === "object" && data && Symbol.iterator in data && !Array.isArray(data)) {
       data = [...(data as Iterable<unknown>)]
     }
@@ -78,7 +83,7 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
     data: unknown,
     context: ParsingContext,
     mode: "_coerce" | "_validate" = "_validate"
-  ): InternalParsingResult<T[]> {
+  ): InternalParsingResult<LuftArray<ARRAY_TYPE>["returnType"]> {
     // Check if the data is an array
     if (Array.isArray(data)) {
       // Check if the array is empty
@@ -93,7 +98,7 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
         })
         return {
           success: false,
-        }
+        } as const
       }
 
       // Check if the array is too long
@@ -108,7 +113,7 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
         })
         return {
           success: false,
-        }
+        } as const
       }
 
       // Check if the array is too short
@@ -123,7 +128,7 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
         })
         return {
           success: false,
-        }
+        } as const
       }
 
       // This will track if one of the elments in the array is invalid. If this is the case at the end of the validation
@@ -135,7 +140,10 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
       data = [...data]
       // Check every element of the array for the right type
       for (let i = 0; i < (data as unknown[]).length; ++i) {
-        const result = (this.schema.type as InternalLuftBaseType<unknown>)[mode]((data as unknown[])[i], context)
+        const result = (this.schema.type as unknown as InternalLuftBaseType<unknown>)[mode](
+          (data as unknown[])[i],
+          context
+        )
         if (result.success) {
           // Save the returned data, because there mey have been some coerced values
           ;(data as unknown[])[i] = result.data
@@ -144,18 +152,18 @@ export class LuftArray<T> extends LuftBaseType<T[]> {
         }
       }
 
-      if (failAtEnd) return { success: false }
+      if (failAtEnd) return { success: false } as const
     } else {
       // The data is not an array, so return an error
-      createInvalidTypeIssue(data, this.supportedTypes, context)
+      context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return {
         success: false,
-      }
+      } as const
     }
 
     return {
       success: true,
-      data: data as T[],
-    }
+      data: data as LuftArray<ARRAY_TYPE>["returnType"],
+    } as const
   }
 }

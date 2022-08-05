@@ -71,7 +71,7 @@ export class LuftDate extends LuftBaseType<Date> {
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<Date> {
     if (!(data instanceof Date)) {
-      createInvalidTypeIssue(data, this.supportedTypes, context)
+      context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return {
         success: false,
       }

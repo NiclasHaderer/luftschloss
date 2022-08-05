@@ -16,6 +16,9 @@ export const getTypeOf = (value: unknown) => {
     if (type.constructor.name === "Object") return "object" as const
     return type.constructor.name
   }
+  if (type === "number" && isNaN(value as number)) {
+    return "NaN" as const
+  }
   return type
 }
 

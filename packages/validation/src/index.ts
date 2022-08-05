@@ -5,3 +5,8 @@
  */
 
 export * from "./lib"
+
+// TODO public api
+// TODO types
+// TODO tests
+// TODO context path

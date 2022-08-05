@@ -58,7 +58,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     mode: "_coerce" | "_validate" = "_validate"
   ): InternalParsingResult<T> {
     if (typeof data !== "object" || data === null) {
-      createInvalidTypeIssue(data, this.supportedTypes, context)
+      context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return { success: false }
     }
 

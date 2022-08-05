@@ -103,7 +103,7 @@ export class LuftInt extends LuftBaseType<number> {
       }
     }
 
-    createInvalidTypeIssue(data, this.supportedTypes, context)
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
     return {
       success: false,
     }

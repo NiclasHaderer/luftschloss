@@ -19,15 +19,16 @@ export type InternalParsingResult<T> =
       data?: never
     }
 
-type ParsingResult<T> =
-  | {
-      success: true
-      data: T
-    }
-  | {
-      success: false
-      issues: ParsingIssue[]
-    }
+export type SuccessfulParsingResult<T> = {
+  success: true
+  data: T
+}
+export type UnsuccessfulParsingResult = {
+  success: false
+  issues: ParsingIssue[]
+}
+
+export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult<T>
 
 export class ParsingContext {
   private _issues: ParsingIssue[] = []
@@ -53,14 +54,15 @@ export type InternalLuftBaseType<OUT_TYPE> = {
   _coerce(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
 } & LuftBaseType<OUT_TYPE>
 
-export abstract class LuftBaseType<T> {
+export abstract class LuftBaseType<RETURN_TYPE> {
   public readonly schema: Record<string, unknown> = {}
+  protected abstract returnType: unknown
 
   public abstract readonly supportedTypes: string[]
   private beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
   private beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
 
-  public validate(data: unknown): T {
+  public validate(data: unknown): RETURN_TYPE {
     const result = this.validateSave(data)
     if (result.success) {
       return result.data
@@ -68,7 +70,7 @@ export abstract class LuftBaseType<T> {
     throw new LuftParsingError(result.issues)
   }
 
-  public validateSave(data: unknown): ParsingResult<T> {
+  public validateSave(data: unknown): ParsingResult<RETURN_TYPE> {
     const context = new ParsingContext()
     const resultData = this._validate(data, context)
 
@@ -99,13 +101,13 @@ export abstract class LuftBaseType<T> {
     }
 
     throw new Error(
-      "Context has issues, but the parsing result is marked as valid. Please check you parsers for errors"
+      "Context has issues, but the parsing result is marked as valid. Please check if your parser added issues if he returned false"
     )
   }
 
-  protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<T>
+  protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
 
-  public coerce(data: unknown): T {
+  public coerce(data: unknown): RETURN_TYPE {
     const result = this.coerceSave(data)
     if (result.success) {
       return result.data
@@ -113,7 +115,7 @@ export abstract class LuftBaseType<T> {
     throw new LuftParsingError(result.issues)
   }
 
-  public coerceSave(data: unknown): ParsingResult<T> {
+  public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
     const context = new ParsingContext()
 
     for (const coerceBeforeHook of this.beforeCoerceHooks) {
@@ -149,9 +151,9 @@ export abstract class LuftBaseType<T> {
     )
   }
 
-  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T>
+  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
 
-  public abstract clone(): LuftBaseType<T>
+  public abstract clone(): LuftBaseType<RETURN_TYPE>
 
   // TODO fix type
   //public optional() {
@@ -170,7 +172,7 @@ export abstract class LuftBaseType<T> {
     return new LuftUnion(this, type)
   }
 
-  public default(defaultValue: T): this {
+  public default(defaultValue: RETURN_TYPE): this {
     const addDefaultFun = (coerceValue: unknown): InternalParsingResult<unknown> => {
       if (coerceValue === undefined || coerceValue === null) {
         return {
@@ -198,6 +200,8 @@ export abstract class LuftBaseType<T> {
 }
 
 export class LuftUndefined extends LuftBaseType<undefined> {
+  returnType: undefined
+
   public supportedTypes = ["undefined"]
 
   public clone(): LuftUndefined {
@@ -216,6 +220,8 @@ export class LuftUndefined extends LuftBaseType<undefined> {
 }
 
 export class LuftNull extends LuftBaseType<null> {
+  returnType!: null
+
   public supportedTypes = ["null"]
 
   public clone(): LuftNull {
@@ -234,6 +240,8 @@ export class LuftNull extends LuftBaseType<null> {
 }
 
 export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftTypeOf<T[number]>> {
+  returnType!: LuftTypeOf<T[number]>
+
   public override readonly schema: { types: LuftBaseType<unknown>[] }
 
   public constructor(...types: LuftBaseType<unknown>[]) {

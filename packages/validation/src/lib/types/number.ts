@@ -10,8 +10,17 @@ import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type
 
 export class LuftNumber extends LuftBaseType<number> {
   public readonly supportedTypes = ["number"]
+  protected readonly returnType!: number
 
-  constructor(public override readonly schema: { min: number; max: number; allowNan: boolean }) {
+  constructor(
+    public override readonly schema: {
+      min: number
+      max: number
+      allowNan: boolean
+      minCompare: ">=" | ">"
+      maxCompare: "<=" | "<"
+    } = { min: -Infinity, max: Infinity, allowNan: false, minCompare: ">=", maxCompare: "<=" }
+  ) {
     super()
   }
 
@@ -21,8 +30,7 @@ export class LuftNumber extends LuftBaseType<number> {
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
     if (typeof data === "string") {
-      const parsedData = parseFloat(data)
-      this._validate(parsedData, context)
+      data = parseFloat(data)
     }
     return this._validate(data, context)
   }
@@ -34,68 +42,106 @@ export class LuftNumber extends LuftBaseType<number> {
 
   public min(number: number): LuftNumber {
     this.schema.min = number
+    this.schema.minCompare = ">"
     return this
   }
 
-  public positive(): LuftNumber {
-    this.schema.min = 0
-    return this
-  }
-
-  public nonNegative(): LuftNumber {
-    this.schema.min = -1
-    return this
-  }
-
-  public negative(): LuftNumber {
-    this.schema.max = 0
-    return this
-  }
-
-  public nonPositive(): LuftNumber {
-    this.schema.max = 1
+  public minEq(number: number): LuftNumber {
+    this.schema.min = number
+    this.schema.minCompare = ">="
     return this
   }
 
   public max(number: number): LuftNumber {
-    this.schema.min = number
+    this.schema.max = number
+    this.schema.maxCompare = "<"
     return this
   }
 
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<number> {
-    if (typeof data === "number" && (this.schema.allowNan || !isNaN(data))) {
-      if (data < this.schema.min) {
-        context.addIssue({
-          code: LuftErrorCodes.INVALID_RANGE,
-          message: `Number to small. Expected value greater than ${this.schema.min} but got ${data}`,
-          path: [...context.path],
-          max: this.schema.max,
-          min: this.schema.min,
-          actual: data,
-        })
-        return { success: false }
-      }
-      if (data > this.schema.max) {
-        context.addIssue({
-          code: LuftErrorCodes.INVALID_RANGE,
-          message: `Number to large. Expected value smaller than ${this.schema.max} but got ${data}`,
-          path: [...context.path],
-          max: this.schema.max,
-          min: this.schema.min,
-          actual: data,
-        })
-        return { success: false }
-      }
+  public maxEq(number: number): LuftNumber {
+    this.schema.max = number
+    this.schema.maxCompare = "<="
+    return this
+  }
 
+  public positive(): LuftNumber {
+    return this.min(0)
+  }
+
+  public nonNegative(): LuftNumber {
+    return this.minEq(0)
+  }
+
+  public negative(): LuftNumber {
+    return this.max(0)
+  }
+
+  public nonPositive(): LuftNumber {
+    return this.maxEq(0)
+  }
+
+  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<number> {
+    // Either no number
+    if (typeof data !== "number" || (!this.schema.allowNan && isNaN(data))) {
+      context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return {
-        success: true,
-        data: data,
+        success: false,
       }
     }
 
-    createInvalidTypeIssue(data, this.supportedTypes, context)
+    // Don't bother checking if nan is smaller or larger the min/max.
+    // If you want greater and smaller to work properly do not allow nan
+    if (isNaN(data)) return { success: true, data: NaN }
+
+    // To small
+    if (this.isToSmall(data)) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_RANGE,
+        message: `Expected value greater than ${this.schema.min} but got ${data}`,
+        path: [...context.path],
+        max: this.schema.max,
+        min: this.schema.min,
+        actual: data,
+        maxCompare: this.schema.maxCompare,
+        minCompare: this.schema.minCompare,
+      })
+      return { success: false }
+    }
+
+    // To large
+    if (this.isToLarge(data)) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_RANGE,
+        message: `Number to large. Expected value smaller than ${this.schema.max} but got ${data}`,
+        path: [...context.path],
+        max: this.schema.max,
+        min: this.schema.min,
+        actual: data,
+        maxCompare: this.schema.maxCompare,
+        minCompare: this.schema.minCompare,
+      })
+      return { success: false }
+    }
+
     return {
-      success: false,
+      success: true,
+      data: data,
+    }
+  }
+
+  protected isToSmall(data: number): boolean {
+    if (this.schema.minCompare === ">") {
+      return !(data > this.schema.min)
+    } else {
+      return !(data >= this.schema.min)
+    }
+  }
+
+  protected isToLarge(data: number): boolean {
+    if (this.schema.maxCompare === "<") {
+      return !(data < this.schema.max)
+    } else {
+      return !(data <= this.schema.max)
     }
   }
 }

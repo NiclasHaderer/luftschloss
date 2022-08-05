@@ -6,7 +6,6 @@
 
 export const LuftErrorCodes = {
   INVALID_UNION: "INVALID_UNION",
-  CUSTOM: "CUSTOM",
   MISSING_KEYS: "MISSING_KEYS",
   TO_MANY_KEYS: "TO_MANY_KEYS",
   INVALID_TYPE: "INVALID_TYPE",
@@ -56,6 +55,8 @@ export type InvalidRangeIssue = BaseParsingIssues & {
   min: number
   max: number
   actual: number
+  minCompare: ">=" | ">"
+  maxCompare: "<=" | "<"
 }
 
 export type AdditionalKeysIssue = BaseParsingIssues & {
