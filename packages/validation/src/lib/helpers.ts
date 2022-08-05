@@ -16,8 +16,16 @@ export const getTypeOf = (value: unknown) => {
     if (type.constructor.name === "Object") return "object" as const
     return type.constructor.name
   }
-  if (type === "number" && isNaN(value as number)) {
-    return "NaN" as const
+  if (type === "number") {
+    if (isNaN(value as number)) {
+      return "NaN" as const
+    } else if (value === Infinity) {
+      return "Infinity" as const
+    } else if (value === -Infinity) {
+      return "-Infinity" as const
+    } else if ((value as number) % 1 !== 0) {
+      return "float" as const
+    }
   }
   return type
 }

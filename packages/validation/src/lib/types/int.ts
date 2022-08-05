@@ -6,20 +6,34 @@
 
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalParsingResult, ParsingContext } from "./base-type"
+import { LuftNumber } from "./number"
 
-export class LuftInt extends LuftBaseType<number> {
+type LuftIntSchema = {
+  min: number
+  max: number
+  allowNan: boolean
+  minCompare: ">=" | ">"
+  maxCompare: "<=" | "<"
+  roundWith: "floor" | "ceil" | "trunc" | "round"
+}
+
+export class LuftInt extends LuftNumber {
   public readonly supportedTypes = ["int"]
+  public override readonly schema: LuftIntSchema
 
   constructor(
-    public override readonly schema: {
-      min: number
-      max: number
-      allowNan: boolean
-      roundWith: "floor" | "ceil" | "trunc" | "round"
+    schema: LuftIntSchema = {
+      min: -Infinity,
+      max: Infinity,
+      allowNan: false,
+      minCompare: ">=",
+      maxCompare: "<=",
+      roundWith: "round",
     }
   ) {
     super()
+    this.schema = schema
   }
 
   public clone(): LuftInt {
@@ -42,70 +56,15 @@ export class LuftInt extends LuftBaseType<number> {
     return this
   }
 
-  public allowNaN(allow: boolean): LuftInt {
-    this.schema.allowNan = allow
-    return this
-  }
-
-  public min(number: number): LuftInt {
-    this.schema.min = number
-    return this
-  }
-
-  public positive(): LuftInt {
-    this.schema.min = 0
-    return this
-  }
-
-  public nonNegative(): LuftInt {
-    this.schema.min = -1
-    return this
-  }
-
-  public negative(): LuftInt {
-    this.schema.max = 0
-    return this
-  }
-
-  public nonPositive(): LuftInt {
-    this.schema.max = 1
-    return this
-  }
-
-  public max(number: number): LuftInt {
-    this.schema.min = number
-    return this
-  }
-
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<number> {
-    if (typeof data === "number" && (this.schema.allowNan || !isNaN(data))) {
-      if (data < this.schema.min) {
-        context.addIssue({
-          code: LuftErrorCodes.INVALID_RANGE,
-          message: `Number to small. Expected value greater than ${this.schema.min} but got ${data}`,
-          path: [...context.path],
-          max: this.schema.max,
-          min: this.schema.min,
-          actual: data,
-        })
-        return { success: false }
-      }
-      if (data > this.schema.max) {
-        context.addIssue({
-          code: LuftErrorCodes.INVALID_RANGE,
-          message: `Number to large. Expected value smaller than ${this.schema.max} but got ${data}`,
-          path: [...context.path],
-          max: this.schema.max,
-          min: this.schema.min,
-          actual: data,
-        })
-        return { success: false }
-      }
-    }
+    const result = super._validate(data, context)
+    if (!result.success) return result
 
-    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
-    return {
-      success: false,
+    // Is a float number
+    if (result.data % 1 !== 0) {
+      context.addIssue(createInvalidTypeIssue(LuftErrorCodes.INVALID_TYPE, this.supportedTypes, context))
+      return { success: false }
     }
+    return result
   }
 }

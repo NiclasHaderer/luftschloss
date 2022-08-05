@@ -81,7 +81,6 @@ export class LuftNumber extends LuftBaseType<number> {
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<number> {
-    // Either no number
     if (typeof data !== "number" || (!this.schema.allowNan && isNaN(data))) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return {
