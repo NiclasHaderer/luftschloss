@@ -155,18 +155,17 @@ export abstract class LuftBaseType<RETURN_TYPE> {
 
   public abstract clone(): LuftBaseType<RETURN_TYPE>
 
-  // TODO fix type
-  //public optional() {
-  //  return new LuftUnion(this, new LuftUndefined())
-  //}
-  //
-  //public nullable() {
-  //  return new LuftUnion(this, new LuftNull())
-  //}
-  //
-  //public nullish(): LuftNull<LuftTypeOf<LuftUndefined<T>>> {
-  //  return new LuftUnion(this, new LuftNull(), new LuftUndefined())
-  //}
+  public optional(): LuftUnion<[this, LuftUndefined]> {
+    return new LuftUnion({ types: [this, new LuftUndefined()] })
+  }
+
+  public nullable(): LuftUnion<[this, LuftNull]> {
+    return new LuftUnion({ types: [this, new LuftNull()] })
+  }
+
+  public nullish(): LuftUnion<[this, LuftNull, LuftUndefined]> {
+    return new LuftUnion({ types: [this, new LuftNull(), new LuftUndefined()] })
+  }
 
   public or<T extends LuftBaseType<unknown>>(type: T): LuftUnion<(T | this)[]> {
     return new LuftUnion({ types: [this, type] })

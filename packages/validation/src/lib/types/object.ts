@@ -10,8 +10,7 @@ import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 import { LuftInfer } from "../infer"
 
-// TODO object merge, pick, omit, partial, deepPartial
-// TODO every modification has to create a new object (clone)
+// TODO deepPartial
 
 type ExtractType<T extends Record<string, LuftBaseType<unknown>>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
@@ -23,11 +22,20 @@ type LuftObjectConstructor = {
   tryParseString: boolean
 }
 
-const getAdditionalKeys = (actualKeys: string[], targetKeys: string[]): string[] =>
-  actualKeys.filter(key => targetKeys.includes(key))
+const getAdditionalKeys = (toManyKeys: string[], allKeys: string[]): string[] =>
+  toManyKeys.filter(key => allKeys.includes(key))
 
-const getMissingKeys = (actualKeys: string[], targetKeys: string[]): string[] =>
-  targetKeys.filter(key => actualKeys.includes(key))
+const getMissingKeys = (partialKeys: string[], allKeys: string[]): string[] =>
+  allKeys.filter(key => partialKeys.includes(key))
+
+const copyObject = <T extends Record<string, LuftBaseType<unknown>>>(object: T): T => {
+  const newObject = saveObject<Record<string, LuftBaseType<unknown>>>()
+  for (const [key, value] of Object.entries(object)) {
+    newObject[key] = value.clone()
+  }
+
+  return newObject as T
+}
 
 export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends LuftBaseType<ExtractType<T>> {
   public readonly supportedTypes = ["object"]
@@ -49,6 +57,49 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
       type,
       tryParseString,
     }
+  }
+
+  public extend<T extends LuftObject<Record<string, LuftBaseType<unknown>>>>(object: T) {
+    return this.merge(object.schema.type)
+  }
+
+  public merge<NEW_OBJECT extends Record<string, LuftBaseType<unknown>>>(object: NEW_OBJECT) {
+    return new LuftObject({
+      type: {
+        ...copyObject(this.schema.type),
+        ...copyObject(object),
+      },
+    })
+  }
+
+  public omit<KEY extends keyof T & string>(...keys: KEY[]) {
+    const keysToPick = getMissingKeys(keys, Object.keys(this.schema.type))
+    return this.pick(...keysToPick)
+  }
+
+  public pick<KEY extends keyof T & string>(...keys: KEY[]) {
+    const finishedObject = keys.reduce((acc, key) => {
+      acc[key] = this.schema.type[key].clone()
+      return acc
+    }, {} as Record<string, LuftBaseType<unknown>>)
+
+    return new LuftObject({
+      ...this.schema,
+      type: finishedObject,
+    })
+  }
+
+  public partial() {
+    const type = this.schema.type
+    const newType = Object.keys(this.schema.type).reduce((acc, key) => {
+      acc[key] = type[key].optional()
+      return acc
+    }, {} as Record<string, LuftBaseType<unknown>>)
+
+    return new LuftObject({
+      ...this.schema,
+      type: newType,
+    })
   }
 
   public clone(): LuftObject<T> {
