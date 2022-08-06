@@ -55,7 +55,7 @@ export type InternalLuftBaseType<OUT_TYPE> = {
 } & LuftBaseType<OUT_TYPE>
 
 export abstract class LuftBaseType<RETURN_TYPE> {
-  public readonly schema: Record<string, unknown> = {}
+  public abstract readonly schema: Record<string, unknown>
   protected abstract returnType: unknown
 
   public abstract readonly supportedTypes: string[]
@@ -168,8 +168,8 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   //  return new LuftUnion(this, new LuftNull(), new LuftUndefined())
   //}
 
-  public or<T extends LuftBaseType<unknown>>(type: LuftBaseType<T>): LuftUnion<[T, this]> {
-    return new LuftUnion(this, type)
+  public or<T extends LuftBaseType<unknown>>(type: T): LuftUnion<(T | this)[]> {
+    return new LuftUnion({ types: [this, type] })
   }
 
   public default(defaultValue: RETURN_TYPE): this {
@@ -200,7 +200,8 @@ export abstract class LuftBaseType<RETURN_TYPE> {
 }
 
 export class LuftUndefined extends LuftBaseType<undefined> {
-  returnType: undefined
+  protected returnType: undefined
+  public readonly schema = {}
 
   public supportedTypes = ["undefined"]
 
@@ -220,9 +221,9 @@ export class LuftUndefined extends LuftBaseType<undefined> {
 }
 
 export class LuftNull extends LuftBaseType<null> {
-  returnType!: null
-
   public supportedTypes = ["null"]
+  public readonly schema = {}
+  protected returnType!: null
 
   public clone(): LuftNull {
     return new LuftNull()
@@ -240,17 +241,14 @@ export class LuftNull extends LuftBaseType<null> {
 }
 
 export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftTypeOf<T[number]>> {
-  returnType!: LuftTypeOf<T[number]>
+  protected returnType!: LuftTypeOf<T[number]>
 
-  public override readonly schema: { types: LuftBaseType<unknown>[] }
-
-  public constructor(...types: LuftBaseType<unknown>[]) {
+  public constructor(public readonly schema: { types: T }) {
     super()
-    this.schema = { types: types }
   }
 
   public clone(): LuftUnion<T> {
-    return new LuftUnion(...this.schema.types.map(type => type.clone()))
+    return new LuftUnion({ types: this.schema.types.map(type => type.clone()) as T })
   }
 
   public get supportedTypes() {

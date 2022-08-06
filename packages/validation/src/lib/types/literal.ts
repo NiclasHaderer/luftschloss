@@ -25,8 +25,9 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
   }
 
   public ignoreCase(ignoreCase: boolean): LuftLiteral<T> {
-    this.schema.ignoreCase = ignoreCase
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.ignoreCase = ignoreCase
+    return newValidator
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T[number]> {

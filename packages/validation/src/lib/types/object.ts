@@ -28,7 +28,12 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
   protected returnType!: ExtractType<T>
 
   public constructor(
-    public override readonly schema: { type: T; treatMissingKeyAs: "error" | "undefined"; ignoreUnknownKeys: boolean }
+    public override readonly schema: {
+      type: T
+      treatMissingKeyAs: "error" | "undefined"
+      ignoreUnknownKeys: boolean
+      tryParseString: boolean
+    }
   ) {
     super()
   }
@@ -43,19 +48,31 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
   }
 
   public ignoreUnknownKeys(ignore: boolean): LuftObject<T> {
-    this.schema.ignoreUnknownKeys = ignore
-
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.ignoreUnknownKeys = ignore
+    return newValidator
   }
 
   public treatMissingKeyAs(treatAs: "error" | "undefined"): LuftObject<T> {
-    this.schema.treatMissingKeyAs = treatAs
+    const newValidator = this.clone()
+    newValidator.schema.treatMissingKeyAs = treatAs
+    return newValidator
+  }
 
-    return this
+  public tryParseString(parseString: boolean): LuftObject<T> {
+    const newValidator = this.clone()
+    newValidator.schema.tryParseString = parseString
+    return newValidator
   }
 
   protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<ExtractType<T>> {
-    // TODO perhaps if string try json.parse and then validate
+    if (this.schema.treatMissingKeyAs && typeof data === "string") {
+      try {
+        data = JSON.parse(data)
+      } catch {
+        // Do nothing and let validate catch the error
+      }
+    }
     return this._validate(data, context, "_coerce")
   }
 

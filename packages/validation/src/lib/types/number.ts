@@ -36,32 +36,37 @@ export class LuftNumber extends LuftBaseType<number> {
   }
 
   public allowNaN(allow: boolean): LuftNumber {
-    this.schema.allowNan = allow
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.allowNan = allow
+    return newValidator
   }
 
   public min(number: number): LuftNumber {
-    this.schema.min = number
-    this.schema.minCompare = ">"
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.min = number
+    newValidator.schema.minCompare = ">"
+    return newValidator
   }
 
   public minEq(number: number): LuftNumber {
-    this.schema.min = number
-    this.schema.minCompare = ">="
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.min = number
+    newValidator.schema.minCompare = ">="
+    return newValidator
   }
 
   public max(number: number): LuftNumber {
-    this.schema.max = number
-    this.schema.maxCompare = "<"
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.max = number
+    newValidator.schema.maxCompare = "<"
+    return newValidator
   }
 
   public maxEq(number: number): LuftNumber {
-    this.schema.max = number
-    this.schema.maxCompare = "<="
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.max = number
+    newValidator.schema.maxCompare = "<="
+    return newValidator
   }
 
   public positive(): LuftNumber {

@@ -28,18 +28,21 @@ export class LuftString extends LuftBaseType<string> {
   }
 
   public min(minLength: number): LuftString {
-    this.schema.minLength = minLength
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.minLength = minLength
+    return newValidator
   }
 
   public max(maxLength: number): LuftString {
-    this.schema.maxLength = maxLength
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.maxLength = maxLength
+    return newValidator
   }
 
   public trim(shouldTrim = true): LuftString {
-    this.schema.trim = shouldTrim
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.trim = shouldTrim
+    return newValidator
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {

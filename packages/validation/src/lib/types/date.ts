@@ -28,27 +28,31 @@ export class LuftDate extends LuftBaseType<Date> {
   }
 
   public after(date: Date | number | string): LuftDate {
-    this.schema.after = this.toDateNumber(date)
-    this.schema.minCompare = ">"
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.after = this.toDateNumber(date)
+    newValidator.schema.minCompare = ">"
+    return newValidator
   }
 
   public before(date: Date | number | string): LuftDate {
-    this.schema.before = this.toDateNumber(date)
-    this.schema.maxCompare = "<"
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.before = this.toDateNumber(date)
+    newValidator.schema.maxCompare = "<"
+    return newValidator
   }
 
   public afterEq(date: Date | number | string): LuftDate {
-    this.schema.after = this.toDateNumber(date)
-    this.schema.minCompare = ">="
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.after = this.toDateNumber(date)
+    newValidator.schema.minCompare = ">="
+    return newValidator
   }
 
   public beforeEq(date: Date | number | string): LuftDate {
-    this.schema.before = this.toDateNumber(date)
-    this.schema.maxCompare = "<="
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.before = this.toDateNumber(date)
+    newValidator.schema.maxCompare = "<="
+    return newValidator
   }
 
   private toDateNumber(date: Date | number | string): number {
@@ -94,7 +98,7 @@ export class LuftDate extends LuftBaseType<Date> {
       }
     }
 
-    if (this.schema.after !== undefined && data.getTime() < this.schema.after) {
+    if (this.isToEarly(data)) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected date after ${this.schema.after}, but got ${data.getTime()}`,
@@ -108,7 +112,7 @@ export class LuftDate extends LuftBaseType<Date> {
       return { success: false }
     }
 
-    if (this.schema.before !== undefined && data.getTime() > this.schema.before) {
+    if (this.isToLate(data)) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected date before ${this.schema.before}, but got ${data.getTime()}`,
@@ -128,7 +132,7 @@ export class LuftDate extends LuftBaseType<Date> {
     }
   }
 
-  protected isToLate(data: Date): boolean {
+  private isToLate(data: Date): boolean {
     if (this.schema.maxCompare === "<") {
       return !(data.getTime() < this.schema.before)
     } else {
@@ -136,7 +140,7 @@ export class LuftDate extends LuftBaseType<Date> {
     }
   }
 
-  protected isToEarly(data: Date): boolean {
+  private isToEarly(data: Date): boolean {
     if (this.schema.minCompare === ">") {
       return !(data.getTime() > this.schema.after)
     } else {

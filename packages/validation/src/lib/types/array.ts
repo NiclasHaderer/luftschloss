@@ -15,7 +15,7 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
 
   public constructor(
     public override readonly schema: {
-      parser: "json" | "csv" | undefined
+      parser: "json" | "csv" | "nothing"
       maxLength: number
       minLength: number
       nonEmpty: boolean
@@ -33,23 +33,27 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
   }
 
   public minLength(minLength: number): LuftArray<ARRAY_TYPE> {
-    this.schema.minLength = minLength
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.minLength = minLength
+    return newValidator
   }
 
   public maxLength(minLength: number): LuftArray<ARRAY_TYPE> {
-    this.schema.maxLength = minLength
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.maxLength = minLength
+    return newValidator
   }
 
   public nonEmpty(allowNonEmpty = false) {
-    this.schema.nonEmpty = allowNonEmpty
-    return this
+    const newValidator = this.clone()
+    newValidator.schema.nonEmpty = allowNonEmpty
+    return newValidator
   }
 
-  public parseWith(parser: "json" | "csv"): LuftArray<ARRAY_TYPE> {
-    this.schema.parser = parser
-    return this
+  public parseWith(parser: "json" | "csv" | "nothing"): LuftArray<ARRAY_TYPE> {
+    const newValidator = this.clone()
+    newValidator.schema.parser = parser
+    return newValidator
   }
 
   protected _coerce(
@@ -60,7 +64,7 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
       data = [...(data as Iterable<unknown>)]
     }
 
-    if (typeof data === "string" && this.schema.parser) {
+    if (typeof data === "string") {
       switch (this.schema.parser) {
         case "json": {
           try {
@@ -72,6 +76,8 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
         }
         case "csv":
           data = data.split(",")
+          break
+        case "nothing":
           break
       }
     }
