@@ -6,24 +6,40 @@
 
 import { saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftUnion, ParsingContext } from "./base-type"
 import { LuftNumber } from "./number"
 import { LuftString } from "./string"
+import { LuftInfer } from "../infer"
 
-export class LuftRecord<T extends Record<string | number, unknown>> extends LuftBaseType<T> {
+type LuftRecordKey = LuftString | LuftNumber | LuftUnion<(LuftString | LuftNumber)[]>
+
+export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<unknown>> extends LuftBaseType<
+  Record<LuftInfer<KEY>, LuftInfer<VALUE>>
+> {
   readonly supportedTypes: string[] = ["object"]
+  protected returnType!: Record<LuftInfer<KEY>, LuftInfer<VALUE>>
 
-  // TODO allow unions with are a union of LuftString and LuftNumber
-  //  LuftLiterals are not allowed as keys, because you should use an object instead
-  constructor(public readonly schema: { key: LuftString | LuftNumber; value: LuftBaseType<unknown> }) {
+  constructor(
+    public readonly schema: {
+      key: KEY
+      value: VALUE
+    }
+  ) {
     super()
   }
 
-  public clone(): LuftRecord<T> {
-    return new LuftRecord({ ...this.schema, key: this.schema.key.clone(), value: this.schema.value.clone() })
+  public clone(): LuftRecord<KEY, VALUE> {
+    return new LuftRecord({
+      ...this.schema,
+      key: this.schema.key.clone() as KEY,
+      value: this.schema.value.clone() as VALUE,
+    })
   }
 
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T> {
+  protected _coerce(
+    data: unknown,
+    context: ParsingContext
+  ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
     return this._validate(data, context)
   }
 
@@ -31,13 +47,13 @@ export class LuftRecord<T extends Record<string | number, unknown>> extends Luft
     data: unknown,
     context: ParsingContext,
     mode: "_validate" | "_coerce" = "_validate"
-  ): InternalParsingResult<T> {
+  ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
     if (typeof data !== "object" || data === null) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return { success: false }
     }
 
-    const newData = saveObject<T>()
+    const newData = saveObject<Record<LuftInfer<KEY>, LuftInfer<VALUE>>>()
     let failAtEnd = false
     for (const [key, value] of Object.entries(data)) {
       const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>)[mode](key, context)

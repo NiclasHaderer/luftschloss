@@ -10,11 +10,14 @@ import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type
 
 export class LuftDate extends LuftBaseType<Date> {
   public readonly supportedTypes = ["date"]
+  protected returnType!: Date
 
   constructor(
     public readonly schema: {
-      after: number | undefined
-      before: number | undefined
+      after: number
+      before: number
+      minCompare: ">=" | ">"
+      maxCompare: "<=" | "<"
     }
   ) {
     super()
@@ -26,11 +29,25 @@ export class LuftDate extends LuftBaseType<Date> {
 
   public after(date: Date | number | string): LuftDate {
     this.schema.after = this.toDateNumber(date)
+    this.schema.minCompare = ">"
     return this
   }
 
   public before(date: Date | number | string): LuftDate {
     this.schema.before = this.toDateNumber(date)
+    this.schema.maxCompare = "<"
+    return this
+  }
+
+  public afterEq(date: Date | number | string): LuftDate {
+    this.schema.after = this.toDateNumber(date)
+    this.schema.minCompare = ">="
+    return this
+  }
+
+  public beforeEq(date: Date | number | string): LuftDate {
+    this.schema.before = this.toDateNumber(date)
+    this.schema.maxCompare = "<="
     return this
   }
 
@@ -85,6 +102,8 @@ export class LuftDate extends LuftBaseType<Date> {
         max: this.schema.before ?? Infinity,
         min: this.schema.after,
         actual: data.getTime(),
+        maxCompare: this.schema.maxCompare,
+        minCompare: this.schema.minCompare,
       })
       return { success: false }
     }
@@ -97,6 +116,8 @@ export class LuftDate extends LuftBaseType<Date> {
         max: this.schema.before,
         min: this.schema.after ?? -Infinity,
         actual: data.getTime(),
+        maxCompare: this.schema.maxCompare,
+        minCompare: this.schema.minCompare,
       })
       return { success: false }
     }
@@ -104,6 +125,22 @@ export class LuftDate extends LuftBaseType<Date> {
     return {
       success: true,
       data: data,
+    }
+  }
+
+  protected isToLate(data: Date): boolean {
+    if (this.schema.maxCompare === "<") {
+      return !(data.getTime() < this.schema.before)
+    } else {
+      return !(data.getTime() <= this.schema.before)
+    }
+  }
+
+  protected isToEarly(data: Date): boolean {
+    if (this.schema.minCompare === ">") {
+      return !(data.getTime() > this.schema.after)
+    } else {
+      return !(data.getTime() >= this.schema.after)
     }
   }
 }

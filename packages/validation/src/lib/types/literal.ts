@@ -8,10 +8,11 @@ import { CaseInsensitiveSet } from "../CaseInsensitiveSet"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
-export class LuftLiteral<T extends (string | number | boolean)[]> extends LuftBaseType<T[number]> {
+export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> extends LuftBaseType<T[number]> {
   private nonSensitiveSchema: CaseInsensitiveSet<T[number]>
   private sensitiveSchema: Set<T[number]>
   public readonly supportedTypes = this.schema.types.map(t => t.toString())
+  protected returnType!: T
 
   public constructor(public readonly schema: { types: T; ignoreCase: boolean }) {
     super()
@@ -20,7 +21,7 @@ export class LuftLiteral<T extends (string | number | boolean)[]> extends LuftBa
   }
 
   public clone(): LuftLiteral<T> {
-    return new LuftLiteral({ ...this.schema, types: [...this.schema.types] as T })
+    return new LuftLiteral({ ...this.schema, types: [...this.schema.types] as unknown as T })
   }
 
   public ignoreCase(ignoreCase: boolean): LuftLiteral<T> {

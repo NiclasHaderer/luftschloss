@@ -28,7 +28,7 @@ export type UnsuccessfulParsingResult = {
   issues: ParsingIssue[]
 }
 
-export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult<T>
+export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
 
 export class ParsingContext {
   private _issues: ParsingIssue[] = []

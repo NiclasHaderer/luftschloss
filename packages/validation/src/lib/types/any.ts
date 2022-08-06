@@ -9,6 +9,7 @@ import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type
 
 export class LuftAny extends LuftBaseType<any> {
   readonly supportedTypes = ["any"]
+  protected returnType: any
 
   public clone(): LuftAny {
     return new LuftAny()

@@ -8,8 +8,14 @@ import { saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { LuftInfer } from "../infer"
 
 // TODO object merge, pick, omit, partial, deepPartial
+// TODO every modification has to create a new object (clone)
+
+type ExtractType<T extends Record<string, LuftBaseType<unknown>>> = {
+  [KEY in keyof T]: LuftInfer<T[KEY]>
+}
 
 const getAdditionalKeys = (actualKeys: string[], targetKeys: string[]): string[] =>
   actualKeys.filter(key => targetKeys.includes(key))
@@ -17,8 +23,9 @@ const getAdditionalKeys = (actualKeys: string[], targetKeys: string[]): string[]
 const getMissingKeys = (actualKeys: string[], targetKeys: string[]): string[] =>
   targetKeys.filter(key => actualKeys.includes(key))
 
-export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends LuftBaseType<T> {
+export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends LuftBaseType<ExtractType<T>> {
   public readonly supportedTypes = ["object"]
+  protected returnType!: ExtractType<T>
 
   public constructor(
     public override readonly schema: { type: T; treatMissingKeyAs: "error" | "undefined"; ignoreUnknownKeys: boolean }
@@ -47,7 +54,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     return this
   }
 
-  protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<T> {
+  protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<ExtractType<T>> {
     // TODO perhaps if string try json.parse and then validate
     return this._validate(data, context, "_coerce")
   }
@@ -56,7 +63,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     data: unknown,
     context: ParsingContext,
     mode: "_coerce" | "_validate" = "_validate"
-  ): InternalParsingResult<T> {
+  ): InternalParsingResult<ExtractType<T>> {
     if (typeof data !== "object" || data === null) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return { success: false }
@@ -77,7 +84,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     }
 
     let detectedMissingKeys = false
-    const parsedObject = saveObject<T>()
+    const parsedObject = saveObject<ExtractType<T>>()
     for (const [key, validator] of Object.entries(this.schema.type)) {
       if (!(key in data) && this.schema.treatMissingKeyAs === "error" && !detectedMissingKeys) {
         failAtEnd = true

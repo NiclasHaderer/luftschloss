@@ -7,7 +7,7 @@
 export class CaseInsensitiveSet<T> extends Set<T> {
   private sensitiveLookup = new Map<string, string>()
 
-  public constructor(values: T[] | null) {
+  public constructor(values: ReadonlyArray<T> | null) {
     const transformedValues: T[] | null = values
       ? (values.map(v => {
           if (typeof v === "string") {
@@ -71,10 +71,12 @@ export class CaseInsensitiveSet<T> extends Set<T> {
     return this.values()
   }
 
-  public override forEach(callbackfn: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
-    const boundFun = callbackfn.bind(this)
+  public override forEach<THIS = undefined>(
+    callbackfn: (this: THIS, value: T, value2: T, set: Set<T>) => void,
+    thisArg?: THIS
+  ) {
     for (const value of this.values()) {
-      boundFun(value, value, this)
+      callbackfn.apply(thisArg as THIS, [value, value, this])
     }
   }
 
