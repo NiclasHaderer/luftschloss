@@ -7,13 +7,24 @@
 import { saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import {
+  InternalLuftBaseType,
+  InternalParsingResult,
+  LuftBaseType,
+  LuftUndefined,
+  LuftUnion,
+  ParsingContext,
+} from "./base-type"
 import { LuftInfer } from "../infer"
 
 // TODO deepPartial
 
 type ExtractType<T extends Record<string, LuftBaseType<unknown>>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
+}
+
+type ObjectPartial<T extends Record<string, LuftBaseType<unknown>>> = {
+  [KEY in keyof T]: LuftUnion<[LuftUndefined, T[KEY]]>
 }
 
 type LuftObjectConstructor = {
@@ -23,7 +34,7 @@ type LuftObjectConstructor = {
 }
 
 const getAdditionalKeys = (toManyKeys: string[], allKeys: string[]): string[] =>
-  toManyKeys.filter(key => allKeys.includes(key))
+  toManyKeys.filter(key => !allKeys.includes(key))
 
 const getMissingKeys = (partialKeys: string[], allKeys: string[]): string[] =>
   allKeys.filter(key => partialKeys.includes(key))
@@ -59,11 +70,15 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     }
   }
 
-  public extend<T extends LuftObject<Record<string, LuftBaseType<unknown>>>>(object: T) {
+  public extend<NEW_TYPE extends Record<string, LuftBaseType<unknown>>>(
+    object: LuftObject<NEW_TYPE>
+  ): LuftObject<T & NEW_TYPE> {
     return this.merge(object.schema.type)
   }
 
-  public merge<NEW_OBJECT extends Record<string, LuftBaseType<unknown>>>(object: NEW_OBJECT) {
+  public merge<NEW_OBJECT extends Record<string, LuftBaseType<unknown>>>(
+    object: NEW_OBJECT
+  ): LuftObject<T & NEW_OBJECT> {
     return new LuftObject({
       type: {
         ...copyObject(this.schema.type),
@@ -72,33 +87,33 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     })
   }
 
-  public omit<KEY extends keyof T & string>(...keys: KEY[]) {
+  public omit<KEY extends keyof T & string>(...keys: KEY[]): LuftObject<Omit<T, KEY>> {
     const keysToPick = getMissingKeys(keys, Object.keys(this.schema.type))
-    return this.pick(...keysToPick)
+    return this.pick(...keysToPick) as LuftObject<Omit<T, KEY>>
   }
 
-  public pick<KEY extends keyof T & string>(...keys: KEY[]) {
+  public pick<KEY extends keyof T & string>(...keys: KEY[]): LuftObject<Pick<T, KEY>> {
     const finishedObject = keys.reduce((acc, key) => {
       acc[key] = this.schema.type[key].clone()
       return acc
     }, {} as Record<string, LuftBaseType<unknown>>)
 
-    return new LuftObject({
+    return new LuftObject<Pick<T, KEY>>({
       ...this.schema,
-      type: finishedObject,
+      type: finishedObject as Pick<T, KEY>,
     })
   }
 
-  public partial() {
+  public partial(): LuftObject<ObjectPartial<T>> {
     const type = this.schema.type
     const newType = Object.keys(this.schema.type).reduce((acc, key) => {
       acc[key] = type[key].optional()
       return acc
     }, {} as Record<string, LuftBaseType<unknown>>)
 
-    return new LuftObject({
+    return new LuftObject<ObjectPartial<T>>({
       ...this.schema,
-      type: newType,
+      type: newType as ObjectPartial<T>,
     })
   }
 
@@ -130,7 +145,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
   }
 
   protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<ExtractType<T>> {
-    if (this.schema.treatMissingKeyAs && typeof data === "string") {
+    if (this.schema.tryParseString && typeof data === "string") {
       try {
         data = JSON.parse(data)
       } catch {
@@ -151,30 +166,48 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     context: ParsingContext,
     mode: "_coerce" | "_validate" = "_validate"
   ): InternalParsingResult<ExtractType<T>> {
+    // Wrong type
     if (typeof data !== "object" || data === null) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return { success: false }
     }
 
+    // Tack if the validation should fail at the end
     let failAtEnd = false
 
+    // Get the keys of the data and the schema
     const dataKeys = Object.keys(data)
-    const schemaKeys = Object.keys(this.schema)
-    if (!this.schema.ignoreUnknownKeys && dataKeys.length > schemaKeys.length) {
-      context.addIssue({
-        code: LuftErrorCodes.TO_MANY_KEYS,
-        path: [...context.path],
-        message: "Object keys do not match",
-        additionalKeys: getAdditionalKeys(dataKeys, schemaKeys),
-      })
-      failAtEnd = true
+    const schemaKeys = Object.keys(this.schema.type)
+
+    // Do NOT ignore unknown keys
+    if (!this.schema.ignoreUnknownKeys) {
+      const additionalKeys = getAdditionalKeys(dataKeys, schemaKeys)
+      // If there are to many keys add the issue
+      if (additionalKeys.length > 0) {
+        context.addIssue({
+          code: LuftErrorCodes.TO_MANY_KEYS,
+          path: [...context.path],
+          message: "Object keys do not match",
+          additionalKeys: additionalKeys,
+        })
+        failAtEnd = true
+      }
     }
 
+    // This tracks if missing tracks have already been detected
+    // This stops the issue being added twice
     let detectedMissingKeys = false
+
+    // The object for the new data
     const parsedObject = saveObject<ExtractType<T>>()
+    // Iterate over the schema
     for (const [key, validator] of Object.entries(this.schema.type)) {
+      // The key is not in the data and missingKeys should be treated as error and not as undefined
+      // Only step in this condition if the condition has not been executed before
       if (!(key in data) && this.schema.treatMissingKeyAs === "error" && !detectedMissingKeys) {
+        // Save that the validation should faile
         failAtEnd = true
+        // Do NOT enter this condition again
         detectedMissingKeys = true
         context.addIssue({
           code: LuftErrorCodes.MISSING_KEYS,
@@ -182,12 +215,14 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
           message: "Object keys do not match",
           missingKeys: getMissingKeys(dataKeys, schemaKeys),
         })
+        // Skip validation, because the key does not exist
         continue
       }
 
+      // Validate the retrieved value
       const a = (validator as InternalLuftBaseType<unknown>)[mode]((data as Record<string, unknown>)[key], context)
       if (a.success) {
-        //eslint-disable-next-line @typescript-eslint/no-extra-semi
+        // Save the (potentially) coerced value in the new object
         ;(parsedObject as Record<string, unknown>)[key] = a.data
       } else {
         failAtEnd = true
