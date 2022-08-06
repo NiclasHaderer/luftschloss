@@ -7,7 +7,7 @@
 import { uniqueList } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftParsingError, ParsingIssue } from "../parsing-error"
-import { LuftTypeOf } from "../types"
+import { LuftInfer } from "../infer"
 
 export type InternalParsingResult<T> =
   | {
@@ -240,8 +240,8 @@ export class LuftNull extends LuftBaseType<null> {
   }
 }
 
-export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftTypeOf<T[number]>> {
-  protected returnType!: LuftTypeOf<T[number]>
+export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftInfer<T[number]>> {
+  protected returnType!: LuftInfer<T[number]>
 
   public constructor(public readonly schema: { types: T }) {
     super()
@@ -255,11 +255,11 @@ export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<L
     return uniqueList(this.schema.types.flatMap(s => s.supportedTypes))
   }
 
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<LuftTypeOf<T[number]>> {
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<T[number]>> {
     return this.validateAndCoerce(data, context, "coerce")
   }
 
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<LuftTypeOf<T[number]>> {
+  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<T[number]>> {
     return this.validateAndCoerce(data, context, "validate")
   }
 
@@ -267,8 +267,8 @@ export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<L
     data: unknown,
     context: ParsingContext,
     mode: "validate" | "coerce"
-  ): InternalParsingResult<LuftTypeOf<T[number]>> {
-    const validators = this.schema as unknown as InternalLuftBaseType<LuftTypeOf<T[number]>>[]
+  ): InternalParsingResult<LuftInfer<T[number]>> {
+    const validators = this.schema as unknown as InternalLuftBaseType<LuftInfer<T[number]>>[]
     for (const validator of validators) {
       const cb = mode === "coerce" ? validator._coerce.bind(this) : validator._validate.bind(this)
 

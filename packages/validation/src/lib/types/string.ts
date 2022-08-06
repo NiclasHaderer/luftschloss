@@ -12,7 +12,13 @@ export class LuftString extends LuftBaseType<string> {
   public readonly supportedTypes = ["string"]
   public returnType!: string
 
-  constructor(public override readonly schema: { minLength: number; maxLength: number; trim: boolean }) {
+  constructor(
+    public override readonly schema: { minLength: number; maxLength: number; trim: boolean } = {
+      minLength: -Infinity,
+      maxLength: Infinity,
+      trim: false,
+    }
+  ) {
     super()
   }
 

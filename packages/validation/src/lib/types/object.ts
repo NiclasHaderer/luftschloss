@@ -17,6 +17,12 @@ type ExtractType<T extends Record<string, LuftBaseType<unknown>>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
 }
 
+type LuftObjectConstructor = {
+  treatMissingKeyAs: "error" | "undefined"
+  ignoreUnknownKeys: boolean
+  tryParseString: boolean
+}
+
 const getAdditionalKeys = (actualKeys: string[], targetKeys: string[]): string[] =>
   actualKeys.filter(key => targetKeys.includes(key))
 
@@ -26,16 +32,23 @@ const getMissingKeys = (actualKeys: string[], targetKeys: string[]): string[] =>
 export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends LuftBaseType<ExtractType<T>> {
   public readonly supportedTypes = ["object"]
   protected returnType!: ExtractType<T>
+  public schema: { type: T } & LuftObjectConstructor
 
-  public constructor(
-    public override readonly schema: {
-      type: T
-      treatMissingKeyAs: "error" | "undefined"
-      ignoreUnknownKeys: boolean
-      tryParseString: boolean
-    }
-  ) {
+  public constructor({
+    treatMissingKeyAs = "error",
+    ignoreUnknownKeys = true,
+    tryParseString = false,
+    type,
+  }: Partial<LuftObjectConstructor> & {
+    type: T
+  }) {
     super()
+    this.schema = {
+      treatMissingKeyAs,
+      ignoreUnknownKeys,
+      type,
+      tryParseString,
+    }
   }
 
   public clone(): LuftObject<T> {

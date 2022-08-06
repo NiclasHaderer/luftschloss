@@ -11,7 +11,7 @@ import { LuftNumber } from "./number"
 import { LuftString } from "./string"
 import { LuftInfer } from "../infer"
 
-type LuftRecordKey = LuftString | LuftNumber | LuftUnion<(LuftString | LuftNumber)[]>
+export type LuftRecordKey = LuftString | LuftNumber | LuftUnion<(LuftString | LuftNumber)[]>
 
 export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<unknown>> extends LuftBaseType<
   Record<LuftInfer<KEY>, LuftInfer<VALUE>>

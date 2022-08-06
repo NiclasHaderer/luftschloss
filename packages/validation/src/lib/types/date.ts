@@ -18,7 +18,7 @@ export class LuftDate extends LuftBaseType<Date> {
       before: number
       minCompare: ">=" | ">"
       maxCompare: "<=" | "<"
-    }
+    } = { after: -Infinity, before: Infinity, minCompare: ">=", maxCompare: "<=" }
   ) {
     super()
   }

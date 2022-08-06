@@ -9,20 +9,27 @@ import { LuftInfer } from "../infer"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
+type LuftArrayConstructor = {
+  parser: "json" | "csv" | "nothing"
+  maxLength: number
+  minLength: number
+  nonEmpty: boolean
+}
+
 export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
   public readonly supportedTypes = ["array"]
   protected readonly returnType!: LuftInfer<ARRAY_TYPE>[]
+  public readonly schema: LuftArrayConstructor & { type: ARRAY_TYPE }
 
-  public constructor(
-    public override readonly schema: {
-      parser: "json" | "csv" | "nothing"
-      maxLength: number
-      minLength: number
-      nonEmpty: boolean
-      type: ARRAY_TYPE
-    }
-  ) {
+  public constructor({
+    type,
+    nonEmpty = false,
+    parser = "nothing",
+    maxLength = Infinity,
+    minLength = -Infinity,
+  }: Partial<LuftArrayConstructor> & { type: ARRAY_TYPE }) {
     super()
+    this.schema = { type, nonEmpty, parser, maxLength, minLength }
   }
 
   public clone() {

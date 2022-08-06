@@ -12,12 +12,14 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
   private nonSensitiveSchema: CaseInsensitiveSet<T[number]>
   private sensitiveSchema: Set<T[number]>
   public readonly supportedTypes = this.schema.types.map(t => t.toString())
+  public readonly schema: { types: T; ignoreCase: boolean }
   protected returnType!: T
 
-  public constructor(public readonly schema: { types: T; ignoreCase: boolean }) {
+  public constructor({ types, ignoreCase = false }: { types: T; ignoreCase?: boolean }) {
     super()
-    this.nonSensitiveSchema = new CaseInsensitiveSet(schema.types)
-    this.sensitiveSchema = new Set(schema.types)
+    this.schema = { types, ignoreCase }
+    this.nonSensitiveSchema = new CaseInsensitiveSet(this.schema.types)
+    this.sensitiveSchema = new Set(this.schema.types)
   }
 
   public clone(): LuftLiteral<T> {

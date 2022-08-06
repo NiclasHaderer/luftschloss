@@ -11,4 +11,4 @@
 // TODO make supportedTypes consistent
 // TODO perhaps a custom parser error for string parsing
 
-export * from "./types"
+export * from "./factories"
