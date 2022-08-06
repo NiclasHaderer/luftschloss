@@ -9,6 +9,7 @@ import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type
 export class LuftNever extends LuftBaseType<never> {
   readonly supportedTypes = ["never"]
   protected returnType!: never
+  public readonly schema = {}
 
   public clone(): LuftNever {
     return new LuftNever()
