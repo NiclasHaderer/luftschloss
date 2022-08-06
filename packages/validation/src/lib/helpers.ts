@@ -5,7 +5,7 @@
  */
 
 import { isArray } from "@luftschloss/core"
-import { InvalidTypeParsingIssue, LuftErrorCodes } from "./parsing-error"
+import { InvalidTypeError, LuftErrorCodes } from "./parsing-error"
 import { ParsingContext } from "./types/base-type"
 
 export const getTypeOf = (value: unknown) => {
@@ -35,7 +35,7 @@ export const createInvalidTypeIssue = (
   expectedType: string[],
   context: ParsingContext,
   message?: string
-): InvalidTypeParsingIssue => {
+): InvalidTypeError => {
   const receivedType = getTypeOf(data)
   return {
     message: message ?? `Expected ${expectedType.join(", ")}, but got ${receivedType}`,

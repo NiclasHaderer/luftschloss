@@ -83,7 +83,13 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
       try {
         data = JSON.parse(data)
       } catch {
-        // Do nothing and let validate catch the error
+        context.addIssue({
+          code: LuftErrorCodes.PARSING_ISSUE,
+          path: [...context.path],
+          message: "String is not a valid json",
+          parser: "json",
+        })
+        return { success: false }
       }
     }
     return this._validate(data, context, "_coerce")

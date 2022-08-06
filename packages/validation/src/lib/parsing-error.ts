@@ -12,45 +12,48 @@ export const LuftErrorCodes = {
   INVALID_VALUE: "INVALID_VALUE",
   INVALID_LENGTH: "INVALID_LENGTH",
   INVALID_RANGE: "INVALID_RANGE",
+  PARSING_ISSUE: "PARSING_ISSUE",
 } as const
 
 export type LuftErrorCodes = typeof LuftErrorCodes[keyof typeof LuftErrorCodes]
 
-type BaseParsingIssues = {
+type BaseParsingError = {
   code: LuftErrorCodes
   path: (string | number)[]
   message: string
 }
-export type UnionParsingIssue = BaseParsingIssues & {
+
+export type UnionError = BaseParsingError & {
   code: "INVALID_UNION"
   expectedType: string[]
   receivedType: string
 }
 
-export type InvalidTypeParsingIssue = BaseParsingIssues & {
+export type InvalidTypeError = BaseParsingError & {
   code: "INVALID_TYPE"
   expectedType: string[]
   receivedType: string
 }
 
-export type InvalidValueParsingIssue = BaseParsingIssues & {
+export type InvalidValueError = BaseParsingError & {
   code: "INVALID_VALUE"
   allowedValues: string[]
   receivedValue: string
 }
-export type InvalidLengthParsingIssue = BaseParsingIssues & {
+
+export type InvalidLengthError = BaseParsingError & {
   code: "INVALID_LENGTH"
   maxLen: number
   minLen: number
   actualLen: number
 }
 
-export type MissingKeysIssue = BaseParsingIssues & {
+export type MissingKeysError = BaseParsingError & {
   code: "MISSING_KEYS"
   missingKeys: string[]
 }
 
-export type InvalidRangeIssue = BaseParsingIssues & {
+export type InvalidRangeError = BaseParsingError & {
   code: "INVALID_RANGE"
   min: number
   max: number
@@ -59,22 +62,28 @@ export type InvalidRangeIssue = BaseParsingIssues & {
   maxCompare: "<=" | "<"
 }
 
-export type AdditionalKeysIssue = BaseParsingIssues & {
+export type AdditionalKeysError = BaseParsingError & {
   code: "TO_MANY_KEYS"
   additionalKeys: string[]
 }
 
-export type ParsingIssue =
-  | UnionParsingIssue
-  | InvalidTypeParsingIssue
-  | MissingKeysIssue
-  | AdditionalKeysIssue
-  | InvalidValueParsingIssue
-  | InvalidLengthParsingIssue
-  | InvalidRangeIssue
+export type StringParsingError = BaseParsingError & {
+  code: "PARSING_ISSUE"
+  parser: string
+}
+
+export type ParsingError =
+  | UnionError
+  | InvalidTypeError
+  | MissingKeysError
+  | AdditionalKeysError
+  | InvalidValueError
+  | InvalidLengthError
+  | InvalidRangeError
+  | StringParsingError
 
 export class LuftParsingError extends Error {
-  public constructor(public readonly issues: ParsingIssue[], message?: string) {
+  public constructor(public readonly issues: ParsingError[], message?: string) {
     super(message)
   }
 }

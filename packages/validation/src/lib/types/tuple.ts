@@ -49,9 +49,15 @@ export class LuftTuple<T extends ReadonlyArray<LuftBaseType<unknown>>> extends L
       switch (this.schema.parser) {
         case "json": {
           try {
-            data = JSON.parse(data as string)
+            data = JSON.parse(data)
           } catch {
-            // Ignore because the "validate" function will send the error message
+            context.addIssue({
+              code: LuftErrorCodes.PARSING_ISSUE,
+              path: [...context.path],
+              message: "String is not a valid json",
+              parser: "json",
+            })
+            return { success: false }
           }
           break
         }

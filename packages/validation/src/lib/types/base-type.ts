@@ -6,7 +6,7 @@
 
 import { uniqueList } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
-import { LuftParsingError, ParsingIssue } from "../parsing-error"
+import { LuftParsingError, ParsingError } from "../parsing-error"
 import { LuftInfer } from "../infer"
 
 export type InternalParsingResult<T> =
@@ -25,16 +25,16 @@ export type SuccessfulParsingResult<T> = {
 }
 export type UnsuccessfulParsingResult = {
   success: false
-  issues: ParsingIssue[]
+  issues: ParsingError[]
 }
 
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
 
 export class ParsingContext {
-  private _issues: ParsingIssue[] = []
+  private _issues: ParsingError[] = []
   public readonly path: Readonly<string | number[]> = []
 
-  public addIssue(issue: ParsingIssue): ParsingContext {
+  public addIssue(issue: ParsingError): ParsingContext {
     this._issues.push(issue)
     return this
   }
