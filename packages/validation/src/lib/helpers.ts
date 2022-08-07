@@ -6,7 +6,7 @@
 
 import { isArray } from "@luftschloss/core"
 import { InvalidTypeError, LuftErrorCodes } from "./parsing-error"
-import { ParsingContext } from "./types/base-type"
+import { ParsingContext } from "./parsing-context"
 
 export const getTypeOf = (value: unknown) => {
   const type = typeof value

@@ -8,6 +8,7 @@ import { uniqueList } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftParsingError, ParsingError } from "../parsing-error"
 import { LuftInfer } from "../infer"
+import { ParsingContext } from "../parsing-context"
 
 export type InternalParsingResult<T> =
   | {
@@ -29,24 +30,6 @@ export type UnsuccessfulParsingResult = {
 }
 
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
-
-export class ParsingContext {
-  private _issues: ParsingError[] = []
-  public readonly path: Readonly<string | number[]> = []
-
-  public addIssue(issue: ParsingError): ParsingContext {
-    this._issues.push(issue)
-    return this
-  }
-
-  public get hasIssues() {
-    return this._issues.length !== 0
-  }
-
-  public get issues() {
-    return this._issues
-  }
-}
 
 export type InternalLuftBaseType<OUT_TYPE> = {
   _validate(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
@@ -259,23 +242,23 @@ export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<L
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<T[number]>> {
-    return this.validateAndCoerce(data, context, "coerce")
+    return this.validateAndCoerce(data, context, "_coerce")
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<T[number]>> {
-    return this.validateAndCoerce(data, context, "validate")
+    return this.validateAndCoerce(data, context, "_validate")
   }
 
   private validateAndCoerce(
     data: unknown,
     context: ParsingContext,
-    mode: "validate" | "coerce"
+    mode: "_validate" | "_coerce"
   ): InternalParsingResult<LuftInfer<T[number]>> {
-    const validators = this.schema as unknown as InternalLuftBaseType<LuftInfer<T[number]>>[]
+    const validators = this.schema.types as unknown as InternalLuftBaseType<LuftInfer<T[number]>>[]
+    // TODO create a context for every validator and merge the error messages in the root validator
+    //  if no validator succeeds.
     for (const validator of validators) {
-      const cb = mode === "coerce" ? validator._coerce.bind(this) : validator._validate.bind(this)
-
-      const result = cb(data, context)
+      const result = validator[mode](data, context)
       if (result.success) return result
     }
 

@@ -6,10 +6,11 @@
 
 import { saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftUnion, ParsingContext } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftUnion } from "./base-type"
 import { LuftNumber } from "./number"
 import { LuftString } from "./string"
 import { LuftInfer } from "../infer"
+import { ParsingContext } from "../parsing-context"
 
 export type LuftRecordKey = LuftString | LuftNumber | LuftUnion<(LuftString | LuftNumber)[]>
 

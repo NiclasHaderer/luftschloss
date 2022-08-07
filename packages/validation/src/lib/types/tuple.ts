@@ -4,11 +4,12 @@
  * MIT Licensed
  */
 
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType } from "./base-type"
 import { LuftInfer } from "../infer"
 import { createInvalidTypeIssue } from "../helpers"
 import { isArray } from "@luftschloss/core"
 import { LuftErrorCodes } from "../parsing-error"
+import { ParsingContext } from "../parsing-context"
 
 type ExtractType<T extends ReadonlyArray<LuftBaseType<unknown>>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>

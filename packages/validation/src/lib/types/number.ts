@@ -5,8 +5,9 @@
  */
 
 import { createInvalidTypeIssue } from "../helpers"
+import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalParsingResult, LuftBaseType } from "./base-type"
 
 export class LuftNumber extends LuftBaseType<number> {
   public readonly supportedTypes = ["number"]

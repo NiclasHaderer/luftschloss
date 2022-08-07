@@ -6,7 +6,8 @@
 
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { ParsingContext } from "../parsing-context"
 
 export class LuftString extends LuftBaseType<string> {
   public readonly supportedTypes = ["string"]

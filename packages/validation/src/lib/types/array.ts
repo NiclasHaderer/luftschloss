@@ -6,8 +6,9 @@
 
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftInfer } from "../infer"
+import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType } from "./base-type"
 
 type LuftArrayConstructor = {
   parser: "json" | "csv" | "nothing"

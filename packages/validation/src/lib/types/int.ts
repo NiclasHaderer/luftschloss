@@ -6,8 +6,9 @@
 
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalParsingResult, ParsingContext } from "./base-type"
+import { InternalParsingResult } from "./base-type"
 import { LuftNumber } from "./number"
+import { ParsingContext } from "../parsing-context"
 
 type LuftIntSchema = {
   min: number

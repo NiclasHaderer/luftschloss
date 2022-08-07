@@ -5,8 +5,9 @@
  */
 
 import { CaseInsinsitiveSet } from "../case-insinsitive-set"
+import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalParsingResult, LuftBaseType } from "./base-type"
 
 export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> extends LuftBaseType<T[number]> {
   private nonSensitiveSchema: CaseInsinsitiveSet<T[number]>

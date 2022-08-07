@@ -5,7 +5,8 @@
  */
 
 import { createInvalidTypeIssue } from "../helpers"
-import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { ParsingContext } from "../parsing-context"
+import { InternalParsingResult, LuftBaseType } from "./base-type"
 
 export class LuftRegexp extends LuftBaseType<string> {
   public constructor(public override readonly schema: { regex: RegExp }) {

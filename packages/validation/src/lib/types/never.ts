@@ -4,8 +4,9 @@
  * MIT Licensed
  */
 
-import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
+import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { createInvalidTypeIssue } from "../helpers"
+import { ParsingContext } from "../parsing-context"
 
 export class LuftNever extends LuftBaseType<never> {
   readonly supportedTypes = ["never"]

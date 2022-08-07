@@ -7,15 +7,9 @@
 import { saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
-import {
-  InternalLuftBaseType,
-  InternalParsingResult,
-  LuftBaseType,
-  LuftUndefined,
-  LuftUnion,
-  ParsingContext,
-} from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftUndefined, LuftUnion } from "./base-type"
 import { LuftInfer } from "../infer"
+import { ParsingContext } from "../parsing-context"
 
 // TODO deepPartial
 
