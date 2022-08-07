@@ -8,8 +8,6 @@ import { createInvalidTypeIssue } from "../helpers"
 import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type"
 
 export class LuftRegexp extends LuftBaseType<string> {
-  protected returnType!: string
-
   public constructor(public override readonly schema: { regex: RegExp }) {
     super()
   }

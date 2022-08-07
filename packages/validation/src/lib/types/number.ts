@@ -10,7 +10,6 @@ import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type
 
 export class LuftNumber extends LuftBaseType<number> {
   public readonly supportedTypes = ["number"]
-  protected readonly returnType!: number
 
   constructor(
     public override readonly schema: {

@@ -17,7 +17,6 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<un
   Record<LuftInfer<KEY>, LuftInfer<VALUE>>
 > {
   readonly supportedTypes: string[] = ["object"]
-  protected returnType!: Record<LuftInfer<KEY>, LuftInfer<VALUE>>
 
   constructor(
     public readonly schema: {

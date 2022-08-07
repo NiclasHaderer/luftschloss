@@ -18,7 +18,6 @@ type LuftArrayConstructor = {
 
 export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
   public readonly supportedTypes = ["array"]
-  protected readonly returnType!: LuftInfer<ARRAY_TYPE>[]
   public readonly schema: LuftArrayConstructor & { type: ARRAY_TYPE }
 
   public constructor({
@@ -63,10 +62,7 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
     return newValidator
   }
 
-  protected _coerce(
-    data: unknown,
-    context: ParsingContext
-  ): InternalParsingResult<LuftArray<ARRAY_TYPE>["returnType"]> {
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<ARRAY_TYPE>[]> {
     if (typeof data === "object" && data && Symbol.iterator in data && !Array.isArray(data)) {
       data = [...(data as Iterable<unknown>)]
     }
@@ -102,7 +98,7 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
     data: unknown,
     context: ParsingContext,
     mode: "_coerce" | "_validate" = "_validate"
-  ): InternalParsingResult<LuftArray<ARRAY_TYPE>["returnType"]> {
+  ): InternalParsingResult<LuftInfer<ARRAY_TYPE>[]> {
     // Check if the data is an array
     if (Array.isArray(data)) {
       // Check if the array is empty
@@ -182,7 +178,7 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
 
     return {
       success: true,
-      data: data as LuftArray<ARRAY_TYPE>["returnType"],
+      data: data as LuftInfer<ARRAY_TYPE>[],
     } as const
   }
 }

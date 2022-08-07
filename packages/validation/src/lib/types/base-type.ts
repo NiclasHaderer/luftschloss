@@ -56,7 +56,6 @@ export type InternalLuftBaseType<OUT_TYPE> = {
 
 export abstract class LuftBaseType<RETURN_TYPE> {
   public abstract readonly schema: Record<string, unknown>
-  protected abstract returnType: unknown
 
   public abstract readonly supportedTypes: string[]
   private beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
@@ -86,23 +85,32 @@ export abstract class LuftBaseType<RETURN_TYPE> {
       }
     }
 
-    if (context.hasIssues && !resultData.success) {
-      return {
-        success: false,
-        issues: context.issues,
-      }
+    // Issues, but no success
+    if (context.hasIssues && resultData.success) {
+      throw new Error(
+        "Context has issues, but the parsing result is marked as valid. Please check if your parser added issues if he returned false"
+      )
     }
-
-    if (!context.hasIssues && resultData.success) {
+    // No success, but also no issues
+    else if (!context.hasIssues && !resultData.success) {
+      throw new Error(
+        "Context does not have issues, but the parsing result is marked as valid. Please add issues if the result is not valid."
+      )
+    }
+    // Successful
+    else if (resultData.success) {
       return {
         success: true,
         data: resultData.data,
       }
     }
-
-    throw new Error(
-      "Context has issues, but the parsing result is marked as valid. Please check if your parser added issues if he returned false"
-    )
+    // Not successful
+    else {
+      return {
+        success: false,
+        issues: context.issues,
+      }
+    }
   }
 
   protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
@@ -199,7 +207,6 @@ export abstract class LuftBaseType<RETURN_TYPE> {
 }
 
 export class LuftUndefined extends LuftBaseType<undefined> {
-  protected returnType: undefined
   public readonly schema = {}
 
   public supportedTypes = ["undefined"]
@@ -222,7 +229,6 @@ export class LuftUndefined extends LuftBaseType<undefined> {
 export class LuftNull extends LuftBaseType<null> {
   public supportedTypes = ["null"]
   public readonly schema = {}
-  protected returnType!: null
 
   public clone(): LuftNull {
     return new LuftNull()
@@ -240,8 +246,6 @@ export class LuftNull extends LuftBaseType<null> {
 }
 
 export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftInfer<T[number]>> {
-  protected returnType!: LuftInfer<T[number]>
-
   public constructor(public readonly schema: { types: T }) {
     super()
   }

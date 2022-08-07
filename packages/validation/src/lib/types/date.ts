@@ -10,7 +10,6 @@ import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type
 
 export class LuftDate extends LuftBaseType<Date> {
   public readonly supportedTypes = ["date"]
-  protected returnType!: Date
 
   constructor(
     public readonly schema: {

@@ -37,7 +37,7 @@ const getAdditionalKeys = (toManyKeys: string[], allKeys: string[]): string[] =>
   toManyKeys.filter(key => !allKeys.includes(key))
 
 const getMissingKeys = (partialKeys: string[], allKeys: string[]): string[] =>
-  allKeys.filter(key => partialKeys.includes(key))
+  allKeys.filter(key => !partialKeys.includes(key))
 
 const copyObject = <T extends Record<string, LuftBaseType<unknown>>>(object: T): T => {
   const newObject = saveObject<Record<string, LuftBaseType<unknown>>>()
@@ -50,7 +50,6 @@ const copyObject = <T extends Record<string, LuftBaseType<unknown>>>(object: T):
 
 export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends LuftBaseType<ExtractType<T>> {
   public readonly supportedTypes = ["object"]
-  protected returnType!: ExtractType<T>
   public schema: { type: T } & LuftObjectConstructor
 
   public constructor({

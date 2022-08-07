@@ -16,7 +16,6 @@ type ExtractType<T extends ReadonlyArray<LuftBaseType<unknown>>> = {
 
 export class LuftTuple<T extends ReadonlyArray<LuftBaseType<unknown>>> extends LuftBaseType<ExtractType<T>> {
   readonly supportedTypes = ["array"]
-  protected returnType!: ExtractType<T>
   public override readonly schema: {
     types: T
     parser: "json" | "csv" | "nothing"

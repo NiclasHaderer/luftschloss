@@ -10,7 +10,6 @@ import { InternalParsingResult, LuftBaseType, ParsingContext } from "./base-type
 
 export class LuftString extends LuftBaseType<string> {
   public readonly supportedTypes = ["string"]
-  public returnType!: string
 
   constructor(
     public override readonly schema: { minLength: number; maxLength: number; trim: boolean } = {
@@ -45,7 +44,7 @@ export class LuftString extends LuftBaseType<string> {
     return newValidator
   }
 
-  public trim(shouldTrim = true): LuftString {
+  public trim(shouldTrim: boolean): LuftString {
     const newValidator = this.clone()
     newValidator.schema.trim = shouldTrim
     return newValidator
