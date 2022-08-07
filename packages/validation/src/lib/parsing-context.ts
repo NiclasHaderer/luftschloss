@@ -4,8 +4,8 @@ export class ParsingContext {
   private _issues: ParsingError[] = []
   public readonly path: Readonly<string | number[]> = []
 
-  public addIssue(issue: ParsingError): ParsingContext {
-    this._issues.push(issue)
+  public addIssue(...issue: ParsingError[]): ParsingContext {
+    this._issues.push(...issue)
     return this
   }
 
@@ -15,5 +15,17 @@ export class ParsingContext {
 
   public get issues() {
     return this._issues
+  }
+
+  public clone() {
+    const newContext = new ParsingContext()
+    // TODO copy path as well
+    return newContext.addIssue(...this._issues.map(i => ({ ...i })))
+  }
+
+  public cloneEmpty() {
+    const newContext = new ParsingContext()
+    // TODO copy path as well
+    return newContext
   }
 }

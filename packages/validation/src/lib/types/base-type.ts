@@ -5,8 +5,8 @@
  */
 
 import { uniqueList } from "@luftschloss/core"
-import { createInvalidTypeIssue } from "../helpers"
-import { LuftParsingError, ParsingError } from "../parsing-error"
+import { createInvalidTypeIssue, getTypeOf } from "../helpers"
+import { LuftErrorCodes, LuftParsingError, ParsingError } from "../parsing-error"
 import { LuftInfer } from "../infer"
 import { ParsingContext } from "../parsing-context"
 
@@ -255,14 +255,26 @@ export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<L
     mode: "_validate" | "_coerce"
   ): InternalParsingResult<LuftInfer<T[number]>> {
     const validators = this.schema.types as unknown as InternalLuftBaseType<LuftInfer<T[number]>>[]
-    // TODO create a context for every validator and merge the error messages in the root validator
-    //  if no validator succeeds.
+    const newErrors: ParsingError[] = []
     for (const validator of validators) {
-      const result = validator[mode](data, context)
-      if (result.success) return result
+      const customContext = context.cloneEmpty()
+      const result = validator[mode](data, customContext)
+      if (result.success) {
+        return result
+      } else {
+        newErrors.push(...customContext.issues)
+      }
     }
 
-    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
+    context.addIssue({
+      code: LuftErrorCodes.INVALID_UNION,
+      message: `Could not match to any of the available types ${this.supportedTypes.join(", ")}`,
+      path: [...context.path],
+      expectedType: this.supportedTypes,
+      receivedType: getTypeOf(data),
+      errors: newErrors,
+    })
+
     return { success: false }
   }
 }

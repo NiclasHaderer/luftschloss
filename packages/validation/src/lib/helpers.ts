@@ -14,7 +14,7 @@ export const getTypeOf = (value: unknown) => {
     if (isArray(value)) return "array" as const
     if (value === null) return "null" as const
     if (type.constructor.name === "Object") return "object" as const
-    return type.constructor.name
+    return (value as object).constructor.name
   }
   if (type === "number") {
     if (isNaN(value as number)) {

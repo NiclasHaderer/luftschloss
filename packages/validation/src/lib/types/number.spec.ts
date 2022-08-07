@@ -2,49 +2,21 @@ import { LuftInfer } from "../infer"
 import { SuccessfulParsingResult } from "./base-type"
 import { LuftNumber } from "./number"
 
-test("Test default schema", () => {
-  expect(new LuftNumber().schema).toEqual({
-    min: -Infinity,
-    max: Infinity,
-    allowNan: false,
-    minCompare: ">=",
-    maxCompare: "<=",
-  })
-})
-
 test("Test if correct number is parsed", () => {
-  const numberSchema = new LuftNumber({
-    min: -Infinity,
-    max: Infinity,
-    allowNan: false,
-    minCompare: ">",
-    maxCompare: "<",
-  })
+  const numberSchema = new LuftNumber()
   const result = numberSchema.validateSave(1)
   expect(result.success).toBe(true)
   expect((result as SuccessfulParsingResult<LuftInfer<LuftNumber>>).data).toBe(1)
 })
 
 test("Test invalid type", () => {
-  const numberSchema = new LuftNumber({
-    min: -Infinity,
-    max: Infinity,
-    allowNan: false,
-    minCompare: ">",
-    maxCompare: "<",
-  })
+  const numberSchema = new LuftNumber()
   const result = numberSchema.validateSave("no-number")
   expect(result.success).toBe(false)
 })
 
 test("NaN not accepted", () => {
-  const numberSchema = new LuftNumber({
-    min: -Infinity,
-    max: Infinity,
-    allowNan: false,
-    minCompare: ">",
-    maxCompare: "<",
-  })
+  const numberSchema = new LuftNumber()
   const result = numberSchema.validateSave(NaN)
   expect(result.success).toBe(false)
 })
@@ -57,7 +29,7 @@ test("NaN accepted", () => {
 })
 
 test("Invalid negative range", () => {
-  let numberSchema = new LuftNumber().min(-10).max(10)
+  const numberSchema = new LuftNumber().min(-10).max(10)
   // Invalid numbers
   const result1 = numberSchema.validateSave(-11)
   expect(result1.success).toBe(false)
@@ -69,28 +41,10 @@ test("Invalid negative range", () => {
   expect(result3.success).toBe(true)
   const result4 = numberSchema.validateSave(9)
   expect(result4.success).toBe(true)
-
-  // Check 0
-  numberSchema = numberSchema.positive()
-  expect(numberSchema.validateSave(0).success).toBe(false)
-  expect(numberSchema.validateSave(1).success).toBe(true)
-  numberSchema = numberSchema.nonNegative()
-  expect(numberSchema.validateSave(0).success).toBe(true)
-  expect(numberSchema.validateSave(1).success).toBe(true)
-
-  // Reset options
-  numberSchema = numberSchema.max(Infinity).min(-Infinity)
-
-  numberSchema = numberSchema.negative()
-  expect(numberSchema.validateSave(0).success).toBe(false)
-  expect(numberSchema.validateSave(-1).success).toBe(true)
-  numberSchema = numberSchema.nonPositive()
-  expect(numberSchema.validateSave(0).success).toBe(true)
-  expect(numberSchema.validateSave(-1).success).toBe(true)
 })
 
 test("Parse string coercion", () => {
-  let numberSchema = new LuftNumber()
+  let numberSchema = new LuftNumber().parseString(true)
   const result1 = numberSchema.coerceSave("9.6")
   expect(result1.success).toBe(true)
   expect((result1 as SuccessfulParsingResult<LuftInfer<LuftNumber>>).data).toBe(9.6)
@@ -114,32 +68,4 @@ test("Clone number", () => {
   const clone = numberSchema.clone()
   expect(clone).toBeInstanceOf(LuftNumber)
   expect(clone.schema).toEqual(numberSchema.schema)
-})
-
-test("Use modifiers", () => {
-  let numberSchema = new LuftNumber()
-  numberSchema = numberSchema.min(-10)
-  expect(numberSchema.schema.min).toBe(-10)
-  expect(numberSchema.validateSave(-10).success).toBe(false)
-  expect(numberSchema.validateSave(-9).success).toBe(true)
-  numberSchema = numberSchema.minEq(-10)
-  expect(numberSchema.validateSave(-10).success).toBe(true)
-
-  numberSchema = numberSchema.max(10)
-  expect(numberSchema.schema.max).toBe(10)
-  expect(numberSchema.validateSave(10).success).toBe(false)
-  expect(numberSchema.validateSave(9).success).toBe(true)
-  numberSchema = numberSchema.maxEq(10)
-  expect(numberSchema.validateSave(10).success).toBe(true)
-
-  expect(numberSchema.validateSave(NaN).success).toBe(false)
-  numberSchema = numberSchema.allowNaN(true)
-  expect(numberSchema.validateSave(NaN).success).toBe(true)
-
-  numberSchema = numberSchema.nonNegative().nonPositive()
-  expect(numberSchema.validateSave(-1).success).toBe(false)
-  expect(numberSchema.validateSave(0).success).toBe(true)
-  expect(numberSchema.validateSave(1).success).toBe(false)
-  expect(numberSchema.schema.min).toBe(0)
-  expect(numberSchema.schema.max).toBe(0)
 })

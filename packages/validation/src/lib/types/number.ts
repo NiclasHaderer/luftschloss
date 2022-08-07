@@ -19,7 +19,15 @@ export class LuftNumber extends LuftBaseType<number> {
       allowNan: boolean
       minCompare: ">=" | ">"
       maxCompare: "<=" | "<"
-    } = { min: -Infinity, max: Infinity, allowNan: false, minCompare: ">=", maxCompare: "<=" }
+      parseString: boolean
+    } = {
+      min: -Infinity,
+      max: Infinity,
+      allowNan: false,
+      minCompare: ">=",
+      maxCompare: "<=",
+      parseString: false,
+    }
   ) {
     super()
   }
@@ -28,11 +36,10 @@ export class LuftNumber extends LuftBaseType<number> {
     return new LuftNumber({ ...this.schema })
   }
 
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
-    if (typeof data === "string") {
-      data = parseFloat(data)
-    }
-    return this._validate(data, context)
+  public parseString(parse: boolean): LuftNumber {
+    const newValidator = this.clone()
+    newValidator.schema.parseString = parse
+    return newValidator
   }
 
   public allowNaN(allow: boolean): LuftNumber {
@@ -85,6 +92,13 @@ export class LuftNumber extends LuftBaseType<number> {
     return this.maxEq(0)
   }
 
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
+    if (typeof data === "string" && this.schema.parseString) {
+      data = parseFloat(data)
+    }
+    return this._validate(data, context)
+  }
+
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<number> {
     if (typeof data !== "number" || (!this.schema.allowNan && isNaN(data))) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
@@ -133,7 +147,7 @@ export class LuftNumber extends LuftBaseType<number> {
     }
   }
 
-  protected isToSmall(data: number): boolean {
+  private isToSmall(data: number): boolean {
     if (this.schema.minCompare === ">") {
       return !(data > this.schema.min)
     } else {
@@ -141,7 +155,7 @@ export class LuftNumber extends LuftBaseType<number> {
     }
   }
 
-  protected isToLarge(data: number): boolean {
+  private isToLarge(data: number): boolean {
     if (this.schema.maxCompare === "<") {
       return !(data < this.schema.max)
     } else {

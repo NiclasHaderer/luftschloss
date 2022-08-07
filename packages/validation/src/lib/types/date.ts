@@ -72,7 +72,8 @@ export class LuftDate extends LuftBaseType<Date> {
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<Date> {
     // Coerce from number to date
     if (typeof data === "number") {
-      data = new Date(data)
+      const newData = new Date(data)
+      if (!isNaN(newData.getTime())) data = newData
     }
 
     // Try to parse the date

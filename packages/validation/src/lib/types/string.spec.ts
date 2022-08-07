@@ -1,6 +1,6 @@
 import { LuftString } from "./string"
 import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type"
-import { InvalidLengthError, LuftErrorCodes } from "../parsing-error"
+import { InvalidLengthError, InvalidTypeError, LuftErrorCodes } from "../parsing-error"
 
 test("Test valid types", () => {
   const validator = new LuftString()
@@ -43,9 +43,15 @@ test("Test min length", () => {
   expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).actualLen).toBe(1)
 })
 
-test("Test invalid type", () => {
+test("Test invalid type for string", () => {
   const validator = new LuftString()
   expect(validator.validateSave(2).success).toBe(false)
   expect(validator.validateSave(null).success).toBe(false)
   expect(validator.validateSave(undefined).success).toBe(false)
+  let invalidType = (validator.validateSave(Infinity) as UnsuccessfulParsingResult).issues[0] as InvalidTypeError
+  expect(invalidType.receivedType).toBe("Infinity")
+  invalidType = (validator.validateSave(-Infinity) as UnsuccessfulParsingResult).issues[0] as InvalidTypeError
+  expect(invalidType.receivedType).toBe("-Infinity")
+  invalidType = (validator.validateSave(NaN) as UnsuccessfulParsingResult).issues[0] as InvalidTypeError
+  expect(invalidType.receivedType).toBe("NaN")
 })

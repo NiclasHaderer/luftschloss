@@ -1,6 +1,6 @@
 import { LuftNull, LuftUndefined, LuftUnion, SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type"
 import { LuftString } from "./string"
-import { InvalidTypeError, LuftErrorCodes } from "../parsing-error"
+import { LuftErrorCodes, UnionError } from "../parsing-error"
 
 test("Test undefined", () => {
   const validator = new LuftUndefined()
@@ -34,7 +34,7 @@ test("Test union", () => {
   const unsuccessfulResult = validator.validateSave(new T()) as UnsuccessfulParsingResult
   expect(unsuccessfulResult.success).toBe(false)
   expect(unsuccessfulResult.issues.length).toBe(1)
-  expect(unsuccessfulResult.issues[0].code).toBe(LuftErrorCodes.INVALID_TYPE)
-  expect((unsuccessfulResult.issues[0] as InvalidTypeError).expectedType).toEqual(["null", "string"])
-  expect((unsuccessfulResult.issues[0] as InvalidTypeError).receivedType).toEqual("T")
+  expect(unsuccessfulResult.issues[0].code).toBe(LuftErrorCodes.INVALID_UNION)
+  expect((unsuccessfulResult.issues[0] as UnionError).expectedType).toEqual(["null", "string"])
+  expect((unsuccessfulResult.issues[0] as UnionError).receivedType).toEqual("T")
 })

@@ -23,11 +23,11 @@ type BaseParsingError = {
   message: string
 }
 
-export type UnionError = BaseParsingError & {
-  code: "INVALID_UNION"
-  expectedType: string[]
-  receivedType: string
-}
+export type UnionError = BaseParsingError &
+  Omit<InvalidTypeError, "code"> & {
+    code: "INVALID_UNION"
+    errors: BaseParsingError[]
+  }
 
 export type InvalidTypeError = BaseParsingError & {
   code: "INVALID_TYPE"
