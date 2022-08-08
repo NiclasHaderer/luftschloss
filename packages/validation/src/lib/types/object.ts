@@ -6,10 +6,10 @@
 
 import { saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
-import { LuftErrorCodes } from "../parsing-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftUndefined, LuftUnion } from "./base-type"
 import { LuftInfer } from "../infer"
 import { ParsingContext } from "../parsing-context"
+import { LuftErrorCodes } from "../parsing-error"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftUndefined, LuftUnion } from "./base-type"
 
 // TODO deepPartial
 
@@ -33,7 +33,7 @@ const getAdditionalKeys = (toManyKeys: string[], allKeys: string[]): string[] =>
 const getMissingKeys = (partialKeys: string[], allKeys: string[]): string[] =>
   allKeys.filter(key => !partialKeys.includes(key))
 
-const copyObject = <T extends Record<string, LuftBaseType<unknown>>>(object: T): T => {
+const copyValidatorObject = <T extends Record<string, LuftBaseType<unknown>>>(object: T): T => {
   const newObject = saveObject<Record<string, LuftBaseType<unknown>>>()
   for (const [key, value] of Object.entries(object)) {
     newObject[key] = value.clone()
@@ -73,19 +73,20 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     object: NEW_OBJECT
   ): LuftObject<T & NEW_OBJECT> {
     return new LuftObject({
+      ...this.schema,
       type: {
-        ...copyObject(this.schema.type),
-        ...copyObject(object),
+        ...copyValidatorObject(this.schema.type),
+        ...copyValidatorObject(object),
       },
     })
   }
 
-  public omit<KEY extends keyof T & string>(...keys: KEY[]): LuftObject<Omit<T, KEY>> {
+  public omit<KEY extends keyof T & string>(keys: KEY[]): LuftObject<Omit<T, KEY>> {
     const keysToPick = getMissingKeys(keys, Object.keys(this.schema.type))
-    return this.pick(...keysToPick) as LuftObject<Omit<T, KEY>>
+    return this.pick(keysToPick) as LuftObject<Omit<T, KEY>>
   }
 
-  public pick<KEY extends keyof T & string>(...keys: KEY[]): LuftObject<Pick<T, KEY>> {
+  public pick<KEY extends keyof T & string>(keys: KEY[]): LuftObject<Pick<T, KEY>> {
     const finishedObject = keys.reduce((acc, key) => {
       acc[key] = this.schema.type[key].clone()
       return acc
@@ -107,7 +108,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     return new LuftObject<ObjectPartial<T>>({
       ...this.schema,
       type: newType as ObjectPartial<T>,
-    })
+    }).treatMissingKeyAs("undefined")
   }
 
   public clone(): LuftObject<T> {

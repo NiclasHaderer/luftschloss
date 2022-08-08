@@ -5,22 +5,11 @@
  */
 
 export class CaseInsensitiveSet<T> extends Set<T> {
-  private sensitiveLookup = new Map<string, string>()
+  private sensitiveLookup: Map<string, string> = new Map<string, string>()
 
   public constructor(values: ReadonlyArray<T> | null) {
-    const transformedValues: T[] | null = values
-      ? (values.map(v => {
-          if (typeof v === "string") {
-            const lowerV = v.toLowerCase()
-            this.sensitiveLookup.set(lowerV, v)
-            return lowerV
-          } else {
-            return v
-          }
-        }) as T[])
-      : null
-
-    super(transformedValues)
+    super()
+    if (values) values.forEach(value => this.add(value))
   }
 
   public getCorresponding(value: T): T {

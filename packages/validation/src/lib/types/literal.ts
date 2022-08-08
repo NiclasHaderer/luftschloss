@@ -12,7 +12,6 @@ import { InternalParsingResult, LuftBaseType } from "./base-type"
 export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> extends LuftBaseType<T[number]> {
   private nonSensitiveSchema: CaseInsensitiveSet<T[number]>
   private sensitiveSchema: Set<T[number]>
-  public readonly supportedTypes = this.schema.types.map(t => t.toString())
   public readonly schema: { types: T; ignoreCase: boolean }
 
   public constructor({ types, ignoreCase = false }: { types: T; ignoreCase?: boolean }) {
@@ -20,6 +19,10 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
     this.schema = { types, ignoreCase }
     this.nonSensitiveSchema = new CaseInsensitiveSet(this.schema.types)
     this.sensitiveSchema = new Set(this.schema.types)
+  }
+
+  public get supportedTypes() {
+    return this.schema.types.map(t => t.toString())
   }
 
   public clone(): LuftLiteral<T> {
@@ -63,7 +66,7 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
       code: LuftErrorCodes.INVALID_VALUE,
       message: `Could not match value ${valueDisplay} to one of ${this.schema.types.join(", ")}`,
       path: [...context.path],
-      allowedValues: this.schema.types.map(v => v.toString()),
+      allowedValues: this.supportedTypes,
       receivedValue: valueDisplay,
     })
     return {
