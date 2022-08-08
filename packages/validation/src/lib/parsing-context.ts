@@ -2,7 +2,7 @@ import { ParsingError } from "./parsing-error"
 
 export class ParsingContext {
   private _issues: ParsingError[] = []
-  public readonly path: Readonly<string | number[]> = []
+  public path: Readonly<string | number[]> = []
 
   public addIssue(...issue: ParsingError[]): ParsingContext {
     this._issues.push(...issue)
@@ -17,15 +17,27 @@ export class ParsingContext {
     return this._issues
   }
 
+  /**
+   * @internal
+   */
+  public stepInto(...path: (string | number)[]): ParsingContext {
+    this.path = [...this.path, ...path] as Readonly<string | number[]>
+    return this
+  }
+
+  /**
+   * @internal
+   */
+  public stepOut(): ParsingContext {
+    this.path = this.path.slice(0, this.path.length - 1)
+    return this
+  }
+
   public clone() {
-    const newContext = new ParsingContext()
-    // TODO copy path as well
-    return newContext.addIssue(...this._issues.map(i => ({ ...i })))
+    return new ParsingContext().stepInto(...this.path).addIssue(...this._issues.map(i => ({ ...i })))
   }
 
   public cloneEmpty() {
-    const newContext = new ParsingContext()
-    // TODO copy path as well
-    return newContext
+    return new ParsingContext().stepInto(...this.path)
   }
 }

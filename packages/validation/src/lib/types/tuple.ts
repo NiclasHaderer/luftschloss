@@ -32,6 +32,8 @@ export class LuftTuple<T extends ReadonlyArray<LuftBaseType<unknown>>> extends L
       ...this.schema,
       types: this.schema.types.map(t => t.clone()) as unknown as T,
     })
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public parseWith(parser: "json" | "csv" | "nothing"): LuftTuple<T> {

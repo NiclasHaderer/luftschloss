@@ -39,10 +39,16 @@ export type InternalLuftBaseType<OUT_TYPE> = {
 
 export abstract class LuftBaseType<RETURN_TYPE> {
   public abstract readonly schema: Record<string, unknown>
-
   public abstract readonly supportedTypes: string[]
-  private beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
-  private beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
+
+  protected beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
+  protected beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
+
+  protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
+
+  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
+
+  public abstract clone(): LuftBaseType<RETURN_TYPE>
 
   public validate(data: unknown): RETURN_TYPE {
     const result = this.validateSave(data)
@@ -54,9 +60,35 @@ export abstract class LuftBaseType<RETURN_TYPE> {
 
   public validateSave(data: unknown): ParsingResult<RETURN_TYPE> {
     const context = new ParsingContext()
-    const resultData = this._validate(data, context)
 
-    for (const coerceBeforeHook of this.beforeValidateHooks) {
+    for (const validateBeforeHook of this.beforeValidateHooks) {
+      const result = validateBeforeHook(data, context)
+      if (result.success) {
+        data = result.data
+      } else {
+        return {
+          success: false,
+          issues: context.issues,
+        }
+      }
+    }
+
+    const resultData = this._validate(data, context)
+    return this.checkDataAndReturn(context, resultData)
+  }
+
+  public coerce(data: unknown): RETURN_TYPE {
+    const result = this.coerceSave(data)
+    if (result.success) {
+      return result.data
+    }
+    throw new LuftParsingError(result.issues, "Could not coerce data")
+  }
+
+  public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
+    const context = new ParsingContext()
+
+    for (const coerceBeforeHook of this.beforeCoerceHooks) {
       const result = coerceBeforeHook(data, context)
       if (result.success) {
         data = result.data
@@ -68,6 +100,14 @@ export abstract class LuftBaseType<RETURN_TYPE> {
       }
     }
 
+    const resultData = this._coerce(data, context)
+    return this.checkDataAndReturn(context, resultData)
+  }
+
+  private checkDataAndReturn(
+    context: ParsingContext,
+    resultData: InternalParsingResult<RETURN_TYPE>
+  ): ParsingResult<RETURN_TYPE> {
     // Issues, but no success
     if (context.hasIssues && resultData.success) {
       throw new Error(
@@ -96,70 +136,22 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     }
   }
 
-  protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
-
-  public coerce(data: unknown): RETURN_TYPE {
-    const result = this.coerceSave(data)
-    if (result.success) {
-      return result.data
-    }
-    throw new LuftParsingError(result.issues, "Could not coerce data")
-  }
-
-  public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
-    const context = new ParsingContext()
-
-    for (const coerceBeforeHook of this.beforeCoerceHooks) {
-      const result = coerceBeforeHook(data, context)
-      if (result.success) {
-        data = result.data
-      } else {
-        return {
-          success: false,
-          issues: context.issues,
-        }
-      }
-    }
-
-    const resultData = this._coerce ? this._coerce(data, context) : this._validate(data, context)
-
-    if (context.hasIssues && !resultData.success) {
-      return {
-        success: false,
-        issues: context.issues,
-      }
-    }
-
-    if (!context.hasIssues && resultData.success) {
-      return {
-        success: true,
-        data: resultData.data,
-      }
-    }
-
-    throw new Error(
-      "Context has issues, but the parsing result is marked as valid. Please check you parsers for errors"
-    )
-  }
-
-  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
-
-  public abstract clone(): LuftBaseType<RETURN_TYPE>
-
   public optional(): LuftUnion<[this, LuftUndefined]> {
-    return new LuftUnion({ types: [this, new LuftUndefined()] })
+    return new LuftUnion({ types: [this.clone(), new LuftUndefined()] }) as LuftUnion<[this, LuftUndefined]>
   }
 
   public nullable(): LuftUnion<[this, LuftNull]> {
-    return new LuftUnion({ types: [this, new LuftNull()] })
+    return new LuftUnion({ types: [this.clone(), new LuftNull()] }) as LuftUnion<[this, LuftNull]>
   }
 
   public nullish(): LuftUnion<[this, LuftNull, LuftUndefined]> {
-    return new LuftUnion({ types: [this, new LuftNull(), new LuftUndefined()] })
+    return new LuftUnion({ types: [this.clone(), new LuftNull(), new LuftUndefined()] }) as LuftUnion<
+      [this, LuftNull, LuftUndefined]
+    >
   }
 
   public or<T extends LuftBaseType<unknown>>(type: T): LuftUnion<(T | this)[]> {
-    return new LuftUnion({ types: [this, type] })
+    return new LuftUnion({ types: [this.clone(), type] }) as LuftUnion<(T | this)[]>
   }
 
   public default(defaultValue: RETURN_TYPE): this {
@@ -173,19 +165,63 @@ export abstract class LuftBaseType<RETURN_TYPE> {
       return { success: true, data: coerceValue }
     }
 
-    this.beforeValidate(addDefaultFun)
-    this.beforeCoerce(addDefaultFun)
-    return this
+    let newValidator = this.beforeValidate(addDefaultFun)
+    newValidator = newValidator.beforeCoerce(addDefaultFun)
+    return newValidator
   }
 
-  public beforeValidate(cb: (value: unknown, context: ParsingContext) => InternalParsingResult<unknown>): this {
-    this.beforeValidateHooks.push(cb)
-    return this
+  public beforeValidate(
+    ...callbacks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+  ): this
+  public beforeValidate(
+    dontClone: boolean,
+    ...callbacks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+  ): this
+  public beforeValidate(
+    ...data:
+      | ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+      | [boolean, ...((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]]
+  ): this {
+    return this.addHook(data, "beforeValidateHooks")
   }
 
-  public beforeCoerce(cb: (value: unknown, context: ParsingContext) => InternalParsingResult<unknown>): this {
-    this.beforeCoerceHooks.push(cb)
-    return this
+  public beforeCoerce(
+    ...callbacks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+  ): this
+  public beforeCoerce(
+    dontClone: boolean,
+    ...callbacks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+  ): this
+  public beforeCoerce(
+    ...data:
+      | ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+      | [boolean, ...((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]]
+  ): this {
+    return this.addHook(data, "beforeCoerceHooks")
+  }
+
+  private addHook(
+    data:
+      | ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+      | [boolean, ...((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]],
+    hookType: "beforeValidateHooks" | "beforeCoerceHooks"
+  ): this {
+    //eslint-disable-next-line @typescript-eslint/no-this-alias
+    let self = this
+    let callbacks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+    if (typeof data[0] === "boolean") {
+      callbacks = data.slice(1) as ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+      const dontClone = data[0]
+      if (dontClone == false) {
+        self = self.clone() as this
+      }
+    } else {
+      callbacks = data as ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+      self = self.clone() as this
+    }
+
+    self[hookType].push(...callbacks)
+    return self
   }
 }
 
@@ -196,6 +232,8 @@ export class LuftUndefined extends LuftBaseType<undefined> {
 
   public clone(): LuftUndefined {
     return new LuftUndefined()
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
@@ -215,6 +253,8 @@ export class LuftNull extends LuftBaseType<null> {
 
   public clone(): LuftNull {
     return new LuftNull()
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
@@ -235,6 +275,8 @@ export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<L
 
   public clone(): LuftUnion<T> {
     return new LuftUnion({ types: this.schema.types.map(type => type.clone()) as T })
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public get supportedTypes() {
@@ -242,17 +284,13 @@ export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<L
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<T[number]>> {
-    return this.validateAndCoerce(data, context, "_coerce")
+    return this._validate(data, context, "_coerce")
   }
 
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<T[number]>> {
-    return this.validateAndCoerce(data, context, "_validate")
-  }
-
-  private validateAndCoerce(
+  protected _validate(
     data: unknown,
     context: ParsingContext,
-    mode: "_validate" | "_coerce"
+    mode: "_validate" | "_coerce" = "_validate"
   ): InternalParsingResult<LuftInfer<T[number]>> {
     const validators = this.schema.types as unknown as InternalLuftBaseType<LuftInfer<T[number]>>[]
     const newErrors: ParsingError[] = []

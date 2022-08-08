@@ -25,6 +25,8 @@ export class LuftDate extends LuftBaseType<Date> {
 
   public clone(): LuftDate {
     return new LuftDate({ ...this.schema })
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public after(date: Date | number | string): LuftDate {

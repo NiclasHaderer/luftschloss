@@ -34,6 +34,8 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<un
       key: this.schema.key.clone() as KEY,
       value: this.schema.value.clone() as VALUE,
     })
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(

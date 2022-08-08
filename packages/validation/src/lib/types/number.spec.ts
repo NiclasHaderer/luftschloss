@@ -66,6 +66,7 @@ test("Parse string coercion", () => {
 test("Clone number", () => {
   const numberSchema = new LuftNumber()
   const clone = numberSchema.clone()
-  expect(clone).toBeInstanceOf(LuftNumber)
+  expect(clone).toStrictEqual(numberSchema)
+  expect(clone).not.toBe(numberSchema)
   expect(clone.schema).toEqual(numberSchema.schema)
 })

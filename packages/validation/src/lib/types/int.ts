@@ -40,6 +40,8 @@ export class LuftInt extends LuftNumber {
 
   public clone(): LuftInt {
     return new LuftInt({ ...this.schema })
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public parseString(parse: boolean): LuftInt {

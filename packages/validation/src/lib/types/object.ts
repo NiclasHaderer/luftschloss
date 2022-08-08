@@ -118,6 +118,8 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
     }, {} as T)
 
     return new LuftObject({ ...this.schema, type: clonedType })
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public ignoreUnknownKeys(ignore: boolean): LuftObject<T> {

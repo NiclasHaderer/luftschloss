@@ -13,7 +13,7 @@ export class LuftAny extends LuftBaseType<any> {
   public readonly schema = {}
 
   public clone(): LuftAny {
-    return new LuftAny()
+    return new LuftAny().beforeCoerce(true, ...this.beforeCoerceHooks).beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<any> {

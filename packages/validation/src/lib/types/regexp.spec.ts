@@ -9,6 +9,7 @@ test("Test regex", () => {
 test("Clone validator", () => {
   const validator = new LuftRegexp({ regex: /^\d$/ })
   const clone = validator.clone()
-  expect(clone).toBeInstanceOf(LuftRegexp)
+  expect(clone).toStrictEqual(validator)
+  expect(clone).not.toBe(validator)
   expect(clone.schema).toEqual(validator.schema)
 })

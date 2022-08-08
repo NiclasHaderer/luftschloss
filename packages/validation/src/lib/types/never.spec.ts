@@ -26,5 +26,5 @@ test("Test that no value is allowed for the never type", () => {
 test("Test any schema clone", () => {
   const validator = new LuftNever()
   expect(validator).not.toBe(validator.clone())
-  expect(validator).toBeInstanceOf(LuftNever)
+  expect(validator.clone()).toStrictEqual(validator)
 })

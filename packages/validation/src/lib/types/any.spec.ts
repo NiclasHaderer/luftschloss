@@ -26,5 +26,5 @@ test("Test if different types are allowed for the any type", () => {
 test("Test any schema clone", () => {
   const validator = new LuftAny()
   expect(validator).not.toBe(validator.clone())
-  expect(validator).toBeInstanceOf(LuftAny)
+  expect(validator.clone()).toStrictEqual(validator)
 })

@@ -19,6 +19,8 @@ export class LuftRegexp extends LuftBaseType<string> {
 
   public clone(): LuftRegexp {
     return new LuftRegexp({ regex: new RegExp(this.schema.regex.source, this.schema.regex.flags) })
+      .beforeCoerce(true, ...this.beforeCoerceHooks)
+      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
