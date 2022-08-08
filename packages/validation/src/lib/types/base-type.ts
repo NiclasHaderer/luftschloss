@@ -6,9 +6,9 @@
 
 import { uniqueList } from "@luftschloss/core"
 import { createInvalidTypeIssue, getTypeOf } from "../helpers"
-import { LuftErrorCodes, LuftParsingError, ParsingError } from "../parsing-error"
 import { LuftInfer } from "../infer"
 import { ParsingContext } from "../parsing-context"
+import { LuftErrorCodes, LuftParsingError, ParsingError } from "../parsing-error"
 
 export type InternalParsingResult<T> =
   | {
@@ -49,7 +49,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     if (result.success) {
       return result.data
     }
-    throw new LuftParsingError(result.issues)
+    throw new LuftParsingError(result.issues, "Could not validate data")
   }
 
   public validateSave(data: unknown): ParsingResult<RETURN_TYPE> {
@@ -103,7 +103,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     if (result.success) {
       return result.data
     }
-    throw new LuftParsingError(result.issues)
+    throw new LuftParsingError(result.issues, "Could not coerce data")
   }
 
   public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {

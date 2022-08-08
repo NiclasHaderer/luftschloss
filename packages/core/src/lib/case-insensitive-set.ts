@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-export class CaseInsinsitiveSet<T> extends Set<T> {
+export class CaseInsensitiveSet<T> extends Set<T> {
   private sensitiveLookup = new Map<string, string>()
 
   public constructor(values: ReadonlyArray<T> | null) {

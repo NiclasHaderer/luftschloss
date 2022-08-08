@@ -4,13 +4,13 @@
  * MIT Licensed
  */
 
-import { CaseInsinsitiveSet } from "../case-insinsitive-set"
+import { CaseInsensitiveSet } from "@luftschloss/core"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 
 export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> extends LuftBaseType<T[number]> {
-  private nonSensitiveSchema: CaseInsinsitiveSet<T[number]>
+  private nonSensitiveSchema: CaseInsensitiveSet<T[number]>
   private sensitiveSchema: Set<T[number]>
   public readonly supportedTypes = this.schema.types.map(t => t.toString())
   public readonly schema: { types: T; ignoreCase: boolean }
@@ -18,7 +18,7 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
   public constructor({ types, ignoreCase = false }: { types: T; ignoreCase?: boolean }) {
     super()
     this.schema = { types, ignoreCase }
-    this.nonSensitiveSchema = new CaseInsinsitiveSet(this.schema.types)
+    this.nonSensitiveSchema = new CaseInsensitiveSet(this.schema.types)
     this.sensitiveSchema = new Set(this.schema.types)
   }
 
