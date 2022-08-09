@@ -10,9 +10,10 @@ import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftUnion } from "./base-type"
 import { LuftNumber } from "./number"
+import { LuftRegexp } from "./regexp"
 import { LuftString } from "./string"
 
-export type LuftRecordKey = LuftString | LuftNumber | LuftUnion<(LuftString | LuftNumber)[]>
+export type LuftRecordKey = LuftString | LuftNumber | LuftRegexp | LuftUnion<(LuftString | LuftNumber | LuftRegexp)[]>
 
 export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<unknown>> extends LuftBaseType<
   Record<LuftInfer<KEY>, LuftInfer<VALUE>>
@@ -49,7 +50,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<un
     data: unknown,
     context: ParsingContext
   ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
-    return this._validate(data, context)
+    return this._validate(data, context, "_coerce")
   }
 
   protected _validate(

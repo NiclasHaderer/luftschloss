@@ -4,11 +4,11 @@
  * MIT Licensed
  */
 
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer } from "./base-type"
-import { createInvalidTypeIssue } from "../helpers"
 import { isArray } from "@luftschloss/core"
-import { LuftErrorCodes } from "../parsing-error"
+import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
+import { LuftErrorCodes } from "../parsing-error"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer } from "./base-type"
 
 type ExtractType<T extends ReadonlyArray<LuftBaseType<unknown>>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
@@ -69,10 +69,14 @@ export class LuftTuple<T extends ReadonlyArray<LuftBaseType<unknown>>> extends L
           break
       }
     }
-    return this._validate(data, context)
+    return this._validate(data, context, "_coerce")
   }
 
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<ExtractType<T>> {
+  protected _validate(
+    data: unknown,
+    context: ParsingContext,
+    mode: "_validate" | "_coerce" = "_validate"
+  ): InternalParsingResult<ExtractType<T>> {
     if (!isArray(data)) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return { success: false }
@@ -89,15 +93,16 @@ export class LuftTuple<T extends ReadonlyArray<LuftBaseType<unknown>>> extends L
         minLen: schemaLength,
         actualLen: dataLength,
       })
+      return { success: false }
     }
 
     let failAtEnd = false
 
-    const newArray: unknown[] = []
+    const newArray: unknown[] = new Array(schemaLength)
     for (let i = 0; i < data.length; ++i) {
-      const validationResult = (this.schema.types[i] as InternalLuftBaseType<unknown>)._validate(data, context)
+      const validationResult = (this.schema.types[i] as InternalLuftBaseType<unknown>)[mode](data[i], context)
       if (validationResult.success) {
-        newArray[0] = validationResult.data
+        newArray[i] = validationResult.data
       } else {
         failAtEnd = true
       }

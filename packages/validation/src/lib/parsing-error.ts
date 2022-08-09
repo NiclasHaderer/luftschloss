@@ -87,3 +87,5 @@ export class LuftParsingError extends Error {
     super(message)
   }
 }
+
+export class LuftParsingUsageError extends Error {}

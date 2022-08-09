@@ -7,7 +7,7 @@
 import { uniqueList } from "@luftschloss/core"
 import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
-import { LuftErrorCodes, LuftParsingError, ParsingError } from "../parsing-error"
+import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"
 
 export type LuftInfer<T extends LuftBaseType<unknown>> = T extends LuftBaseType<infer U> ? U : never
 
@@ -62,19 +62,22 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   public validateSave(data: unknown): ParsingResult<RETURN_TYPE> {
     const context = new ParsingContext()
 
+    let resultData: InternalParsingResult<RETURN_TYPE> | undefined = undefined
     for (const validateBeforeHook of this.beforeValidateHooks) {
       const result = validateBeforeHook(data, context)
       if (result.success) {
         data = result.data
       } else {
-        return {
-          success: false,
-          issues: context.issues,
-        }
+        resultData = result
+        break
       }
     }
 
-    const resultData = this._validate(data, context)
+    if (resultData) {
+      return this.checkDataAndReturn(context, resultData)
+    }
+
+    resultData = this._validate(data, context)
     return this.checkDataAndReturn(context, resultData)
   }
 
@@ -89,19 +92,22 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
     const context = new ParsingContext()
 
+    let resultData: InternalParsingResult<RETURN_TYPE> | undefined = undefined
     for (const coerceBeforeHook of this.beforeCoerceHooks) {
       const result = coerceBeforeHook(data, context)
       if (result.success) {
         data = result.data
       } else {
-        return {
-          success: false,
-          issues: context.issues,
-        }
+        resultData = result
+        break
       }
     }
 
-    const resultData = this._coerce(data, context)
+    if (resultData) {
+      return this.checkDataAndReturn(context, resultData)
+    }
+
+    resultData = this._coerce(data, context)
     return this.checkDataAndReturn(context, resultData)
   }
 
@@ -111,13 +117,13 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   ): ParsingResult<RETURN_TYPE> {
     // Issues, but no success
     if (context.hasIssues && resultData.success) {
-      throw new Error(
+      throw new LuftParsingUsageError(
         "Context has issues, but the parsing result is marked as valid. Please check if your parser added issues if he returned false"
       )
     }
     // No success, but also no issues
     else if (!context.hasIssues && !resultData.success) {
-      throw new Error(
+      throw new LuftParsingUsageError(
         "Context does not have issues, but the parsing result is marked as valid. Please add issues if the result is not valid."
       )
     }

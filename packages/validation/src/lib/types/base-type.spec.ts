@@ -1,4 +1,5 @@
-import { LuftErrorCodes, UnionError } from "../parsing-error"
+import { createInvalidTypeIssue } from "../helpers"
+import { LuftErrorCodes, LuftParsingUsageError, UnionError } from "../parsing-error"
 import {
   LuftBaseType,
   LuftNull,
@@ -84,4 +85,51 @@ test("Test adding validator", () => {
   expect(validator).not.toBe(notANewValidator)
   notANewValidator = validator.beforeValidate(value => ({ success: true, data: value }))
   expect(validator).not.toBe(notANewValidator)
+})
+
+test("Test or", () => {
+  const validator = new LuftString()
+  expect(validator.validateSave(null).success).toBe(false)
+  expect(validator.or(new LuftNull()).validateSave(null).success).toBe(true)
+})
+
+test("Test before validate hook", () => {
+  const alwaysFalse = new LuftString().beforeValidate((value, context) => {
+    context.addIssue(createInvalidTypeIssue(value, ["string"], context))
+    return { success: false }
+  })
+  expect(alwaysFalse.validateSave("hello").success).toBe(false)
+
+  const addWorld = new LuftString().beforeValidate((value, context) => {
+    return { success: true, data: value + " world" }
+  })
+  expect(addWorld.validate("hello")).toBe("hello world")
+  expect(addWorld.coerce("hello")).toBe("hello")
+})
+
+test("Test before coerce hook", () => {
+  const alwaysFalse = new LuftString().beforeCoerce((value, context) => {
+    context.addIssue(createInvalidTypeIssue(value, ["string"], context))
+    return { success: false }
+  })
+  expect(alwaysFalse.coerceSave("hello").success).toBe(false)
+
+  const addWorld = new LuftString().beforeCoerce((value, context) => {
+    return { success: true, data: value + " world" }
+  })
+  expect(addWorld.coerce("hello")).toBe("hello world")
+  expect(addWorld.validate("hello")).toBe("hello")
+})
+
+test("Test invalid hooks", () => {
+  const invalidFalse = new LuftString().beforeValidate((value, context) => {
+    return { success: false }
+  })
+  expect(() => invalidFalse.validate("hello")).toThrow(LuftParsingUsageError)
+
+  const invalidTrue = new LuftString().beforeValidate((value, context) => {
+    context.addIssue(createInvalidTypeIssue(value, ["string"], context))
+    return { success: true, data: value }
+  })
+  expect(() => invalidTrue.validate("hello")).toThrow(LuftParsingUsageError)
 })

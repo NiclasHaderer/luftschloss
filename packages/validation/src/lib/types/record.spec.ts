@@ -20,10 +20,19 @@ test("Test valid record", () => {
     hello: 1,
     world: 2,
   })
+  expect(
+    validator.coerce({
+      hello: 1,
+      world: 2,
+    })
+  ).toEqual({
+    hello: 1,
+    world: 2,
+  })
 })
 
 test("Test invalid record", () => {
-  const validator = new LuftRecord({ key: new LuftString(), value: new LuftNumber() })
+  const validator = new LuftRecord({ key: new LuftString(), value: new LuftNumber().parseString(true) })
   expect(() =>
     validator.validate({
       hello: "1",
@@ -31,6 +40,12 @@ test("Test invalid record", () => {
     })
   ).toThrow(LuftParsingError)
   expect(() => validator.validate("hello")).toThrow(LuftParsingError)
+  expect(
+    validator.coerce({
+      hello: "1",
+      world: 2,
+    })
+  ).toEqual({ hello: 1, world: 2 })
 })
 
 test("Test non empty", () => {
