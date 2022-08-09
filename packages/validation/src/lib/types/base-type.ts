@@ -6,9 +6,10 @@
 
 import { uniqueList } from "@luftschloss/core"
 import { createInvalidTypeIssue, getTypeOf } from "../helpers"
-import { LuftInfer } from "../infer"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftParsingError, ParsingError } from "../parsing-error"
+
+export type LuftInfer<T extends LuftBaseType<unknown>> = T extends LuftBaseType<infer U> ? U : never
 
 export type InternalParsingResult<T> =
   | {

@@ -1,5 +1,4 @@
-import { LuftInfer } from "../infer"
-import { SuccessfulParsingResult } from "./base-type"
+import { LuftInfer, SuccessfulParsingResult } from "./base-type"
 import { LuftNumber } from "./number"
 
 test("Test if correct number is parsed", () => {

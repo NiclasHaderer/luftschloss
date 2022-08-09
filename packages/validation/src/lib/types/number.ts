@@ -96,7 +96,7 @@ export class LuftNumber extends LuftBaseType<number> {
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
     if (typeof data === "string" && this.schema.parseString) {
-      data = parseFloat(data)
+      data = Number(data)
     }
     return this._validate(data, context)
   }

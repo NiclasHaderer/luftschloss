@@ -6,10 +6,16 @@
 
 import { saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
-import { LuftInfer } from "../infer"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftUndefined, LuftUnion } from "./base-type"
+import {
+  InternalLuftBaseType,
+  InternalParsingResult,
+  LuftBaseType,
+  LuftInfer,
+  LuftUndefined,
+  LuftUnion,
+} from "./base-type"
 
 // TODO deepPartial
 
@@ -201,7 +207,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends
       // The key is not in the data and missingKeys should be treated as error and not as undefined
       // Only step in this condition if the condition has not been executed before
       if (!(key in data) && this.schema.treatMissingKeyAs === "error" && !detectedMissingKeys) {
-        // Save that the validation should faile
+        // Save that the validation should fail
         failAtEnd = true
         // Do NOT enter this condition again
         detectedMissingKeys = true

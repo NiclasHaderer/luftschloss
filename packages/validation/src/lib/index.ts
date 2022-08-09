@@ -9,6 +9,5 @@
 
 export * from "./types"
 export * from "./factories"
-export * from "./infer"
 export * from "./parsing-context"
 export * from "./parsing-error"

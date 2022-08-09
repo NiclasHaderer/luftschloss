@@ -5,9 +5,9 @@
  */
 
 import { createInvalidTypeIssue } from "../helpers"
+import { ParsingContext } from "../parsing-context"
 import { InternalParsingResult } from "./base-type"
 import { LuftNumber } from "./number"
-import { ParsingContext } from "../parsing-context"
 
 type LuftIntSchema = {
   min: number
@@ -92,7 +92,7 @@ export class LuftInt extends LuftNumber {
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
     if (typeof data === "string" && this.schema.parseString) {
-      data = parseFloat(data)
+      data = Number(data)
     }
     if (typeof data === "number" && data % 1 !== 0 && this.schema.roundWith !== "none") {
       data = Math[this.schema.roundWith](data)

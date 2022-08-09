@@ -5,16 +5,14 @@
  */
 
 import { createInvalidTypeIssue } from "../helpers"
-import { LuftInfer } from "../infer"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer } from "./base-type"
 
 type LuftArrayConstructor = {
   parser: "json" | "csv" | "nothing"
   maxLength: number
   minLength: number
-  nonEmpty: boolean
 }
 
 export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
@@ -23,13 +21,12 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
 
   public constructor({
     type,
-    nonEmpty = false,
     parser = "nothing",
     maxLength = Infinity,
-    minLength = -Infinity,
+    minLength = 0,
   }: Partial<LuftArrayConstructor> & { type: ARRAY_TYPE }) {
     super()
-    this.schema = { type, nonEmpty, parser, maxLength, minLength }
+    this.schema = { type, parser, maxLength, minLength }
   }
 
   public clone(): LuftArray<ARRAY_TYPE> {
@@ -53,9 +50,9 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
     return newValidator
   }
 
-  public nonEmpty(allowNonEmpty = false) {
+  public nonEmpty(nonEmpty: boolean): LuftArray<ARRAY_TYPE> {
     const newValidator = this.clone()
-    newValidator.schema.nonEmpty = allowNonEmpty
+    newValidator.schema.minLength = nonEmpty ? 1 : 0
     return newValidator
   }
 
@@ -102,86 +99,71 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
     context: ParsingContext,
     mode: "_coerce" | "_validate" = "_validate"
   ): InternalParsingResult<LuftInfer<ARRAY_TYPE>[]> {
-    // Check if the data is an array
-    if (Array.isArray(data)) {
-      // Check if the array is empty
-      if (this.schema.nonEmpty && data.length === 0) {
-        context.addIssue({
-          code: LuftErrorCodes.INVALID_LENGTH,
-          path: [...context.path],
-          message: "Array must not be empty",
-          maxLen: this.schema.maxLength,
-          minLen: 1,
-          actualLen: 0,
-        })
-        return {
-          success: false,
-        } as const
-      }
-
-      // Check if the array is too long
-      if (data.length > this.schema.maxLength) {
-        context.addIssue({
-          code: LuftErrorCodes.INVALID_LENGTH,
-          path: [...context.path],
-          message: `Array length cannot be larger than ${this.schema.maxLength}, but it actually was ${data.length}`,
-          maxLen: this.schema.maxLength,
-          minLen: this.schema.minLength,
-          actualLen: data.length,
-        })
-        return {
-          success: false,
-        } as const
-      }
-
-      // Check if the array is too short
-      if (data.length < this.schema.minLength) {
-        context.addIssue({
-          code: LuftErrorCodes.INVALID_LENGTH,
-          path: [...context.path],
-          message: `Array length cannot be smaller than ${this.schema.minLength}, but it actually was ${data.length}`,
-          maxLen: this.schema.maxLength,
-          minLen: this.schema.minLength,
-          actualLen: data.length,
-        })
-        return {
-          success: false,
-        } as const
-      }
-
-      // This will track if one of the elments in the array is invalid. If this is the case at the end of the validation
-      // we will return an error, but we still parsed every element in the array and therefore have every error in the
-      // array
-      let failAtEnd = false
-      // Data gets copied, because we will modify it by passing it to the validators of the array element.
-      // If one of the validators coerces the value we have to save the updated value
-      data = [...data]
-      // Check every element of the array for the right type
-      for (let i = 0; i < (data as unknown[]).length; ++i) {
-        const result = (this.schema.type as unknown as InternalLuftBaseType<unknown>)[mode](
-          (data as unknown[])[i],
-          context
-        )
-        if (result.success) {
-          // Save the returned data, because there mey have been some coerced values
-          ;(data as unknown[])[i] = result.data
-        } else {
-          failAtEnd = true
-        }
-      }
-
-      if (failAtEnd) return { success: false } as const
-    } else {
+    // Check if the data is not an array
+    if (!Array.isArray(data)) {
       // The data is not an array, so return an error
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return {
         success: false,
-      } as const
+      }
     }
+
+    // Check if the array is too long
+    if (data.length > this.schema.maxLength) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_LENGTH,
+        path: [...context.path],
+        message: `Array length cannot be larger than ${this.schema.maxLength}, but it actually was ${data.length}`,
+        maxLen: this.schema.maxLength,
+        minLen: this.schema.minLength,
+        actualLen: data.length,
+      })
+      return {
+        success: false,
+      }
+    }
+
+    // Check if the array is too short
+    if (data.length < this.schema.minLength) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_LENGTH,
+        path: [...context.path],
+        message: `Array length cannot be smaller than ${this.schema.minLength}, but it actually was ${data.length}`,
+        maxLen: this.schema.maxLength,
+        minLen: this.schema.minLength,
+        actualLen: data.length,
+      })
+      return {
+        success: false,
+      }
+    }
+
+    // This will track if one of the elments in the array is invalid. If this is the case at the end of the validation
+    // we will return an error, but we still parsed every element in the array and therefore have every error in the
+    // array
+    let failAtEnd = false
+    // Data gets copied, because we will modify it by passing it to the validators of the array element.
+    // If one of the validators coerces the value we have to save the updated value
+    data = [...data]
+    // Check every element of the array for the right type
+    for (let i = 0; i < (data as unknown[]).length; ++i) {
+      const result = (this.schema.type as unknown as InternalLuftBaseType<unknown>)[mode](
+        (data as unknown[])[i],
+        context
+      )
+      if (result.success) {
+        // Save the returned data, because there mey have been some coerced values
+        ;(data as unknown[])[i] = result.data
+      } else {
+        failAtEnd = true
+      }
+    }
+
+    if (failAtEnd) return { success: false }
 
     return {
       success: true,
       data: data as LuftInfer<ARRAY_TYPE>[],
-    } as const
+    }
   }
 }

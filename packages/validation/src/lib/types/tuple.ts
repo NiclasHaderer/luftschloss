@@ -4,8 +4,7 @@
  * MIT Licensed
  */
 
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType } from "./base-type"
-import { LuftInfer } from "../infer"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer } from "./base-type"
 import { createInvalidTypeIssue } from "../helpers"
 import { isArray } from "@luftschloss/core"
 import { LuftErrorCodes } from "../parsing-error"
