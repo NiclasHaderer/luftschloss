@@ -4,7 +4,6 @@
  * MIT Licensed
  */
 
-// TODO check types
 // TODO make supportedTypes consistent
 
 export * from "./types"

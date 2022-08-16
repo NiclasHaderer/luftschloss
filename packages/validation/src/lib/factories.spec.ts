@@ -2,6 +2,7 @@ import { luft } from "./factories"
 import {
   LuftAny,
   LuftArray,
+  LuftBool,
   LuftDate,
   LuftInt,
   LuftLiteral,
@@ -19,6 +20,7 @@ test("Test if different factories return the same as the default constructor", (
   expect(luft.any()).toStrictEqual(new LuftAny())
   expect(luft.array(luft.string())).toStrictEqual(new LuftArray({ type: new LuftString() }))
   expect(luft.date()).toStrictEqual(new LuftDate())
+  expect(luft.bool()).toStrictEqual(new LuftBool())
   expect(luft.int()).toStrictEqual(new LuftInt())
   expect(luft.literal(["a", "b", false])).toStrictEqual(new LuftLiteral({ types: ["a", "b", false] }))
   expect(luft.never()).toStrictEqual(new LuftNever())

@@ -2,6 +2,7 @@ import {
   LuftAny,
   LuftArray,
   LuftBaseType,
+  LuftBool,
   LuftDate,
   LuftInt,
   LuftLiteral,
@@ -18,6 +19,7 @@ import {
 
 export const any = () => new LuftAny()
 export const array = <T extends LuftBaseType<unknown>>(type: T) => new LuftArray({ type })
+export const bool = () => new LuftBool()
 export const date = () => new LuftDate()
 
 export const int = () => new LuftInt()
@@ -38,6 +40,7 @@ export const uuid = () => new LuftUUIDString()
 export const luft = {
   any,
   array,
+  bool,
   date,
   int,
   literal,
