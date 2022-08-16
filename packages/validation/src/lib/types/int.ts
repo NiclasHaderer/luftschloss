@@ -34,7 +34,7 @@ export class LuftInt extends LuftNumber {
       parseString: false,
     }
   ) {
-    super()
+    super(schema)
     this.schema = schema
   }
 

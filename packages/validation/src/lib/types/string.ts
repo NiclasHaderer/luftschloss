@@ -10,7 +10,9 @@ import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 
 export class LuftString extends LuftBaseType<string> {
-  public readonly supportedTypes = ["string"]
+  public get supportedTypes() {
+    return ["string"]
+  }
 
   constructor(
     public override readonly schema: { minLength: number; maxLength: number; trim: boolean } = {
