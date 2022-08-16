@@ -33,6 +33,7 @@ export class LuftRegexp extends LuftString {
 
   public set supportedTypes(_: string[]) {
     // Only reading is supported
+    throw new Error("Setting of supported types is not allowed")
   }
 
   public clone(): LuftRegexp {
