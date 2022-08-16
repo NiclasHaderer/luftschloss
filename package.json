@@ -22,6 +22,7 @@
     "@nrwl/jest": "14.5.1",
     "@nrwl/js": "14.5.1",
     "@nrwl/linter": "14.5.1",
+    "@faker-js/faker": "^7.4.0",
     "@nrwl/node": "14.5.1",
     "@nrwl/nx-cloud": "14.2.0",
     "@nrwl/web": "14.5.1",

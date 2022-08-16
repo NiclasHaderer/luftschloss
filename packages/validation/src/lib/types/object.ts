@@ -48,7 +48,7 @@ const copyValidatorObject = <T extends Record<string, LuftBaseType<unknown>>>(ob
   return newObject as T
 }
 
-export class LuftObject<T extends Record<string, LuftBaseType<unknown>>> extends LuftBaseType<ExtractType<T>> {
+export class LuftObject<T extends Record<string, LuftBaseType<any>>> extends LuftBaseType<ExtractType<T>> {
   public readonly supportedTypes = ["object"]
   public schema: { type: T } & LuftObjectConstructor
 

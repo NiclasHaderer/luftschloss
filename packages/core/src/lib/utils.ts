@@ -33,3 +33,5 @@ export const isArray = (value: unknown): value is unknown[] => Array.isArray(val
 export const uniqueList = <T>(list: T[]): T[] => {
   return [...new Set(list)]
 }
+
+export const randomRange = (min: number, max: number) => Math.random() * (max - min) + min

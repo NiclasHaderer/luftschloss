@@ -7,6 +7,7 @@ import {
   LuftInt,
   LuftLiteral,
   LuftNever,
+  LuftNull,
   LuftNumber,
   LuftObject,
   LuftRecord,
@@ -14,6 +15,8 @@ import {
   LuftRegexp,
   LuftString,
   LuftTuple,
+  LuftUndefined,
+  LuftUnion,
   LuftUUIDString,
 } from "./types"
 
@@ -25,6 +28,7 @@ export const date = () => new LuftDate()
 export const int = () => new LuftInt()
 export const literal = <T extends string | number | boolean>(types: T[]) => new LuftLiteral({ types })
 export const never = () => new LuftNever()
+export const nullFactory = () => new LuftNull()
 export const number = () => new LuftNumber()
 export const object = <T extends Record<string, LuftBaseType<unknown>>>(type: T) => new LuftObject({ type })
 export const record = <KEY extends LuftRecordKey, VALUE extends LuftBaseType<unknown>>(key: KEY, value: VALUE) =>
@@ -35,6 +39,8 @@ export const record = <KEY extends LuftRecordKey, VALUE extends LuftBaseType<unk
 export const regex = (regex: RegExp) => new LuftRegexp({ regex })
 export const string = () => new LuftString()
 export const tuple = <T extends LuftBaseType<unknown>>(types: T[]) => new LuftTuple({ types })
+export const undefinedFactory = () => new LuftUndefined()
+export const union = <T extends LuftBaseType<unknown>>(types: T[]) => new LuftUnion({ types })
 export const uuid = () => new LuftUUIDString()
 
 export const luft = {
@@ -45,11 +51,14 @@ export const luft = {
   int,
   literal,
   never,
+  null: nullFactory,
   number,
   object,
   record,
   regex,
   string,
   tuple,
-  uuid,
+  undefined: undefinedFactory,
+  union: union,
+  uuid: uuid,
 }
