@@ -9,7 +9,7 @@ import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"
 
-export type LuftInfer<T extends LuftBaseType<any>> = T extends LuftBaseType<infer U> ? U : never
+export type LuftInfer<T extends LuftBaseType<never> | LuftBaseType<any>> = T extends LuftBaseType<infer U> ? U : never
 
 export type InternalParsingResult<T> =
   | {
@@ -33,11 +33,12 @@ export type UnsuccessfulParsingResult = {
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
 
 const NO_DEFAULT = Symbol("NO_DEFAULT")
+
 export interface LuftValidationStorage<T> {
   beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
   beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
-  afterValidateHooks: ((value: T, context: ParsingContext) => InternalParsingResult<T>)[]
-  afterCoerceHooks: ((value: T, context: ParsingContext) => InternalParsingResult<T>)[]
+  afterValidateHooks: ((data: T, context: ParsingContext) => InternalParsingResult<T>)[]
+  afterCoerceHooks: ((data: T, context: ParsingContext) => InternalParsingResult<T>)[]
   defaultValue: T | typeof NO_DEFAULT
 }
 
