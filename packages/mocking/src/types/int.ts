@@ -1,9 +1,11 @@
 import { LuftInfer, LuftInt } from "@luftschloss/validation"
 import { faker } from "@faker-js/faker"
 
-export const fakeInt = (validator: LuftInt): LuftInfer<LuftInt> =>
-  faker.datatype.number({
-    min: validator.schema.min,
-    max: validator.schema.max,
-    precision: 0,
+export const fakeInt = (validator: LuftInt): LuftInfer<LuftInt> => {
+  const inclusiveMax = validator.schema.maxCompare === "<="
+  const inclusiveMin = validator.schema.minCompare === ">="
+  return faker.datatype.number({
+    min: inclusiveMin ? validator.schema.min : validator.schema.min + 1,
+    max: inclusiveMax ? validator.schema.max : validator.schema.max - 1,
   })
+}

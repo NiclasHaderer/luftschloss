@@ -2,7 +2,6 @@ import {
   getTypeOf,
   LuftAny,
   LuftArray,
-  LuftBaseType,
   LuftBool,
   LuftDate,
   LuftInfer,
@@ -16,29 +15,30 @@ import {
   LuftRegexp,
   LuftString,
   LuftTuple,
+  LuftType,
   LuftUndefined,
   LuftUnion,
   LuftUUIDString,
 } from "@luftschloss/validation"
-import { fakeNull } from "./null"
-import { fakeUndefined } from "./undefined"
-import { fakeInt } from "./int"
-import { fakeNumber } from "./number"
-import { fakeRegex } from "./regex"
-import { fakeString } from "./string"
-import { fakeUnion } from "./union"
-import { fakeTuple } from "./tuple"
-import { fakeUUID } from "./uuid"
-import { fakeNever } from "./never"
-import { fakeLiteral } from "./literal"
-import { fakeDate } from "./date"
+import { fakeAny } from "./any"
 import { fakeArray } from "./array"
 import { fakeBool } from "./bool"
-import { fakeRecord } from "./record"
+import { fakeDate } from "./date"
+import { fakeInt } from "./int"
+import { fakeLiteral } from "./literal"
+import { fakeNever } from "./never"
+import { fakeNull } from "./null"
+import { fakeNumber } from "./number"
 import { fakeObject } from "./object"
-import { fakeAny } from "./any"
+import { fakeRecord } from "./record"
+import { fakeRegex } from "./regex"
+import { fakeString } from "./string"
+import { fakeTuple } from "./tuple"
+import { fakeUndefined } from "./undefined"
+import { fakeUnion } from "./union"
+import { fakeUUID } from "./uuid"
 
-export const fakeAll = <T extends LuftBaseType<any>>(validator: T): LuftInfer<T> => {
+export const fakeAll = <T extends LuftType>(validator: T): LuftInfer<T> => {
   // Null
   if (validator instanceof LuftNull) {
     return fakeNull(validator) as LuftInfer<T>

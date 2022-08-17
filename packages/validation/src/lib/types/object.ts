@@ -13,17 +13,18 @@ import {
   InternalParsingResult,
   LuftBaseType,
   LuftInfer,
+  LuftType,
   LuftUndefined,
   LuftUnion,
 } from "./base-type"
 
 // TODO deepPartial
 
-type ExtractType<T extends Record<string, LuftBaseType<unknown>>> = {
+type ExtractType<T extends Record<string, LuftType>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
 }
 
-type ObjectPartial<T extends Record<string, LuftBaseType<unknown>>> = {
+type ObjectPartial<T extends Record<string, LuftType>> = {
   [KEY in keyof T]: LuftUnion<[LuftUndefined, T[KEY]]>
 }
 
@@ -39,8 +40,8 @@ const getAdditionalKeys = (toManyKeys: string[], allKeys: string[]): string[] =>
 const getMissingKeys = (partialKeys: string[], allKeys: string[]): string[] =>
   allKeys.filter(key => !partialKeys.includes(key))
 
-const copyValidatorObject = <T extends Record<string, LuftBaseType<unknown>>>(object: T): T => {
-  const newObject = saveObject<Record<string, LuftBaseType<unknown>>>()
+const copyValidatorObject = <T extends Record<string, LuftType>>(object: T): T => {
+  const newObject = saveObject<Record<string, LuftType>>()
   for (const [key, value] of Object.entries(object)) {
     newObject[key] = value.clone()
   }
@@ -48,7 +49,7 @@ const copyValidatorObject = <T extends Record<string, LuftBaseType<unknown>>>(ob
   return newObject as T
 }
 
-export class LuftObject<T extends Record<string, LuftBaseType<any>>> extends LuftBaseType<ExtractType<T>> {
+export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType<ExtractType<T>> {
   public readonly supportedTypes = ["object"]
   public schema: { type: T } & LuftObjectConstructor
 
@@ -69,15 +70,11 @@ export class LuftObject<T extends Record<string, LuftBaseType<any>>> extends Luf
     }
   }
 
-  public extend<NEW_TYPE extends Record<string, LuftBaseType<unknown>>>(
-    object: LuftObject<NEW_TYPE>
-  ): LuftObject<T & NEW_TYPE> {
+  public extend<NEW_TYPE extends Record<string, LuftType>>(object: LuftObject<NEW_TYPE>): LuftObject<T & NEW_TYPE> {
     return this.merge(object.schema.type)
   }
 
-  public merge<NEW_OBJECT extends Record<string, LuftBaseType<unknown>>>(
-    object: NEW_OBJECT
-  ): LuftObject<T & NEW_OBJECT> {
+  public merge<NEW_OBJECT extends Record<string, LuftType>>(object: NEW_OBJECT): LuftObject<T & NEW_OBJECT> {
     return new LuftObject({
       ...this.schema,
       type: {
@@ -96,7 +93,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<any>>> extends Luf
     const finishedObject = keys.reduce((acc, key) => {
       acc[key] = this.schema.type[key].clone()
       return acc
-    }, {} as Record<string, LuftBaseType<unknown>>)
+    }, {} as Record<string, LuftType>)
 
     return new LuftObject<Pick<T, KEY>>({
       ...this.schema,
@@ -109,7 +106,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<any>>> extends Luf
     const newType = Object.keys(this.schema.type).reduce((acc, key) => {
       acc[key] = type[key].optional()
       return acc
-    }, {} as Record<string, LuftBaseType<unknown>>)
+    }, {} as Record<string, LuftType>)
 
     return new LuftObject<ObjectPartial<T>>({
       ...this.schema,
@@ -119,7 +116,7 @@ export class LuftObject<T extends Record<string, LuftBaseType<any>>> extends Luf
 
   public clone(): LuftObject<T> {
     const clonedType = Object.keys(this.schema.type).reduce((acc, key) => {
-      ;(acc as Record<string, LuftBaseType<unknown>>)[key] = this.schema.type[key].clone()
+      ;(acc as Record<string, LuftType>)[key] = this.schema.type[key].clone()
       return acc
     }, {} as T)
 

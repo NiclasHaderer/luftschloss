@@ -1,8 +1,8 @@
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes, LuftParsingUsageError, UnionError } from "../parsing-error"
 import {
-  LuftBaseType,
   LuftNull,
+  LuftType,
   LuftUndefined,
   LuftUnion,
   SuccessfulParsingResult,
@@ -48,7 +48,7 @@ test("Test union", () => {
 })
 
 test("Test optional, nullish, nullable", () => {
-  let validator: LuftBaseType<unknown> = new LuftString()
+  let validator: LuftType = new LuftString()
   expect(validator.validateSave(undefined).success).toBe(false)
   validator = validator.optional()
   expect(validator.validateSave(undefined).success).toBe(true)

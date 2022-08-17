@@ -1,8 +1,8 @@
-import { LuftArray, LuftBaseType, LuftInfer } from "@luftschloss/validation"
 import { randomRange } from "@luftschloss/core"
+import { LuftArray, LuftInfer, LuftType } from "@luftschloss/validation"
 import { fakeAll } from "./all"
 
-export const fakeArray = <T extends LuftArray<LuftBaseType<any>>>(validator: T): LuftInfer<T> => {
+export const fakeArray = <T extends LuftArray<LuftType>>(validator: T): LuftInfer<T> => {
   const min = validator.schema.minLength < 0 ? 0 : validator.schema.minLength
   const max = validator.schema.maxLength === Infinity ? Math.max(100, min + 100) : validator.schema.maxLength
   const length = Math.round(randomRange(min, max))

@@ -7,7 +7,7 @@
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftType } from "./base-type"
 
 type LuftArrayConstructor = {
   parser: "json" | "csv" | "nothing"
@@ -15,7 +15,7 @@ type LuftArrayConstructor = {
   minLength: number
 }
 
-export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
+export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
   public readonly supportedTypes = ["array"]
   public readonly schema: LuftArrayConstructor & { type: ARRAY_TYPE }
 

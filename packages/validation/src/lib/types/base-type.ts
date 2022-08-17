@@ -9,7 +9,8 @@ import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"
 
-export type LuftInfer<T extends LuftBaseType<never> | LuftBaseType<any>> = T extends LuftBaseType<infer U> ? U : never
+export type LuftType = LuftBaseType<never> | LuftBaseType<any>
+export type LuftInfer<T extends LuftType> = T extends LuftBaseType<infer U> ? U : never
 
 export type InternalParsingResult<T> =
   | {
@@ -172,7 +173,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     >
   }
 
-  public or<T extends LuftBaseType<unknown>>(type: T): LuftUnion<(T | this)[]> {
+  public or<T extends LuftType>(type: T): LuftUnion<(T | this)[]> {
     return new LuftUnion({ types: [this.clone(), type] }) as LuftUnion<(T | this)[]>
   }
 
@@ -286,13 +287,13 @@ export class LuftNull extends LuftBaseType<null> {
   }
 }
 
-export class LuftUnion<T extends LuftBaseType<any>[]> extends LuftBaseType<LuftInfer<T[number]>> {
+export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftBaseType<LuftInfer<T[number]>> {
   public constructor(public readonly schema: { types: T }) {
     super()
   }
 
   public clone(): LuftUnion<T> {
-    return new LuftUnion({ types: this.schema.types.map(type => type.clone()) as T })
+    return new LuftUnion({ types: this.schema.types.map(type => type.clone()) as unknown as T })
   }
 
   public get supportedTypes() {
