@@ -14,8 +14,6 @@ export class LuftNever extends LuftBaseType<never> {
 
   public clone(): LuftNever {
     return new LuftNever()
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<never> {

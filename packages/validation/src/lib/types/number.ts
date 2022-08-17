@@ -34,8 +34,6 @@ export class LuftNumber extends LuftBaseType<number> {
 
   public clone(): LuftNumber {
     return new LuftNumber({ ...this.schema })
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public parseString(parse: boolean): LuftNumber {

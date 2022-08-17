@@ -27,8 +27,6 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
 
   public clone(): LuftLiteral<T> {
     return new LuftLiteral({ ...this.schema, types: [...this.schema.types] as unknown as T })
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public ignoreCase(ignoreCase: boolean): LuftLiteral<T> {

@@ -26,8 +26,6 @@ export class LuftString extends LuftBaseType<string> {
 
   public clone(): LuftString {
     return new LuftString({ ...this.schema })
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {

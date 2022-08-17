@@ -15,7 +15,7 @@ import { LuftString } from "./string"
 
 export type LuftRecordKey = LuftString | LuftNumber | LuftRegexp | LuftUnion<(LuftString | LuftNumber | LuftRegexp)[]>
 
-export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<unknown>> extends LuftBaseType<
+export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<any>> extends LuftBaseType<
   Record<LuftInfer<KEY>, LuftInfer<VALUE>>
 > {
   readonly supportedTypes: string[] = ["object"]
@@ -36,8 +36,6 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftBaseType<un
       key: this.schema.key.clone() as KEY,
       value: this.schema.value.clone() as VALUE,
     })
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public nonEmpty(nonEmpty: boolean) {

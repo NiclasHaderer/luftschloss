@@ -34,8 +34,6 @@ export class LuftArray<ARRAY_TYPE extends LuftBaseType<unknown>> extends LuftBas
       ...this.schema,
       type: this.schema.type.clone() as ARRAY_TYPE,
     })
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public minLength(minLength: number): LuftArray<ARRAY_TYPE> {

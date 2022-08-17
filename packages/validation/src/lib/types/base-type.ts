@@ -9,7 +9,7 @@ import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"
 
-export type LuftInfer<T extends LuftBaseType<unknown>> = T extends LuftBaseType<infer U> ? U : never
+export type LuftInfer<T extends LuftBaseType<any>> = T extends LuftBaseType<infer U> ? U : never
 
 export type InternalParsingResult<T> =
   | {
@@ -32,6 +32,15 @@ export type UnsuccessfulParsingResult = {
 
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
 
+const NO_DEFAULT = Symbol("NO_DEFAULT")
+export interface LuftValidationStorage<T> {
+  beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+  beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+  afterValidateHooks: ((value: T, context: ParsingContext) => InternalParsingResult<T>)[]
+  afterCoerceHooks: ((value: T, context: ParsingContext) => InternalParsingResult<T>)[]
+  defaultValue: T | typeof NO_DEFAULT
+}
+
 export type InternalLuftBaseType<OUT_TYPE> = {
   _validate(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
 
@@ -42,8 +51,13 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   public abstract readonly schema: Record<string, unknown>
   public abstract readonly supportedTypes: string[]
 
-  protected beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
-  protected beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[] = []
+  public readonly validationStorage: LuftValidationStorage<RETURN_TYPE> = {
+    beforeValidateHooks: [],
+    beforeCoerceHooks: [],
+    afterValidateHooks: [],
+    afterCoerceHooks: [],
+    defaultValue: NO_DEFAULT,
+  }
 
   protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
 
@@ -63,7 +77,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     const context = new ParsingContext()
 
     let resultData: InternalParsingResult<RETURN_TYPE> | undefined = undefined
-    for (const validateBeforeHook of this.beforeValidateHooks) {
+    for (const validateBeforeHook of this.validationStorage.beforeValidateHooks) {
       const result = validateBeforeHook(data, context)
       if (result.success) {
         data = result.data
@@ -93,7 +107,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     const context = new ParsingContext()
 
     let resultData: InternalParsingResult<RETURN_TYPE> | undefined = undefined
-    for (const coerceBeforeHook of this.beforeCoerceHooks) {
+    for (const coerceBeforeHook of this.validationStorage.beforeCoerceHooks) {
       const result = coerceBeforeHook(data, context)
       if (result.success) {
         data = result.data
@@ -227,7 +241,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
       self = self.clone() as this
     }
 
-    self[hookType].push(...callbacks)
+    self.validationStorage[hookType].push(...callbacks)
     return self
   }
 }
@@ -239,8 +253,6 @@ export class LuftUndefined extends LuftBaseType<undefined> {
 
   public clone(): LuftUndefined {
     return new LuftUndefined()
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
@@ -260,8 +272,6 @@ export class LuftNull extends LuftBaseType<null> {
 
   public clone(): LuftNull {
     return new LuftNull()
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
@@ -275,15 +285,13 @@ export class LuftNull extends LuftBaseType<null> {
   }
 }
 
-export class LuftUnion<T extends LuftBaseType<unknown>[]> extends LuftBaseType<LuftInfer<T[number]>> {
+export class LuftUnion<T extends LuftBaseType<any>[]> extends LuftBaseType<LuftInfer<T[number]>> {
   public constructor(public readonly schema: { types: T }) {
     super()
   }
 
   public clone(): LuftUnion<T> {
     return new LuftUnion({ types: this.schema.types.map(type => type.clone()) as T })
-      .beforeCoerce(true, ...this.beforeCoerceHooks)
-      .beforeValidate(true, ...this.beforeValidateHooks)
   }
 
   public get supportedTypes() {

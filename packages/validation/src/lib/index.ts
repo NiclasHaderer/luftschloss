@@ -5,6 +5,8 @@
  */
 
 // TODO make supportedTypes consistent
+// TODO copy validationStorage in clone
+// TODO context path
 
 export * from "./types"
 export * from "./factories"
