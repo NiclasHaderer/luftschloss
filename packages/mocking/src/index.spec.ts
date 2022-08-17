@@ -2,6 +2,8 @@ import { fakeAll } from "./types/all"
 import { luft } from "@luftschloss/validation"
 import { isArray } from "@luftschloss/core"
 
+// TODO check for schema limitations and Infinity traps (Perhaps replace Infinity with Number.MAX_VALUE || Number.MAX_SAFE_INTEGER)
+
 test("Mock array generation 1", () => {
   const validator = luft.array(luft.bool()).maxLength(10).minLength(5)
   for (let i = 0; i < 100; i++) {
@@ -58,7 +60,7 @@ test("Mock date generation", () => {
   }
 })
 
-test("Mock int generation", () => {
+test("Mock int generation 1", () => {
   for (let i = 0; i < 1000; i++) {
     const min = -30
     const max = 20
@@ -67,6 +69,15 @@ test("Mock int generation", () => {
     expect(typeof result).toBe("number")
     expect(result).toBeGreaterThan(min)
     expect(result).toBeLessThan(max)
+    expect(Math.abs(result % 1)).toBe(0)
+    expect(validator.validate(result)).toBe(result)
+  }
+})
+test("Mock int generation 2", () => {
+  for (let i = 0; i < 1000; i++) {
+    const validator = luft.int()
+    const result = fakeAll(validator)
+    expect(typeof result).toBe("number")
     expect(Math.abs(result % 1)).toBe(0)
     expect(validator.validate(result)).toBe(result)
   }
