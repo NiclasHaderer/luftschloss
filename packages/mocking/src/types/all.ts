@@ -12,7 +12,6 @@ import {
   LuftNumber,
   LuftObject,
   LuftRecord,
-  LuftRegexp,
   LuftString,
   LuftTuple,
   LuftType,
@@ -31,80 +30,77 @@ import { fakeNull } from "./null"
 import { fakeNumber } from "./number"
 import { fakeObject } from "./object"
 import { fakeRecord } from "./record"
-import { fakeRegex } from "./regex"
 import { fakeString } from "./string"
 import { fakeTuple } from "./tuple"
 import { fakeUndefined } from "./undefined"
 import { fakeUnion } from "./union"
 import { fakeUUID } from "./uuid"
 
+// TODO add custom mocks
+
 export const fakeAll = <T extends LuftType>(validator: T): LuftInfer<T> => {
   // Null
-  if (validator instanceof LuftNull) {
+  if (validator.constructor === LuftNull) {
     return fakeNull(validator) as LuftInfer<T>
   }
   // Undefined
-  else if (validator instanceof LuftUndefined) {
+  else if (validator.constructor === LuftUndefined) {
     return fakeUndefined(validator) as LuftInfer<T>
   }
   // Int
-  else if (validator instanceof LuftInt) {
+  else if (validator.constructor === LuftInt) {
     return fakeInt(validator) as LuftInfer<T>
   }
   // Number
-  else if (validator instanceof LuftNumber) {
+  else if (validator.constructor === LuftNumber) {
     return fakeNumber(validator) as LuftInfer<T>
   }
   // UUID
-  else if (validator instanceof LuftUUIDString) {
+  else if (validator.constructor === LuftUUIDString) {
     return fakeUUID(validator) as LuftInfer<T>
   }
-  // Regex
-  else if (validator instanceof LuftRegexp) {
-    return fakeRegex(validator) as LuftInfer<T>
-  }
   // String
-  else if (validator instanceof LuftString) {
+  else if (validator.constructor === LuftString) {
     return fakeString(validator) as LuftInfer<T>
   }
   // Union
-  else if (validator instanceof LuftUnion) {
+  else if (validator.constructor === LuftUnion) {
     return fakeUnion(validator) as LuftInfer<T>
   }
   // Tuple
-  else if (validator instanceof LuftTuple) {
+  else if (validator.constructor === LuftTuple) {
     return fakeTuple(validator) as LuftInfer<T>
   }
   // Never
-  else if (validator instanceof LuftNever) {
+  else if (validator.constructor === LuftNever) {
     return fakeNever(validator) as LuftInfer<T>
   }
   // Literal
-  else if (validator instanceof LuftLiteral) {
+  else if (validator.constructor === LuftLiteral) {
     return fakeLiteral(validator) as LuftInfer<T>
   }
   // Date
-  else if (validator instanceof LuftDate) {
+  else if (validator.constructor === LuftDate) {
     return fakeDate(validator) as LuftInfer<T>
   }
   // Array
-  else if (validator instanceof LuftArray) {
+  else if (validator.constructor === LuftArray) {
     return fakeArray(validator) as LuftInfer<T>
   }
   // Bool
-  else if (validator instanceof LuftBool) {
+  else if (validator.constructor === LuftBool) {
     return fakeBool(validator) as LuftInfer<T>
   }
   // Record
-  else if (validator instanceof LuftRecord) {
+  else if (validator.constructor === LuftRecord) {
     return fakeRecord(validator) as LuftInfer<T>
   }
   // Object
-  else if (validator instanceof LuftObject) {
+  else if (validator.constructor === LuftObject) {
     return fakeObject(validator) as LuftInfer<T>
   }
   // Any
-  else if (validator instanceof LuftAny) {
+  else if (validator.constructor === LuftAny) {
     return fakeAny(validator) as LuftInfer<T>
   }
 

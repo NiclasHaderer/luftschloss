@@ -2,7 +2,7 @@ import { LuftInfer, LuftString } from "@luftschloss/validation"
 import { randomRange } from "@luftschloss/core"
 import { faker } from "@faker-js/faker"
 
-const trimUntilFits = (stringToReturn: string, min: number) => {
+export const trimUntilFits = (stringToReturn: string, min: number) => {
   stringToReturn = stringToReturn.trim()
   if (stringToReturn.length < min) {
     stringToReturn = stringToReturn + faker.datatype.string(min - stringToReturn.length)

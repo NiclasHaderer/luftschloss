@@ -1,8 +1,16 @@
-import { fakeAll } from "./types/all"
-import { luft } from "@luftschloss/validation"
 import { isArray } from "@luftschloss/core"
+import { luft } from "@luftschloss/validation"
+import { fakeAll } from "./types/all"
 
 // TODO check for schema limitations and Infinity traps (Perhaps replace Infinity with Number.MAX_VALUE || Number.MAX_SAFE_INTEGER)
+
+test("Mock any generation", () => {
+  const validator = luft.any()
+  for (let i = 0; i < 100; i++) {
+    const result = fakeAll(validator)
+    expect(validator.validate(result)).toBe(result)
+  }
+})
 
 test("Mock array generation 1", () => {
   const validator = luft.array(luft.bool()).maxLength(10).minLength(5)
@@ -105,7 +113,7 @@ test("Mock null generation", () => {
   expect(validator.validate(result)).toStrictEqual(result)
 })
 
-test("Mock number generation", () => {
+test("Mock number generation 1", () => {
   for (let i = 0; i < 1000; i++) {
     const min = -30
     const max = 20
@@ -114,6 +122,93 @@ test("Mock number generation", () => {
     expect(typeof result).toBe("number")
     expect(result).toBeGreaterThan(min)
     expect(result).toBeLessThan(max)
+    expect(validator.validate(result)).toBe(result)
+  }
+})
+
+test("Mock number generation 2", () => {
+  for (let i = 0; i < 1000; i++) {
+    const validator = luft.number()
+    const result = fakeAll(validator)
+    expect(typeof result).toBe("number")
+    expect(validator.validate(result)).toBe(result)
+  }
+})
+
+test("Mock object generator", () => {
+  const validator = luft.object({
+    hello: luft.string(),
+    world: luft.number(),
+    nested: luft.object({
+      hello: luft.string(),
+      world: luft.number(),
+    }),
+  })
+  const result = fakeAll(validator)
+  expect(validator.validate(result)).toStrictEqual(result)
+})
+
+test("Mock record generator", () => {
+  const validator = luft.record(
+    luft.string().min(10).max(20),
+    luft.object({
+      hello: luft.string(),
+      world: luft.number(),
+    })
+  )
+  const result = fakeAll(validator)
+  expect(validator.validate(result)).toStrictEqual(result)
+  expect([...Object.keys(result)].every(k => k.length >= 10 && k.length <= 20)).toBe(true)
+})
+
+test("Mock string 1", () => {
+  const validator = luft.string().min(10).max(20).trim(true)
+  for (let i = 0; i < 1000; i++) {
+    const result = fakeAll(validator)
+    expect(validator.validate(result)).toBe(result)
+    expect(result.length).toBeGreaterThanOrEqual(10)
+    expect(result.length).toBeLessThanOrEqual(20)
+    expect(typeof result).toBe("string")
+    expect(result.trim().length).toBe(result.length)
+  }
+})
+
+test("Mock string 2", () => {
+  const validator = luft.string()
+  for (let i = 0; i < 1000; i++) {
+    const result = fakeAll(validator)
+    expect(validator.validate(result)).toBe(result)
+    expect(typeof result).toBe("string")
+  }
+})
+
+test("Mock tuple", () => {
+  const validator = luft.tuple([luft.string(), luft.number(), luft.bool()])
+  const result = fakeAll(validator)
+  expect(validator.validate(result)).toStrictEqual(result)
+})
+
+test("Mock undefined", () => {
+  const validator = luft.undefined()
+  const result = fakeAll(validator)
+  expect(result).toBeUndefined()
+})
+
+test("Mock union", () => {
+  const validator = luft.union([luft.string(), luft.number(), luft.bool()])
+  const result = fakeAll(validator)
+  expect(["string", "number", "bool"]).toContain(typeof result)
+})
+
+test("Mock regex", () => {
+  const validator = luft.regex(/\d/)
+  expect(() => fakeAll(validator)).toThrow("Could not find a faker for LuftRegex")
+})
+
+test("Mock uuid", () => {
+  const validator = luft.uuid()
+  for (let i = 0; i < 100; i++) {
+    const result = fakeAll(validator)
     expect(validator.validate(result)).toBe(result)
   }
 })
