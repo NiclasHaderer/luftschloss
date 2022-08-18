@@ -1,12 +1,3 @@
-nx generate @nrwl/node:lib body --buildable --publishable --importPath="@luftschloss/body"
-nx generate @nrwl/node:lib mocking --buildable --publishable --importPath="@luftschloss/mocking"
-nx generate @nrwl/node:lib openapi --buildable --publishable --importPath="@luftschloss/openapi"
-nx generate @nrwl/node:lib server --buildable --publishable --importPath="@luftschloss/server"
-nx generate @nrwl/node:lib static --buildable --publishable --importPath="@luftschloss/static"
-
-nx generate @nrwl/web:lib schema-generator --buildable --publishable --importPath="@luftschloss/schema-generator"
-nx generate @nrwl/web:lib validation --buildable --publishable --importPath="@luftschloss/validation"
-
 # Luftschloss
 
 This project was generated using [Nx](https://nx.dev).

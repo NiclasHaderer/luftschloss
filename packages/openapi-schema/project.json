@@ -1,30 +1,30 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/schema-generator/src",
+  "sourceRoot": "packages/openapi-schema/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/packages/schema-generator",
-        "main": "packages/schema-generator/src/index.ts",
-        "tsConfig": "packages/schema-generator/tsconfig.lib.json",
-        "assets": ["packages/schema-generator/*.md"]
+        "outputPath": "dist/packages/openapi-schema",
+        "main": "packages/openapi-schema/src/index.ts",
+        "tsConfig": "packages/openapi-schema/tsconfig.lib.json",
+        "assets": ["packages/openapi-schema/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["packages/schema-generator/**/*.ts"]
+        "lintFilePatterns": ["packages/openapi-schema/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/packages/schema-generator"],
+      "outputs": ["coverage/packages/openapi-schema"],
       "options": {
-        "jestConfig": "packages/schema-generator/jest.config.ts",
+        "jestConfig": "packages/openapi-schema/jest.config.ts",
         "passWithNoTests": true
       }
     }

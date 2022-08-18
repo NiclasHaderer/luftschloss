@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 export default {
-  displayName: "schema-generator",
+  displayName: "openapi-schema",
   preset: "../../jest.preset.js",
   globals: {
     "ts-jest": {
@@ -17,5 +17,5 @@ export default {
     "^.+\\.[tj]sx?$": "ts-jest",
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
-  coverageDirectory: "../../coverage/packages/schema-generator",
+  coverageDirectory: "../../coverage/packages/openapi-schema",
 }

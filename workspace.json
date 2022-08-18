@@ -9,7 +9,7 @@
     "mocking": "packages/mocking",
     "openapi": "packages/openapi",
     "proxy": "packages/proxy",
-    "schema-generator": "packages/schema-generator",
+    "openapi-schema": "packages/openapi-schema",
     "server": "packages/server",
     "static": "packages/static",
     "testing": "packages/testing",
