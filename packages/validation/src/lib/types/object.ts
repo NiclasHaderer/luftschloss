@@ -32,6 +32,7 @@ type LuftObjectConstructor = {
   treatMissingKeyAs: "error" | "undefined"
   ignoreUnknownKeys: boolean
   tryParseString: boolean
+  name?: string
 }
 
 const getAdditionalKeys = (toManyKeys: string[], allKeys: string[]): string[] =>
@@ -57,6 +58,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     treatMissingKeyAs = "error",
     ignoreUnknownKeys = true,
     tryParseString = false,
+    name,
     type,
   }: Partial<LuftObjectConstructor> & {
     type: T
@@ -66,30 +68,38 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
       treatMissingKeyAs,
       ignoreUnknownKeys,
       type,
+      name,
       tryParseString,
     }
   }
 
-  public extend<NEW_TYPE extends Record<string, LuftType>>(object: LuftObject<NEW_TYPE>): LuftObject<T & NEW_TYPE> {
-    return this.merge(object.schema.type)
+  public extend<NEW_TYPE extends Record<string, LuftType>>(
+    object: LuftObject<NEW_TYPE>,
+    name?: string
+  ): LuftObject<T & NEW_TYPE> {
+    return this.merge(object.schema.type, name)
   }
 
-  public merge<NEW_OBJECT extends Record<string, LuftType>>(object: NEW_OBJECT): LuftObject<T & NEW_OBJECT> {
+  public merge<NEW_OBJECT extends Record<string, LuftType>>(
+    object: NEW_OBJECT,
+    name?: string
+  ): LuftObject<T & NEW_OBJECT> {
     return new LuftObject({
       ...this.schema,
       type: {
         ...copyValidatorObject(this.schema.type),
         ...copyValidatorObject(object),
       },
+      name,
     })
   }
 
-  public omit<KEY extends keyof T & string>(keys: KEY[]): LuftObject<Omit<T, KEY>> {
+  public omit<KEY extends keyof T & string>(keys: KEY[], name?: string): LuftObject<Omit<T, KEY>> {
     const keysToPick = getMissingKeys(keys, Object.keys(this.schema.type))
-    return this.pick(keysToPick) as LuftObject<Omit<T, KEY>>
+    return this.pick(keysToPick, name) as LuftObject<Omit<T, KEY>>
   }
 
-  public pick<KEY extends keyof T & string>(keys: KEY[]): LuftObject<Pick<T, KEY>> {
+  public pick<KEY extends keyof T & string>(keys: KEY[], name?: string): LuftObject<Pick<T, KEY>> {
     const finishedObject = keys.reduce((acc, key) => {
       acc[key] = this.schema.type[key].clone()
       return acc
@@ -98,10 +108,11 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     return new LuftObject<Pick<T, KEY>>({
       ...this.schema,
       type: finishedObject as Pick<T, KEY>,
+      name,
     })
   }
 
-  public partial(): LuftObject<ObjectPartial<T>> {
+  public partial(name?: string): LuftObject<ObjectPartial<T>> {
     const type = this.schema.type
     const newType = Object.keys(this.schema.type).reduce((acc, key) => {
       acc[key] = type[key].optional()
@@ -111,6 +122,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     return new LuftObject<ObjectPartial<T>>({
       ...this.schema,
       type: newType as ObjectPartial<T>,
+      name,
     }).treatMissingKeyAs("undefined")
   }
 
@@ -127,6 +139,12 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     const newValidator = this.clone()
     newValidator.schema.ignoreUnknownKeys = ignore
     return newValidator
+  }
+
+  public named(name: string): LuftObject<T> {
+    const clone = this.clone()
+    clone.schema.name = name
+    return clone
   }
 
   public treatMissingKeyAs(treatAs: "error" | "undefined"): LuftObject<T> {

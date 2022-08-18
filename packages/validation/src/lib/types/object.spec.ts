@@ -146,3 +146,12 @@ test("Test extend", () => {
 
   expect(validator.validate({ newKey: "newKey" })).toEqual({ newKey: "newKey" })
 })
+
+test("Test set name", () => {
+  let validator: LuftObject<any> = getObjectValidator()
+  expect(validator.schema.name).toBe(undefined)
+  validator = validator.named("ImpressiveName")
+  expect(validator.schema.name).toBe("ImpressiveName")
+  expect(validator.omit(["hello"]).schema.name).toBe(undefined)
+  expect(validator.omit(["hello"], "NewName").schema.name).toBe("NewName")
+})
