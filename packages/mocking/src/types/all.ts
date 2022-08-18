@@ -38,7 +38,7 @@ import { fakeUUID } from "./uuid"
 
 // TODO add custom mocks
 
-export const fakeAll = <T extends LuftType>(validator: T): LuftInfer<T> => {
+export const fakeAll = <T extends LuftType>(validator: T, fieldName?: string): LuftInfer<T> => {
   // Null
   if (validator.constructor === LuftNull) {
     return fakeNull(validator) as LuftInfer<T>
@@ -61,15 +61,15 @@ export const fakeAll = <T extends LuftType>(validator: T): LuftInfer<T> => {
   }
   // String
   else if (validator.constructor === LuftString) {
-    return fakeString(validator) as LuftInfer<T>
+    return fakeString(validator, fieldName) as LuftInfer<T>
   }
   // Union
   else if (validator.constructor === LuftUnion) {
-    return fakeUnion(validator) as LuftInfer<T>
+    return fakeUnion(validator, fieldName) as LuftInfer<T>
   }
   // Tuple
   else if (validator.constructor === LuftTuple) {
-    return fakeTuple(validator) as LuftInfer<T>
+    return fakeTuple(validator, fieldName) as LuftInfer<T>
   }
   // Never
   else if (validator.constructor === LuftNever) {
@@ -85,7 +85,7 @@ export const fakeAll = <T extends LuftType>(validator: T): LuftInfer<T> => {
   }
   // Array
   else if (validator.constructor === LuftArray) {
-    return fakeArray(validator) as LuftInfer<T>
+    return fakeArray(validator, fieldName) as LuftInfer<T>
   }
   // Bool
   else if (validator.constructor === LuftBool) {

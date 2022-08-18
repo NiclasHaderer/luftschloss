@@ -148,12 +148,25 @@ test("Mock object generator", () => {
   expect(validator.validate(result)).toStrictEqual(result)
 })
 
+test("Mock object generator", () => {
+  const validator = luft.object({
+    name: luft.string(),
+    address: luft.string(),
+    country: luft.string(),
+    age: luft.int().min(0).max(120),
+  })
+  const result = fakeAll(validator)
+  expect(validator.validate(result)).toStrictEqual(result)
+})
+
 test("Mock record generator", () => {
   const validator = luft.record(
     luft.string().min(10).max(20),
     luft.object({
-      hello: luft.string(),
-      world: luft.number(),
+      name: luft.string(),
+      address: luft.string(),
+      country: luft.string(),
+      age: luft.int().min(0).max(120),
     })
   )
   const result = fakeAll(validator)

@@ -14,7 +14,8 @@
     "openapi3-ts": "^2.0.2",
     "range-parser": "^1.2.1",
     "tslib": "^2.3.0",
-    "zod": "^3.17.3"
+    "zod": "^3.17.3",
+    "fuse.js": "^6.6.2"
   },
   "devDependencies": {
     "@nrwl/cli": "14.5.1",
