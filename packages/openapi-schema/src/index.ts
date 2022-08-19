@@ -1,1 +1,1 @@
-export type __$__ = "todo"
+const createOpenApiSchema = () => {}
