@@ -103,8 +103,8 @@ test("Test before validate hook", () => {
   const addWorld = new LuftString().beforeValidate((value, context) => {
     return { success: true, data: value + " world" }
   })
-  expect(addWorld.validate("hello")).toBe("hello world")
-  expect(addWorld.coerce("hello")).toBe("hello")
+  expect(addWorld.clone().validate("hello")).toBe("hello world")
+  expect(addWorld.clone().coerce("hello")).toBe("hello")
 })
 
 test("Test before coerce hook", () => {
