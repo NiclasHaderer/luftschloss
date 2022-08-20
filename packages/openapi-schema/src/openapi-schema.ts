@@ -26,6 +26,31 @@ interface OpenApiSchema {
    * The available paths and operations for the API.
    */
   paths?: Paths
+
+  /**
+   * The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement. Closely related to the callbacks feature, this section describes requests initiated other than by an API call, for example by an out of band registration. The key name is a unique string to refer to each webhook, while the (optionally referenced) Path Item Object describes a request that may be initiated by the API provider and the expected responses. An example is available.
+   */
+  webhooks?: Record<string, PathItem | Reference>
+
+  /**
+   * An element to hold various schemas for the document.
+   */
+  components?: Components
+
+  /**
+   * A declaration of which security mechanisms can be used across the API. The list of values includes alternative security requirement objects that can be used. Only one of the security requirement objects need to be satisfied to authorize a request. Individual operations can override this definition. To make security optional, an empty security requirement ({}) can be included in the array.
+   */
+  security?: SecurityRequirement[]
+
+  /**
+   * A list of tags used by the document with additional metadata. The order of the tags can be used to reflect on their order by the parsing tools. Not all tags that are used by the Operation Object must be declared. The tags that are not declared MAY be organized randomly or based on the tools' logic. Each tag name in the list MUST be unique.
+   */
+  tags?: Tag[]
+
+  /**
+   * Additional external documentation.
+   */
+  externalDocs?: ExternalDocumentation
 }
 
 /**
@@ -689,3 +714,288 @@ interface SecurityRequirement {
    */
   [name: string]: [string]
 }
+
+/**
+ * Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.
+ */
+interface Components {
+  /**
+   * An object to hold reusable Schema Objects.
+   */
+  schemas?: Record<string, Schema>
+
+  /**
+   * An object to hold reusable Response Objects.
+   */
+  responses?: Record<string, Response | Reference>
+
+  /**
+   * An object to hold reusable Parameter Objects.
+   */
+  parameters?: Record<string, Parameter | Reference>
+
+  /**
+   * An object to hold reusable Example Objects.
+   */
+  examples?: Record<string, Example | Reference>
+
+  /**
+   * An object to hold reusable Request Body Objects.
+   */
+  requestBodies?: Record<string, RequestBody | Reference>
+
+  /**
+   * An object to hold reusable Header Objects.
+   */
+  headers?: Record<string, Header | Reference>
+
+  /**
+   * An object to hold reusable Security Scheme Objects.
+   */
+  securitySchemes?: Record<string, SecurityScheme | Reference>
+
+  /**
+   * An object to hold reusable Link Objects.
+   */
+  links?: Record<string, Link | Reference>
+
+  /**
+   * An object to hold reusable Callback Objects.
+   */
+  callbacks?: Record<string, Callback | Reference>
+
+  /**
+   * An object to hold reusable Path Item Object.
+   */
+  pathItems?: Record<string, PathItem | Reference>
+}
+
+/**
+ * Adds metadata to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
+ */
+interface Tag {
+  /**
+   * REQUIRED. The name of the tag.
+   */
+  name: string
+
+  /**
+   * A description for the tag. CommonMark syntax MAY be used for rich text representation.
+   */
+  description?: string
+
+  /**
+   * Additional external documentation for this tag.
+   */
+  externalDocs?: ExternalDocumentation
+}
+
+/**
+ * Defines a security scheme that can be used by the operations.
+ *
+ * Supported schemes are HTTP authentication, an API key (either as a header, a cookie parameter or as a query parameter), mutual TLS (use of a client certificate), OAuth2's common flows (implicit, password, client credentials and authorization code) as defined in RFC6749, and OpenID Connect Discovery. Please note that as of 2020, the implicit flow is about to be deprecated by OAuth 2.0 Security Best Current Practice. Recommended for most use case is Authorization Code Grant flow with PKCE.
+ */
+interface SecurityScheme {
+  /**
+   * REQUIRED. The type of the security scheme. Valid values are "apiKey", "http", "mutualTLS", "oauth2", "openIdConnect".
+   * Applies to: Any
+   */
+  type: "apiKey" | "http" | "mutualTLS" | "oauth2" | "openIdConnect"
+
+  /**
+   * A description for security scheme. CommonMark syntax MAY be used for rich text representation.
+   * Applies to: Any
+   */
+  description?: string
+
+  /**
+   * REQUIRED. The name of the header, query or cookie parameter to be used.
+   * Applies to: apiKey
+   */
+  name: string
+
+  /**
+   * REQUIRED. The location of the API key. Valid values are "query", "header" or "cookie".
+   * Applies to: apiKey
+   */
+  in: "query" | "header" | "cookie"
+
+  /**
+   * REQUIRED. The name of the HTTP Authorization scheme to be used in the Authorization header as defined in RFC7235. The values used SHOULD be registered in the IANA Authentication Scheme registry.
+   * Applies to: http
+   */
+  scheme: string
+
+  /**
+   * A hint to the client to identify how the bearer token is formatted. Bearer tokens are usually generated by an authorization server, so this information is primarily for documentation purposes.
+   * Applies to: http ("bearer")
+   */
+  bearerFormat?: string
+
+  /**
+   * REQUIRED. An object containing configuration information for the flow types supported.
+   * Applies to: oauth2
+   */
+  flows: OAuthFlows
+
+  /**
+   * REQUIRED. OpenId Connect URL to discover OAuth2 configuration values. This MUST be in the form of a URL. The OpenID Connect standard requires the use of TLS.
+   * Applies to: openIdConnect
+   */
+  openIdConnectUrl: string
+}
+
+/**
+ * Allows configuration of the supported OAuth Flows.
+ */
+interface OAuthFlows {
+  /**
+   * Configuration for the OAuth Implicit flow
+   */
+  implicit?: OAuthFlow
+
+  /**
+   * Configuration for the OAuth Resource Owner Password flow
+   */
+  password?: OAuthFlow
+
+  /**
+   * Configuration for the OAuth Client Credentials flow. Previously called application in OpenAPI 2.0.
+   */
+  clientCredentials?: OAuthFlow
+
+  /**
+   * Configuration for the OAuth Authorization Code flow. Previously called accessCode in OpenAPI 2.0.
+   */
+  authorizationCode?: OAuthFlow
+}
+
+/**
+ * Configuration details for a supported OAuth Flow
+ */
+interface OAuthFlow {
+  /**
+   * REQUIRED. The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.
+   * Applies to: oauth2 ("implicit", "authorizationCode")
+   */
+  authorizationUrl: string
+
+  /**
+   * REQUIRED. The token URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.
+   * Applies to: oauth2 ("password", "clientCredentials", "authorizationCode")
+   */
+  tokenUrl: string
+
+  /**
+   * The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.
+   * Applies to: oauth2
+   */
+  refreshUrl?: string
+
+  /**
+   * REQUIRED. The available scopes for the OAuth2 security scheme. A map between the scope name and a short description for it. The map MAY be empty.
+   * Applies to: oauth2
+   */
+  scopes: Record<string, string>
+}
+
+interface SpecificationExtension {
+  [extensionName: `x-${string}`]: any
+}
+
+/**
+ * When request bodies or response payloads may be one of a number of different schemas, a discriminator object can be used to aid in serialization, deserialization, and validation. The discriminator is a specific object in a schema which is used to inform the consumer of the document of an alternative schema based on the value associated with it.
+ *
+ * When using the discriminator, inline schemas will not be considered.
+ */
+interface Discriminator extends SpecificationExtension {
+  /**
+   * REQUIRED. The name of the property in the payload that will hold the discriminator value.
+   */
+  propertyName: string
+
+  /**
+   * An object to hold mappings between payload values and schema names or references.
+   */
+  mapping?: Record<string, string>
+}
+
+/**
+ * A metadata object that allows for more fine-tuned XML model definitions.
+ *
+ * When using arrays, XML element names are not inferred (for singular/plural forms) and the name property SHOULD be used to add that information. See examples for expected behavior.
+ */
+interface XML extends SpecificationExtension {
+  /**
+   * Replaces the name of the element/attribute used for the described schema property. When defined within items, it will affect the name of the individual XML elements within the list. When defined alongside type being array (outside the items), it will affect the wrapping element and only if wrapped is true. If wrapped is false, it will be ignored.
+   */
+  name?: string
+
+  /**
+   * The URI of the namespace definition. This MUST be in the form of an absolute URI.
+   */
+  namespace?: string
+
+  /**
+   * The prefix to be used for the name.
+   */
+  prefix?: string
+
+  /**
+   * Declares whether the property definition translates to an attribute instead of an element. Default value is false.
+   */
+  attribute?: boolean
+
+  /**
+   * MAY be used only for an array definition. Signifies whether the array is wrapped (for example, <books><book/><book/></books>) or unwrapped (<book/><book/>). Default value is false. The definition takes effect only when defined alongside type being array (outside the items).
+   */
+  wrapped?: boolean
+}
+
+/**
+ * The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is a superset of the JSON Schema Specification Draft 2020-12.
+ *
+ * For more information about the properties, see JSON Schema Core and JSON Schema Validation.
+ *
+ * Unless stated otherwise, the property definitions follow those of JSON Schema and do not add any additional semantics. Where JSON Schema indicates that behavior is defined by the application (e.g. for annotations), OAS also defers the definition of semantics to the application consuming the OpenAPI document.
+ * Properties
+ *
+ * The OpenAPI Schema Object dialect is defined as requiring the OAS base vocabulary, in addition to the vocabularies as specified in the JSON Schema draft 2020-12 general purpose meta-schema.
+ *
+ * The OpenAPI Schema Object dialect for this version of the specification is identified by the URI https://spec.openapis.org/oas/3.1/dialect/base (the "OAS dialect schema id").
+ *
+ * The following properties are taken from the JSON Schema specification but their definitions have been extended by the OAS:
+ *
+ *     description - CommonMark syntax MAY be used for rich text representation.
+ *     format - See Data Type Formats for further details. While relying on JSON Schema's defined formats, the OAS offers a few additional predefined formats.
+ *
+ * In addition to the JSON Schema properties comprising the OAS dialect, the Schema Object supports keywords from any other vocabularies, or entirely arbitrary properties.
+ *
+ * The OpenAPI Specification's base vocabulary is comprised of the following keywords:
+ */
+type OpenApiSchemaExtensions = {
+  /**
+   * Adds support for polymorphism. The discriminator is an object name that is used to differentiate between other schemas which may satisfy the payload description. See Composition and Inheritance for more details.
+   */
+  discriminator?: Discriminator
+
+  /**
+   * This MAY be used only on properties schemas. It has no effect on root schemas. Adds additional metadata to describe the XML representation of this property.
+   */
+  xml?: XML
+
+  /**
+   * Additional external documentation for this schema.
+   */
+  externalDocs?: ExternalDocumentation
+
+  /**
+   * A free-form property to include an example of an instance for this schema. To represent examples that cannot be naturally represented in JSON or YAML, a string value can be used to contain the example with escaping where necessary.
+
+   Deprecated: The example property has been deprecated in favor of the JSON Schema examples keyword. Use of example is discouraged, and later versions of this specification may remove it.
+   @deprecated
+   */
+  example?: any
+}
+
+type Schema = OpenApiSchemaExtensions

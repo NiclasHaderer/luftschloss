@@ -1,1 +1,3 @@
-const createOpenApiSchema = () => {}
+const createOpenApiSchema = () => {
+  // TODO
+}
