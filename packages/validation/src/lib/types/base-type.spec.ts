@@ -78,13 +78,18 @@ test("Test default", () => {
 
 test("Test adding validator", () => {
   const validator = new LuftString()
-  const newValidator = validator.beforeValidate(true, value => ({ success: true, data: value }))
-  expect(validator).toBe(newValidator)
-
-  let notANewValidator = validator.beforeValidate(false, value => ({ success: true, data: value }))
-  expect(validator).not.toBe(notANewValidator)
-  notANewValidator = validator.beforeValidate(value => ({ success: true, data: value }))
-  expect(validator).not.toBe(notANewValidator)
+  let newValidator = validator.beforeValidate(value => ({ success: true, data: value }))
+  expect(validator).not.toBe(newValidator)
+  newValidator = validator.beforeCoerce(value => ({ success: true, data: value }))
+  expect(validator).not.toBe(newValidator)
+  newValidator = validator.afterValidate(value => ({ success: true, data: value }))
+  expect(validator).not.toBe(newValidator)
+  newValidator = validator.afterCoerce(value => ({ success: true, data: value }))
+  expect(validator).not.toBe(newValidator)
+  newValidator = validator.before(value => ({ success: true, data: value }))
+  expect(validator).not.toBe(newValidator)
+  newValidator = validator.after(value => ({ success: true, data: value }))
+  expect(validator).not.toBe(newValidator)
 })
 
 test("Test or", () => {
@@ -132,4 +137,18 @@ test("Test invalid hooks", () => {
     return { success: true, data: value }
   })
   expect(() => invalidTrue.validate("hello")).toThrow(LuftParsingUsageError)
+})
+
+test("Test deprecated", () => {
+  const validator = new LuftString().deprecated(true)
+  let loggedValue
+
+  // Mock console to get the error message printed to the console
+  const oldLog = global.console.log
+  global.console.log = (...args: any[]) => {
+    loggedValue = args
+  }
+  expect(validator.validateSave("hello").success).toBe(true)
+  expect(loggedValue).toStrictEqual(["Usage of deprecated type undefined at", []])
+  global.console.log = oldLog
 })

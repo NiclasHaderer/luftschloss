@@ -290,7 +290,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   }
 
   private logDeprecated(value: unknown, context: ParsingContext): InternalParsingResult<unknown> {
-    console.log("Usage of deprecated type at", context.path)
+    console.log(`Usage of deprecated type ${getTypeOf(this)} at`, context.path)
     return { success: true, data: value }
   }
 
