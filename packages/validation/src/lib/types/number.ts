@@ -33,7 +33,7 @@ export class LuftNumber extends LuftBaseType<number> {
   }
 
   public clone(): LuftNumber {
-    return new LuftNumber({ ...this.schema })
+    return new LuftNumber({ ...this.schema }).replaceValidationStorage(this.validationStorage)
   }
 
   public parseString(parse: boolean): LuftNumber {

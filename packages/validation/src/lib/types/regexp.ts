@@ -37,7 +37,10 @@ export class LuftRegexp extends LuftString {
   }
 
   public clone(): LuftRegexp {
-    return new LuftRegexp({ ...this.schema, regex: new RegExp(this.schema.regex.source, this.schema.regex.flags) })
+    return new LuftRegexp({
+      ...this.schema,
+      regex: new RegExp(this.schema.regex.source, this.schema.regex.flags),
+    }).replaceValidationStorage(this.validationStorage)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {

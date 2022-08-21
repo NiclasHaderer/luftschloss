@@ -9,6 +9,12 @@ export class LuftBool extends LuftBaseType<boolean> {
     super()
   }
 
+  public clone(): LuftBaseType<boolean> {
+    return new LuftBool({
+      ...this.schema,
+    }).replaceValidationStorage(this.validationStorage)
+  }
+
   public parseString(parse: boolean) {
     const clone = this.clone()
     clone.schema.parseString = parse
@@ -38,11 +44,5 @@ export class LuftBool extends LuftBaseType<boolean> {
       data,
       success: true,
     }
-  }
-
-  clone(): LuftBaseType<boolean> {
-    return new LuftBool({
-      ...this.schema,
-    })
   }
 }

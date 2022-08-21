@@ -24,7 +24,7 @@ export class LuftDate extends LuftBaseType<Date> {
   }
 
   public clone(): LuftDate {
-    return new LuftDate({ ...this.schema })
+    return new LuftDate({ ...this.schema }).replaceValidationStorage(this.validationStorage)
   }
 
   public after(date: Date | number | string): LuftDate {

@@ -39,7 +39,7 @@ export class LuftInt extends LuftNumber {
   }
 
   public clone(): LuftInt {
-    return new LuftInt({ ...this.schema })
+    return new LuftInt({ ...this.schema }).replaceValidationStorage(this.validationStorage)
   }
 
   public parseString(parse: boolean): LuftInt {

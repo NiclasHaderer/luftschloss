@@ -53,12 +53,24 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   public abstract readonly schema: Record<string, unknown>
   public abstract readonly supportedTypes: string[]
 
-  public readonly validationStorage: LuftValidationStorage<RETURN_TYPE> = {
+  private _validationStorage: LuftValidationStorage<RETURN_TYPE> = {
     beforeValidateHooks: [],
     beforeCoerceHooks: [],
     afterValidateHooks: [],
     afterCoerceHooks: [],
     defaultValue: NO_DEFAULT,
+  }
+
+  public get validationStorage() {
+    return this._validationStorage
+  }
+
+  /**
+   * @internal
+   */
+  public replaceValidationStorage(newValidationStorage: LuftValidationStorage<RETURN_TYPE>): this {
+    this._validationStorage = newValidationStorage
+    return this
   }
 
   protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
@@ -254,7 +266,7 @@ export class LuftUndefined extends LuftBaseType<undefined> {
   public supportedTypes = ["undefined"]
 
   public clone(): LuftUndefined {
-    return new LuftUndefined()
+    return new LuftUndefined().replaceValidationStorage(this.validationStorage)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
@@ -273,7 +285,7 @@ export class LuftNull extends LuftBaseType<null> {
   public readonly schema = {}
 
   public clone(): LuftNull {
-    return new LuftNull()
+    return new LuftNull().replaceValidationStorage(this.validationStorage)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
@@ -293,7 +305,9 @@ export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftBaseType<L
   }
 
   public clone(): LuftUnion<T> {
-    return new LuftUnion({ types: this.schema.types.map(type => type.clone()) as unknown as T })
+    return new LuftUnion({
+      types: this.schema.types.map(type => type.clone()) as unknown as T,
+    }).replaceValidationStorage(this.validationStorage)
   }
 
   public get supportedTypes() {

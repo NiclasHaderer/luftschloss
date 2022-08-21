@@ -33,7 +33,7 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     return new LuftArray<ARRAY_TYPE>({
       ...this.schema,
       type: this.schema.type.clone() as ARRAY_TYPE,
-    })
+    }).replaceValidationStorage(this.validationStorage)
   }
 
   public minLength(minLength: number): LuftArray<ARRAY_TYPE> {

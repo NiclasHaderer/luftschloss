@@ -11,3 +11,5 @@ export class LuftUUIDString extends LuftRegexp {
     super({ regex: /[a-fA-F\d]{8}-[a-fA-F\d]{4}-[a-fA-F\d]{4}-[a-fA-F\d]{4}-[a-fA-F\d]{12}/ })
   }
 }
+
+// TODO add this to string.uuid() method

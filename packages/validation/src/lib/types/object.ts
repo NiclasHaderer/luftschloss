@@ -132,7 +132,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
       return acc
     }, {} as T)
 
-    return new LuftObject({ ...this.schema, type: clonedType })
+    return new LuftObject({ ...this.schema, type: clonedType }).replaceValidationStorage(this.validationStorage)
   }
 
   public ignoreUnknownKeys(ignore: boolean): LuftObject<T> {

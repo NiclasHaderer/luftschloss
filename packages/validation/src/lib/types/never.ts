@@ -13,7 +13,7 @@ export class LuftNever extends LuftBaseType<never> {
   public readonly schema = {}
 
   public clone(): LuftNever {
-    return new LuftNever()
+    return new LuftNever().replaceValidationStorage(this.validationStorage)
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<never> {

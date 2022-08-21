@@ -25,14 +25,7 @@ export class LuftString extends LuftBaseType<string> {
   }
 
   public clone(): LuftString {
-    return new LuftString({ ...this.schema })
-  }
-
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
-    if (typeof data === "string" && this.schema.trim) {
-      data = data.trim()
-    }
-    return this._validate(data, context)
+    return new LuftString({ ...this.schema }).replaceValidationStorage(this.validationStorage)
   }
 
   public min(minLength: number): LuftString {
@@ -51,6 +44,13 @@ export class LuftString extends LuftBaseType<string> {
     const newValidator = this.clone()
     newValidator.schema.trim = shouldTrim
     return newValidator
+  }
+
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
+    if (typeof data === "string" && this.schema.trim) {
+      data = data.trim()
+    }
+    return this._validate(data, context)
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {

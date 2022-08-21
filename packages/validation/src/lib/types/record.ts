@@ -35,7 +35,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
       ...this.schema,
       key: this.schema.key.clone() as KEY,
       value: this.schema.value.clone() as VALUE,
-    })
+    }).replaceValidationStorage(this.validationStorage)
   }
 
   public nonEmpty(nonEmpty: boolean) {
