@@ -1,3 +1,14 @@
+import {
+  ArraySchema,
+  BooleanSchema,
+  ConstSchema,
+  EnumSchema,
+  NullSchema,
+  NumberSchema,
+  ObjectSchema,
+  StringSchema,
+} from "./json-schema-2020-12"
+
 /**
  * This is the root object of the OpenAPI document.
  */
@@ -998,4 +1009,13 @@ type OpenApiSchemaExtensions = {
   example?: any
 }
 
-type Schema = OpenApiSchemaExtensions
+type Schema =
+  | EnumSchema<Schema & OpenApiSchemaExtensions>
+  | ConstSchema<Schema & OpenApiSchemaExtensions>
+  | ObjectSchema<Schema & OpenApiSchemaExtensions>
+  | ArraySchema<Schema & OpenApiSchemaExtensions>
+  | StringSchema<Schema & OpenApiSchemaExtensions>
+  | NumberSchema<Schema & OpenApiSchemaExtensions>
+  | BooleanSchema<Schema & OpenApiSchemaExtensions>
+  | NullSchema<Schema & OpenApiSchemaExtensions>
+  | boolean
