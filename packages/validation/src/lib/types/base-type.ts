@@ -49,6 +49,9 @@ export type InternalLuftBaseType<OUT_TYPE> = {
   _coerce(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
 } & LuftBaseType<OUT_TYPE>
 
+// TODO deprecated
+// TODO description
+
 export abstract class LuftBaseType<RETURN_TYPE> {
   public abstract readonly schema: Record<string, unknown>
   public abstract readonly supportedTypes: string[]

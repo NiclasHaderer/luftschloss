@@ -9,24 +9,28 @@ import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 
+export type LuftNumberSchema = {
+  min: number
+  max: number
+  allowNan: boolean
+  minCompare: ">=" | ">"
+  maxCompare: "<=" | "<"
+  multipleOf: number | undefined
+  parseString: boolean
+}
+
 export class LuftNumber extends LuftBaseType<number> {
   public readonly supportedTypes = ["number"]
 
   constructor(
-    public override readonly schema: {
-      min: number
-      max: number
-      allowNan: boolean
-      minCompare: ">=" | ">"
-      maxCompare: "<=" | "<"
-      parseString: boolean
-    } = {
+    public override readonly schema: LuftNumberSchema = {
       min: -Infinity,
       max: Infinity,
       allowNan: false,
       minCompare: ">=",
       maxCompare: "<=",
       parseString: false,
+      multipleOf: undefined,
     }
   ) {
     super()
@@ -92,6 +96,12 @@ export class LuftNumber extends LuftBaseType<number> {
     return this.maxEq(0)
   }
 
+  public multipleOf(number: number): LuftNumber {
+    const newValidator = this.clone()
+    newValidator.schema.multipleOf = number
+    return newValidator
+  }
+
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
     if (typeof data === "string" && this.schema.parseString) {
       data = Number(data)
@@ -110,6 +120,21 @@ export class LuftNumber extends LuftBaseType<number> {
     // Don't bother checking if nan is smaller or larger the min/max.
     // If you want greater and smaller to work properly do not allow nan
     if (isNaN(data)) return { success: true, data: NaN }
+
+    // Check for multipleOf
+    if (this.schema.multipleOf !== undefined) {
+      if (Math.abs(data % this.schema.multipleOf) !== 0) {
+        context.addIssue({
+          code: LuftErrorCodes.MULTIPLE_OF,
+          message: `${data} is not a multiple of ${this.schema.multipleOf}`,
+          path: [...context.path],
+          multipleOf: this.schema.multipleOf,
+        })
+        return {
+          success: false,
+        }
+      }
+    }
 
     // To small
     if (this.isToSmall(data)) {

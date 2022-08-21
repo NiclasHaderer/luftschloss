@@ -8,7 +8,9 @@ export const LuftErrorCodes = {
   INVALID_UNION: "INVALID_UNION",
   MISSING_KEYS: "MISSING_KEYS",
   TO_MANY_KEYS: "TO_MANY_KEYS",
+  NOT_UNIQUE: "NOT_UNIQUE",
   INVALID_TYPE: "INVALID_TYPE",
+  MULTIPLE_OF: "MULTIPLE_OF",
   INVALID_VALUE: "INVALID_VALUE",
   INVALID_LENGTH: "INVALID_LENGTH",
   INVALID_RANGE: "INVALID_RANGE",
@@ -23,16 +25,25 @@ type BaseParsingError = {
   message: string
 }
 
+export type InvalidTypeError = BaseParsingError & {
+  code: "INVALID_TYPE"
+  expectedType: string[]
+  receivedType: string
+}
+
 export type UnionError = BaseParsingError &
   Omit<InvalidTypeError, "code"> & {
     code: "INVALID_UNION"
     errors: BaseParsingError[]
   }
 
-export type InvalidTypeError = BaseParsingError & {
-  code: "INVALID_TYPE"
-  expectedType: string[]
-  receivedType: string
+export type NotUniqueError = BaseParsingError & {
+  code: "NOT_UNIQUE"
+}
+
+export type MultipleOfError = BaseParsingError & {
+  code: "MULTIPLE_OF"
+  multipleOf: number
 }
 
 export type InvalidValueError = BaseParsingError & {
@@ -81,6 +92,8 @@ export type ParsingError =
   | InvalidLengthError
   | InvalidRangeError
   | StringParsingError
+  | NotUniqueError
+  | MultipleOfError
 
 export class LuftParsingError extends Error {
   public constructor(public readonly issues: ParsingError[], message?: string) {

@@ -23,11 +23,25 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     key: KEY
     value: VALUE
     nonEmpty: boolean
+    minProperties: number
+    maxProperties: number
   }
 
-  constructor({ nonEmpty = false, key, value }: { key: KEY; value: VALUE; nonEmpty?: boolean }) {
+  constructor({
+    nonEmpty = false,
+    key,
+    value,
+    maxProperties = Number.MAX_SAFE_INTEGER,
+    minProperties = 0,
+  }: {
+    key: KEY
+    value: VALUE
+    nonEmpty?: boolean
+    minProperties: number
+    maxProperties: number
+  }) {
     super()
-    this.schema = { nonEmpty, key, value }
+    this.schema = { nonEmpty, key, value, minProperties, maxProperties }
   }
 
   public clone(): LuftRecord<KEY, VALUE> {
@@ -36,6 +50,18 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
       key: this.schema.key.clone() as KEY,
       value: this.schema.value.clone() as VALUE,
     }).replaceValidationStorage(this.validationStorage)
+  }
+
+  public minProperties(min: number) {
+    const clone = this.clone()
+    clone.schema.minProperties = min
+    return clone
+  }
+
+  public maxProperties(max: number) {
+    const clone = this.clone()
+    clone.schema.maxProperties = max
+    return clone
   }
 
   public nonEmpty(nonEmpty: boolean) {
@@ -58,6 +84,38 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
   ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
     if (typeof data !== "object" || data === null) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
+      return { success: false }
+    }
+
+    const keyCount = Object.keys(data).length
+
+    // To few keys
+    if (keyCount < this.schema.minProperties) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_RANGE,
+        message: `Expected at least ${this.schema.minProperties} properties, but got ${keyCount}`,
+        path: [...context.path],
+        min: this.schema.minProperties,
+        max: this.schema.maxProperties,
+        actual: keyCount,
+        maxCompare: "<=",
+        minCompare: ">=",
+      })
+      return { success: false }
+    }
+
+    // To many keys
+    if (keyCount > this.schema.minProperties) {
+      context.addIssue({
+        code: LuftErrorCodes.INVALID_RANGE,
+        message: `Expected not more than ${this.schema.minProperties} properties, but got ${keyCount}`,
+        path: [...context.path],
+        min: this.schema.minProperties,
+        max: this.schema.maxProperties,
+        actual: keyCount,
+        maxCompare: "<=",
+        minCompare: ">=",
+      })
       return { success: false }
     }
 

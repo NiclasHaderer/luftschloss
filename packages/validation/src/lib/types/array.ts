@@ -13,6 +13,7 @@ type LuftArrayConstructor = {
   parser: "json" | "csv" | "nothing"
   maxLength: number
   minLength: number
+  unique: boolean
 }
 
 export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
@@ -23,10 +24,11 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     type,
     parser = "nothing",
     maxLength = Infinity,
+    unique = false,
     minLength = 0,
   }: Partial<LuftArrayConstructor> & { type: ARRAY_TYPE }) {
     super()
-    this.schema = { type, parser, maxLength, minLength }
+    this.schema = { type, parser, maxLength, minLength, unique }
   }
 
   public clone(): LuftArray<ARRAY_TYPE> {
@@ -34,6 +36,12 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
       ...this.schema,
       type: this.schema.type.clone() as ARRAY_TYPE,
     }).replaceValidationStorage(this.validationStorage)
+  }
+
+  public unique(unique: boolean): LuftArray<ARRAY_TYPE> {
+    const newValidator = this.clone()
+    newValidator.schema.unique = unique
+    return newValidator
   }
 
   public minLength(minLength: number): LuftArray<ARRAY_TYPE> {
@@ -103,6 +111,19 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
       return {
         success: false,
+      }
+    }
+
+    // Check if array has duplicate values
+    if (this.schema.unique) {
+      const unique = new Set(data).size === data.length
+      if (!unique) {
+        context.addIssue({
+          code: LuftErrorCodes.NOT_UNIQUE,
+          path: [...context.path],
+          message: "Array has duplicate values",
+        })
+        return { success: false }
       }
     }
 

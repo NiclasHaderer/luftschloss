@@ -7,16 +7,12 @@
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { InternalParsingResult } from "./base-type"
-import { LuftNumber } from "./number"
+import { LuftNumber, LuftNumberSchema } from "./number"
 
-type LuftIntSchema = {
-  min: number
-  max: number
-  allowNan: boolean
-  minCompare: ">=" | ">"
-  maxCompare: "<=" | "<"
+// TODO check usages of Infinity and -Infinity
+
+type LuftIntSchema = LuftNumberSchema & {
   roundWith: "floor" | "ceil" | "trunc" | "round" | "none"
-  parseString: boolean
 }
 
 export class LuftInt extends LuftNumber {
@@ -32,6 +28,7 @@ export class LuftInt extends LuftNumber {
       maxCompare: "<=",
       roundWith: "none",
       parseString: false,
+      multipleOf: undefined,
     }
   ) {
     super(schema)
@@ -80,6 +77,10 @@ export class LuftInt extends LuftNumber {
 
   public nonPositive(): LuftInt {
     return super.nonPositive() as LuftInt
+  }
+
+  public multipleOf(number: number): LuftInt {
+    return super.multipleOf(number) as LuftInt
   }
 
   public roundWith(mode: "floor" | "ceil" | "trunc" | "round" | "none"): LuftInt {
