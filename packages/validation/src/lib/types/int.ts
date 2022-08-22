@@ -8,6 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { InternalParsingResult } from "./base-type"
 import { LuftNumber, LuftNumberSchema } from "./number"
+import { deepCopy } from "@luftschloss/core"
 
 // TODO check usages of Infinity and -Infinity
 
@@ -36,7 +37,7 @@ export class LuftInt extends LuftNumber {
   }
 
   public clone(): LuftInt {
-    return new LuftInt({ ...this.schema }).replaceValidationStorage(this.validationStorage)
+    return new LuftInt({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public parseString(parse: boolean): LuftInt {

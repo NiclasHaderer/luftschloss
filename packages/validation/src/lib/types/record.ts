@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { saveObject } from "@luftschloss/core"
+import { deepCopy, saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
@@ -37,8 +37,8 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     key: KEY
     value: VALUE
     nonEmpty?: boolean
-    minProperties: number
-    maxProperties: number
+    minProperties?: number
+    maxProperties?: number
   }) {
     super()
     this.schema = { nonEmpty, key, value, minProperties, maxProperties }
@@ -49,7 +49,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
       ...this.schema,
       key: this.schema.key.clone() as KEY,
       value: this.schema.value.clone() as VALUE,
-    }).replaceValidationStorage(this.validationStorage)
+    }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public minProperties(min: number) {

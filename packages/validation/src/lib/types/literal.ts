@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { CaseInsensitiveSet } from "@luftschloss/core"
+import { CaseInsensitiveSet, deepCopy } from "@luftschloss/core"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
@@ -29,7 +29,7 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
     return new LuftLiteral({
       ...this.schema,
       types: [...this.schema.types] as unknown as T,
-    }).replaceValidationStorage(this.validationStorage)
+    }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public ignoreCase(ignoreCase: boolean): LuftLiteral<T> {

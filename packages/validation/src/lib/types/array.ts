@@ -8,6 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftType } from "./base-type"
+import { deepCopy } from "@luftschloss/core"
 
 type LuftArrayConstructor = {
   parser: "json" | "csv" | "nothing"
@@ -35,7 +36,7 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     return new LuftArray<ARRAY_TYPE>({
       ...this.schema,
       type: this.schema.type.clone() as ARRAY_TYPE,
-    }).replaceValidationStorage(this.validationStorage)
+    }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public unique(unique: boolean): LuftArray<ARRAY_TYPE> {

@@ -8,6 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
+import { deepCopy } from "@luftschloss/core"
 
 export class LuftDate extends LuftBaseType<Date> {
   public readonly supportedTypes = ["date"]
@@ -24,7 +25,7 @@ export class LuftDate extends LuftBaseType<Date> {
   }
 
   public clone(): LuftDate {
-    return new LuftDate({ ...this.schema }).replaceValidationStorage(this.validationStorage)
+    return new LuftDate({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public after(date: Date | number | string): LuftDate {

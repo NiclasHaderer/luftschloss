@@ -2,10 +2,18 @@ import { LuftString } from "./string"
 import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type"
 import { InvalidLengthError, InvalidTypeError, LuftErrorCodes } from "../parsing-error"
 
-test("Test valid types", () => {
+test("Test types", () => {
   const validator = new LuftString()
   expect(validator.validateSave("").success).toBe(true)
   expect(validator.validateSave("hello").success).toBe(true)
+  expect(validator.validateSave(undefined).success).toBe(false)
+  expect(validator.validateSave({}).success).toBe(false)
+  expect(validator.validateSave(37).success).toBe(false)
+  expect(validator.validateSave(Infinity).success).toBe(false)
+  expect(validator.coerceSave(undefined).success).toBe(false)
+  expect(validator.coerceSave({}).success).toBe(false)
+  expect(validator.coerceSave(37).success).toBe(false)
+  expect(validator.coerceSave(Infinity).success).toBe(false)
 })
 
 test("Test trim types", () => {

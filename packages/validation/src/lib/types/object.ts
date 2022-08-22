@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { saveObject } from "@luftschloss/core"
+import { deepCopy, saveObject } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
@@ -132,7 +132,9 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
       return acc
     }, {} as T)
 
-    return new LuftObject({ ...this.schema, type: clonedType }).replaceValidationStorage(this.validationStorage)
+    return new LuftObject({ ...this.schema, type: clonedType }).replaceValidationStorage(
+      deepCopy(this.validationStorage)
+    )
   }
 
   public ignoreUnknownKeys(ignore: boolean): LuftObject<T> {

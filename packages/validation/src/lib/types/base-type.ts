@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { uniqueList } from "@luftschloss/core"
+import { deepCopy, uniqueList } from "@luftschloss/core"
 import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"
@@ -33,14 +33,17 @@ export type UnsuccessfulParsingResult = {
 
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
 
-const NO_DEFAULT = Symbol("NO_DEFAULT")
-
 export interface LuftValidationStorage<T> {
   beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
   beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
   afterValidateHooks: ((data: T, context: ParsingContext) => InternalParsingResult<T>)[]
   afterCoerceHooks: ((data: T, context: ParsingContext) => InternalParsingResult<T>)[]
-  defaultValue: T | typeof NO_DEFAULT
+  defaultValue:
+    | {
+        isSet: true
+        value: T
+      }
+    | { isSet: false; value: undefined }
   deprecated: boolean
   description: string | undefined
 }
@@ -60,7 +63,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     beforeCoerceHooks: [],
     afterValidateHooks: [],
     afterCoerceHooks: [],
-    defaultValue: NO_DEFAULT,
+    defaultValue: { isSet: false, value: undefined },
     deprecated: false,
     description: undefined,
   }
@@ -86,7 +89,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   public deprecated(deprecated: boolean): this {
     const copy = this.clone()
     copy.validationStorage.deprecated = deprecated
-    copy.before(copy.logDeprecated)
+    copy.beforeHook(copy.logDeprecated)
     return copy as this
   }
 
@@ -226,11 +229,13 @@ export abstract class LuftBaseType<RETURN_TYPE> {
 
   public default(defaultValue: RETURN_TYPE): this {
     const copy = this.clone()
-    copy.validationStorage.defaultValue = defaultValue
-    return copy.before(copy.returnDefault) as this
+    copy.validationStorage.defaultValue = { isSet: true, value: defaultValue }
+    return copy.beforeHook(copy.returnDefault) as this
   }
 
-  public before(...callbacks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]): this {
+  public beforeHook(
+    ...callbacks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
+  ): this {
     return this.beforeValidate(...callbacks).beforeCoerce(...callbacks)
   }
 
@@ -259,7 +264,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     return copy as this
   }
 
-  public after(
+  public afterHook(
     ...callbacks: ((value: RETURN_TYPE, context: ParsingContext) => InternalParsingResult<RETURN_TYPE>)[]
   ): this {
     return this.afterValidate(...callbacks).afterCoerce(...callbacks)
@@ -294,14 +299,14 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     return { success: true, data: value }
   }
 
-  private returnDefault = (coerceValue: unknown): InternalParsingResult<unknown> => {
-    if (coerceValue === undefined || coerceValue === null) {
+  private returnDefault = (data: unknown): InternalParsingResult<unknown> => {
+    if ((data === undefined || data === null) && this.validationStorage.defaultValue.isSet) {
       return {
         success: true,
-        data: this.validationStorage.defaultValue,
+        data: this.validationStorage.defaultValue.value,
       }
     }
-    return { success: true, data: coerceValue }
+    return { success: true, data: data }
   }
 }
 
@@ -311,7 +316,7 @@ export class LuftUndefined extends LuftBaseType<undefined> {
   public supportedTypes = ["undefined"]
 
   public clone(): LuftUndefined {
-    return new LuftUndefined().replaceValidationStorage(this.validationStorage)
+    return new LuftUndefined().replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
@@ -330,7 +335,7 @@ export class LuftNull extends LuftBaseType<null> {
   public readonly schema = {}
 
   public clone(): LuftNull {
-    return new LuftNull().replaceValidationStorage(this.validationStorage)
+    return new LuftNull().replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
@@ -352,7 +357,7 @@ export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftBaseType<L
   public clone(): LuftUnion<T> {
     return new LuftUnion({
       types: this.schema.types.map(type => type.clone()) as unknown as T,
-    }).replaceValidationStorage(this.validationStorage)
+    }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public get supportedTypes() {

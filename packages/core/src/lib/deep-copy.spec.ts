@@ -51,19 +51,3 @@ test("Test array copy", () => {
   expect(copy.arr[2].func).toBe(copy.arr[2].func)
   expect(copy.arr[2].func()).toBe("hello")
 })
-
-test("Test class copy", () => {
-  class A {
-    constructor(public a: number, public b: { c: B }) {}
-  }
-
-  class B {
-    constructor(public a: Set<A>) {}
-  }
-
-  const a = new A(1, { c: new B(new Set<A>().add(new A(1, { c: new B(new Set<A>()) }))) })
-  const copy = deepCopy(a)
-  expect(copy).toStrictEqual(a)
-  expect(copy).not.toBe(a)
-  expect(copy.b).not.toBe(a.b)
-})

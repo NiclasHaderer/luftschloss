@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { isArray } from "@luftschloss/core"
+import { deepCopy, isArray } from "@luftschloss/core"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
@@ -30,7 +30,7 @@ export class LuftTuple<T extends ReadonlyArray<LuftType>> extends LuftBaseType<E
     return new LuftTuple<T>({
       ...this.schema,
       types: this.schema.types.map(t => t.clone()) as unknown as T,
-    }).replaceValidationStorage(this.validationStorage)
+    }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public parseWith(parser: "json" | "csv" | "nothing"): LuftTuple<T> {

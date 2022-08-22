@@ -7,13 +7,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
+import { deepCopy } from "@luftschloss/core"
 
 export class LuftAny extends LuftBaseType<any> {
   readonly supportedTypes = ["any"]
   public readonly schema = {}
 
   public clone(): LuftAny {
-    return new LuftAny().replaceValidationStorage(this.validationStorage)
+    return new LuftAny().replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<any> {

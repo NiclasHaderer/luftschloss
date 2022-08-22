@@ -8,6 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { InternalParsingResult } from "./base-type"
 import { LuftString } from "./string"
+import { deepCopy } from "@luftschloss/core"
 
 export class LuftRegexp extends LuftString {
   public readonly schema: { regex: RegExp; minLength: number; maxLength: number; trim: boolean }
@@ -40,7 +41,7 @@ export class LuftRegexp extends LuftString {
     return new LuftRegexp({
       ...this.schema,
       regex: new RegExp(this.schema.regex.source, this.schema.regex.flags),
-    }).replaceValidationStorage(this.validationStorage)
+    }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {

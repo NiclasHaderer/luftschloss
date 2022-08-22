@@ -8,6 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
+import { deepCopy } from "@luftschloss/core"
 
 export class LuftString extends LuftBaseType<string> {
   public get supportedTypes() {
@@ -25,7 +26,7 @@ export class LuftString extends LuftBaseType<string> {
   }
 
   public clone(): LuftString {
-    return new LuftString({ ...this.schema }).replaceValidationStorage(this.validationStorage)
+    return new LuftString({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public min(minLength: number): LuftString {

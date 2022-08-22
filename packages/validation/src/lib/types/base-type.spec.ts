@@ -63,6 +63,14 @@ test("Test optional, nullish, nullable", () => {
 
 test("Test default", () => {
   const validator = new LuftString()
+  expect(validator.default("hello")).not.toBe(validator)
+  expect(validator.default("hello").schema).toStrictEqual(validator.schema)
+  expect(validator.default("hello").validationStorage).not.toBe(validator.validationStorage)
+  expect(validator.default("hello").validationStorage).toStrictEqual({
+    ...validator.validationStorage,
+    default: "hello",
+  })
+
   expect(validator.validateSave(undefined).success).toBe(false)
   expect(validator.validateSave(null).success).toBe(false)
   expect(validator.default("hello").validate(null)).toBe("hello")
@@ -86,9 +94,9 @@ test("Test adding validator", () => {
   expect(validator).not.toBe(newValidator)
   newValidator = validator.afterCoerce(value => ({ success: true, data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.before(value => ({ success: true, data: value }))
+  newValidator = validator.beforeHook(value => ({ success: true, data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.after(value => ({ success: true, data: value }))
+  newValidator = validator.afterHook(value => ({ success: true, data: value }))
   expect(validator).not.toBe(newValidator)
 })
 

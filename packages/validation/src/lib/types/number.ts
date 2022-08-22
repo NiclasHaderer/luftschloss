@@ -8,6 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { deepCopy } from "@luftschloss/core"
 
 export type LuftNumberSchema = {
   min: number
@@ -37,7 +38,7 @@ export class LuftNumber extends LuftBaseType<number> {
   }
 
   public clone(): LuftNumber {
-    return new LuftNumber({ ...this.schema }).replaceValidationStorage(this.validationStorage)
+    return new LuftNumber({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
   public parseString(parse: boolean): LuftNumber {
