@@ -1,7 +1,7 @@
 import { LuftInfer, LuftNumber } from "@luftschloss/validation"
 import { faker } from "@faker-js/faker"
 
-export const fakeNumber = (validator: LuftNumber): LuftInfer<LuftNumber> => {
+export const mockNumber = (validator: LuftNumber): LuftInfer<LuftNumber> => {
   const inclusiveMax = validator.schema.maxCompare === "<="
   const inclusiveMin = validator.schema.minCompare === ">="
 

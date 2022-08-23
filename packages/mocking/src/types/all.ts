@@ -19,89 +19,95 @@ import {
   LuftUnion,
   LuftUUIDString,
 } from "@luftschloss/validation"
-import { fakeAny } from "./any"
-import { fakeArray } from "./array"
-import { fakeBool } from "./bool"
-import { fakeDate } from "./date"
-import { fakeInt } from "./int"
-import { fakeLiteral } from "./literal"
-import { fakeNever } from "./never"
-import { fakeNull } from "./null"
-import { fakeNumber } from "./number"
-import { fakeObject } from "./object"
-import { fakeRecord } from "./record"
-import { fakeString } from "./string"
-import { fakeTuple } from "./tuple"
-import { fakeUndefined } from "./undefined"
-import { fakeUnion } from "./union"
-import { fakeUUID } from "./uuid"
+import { mockAny } from "./any"
+import { mockArray } from "./array"
+import { mockBool } from "./bool"
+import { mockDate } from "./date"
+import { mockInt } from "./int"
+import { mockLiteral } from "./literal"
+import { mockNever } from "./never"
+import { mockNull } from "./null"
+import { mockNumber } from "./number"
+import { mockObject } from "./object"
+import { mockRecord } from "./record"
+import { mockString } from "./string"
+import { mockTuple } from "./tuple"
+import { mockUndefined } from "./undefined"
+import { mockUnion } from "./union"
+import { mockUUID } from "./uuid"
+import { getCustomMock } from "./register-type"
 
 // TODO add custom mocks
 
-export const fakeAll = <T extends LuftType>(validator: T, fieldName?: string): LuftInfer<T> => {
+export const mockAll = <T extends LuftType>(validator: T, fieldName?: string): LuftInfer<T> => {
   // Null
   if (validator.constructor === LuftNull) {
-    return fakeNull(validator) as LuftInfer<T>
+    return mockNull(validator) as LuftInfer<T>
   }
   // Undefined
-  else if (validator.constructor === LuftUndefined) {
-    return fakeUndefined(validator) as LuftInfer<T>
+  if (validator.constructor === LuftUndefined) {
+    return mockUndefined(validator) as LuftInfer<T>
   }
   // Int
-  else if (validator.constructor === LuftInt) {
-    return fakeInt(validator) as LuftInfer<T>
+  if (validator.constructor === LuftInt) {
+    return mockInt(validator) as LuftInfer<T>
   }
   // Number
-  else if (validator.constructor === LuftNumber) {
-    return fakeNumber(validator) as LuftInfer<T>
+  if (validator.constructor === LuftNumber) {
+    return mockNumber(validator) as LuftInfer<T>
   }
   // UUID
-  else if (validator.constructor === LuftUUIDString) {
-    return fakeUUID(validator) as LuftInfer<T>
+  if (validator.constructor === LuftUUIDString) {
+    return mockUUID(validator) as LuftInfer<T>
   }
   // String
-  else if (validator.constructor === LuftString) {
-    return fakeString(validator, fieldName) as LuftInfer<T>
+  if (validator.constructor === LuftString) {
+    return mockString(validator, fieldName) as LuftInfer<T>
   }
   // Union
-  else if (validator.constructor === LuftUnion) {
-    return fakeUnion(validator, fieldName) as LuftInfer<T>
+  if (validator.constructor === LuftUnion) {
+    return mockUnion(validator, fieldName) as LuftInfer<T>
   }
   // Tuple
-  else if (validator.constructor === LuftTuple) {
-    return fakeTuple(validator, fieldName) as LuftInfer<T>
+  if (validator.constructor === LuftTuple) {
+    return mockTuple(validator, fieldName) as LuftInfer<T>
   }
   // Never
-  else if (validator.constructor === LuftNever) {
-    return fakeNever(validator) as LuftInfer<T>
+  if (validator.constructor === LuftNever) {
+    return mockNever(validator) as LuftInfer<T>
   }
   // Literal
-  else if (validator.constructor === LuftLiteral) {
-    return fakeLiteral(validator) as LuftInfer<T>
+  if (validator.constructor === LuftLiteral) {
+    return mockLiteral(validator) as LuftInfer<T>
   }
   // Date
-  else if (validator.constructor === LuftDate) {
-    return fakeDate(validator) as LuftInfer<T>
+  if (validator.constructor === LuftDate) {
+    return mockDate(validator) as LuftInfer<T>
   }
   // Array
-  else if (validator.constructor === LuftArray) {
-    return fakeArray(validator, fieldName) as LuftInfer<T>
+  if (validator.constructor === LuftArray) {
+    return mockArray(validator, fieldName) as LuftInfer<T>
   }
   // Bool
-  else if (validator.constructor === LuftBool) {
-    return fakeBool(validator) as LuftInfer<T>
+  if (validator.constructor === LuftBool) {
+    return mockBool(validator) as LuftInfer<T>
   }
   // Record
-  else if (validator.constructor === LuftRecord) {
-    return fakeRecord(validator) as LuftInfer<T>
+  if (validator.constructor === LuftRecord) {
+    return mockRecord(validator) as LuftInfer<T>
   }
   // Object
-  else if (validator.constructor === LuftObject) {
-    return fakeObject(validator) as LuftInfer<T>
+  if (validator.constructor === LuftObject) {
+    return mockObject(validator) as LuftInfer<T>
   }
   // Any
-  else if (validator.constructor === LuftAny) {
-    return fakeAny(validator) as LuftInfer<T>
+  if (validator.constructor === LuftAny) {
+    return mockAny(validator) as LuftInfer<T>
+  }
+
+  const customMock = getCustomMock(validator)
+  if (customMock) {
+    return customMock(validator)
   }
 
   throw new Error(`Could not find a faker for ${getTypeOf(validator)}`)

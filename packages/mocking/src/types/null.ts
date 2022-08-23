@@ -1,3 +1,3 @@
 import { LuftInfer, LuftNull } from "@luftschloss/validation"
 
-export const fakeNull = (_: LuftNull): LuftInfer<LuftNull> => null
+export const mockNull = (_: LuftNull): LuftInfer<LuftNull> => null
