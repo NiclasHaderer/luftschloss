@@ -8,7 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { InternalParsingResult } from "./base-type"
 import { LuftString } from "./string"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 export class LuftRegexp extends LuftString {
   public readonly schema: { regex: RegExp; minLength: number; maxLength: number; trim: boolean }

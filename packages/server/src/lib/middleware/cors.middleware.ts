@@ -3,7 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { saveObject, withDefaults } from "@luftschloss/core"
+import { saveObject, withDefaults } from "@luftschloss/common"
 import { HTTP_METHODS, LRequest, LResponse } from "../core"
 import { Middleware, NextFunction } from "./middleware"
 

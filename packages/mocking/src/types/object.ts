@@ -1,4 +1,4 @@
-import { saveObject } from "@luftschloss/core"
+import { saveObject } from "@luftschloss/common"
 import { LuftInfer, LuftObject, LuftType } from "@luftschloss/validation"
 import { fakeAll } from "./all"
 

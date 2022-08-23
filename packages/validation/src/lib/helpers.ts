@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { isArray } from "@luftschloss/core"
+import { isArray } from "@luftschloss/common"
 import { InvalidTypeError, LuftErrorCodes } from "./parsing-error"
 import { ParsingContext } from "./parsing-context"
 

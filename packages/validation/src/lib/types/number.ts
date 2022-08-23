@@ -8,7 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 export type LuftNumberSchema = {
   min: number

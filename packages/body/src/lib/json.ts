@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { withDefaults } from "@luftschloss/core"
+import { withDefaults } from "@luftschloss/common"
 import { Middleware } from "@luftschloss/server"
 import * as Buffer from "buffer"
 import { commonFormParserFactory } from "./common"

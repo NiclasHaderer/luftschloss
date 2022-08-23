@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { withDefaults } from "@luftschloss/core"
+import { withDefaults } from "@luftschloss/common"
 import { Middleware, UTF8SearchParams } from "@luftschloss/server"
 import Buffer from "buffer"
 import { commonFormParserFactory } from "./common"

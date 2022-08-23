@@ -1,4 +1,4 @@
-import { isArray } from "@luftschloss/core"
+import { isArray } from "@luftschloss/common"
 import { luft } from "@luftschloss/validation"
 import { fakeAll } from "./types/all"
 

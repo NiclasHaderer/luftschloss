@@ -1,7 +1,7 @@
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 import { createInvalidTypeIssue } from "../helpers"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 export class LuftBool extends LuftBaseType<boolean> {
   public readonly supportedTypes = ["bool"]

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { ByLazy, saveObject } from "@luftschloss/core"
+import { ByLazy, saveObject } from "@luftschloss/common"
 import { IncomingMessage } from "http"
 import { AddressInfo } from "net"
 import * as tls from "tls"

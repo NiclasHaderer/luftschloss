@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { withDefaults } from "@luftschloss/core"
+import { withDefaults } from "@luftschloss/common"
 import { HTTPException, isProduction, LRequest, LResponse, Router, RouterBase, Status } from "@luftschloss/server"
 import { promises as fs } from "fs"
 import path from "path"

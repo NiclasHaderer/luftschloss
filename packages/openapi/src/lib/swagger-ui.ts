@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { ByLazy } from "@luftschloss/core"
+import { ByLazy } from "@luftschloss/common"
 import { DefaultRouter, LRequest, LResponse, Router, ServerBase } from "@luftschloss/server"
 import { ApiServer } from "./api.server"
 
@@ -19,11 +19,8 @@ export class SwaggerRouter extends DefaultRouter {
     return super._server as ApiServer
   }
 
-  @ByLazy<string, SwaggerRouter>(self => self.server!.openapi.getSpecAsJson())
+  @ByLazy<string, SwaggerRouter>(self => JSON.stringify(self.server!.openapi))
   private json!: string
-
-  @ByLazy<string, SwaggerRouter>(self => self.server!.openapi.getSpecAsYaml())
-  private yaml!: string
 
   public constructor(private docsUrl: string, private openApiUrl: string) {
     super()
@@ -42,11 +39,6 @@ export class SwaggerRouter extends DefaultRouter {
   private async handleJsonSchema(_: LRequest, response: LResponse): Promise<void> {
     response.text(this.json).headers.set("Content-Type", "application/json")
     await response.end()
-  }
-
-  private handleYmlSchema(_: LRequest, response: LResponse): void {
-    response.headers.set("Content-Type", "text/yaml")
-    response.text(this.yaml)
   }
 
   private handleDocs(_: LRequest, response: LResponse) {

@@ -7,7 +7,7 @@
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 export class LuftNever extends LuftBaseType<never> {
   readonly supportedTypes = ["never"]

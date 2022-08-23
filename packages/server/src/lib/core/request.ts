@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { CustomPropertyDescriptor, Func } from "@luftschloss/core"
+import { CustomPropertyDescriptor, Func } from "@luftschloss/common"
 import { IncomingMessage } from "http"
 import { Headers } from "./headers"
 import { RequestImpl } from "./request-impl"

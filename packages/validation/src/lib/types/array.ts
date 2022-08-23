@@ -8,7 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftType } from "./base-type"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 type LuftArrayConstructor = {
   parser: "json" | "csv" | "nothing"

@@ -1,4 +1,4 @@
-import { randomRange, saveObject } from "@luftschloss/core"
+import { randomRange, saveObject } from "@luftschloss/common"
 import { LuftInfer, LuftRecord, LuftRecordKey, LuftType } from "@luftschloss/validation"
 import { fakeAll } from "./all"
 

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { ValueOf } from "@luftschloss/core"
+import { ValueOf } from "@luftschloss/common"
 import { HTTPException } from "./http-exception"
 
 /**

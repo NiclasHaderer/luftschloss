@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { ByLazy, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/core"
+import { ByLazy, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,

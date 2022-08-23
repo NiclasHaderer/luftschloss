@@ -12,11 +12,11 @@ import {
 /**
  * This is the root object of the OpenAPI document.
  */
-interface OpenApiSchema {
+export interface OpenApiSchema {
   /**
    * REQUIRED. This string MUST be the version number of the OpenAPI Specification that the OpenAPI document uses. The openapi field SHOULD be used by tooling to interpret the OpenAPI document. This is not related to the API info.version string.
    */
-  openapi: string
+  openapi: "3.1.0"
 
   /**
    * REQUIRED. Provides metadata about the API. The metadata MAY be used by tooling as required.
@@ -67,7 +67,7 @@ interface OpenApiSchema {
 /**
  * The object provides metadata about the API. The metadata MAY be used by the clients if needed, and MAY be presented in editing or documentation generation tools for convenience.
  */
-interface Info {
+export interface Info {
   /**
    * REQUIRED. The title of the API.
    */
@@ -107,7 +107,7 @@ interface Info {
 /**
  * Contact information for the exposed API.
  */
-interface Contact {
+export interface Contact {
   /**
    * The identifying name of the contact person/organization.
    */
@@ -127,7 +127,7 @@ interface Contact {
 /**
  * License information for the exposed API.
  */
-interface License {
+export interface License {
   /**
    * REQUIRED. The license name used for the API.
    */
@@ -147,7 +147,7 @@ interface License {
 /**
  * An object representing a Server.
  */
-interface Server {
+export interface Server {
   /**
    * REQUIRED. A URL to the target host. This URL supports Server Variables and MAY be relative, to indicate that the host location is relative to the location where the OpenAPI document is being served. Variable substitutions will be made when a variable is named in {brackets}.
    */
@@ -167,7 +167,7 @@ interface Server {
 /**
  * An object representing a Server Variable for server URL template substitution.
  */
-interface ServerVariable {
+export interface ServerVariable {
   /**
    * An enumeration of string values to be used if the substitution options are from a limited set. The array MUST NOT be empty.
    */
@@ -187,7 +187,7 @@ interface ServerVariable {
 /**
  * Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the Server Object in order to construct the full URL. The Paths MAY be empty, due to Access Control List (ACL) constraints.
  */
-interface Paths {
+export interface Paths {
   /**
    * A relative path to an individual endpoint. The field name MUST begin with a forward slash (/). The path is appended (no relative URL resolution) to the expanded URL from the Server Object's url field in order to construct the full URL. Path templating is allowed. When matching URLs, concrete (non-templated) paths would be matched before their templated counterparts. Templated paths with the same hierarchy but different templated names MUST NOT exist as they are identical. In case of ambiguous matching, it's up to the tooling to decide which one to use.
    */
@@ -197,7 +197,7 @@ interface Paths {
 /**
  * Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available.
  */
-interface PathItem {
+export interface PathItem {
   /**
    * Allows for a referenced definition of this path item. The referenced structure MUST be in the form of a Path Item Object. In case a Path Item Object field appears both in the defined object and the referenced object, the behavior is undefined. See the rules for resolving Relative References.
    */
@@ -267,7 +267,7 @@ interface PathItem {
 /**
  * Describes a single API operation on a path.
  */
-interface Operation {
+export interface Operation {
   /**
    * A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
    */
@@ -332,7 +332,7 @@ interface Operation {
 /**
  * Allows referencing an external resource for extended documentation.
  */
-interface ExternalDocumentation {
+export interface ExternalDocumentation {
   /**
    * A description of the target documentation. CommonMark syntax MAY be used for rich text representation.
    */
@@ -357,7 +357,7 @@ interface ExternalDocumentation {
  *     + header - Custom headers that are expected as part of the request. Note that RFC7230 states header names are case insensitive.
  *     + cookie - Used to pass a specific cookie value to the API.
  */
-interface Parameter {
+export interface Parameter {
   /**
    * REQUIRED. The name of the parameter. Parameter names are case sensitive.
    If in is "path", the name field MUST correspond to a template expression occurring within the path field in the Paths Object. See Path Templating for further information.
@@ -399,7 +399,7 @@ interface Parameter {
  *
  * See the rules for resolving Relative References.
  */
-interface Reference {
+export interface Reference {
   /**
    * REQUIRED. The reference identifier. This MUST be in the form of a URI.
    */
@@ -419,7 +419,7 @@ interface Reference {
 /**
  * Describes a single request body.
  */
-interface RequestBody {
+export interface RequestBody {
   /**
    * A brief description of the request body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.
    */
@@ -439,7 +439,7 @@ interface RequestBody {
 /**
  * Each Media Type Object provides schema and examples for the media type identified by its key.
  */
-interface MediaType {
+export interface MediaType {
   /**
    * The schema defining the content of the request, response, or parameter.
    */
@@ -461,7 +461,7 @@ interface MediaType {
   encoding?: Record<string, Encoding>
 }
 
-interface Example {
+export interface Example {
   /**
    * Short description for the example.
    */
@@ -486,7 +486,7 @@ interface Example {
 /**
  * A single encoding definition applied to a single schema property.
  */
-interface Encoding {
+export interface Encoding {
   /**
    * The Content-Type for encoding a specific property. Default value depends on the property type: for object - application/json; for array – the default is defined based on the inner type; for all other cases the default is application/octet-stream. The value can be a specific media type (e.g. application/json), a wildcard media type (e.g. image/*), or a comma-separated list of the two types.
    */
@@ -538,7 +538,7 @@ interface Encoding {
  *   type: integer
  * ```
  */
-interface Header {
+export interface Header {
   /**
    * A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation.
    */
@@ -560,7 +560,7 @@ interface Header {
   allowEmptyValue?: boolean
 }
 
-type HttpStatusCodes =
+export type HttpStatusCodes =
   | "100"
   | "101"
   | "102"
@@ -634,7 +634,7 @@ type HttpStatusCodes =
  *
  * The Responses Object MUST contain at least one response code, and if only one response code is provided it SHOULD be the response for a successful operation call.
  */
-type Responses = {
+export type Responses = {
   /**
    * The documentation of responses other than the ones declared for specific HTTP response codes. Use this field to cover undeclared responses.
    */
@@ -646,7 +646,7 @@ type Responses = {
 /**
  * Describes a single response from an API Operation, including design-time, static links to operations based on the response.
  */
-interface Response {
+export interface Response {
   /**
    * REQUIRED. A description of the response. CommonMark syntax MAY be used for rich text representation.
    */
@@ -668,7 +668,7 @@ interface Response {
   links?: Record<string, Link | Reference>
 }
 
-interface Link {
+export interface Link {
   /**
    * A relative or absolute URI reference to an OAS operation. This field is mutually exclusive of the operationId field, and MUST point to an Operation Object. Relative operationRef values MAY be used to locate an existing Operation Object in the OpenAPI definition. See the rules for resolving Relative References.
    */
@@ -705,7 +705,7 @@ interface Link {
  *
  * To describe incoming requests from the API provider independent from another API call, use the webhooks field.
  */
-interface Callback {
+export interface Callback {
   /**
    * A Path Item Object, or a reference to one, used to define a callback request and expected responses. A complete example is available.
    */
@@ -719,7 +719,7 @@ interface Callback {
  *
  * When a list of Security Requirement Objects is defined on the OpenAPI Object or Operation Object, only one of the Security Requirement Objects in the list needs to be satisfied to authorize the request.
  */
-interface SecurityRequirement {
+export interface SecurityRequirement {
   /**
    * Each name MUST correspond to a security scheme which is declared in the Security Schemes under the Components Object. If the security scheme is of type "oauth2" or "openIdConnect", then the value is a list of scope names required for the execution, and the list MAY be empty if authorization does not require a specified scope. For other security scheme types, the array MAY contain a list of role names which are required for the execution, but are not otherwise defined or exchanged in-band.
    */
@@ -729,7 +729,7 @@ interface SecurityRequirement {
 /**
  * Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object.
  */
-interface Components {
+export interface Components {
   /**
    * An object to hold reusable Schema Objects.
    */
@@ -784,7 +784,7 @@ interface Components {
 /**
  * Adds metadata to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag defined in the Operation Object instances.
  */
-interface Tag {
+export interface Tag {
   /**
    * REQUIRED. The name of the tag.
    */
@@ -806,7 +806,7 @@ interface Tag {
  *
  * Supported schemes are HTTP authentication, an API key (either as a header, a cookie parameter or as a query parameter), mutual TLS (use of a client certificate), OAuth2's common flows (implicit, password, client credentials and authorization code) as defined in RFC6749, and OpenID Connect Discovery. Please note that as of 2020, the implicit flow is about to be deprecated by OAuth 2.0 Security Best Current Practice. Recommended for most use case is Authorization Code Grant flow with PKCE.
  */
-interface SecurityScheme {
+export interface SecurityScheme {
   /**
    * REQUIRED. The type of the security scheme. Valid values are "apiKey", "http", "mutualTLS", "oauth2", "openIdConnect".
    * Applies to: Any
@@ -859,7 +859,7 @@ interface SecurityScheme {
 /**
  * Allows configuration of the supported OAuth Flows.
  */
-interface OAuthFlows {
+export interface OAuthFlows {
   /**
    * Configuration for the OAuth Implicit flow
    */
@@ -884,7 +884,7 @@ interface OAuthFlows {
 /**
  * Configuration details for a supported OAuth Flow
  */
-interface OAuthFlow {
+export interface OAuthFlow {
   /**
    * REQUIRED. The authorization URL to be used for this flow. This MUST be in the form of a URL. The OAuth2 standard requires the use of TLS.
    * Applies to: oauth2 ("implicit", "authorizationCode")
@@ -910,7 +910,7 @@ interface OAuthFlow {
   scopes: Record<string, string>
 }
 
-interface SpecificationExtension {
+export interface SpecificationExtension {
   [extensionName: `x-${string}`]: any
 }
 
@@ -919,7 +919,7 @@ interface SpecificationExtension {
  *
  * When using the discriminator, inline schemas will not be considered.
  */
-interface Discriminator extends SpecificationExtension {
+export interface Discriminator extends SpecificationExtension {
   /**
    * REQUIRED. The name of the property in the payload that will hold the discriminator value.
    */
@@ -936,7 +936,7 @@ interface Discriminator extends SpecificationExtension {
  *
  * When using arrays, XML element names are not inferred (for singular/plural forms) and the name property SHOULD be used to add that information. See examples for expected behavior.
  */
-interface XML extends SpecificationExtension {
+export interface XML extends SpecificationExtension {
   /**
    * Replaces the name of the element/attribute used for the described schema property. When defined within items, it will affect the name of the individual XML elements within the list. When defined alongside type being array (outside the items), it will affect the wrapping element and only if wrapped is true. If wrapped is false, it will be ignored.
    */
@@ -984,7 +984,7 @@ interface XML extends SpecificationExtension {
  *
  * The OpenAPI Specification's base vocabulary is comprised of the following keywords:
  */
-type OpenApiSchemaExtensions = {
+export type OpenApiSchemaExtensions = {
   /**
    * Adds support for polymorphism. The discriminator is an object name that is used to differentiate between other schemas which may satisfy the payload description. See Composition and Inheritance for more details.
    */
@@ -1009,7 +1009,7 @@ type OpenApiSchemaExtensions = {
   example?: any
 }
 
-type Schema =
+export type Schema =
   | EnumSchema<Schema & OpenApiSchemaExtensions>
   | ConstSchema<Schema & OpenApiSchemaExtensions>
   | ObjectSchema<Schema & OpenApiSchemaExtensions>

@@ -4,7 +4,7 @@
   "projects": {
     "body": "packages/body",
     "client": "packages/client",
-    "core": "packages/core",
+    "common": "packages/common",
     "demo": "apps/demo",
     "mocking": "packages/mocking",
     "openapi": "packages/openapi",

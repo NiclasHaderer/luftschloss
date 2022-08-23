@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { normalizePath, saveObject } from "@luftschloss/core"
+import { normalizePath, saveObject } from "@luftschloss/common"
 import { containsRegex, pathToRegex, PathValidators } from "../path-validator"
 import { HTTP_METHODS, ROUTE_HANDLER } from "./route-collector.model"
 

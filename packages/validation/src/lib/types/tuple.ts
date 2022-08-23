@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { deepCopy, isArray } from "@luftschloss/core"
+import { deepCopy, isArray } from "@luftschloss/common"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"

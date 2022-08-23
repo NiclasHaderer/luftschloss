@@ -4,7 +4,8 @@
  * MIT Licensed
  */
 import { jsonParser } from "@luftschloss/body"
-import { normalizePath, saveObject, withDefaults } from "@luftschloss/core"
+import { OpenApiSchema } from "@luftschloss/openapi-schema"
+import { normalizePath, saveObject, withDefaults } from "@luftschloss/common"
 import {
   DefaultErrorHandler,
   errorMiddleware,
@@ -19,13 +20,19 @@ import {
   uuidPathValidator,
   withServerBase,
 } from "@luftschloss/server"
-import { OpenApiBuilder, PathItemObject } from "openapi3-ts"
 import { ApiRouter } from "./api.router"
 
 type ApiServerArgs = { generateOpenApi: boolean }
 
 export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {
-  public openapi = new OpenApiBuilder()
+  // TODO
+  public openapi: OpenApiSchema = {
+    info: {
+      title: "My fancy title",
+      version: "0.0.0",
+    },
+    openapi: "3.1.0",
+  }
 
   public constructor(private generateOpenApi: boolean) {
     super()
@@ -39,7 +46,7 @@ export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {
   private collectOpenApiDefinitions({ router, basePath }: { router: ApiRouter; basePath: string }) {
     for (const [apiPath, pathItemObject] of Object.entries(router.apiRoutes)) {
       const path = normalizePath(`${basePath}/${apiPath}`)
-      this.openapi.addPath(path, pathItemObject as PathItemObject)
+      // TODO
     }
   }
 }

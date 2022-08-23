@@ -1,4 +1,4 @@
-import { randomRange } from "@luftschloss/core"
+import { randomRange } from "@luftschloss/common"
 import { LuftArray, LuftInfer, LuftType } from "@luftschloss/validation"
 import { fakeAll } from "./all"
 

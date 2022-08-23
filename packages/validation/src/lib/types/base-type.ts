@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { deepCopy, uniqueList } from "@luftschloss/core"
+import { deepCopy, uniqueList } from "@luftschloss/common"
 import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"

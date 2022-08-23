@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { escapeRegexString, normalizePath, saveObject } from "@luftschloss/core"
+import { escapeRegexString, normalizePath, saveObject } from "@luftschloss/common"
 import { DEFAULT_PATH_VALIDATOR_NAME } from "./default"
 
 type ValidatorName = string

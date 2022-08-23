@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 export class LuftAny extends LuftBaseType<any> {
   readonly supportedTypes = ["any"]

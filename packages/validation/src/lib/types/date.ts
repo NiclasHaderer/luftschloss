@@ -8,7 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 export class LuftDate extends LuftBaseType<Date> {
   public readonly supportedTypes = ["date"]

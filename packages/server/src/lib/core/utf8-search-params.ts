@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { saveObject } from "@luftschloss/core"
+import { saveObject } from "@luftschloss/common"
 import { URLSearchParams } from "url"
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL")

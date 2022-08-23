@@ -8,7 +8,7 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { InternalParsingResult } from "./base-type"
 import { LuftNumber, LuftNumberSchema } from "./number"
-import { deepCopy } from "@luftschloss/core"
+import { deepCopy } from "@luftschloss/common"
 
 // TODO check usages of Infinity and -Infinity
 

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { normalizePath } from "@luftschloss/core"
+import { normalizePath } from "@luftschloss/common"
 import { URL } from "url"
 import { UTF8SearchParams } from "./utf8-search-params"
 

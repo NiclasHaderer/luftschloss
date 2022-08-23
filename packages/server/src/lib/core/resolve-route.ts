@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { saveObject } from "@luftschloss/core"
+import { saveObject } from "@luftschloss/common"
 import type { MergedRoutes } from "./route-collector"
 import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } from "./route-collector.model"
 

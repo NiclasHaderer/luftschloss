@@ -5,8 +5,8 @@
  */
 
 import { jsonParser } from "@luftschloss/body"
+import * as OpenApi from "@luftschloss/openapi-schema"
 import { HTTP_METHODS, RouterBase } from "@luftschloss/server"
-import { PathsObject } from "openapi3-ts"
 import { z, ZodNever, ZodObject } from "zod"
 import { ApiRoute, RouterParams } from "./api.route"
 import { ZodApiType } from "./types"
@@ -17,11 +17,9 @@ export type OpenApiHandler<URL_PARAMS extends ZodApiType, BODY extends ZodApiTyp
 ) => z.infer<RESPONSE> | Promise<z.infer<RESPONSE>>
 
 export class ApiRouter extends RouterBase {
-  private readonly _apiRoutes: PathsObject = {}
-
-  public get apiRoutes(): Readonly<PathsObject> {
+  public get apiRoutes(): OpenApi.Paths {
     // TODO fill in handle method
-    return this._apiRoutes
+    return {}
   }
 
   public handle<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType>(

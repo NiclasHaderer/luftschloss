@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { CaseInsensitiveSet, deepCopy } from "@luftschloss/core"
+import { CaseInsensitiveSet, deepCopy } from "@luftschloss/common"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../parsing-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"

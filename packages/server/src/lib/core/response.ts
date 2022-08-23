@@ -3,7 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { CustomPropertyDescriptor, Func } from "@luftschloss/core"
+import { CustomPropertyDescriptor, Func } from "@luftschloss/common"
 import { ReadStream } from "fs"
 import { ServerResponse } from "http"
 import { URL } from "url"

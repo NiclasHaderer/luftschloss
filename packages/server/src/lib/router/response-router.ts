@@ -1,6 +1,6 @@
 import { RouterBase } from "./base.router"
 import { HTTP_METHODS, LRequest, LResponse } from "../core"
-import { Promisable } from "@luftschloss/core"
+import { Promisable } from "@luftschloss/common"
 
 export type RESPONSE_ROUTE_HANDLER = (
   request: LRequest,

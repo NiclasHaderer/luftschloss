@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { saveObject } from "@luftschloss/core"
+import { saveObject } from "@luftschloss/common"
 import { IncomingHttpHeaders } from "http"
 
 export class Headers {
