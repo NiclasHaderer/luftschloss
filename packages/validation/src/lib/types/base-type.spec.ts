@@ -89,17 +89,17 @@ test("Test default", () => {
 
 test("Test adding validator", () => {
   const validator = new LuftString()
-  let newValidator = validator.beforeValidate(value => ({ success: true, data: value }))
+  let newValidator = validator.beforeValidate(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.beforeCoerce(value => ({ success: true, data: value }))
+  newValidator = validator.beforeCoerce(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.afterValidate(value => ({ success: true, data: value }))
+  newValidator = validator.afterValidate(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.afterCoerce(value => ({ success: true, data: value }))
+  newValidator = validator.afterCoerce(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.beforeHook(value => ({ success: true, data: value }))
+  newValidator = validator.beforeHook(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.afterHook(value => ({ success: true, data: value }))
+  newValidator = validator.afterHook(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
 })
 
@@ -112,12 +112,12 @@ test("Test or", () => {
 test("Test before validate hook", () => {
   const alwaysFalse = new LuftString().beforeValidate((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
-    return { success: false }
+    return { action: "abort" }
   })
   expect(alwaysFalse.validateSave("hello").success).toBe(false)
 
   const addWorld = new LuftString().beforeValidate((value, context) => {
-    return { success: true, data: value + " world" }
+    return { action: "continue", data: value + " world" }
   })
   expect(addWorld.clone().validate("hello")).toBe("hello world")
   expect(addWorld.clone().coerce("hello")).toBe("hello")
@@ -126,12 +126,12 @@ test("Test before validate hook", () => {
 test("Test before coerce hook", () => {
   const alwaysFalse = new LuftString().beforeCoerce((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
-    return { success: false }
+    return { action: "abort" }
   })
   expect(alwaysFalse.coerceSave("hello").success).toBe(false)
 
   const addWorld = new LuftString().beforeCoerce((value, context) => {
-    return { success: true, data: value + " world" }
+    return { action: "continue", data: value + " world" }
   })
   expect(addWorld.coerce("hello")).toBe("hello world")
   expect(addWorld.validate("hello")).toBe("hello")
@@ -139,13 +139,13 @@ test("Test before coerce hook", () => {
 
 test("Test invalid hooks", () => {
   const invalidFalse = new LuftString().beforeValidate((value, context) => {
-    return { success: false }
+    return { action: "abort" }
   })
   expect(() => invalidFalse.validate("hello")).toThrow(LuftParsingUsageError)
 
   const invalidTrue = new LuftString().beforeValidate((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
-    return { success: true, data: value }
+    return { action: "continue", data: value }
   })
   expect(() => invalidTrue.validate("hello")).toThrow(LuftParsingUsageError)
 })
@@ -160,6 +160,6 @@ test("Test deprecated", () => {
     loggedValue = args
   }
   expect(validator.validateSave("hello").success).toBe(true)
-  expect(loggedValue).toStrictEqual(["Usage of deprecated type undefined at", []])
+  expect(loggedValue).toStrictEqual(["Detected deprecated usage of LuftString at", []])
   global.console.log = oldLog
 })

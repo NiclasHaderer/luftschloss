@@ -8,6 +8,7 @@ import { deepCopy, uniqueList } from "@luftschloss/common"
 import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"
+import { logDeprecated, returnDefault } from "./base-validation-functions"
 
 export type LuftType = LuftBaseType<never> | LuftBaseType<any>
 export type LuftInfer<T extends LuftType> = T extends LuftBaseType<infer U> ? U : never
@@ -33,24 +34,41 @@ export type UnsuccessfulParsingResult = {
 
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
 
-export interface LuftValidationStorage<T> {
-  beforeValidateHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
-  beforeCoerceHooks: ((value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
-  afterValidateHooks: ((data: T, context: ParsingContext) => InternalParsingResult<T>)[]
-  afterCoerceHooks: ((data: T, context: ParsingContext) => InternalParsingResult<T>)[]
-  defaultValue:
+export interface LuftValidationStorage<RETURN_TYPE> {
+  beforeValidateHooks: ValidationHook<any, unknown, unknown, RETURN_TYPE>[]
+  beforeCoerceHooks: ValidationHook<any, unknown, unknown, RETURN_TYPE>[]
+  afterValidateHooks: ValidationHook<any, RETURN_TYPE, RETURN_TYPE>[]
+  afterCoerceHooks: ValidationHook<any, RETURN_TYPE, RETURN_TYPE>[]
+  default:
     | {
         isSet: true
-        value: T
+        value: RETURN_TYPE
       }
     | { isSet: false; value: undefined }
   deprecated: boolean
   description: string | undefined
 }
 
-// TODO move deprecated, default, etc into own functions
-// TODO pass validator to hook
-// TODO add ability to stop execution in hook with success, failing, or just continue with new data (or old data)
+export type HookResult<CONTINUE, BREAK = CONTINUE> =
+  | {
+      action: "continue"
+      data: CONTINUE
+    }
+  | {
+      action: "abort"
+    }
+  | {
+      action: "break"
+      data: BREAK
+    }
+
+export type ValidationHook<ThisArg, VALUE, CONTINUE, BREAK = CONTINUE> = (
+  this: ThisArg,
+  value: VALUE,
+  context: ParsingContext,
+  // TODO improve validator typ in ValidationHook
+  validation: LuftType
+) => HookResult<CONTINUE, BREAK>
 
 export type InternalLuftBaseType<OUT_TYPE> = {
   _validate(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
@@ -67,7 +85,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     beforeCoerceHooks: [],
     afterValidateHooks: [],
     afterCoerceHooks: [],
-    defaultValue: { isSet: false, value: undefined },
+    default: { isSet: false, value: undefined },
     deprecated: false,
     description: undefined,
   }
@@ -93,7 +111,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   public deprecated(deprecated: boolean): this {
     const copy = this.clone()
     copy.validationStorage.deprecated = deprecated
-    return copy.beforeHook(copy.logDeprecated) as this
+    return copy.beforeHook(logDeprecated) as this
   }
 
   public description(description: string): this {
@@ -111,34 +129,40 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   }
 
   public validateSave(data: unknown): ParsingResult<RETURN_TYPE> {
-    const context = new ParsingContext()
+    return this.run(data, "validate")
+  }
 
-    let resultData: InternalParsingResult<RETURN_TYPE> | undefined = undefined
-    for (const validateBeforeHook of this.validationStorage.beforeValidateHooks) {
-      const result = validateBeforeHook.call(this, data, context)
-      if (result.success) {
+  private run(data: unknown, mode: "validate" | "coerce") {
+    const context = new ParsingContext(mode)
+
+    const hookAccess = ({ validate: "Validate", coerce: "Coerce" } as const)[mode]
+    for (const beforeHook of this.validationStorage[`before${hookAccess}Hooks`]) {
+      const result = beforeHook.call(this, data, context, this)
+
+      if (result.action === "abort") {
+        return this.checkDataAndReturn(context, { success: false })
+      } else if (result.action === "continue") {
         data = result.data
-      } else {
-        resultData = result
-        break
+      } else if (result.action === "break") {
+        return this.checkDataAndReturn(context, { success: true, data: result.data })
       }
     }
 
-    // If resultData is set here we know that there has already been an error, and we can return early
-    if (resultData) {
-      return this.checkDataAndReturn(context, resultData)
-    }
+    const validationResult = this[`_${mode}`](data, context)
+    if (!validationResult.success) return this.checkDataAndReturn(context, validationResult)
 
-    resultData = this._validate(data, context)
-    if (resultData.success) {
-      for (const validateAfterHook of this.validationStorage.afterValidateHooks) {
-        resultData = validateAfterHook.call(this, resultData.data, context)
-        // If there is an error return early
-        if (!resultData.success) break
+    for (const afterHook of this.validationStorage[`after${hookAccess}Hooks`]) {
+      const result = afterHook.call(this, validationResult.data, context, this)
+      if (result.action === "abort") {
+        return this.checkDataAndReturn(context, { success: false })
+      } else if (result.action === "continue") {
+        validationResult.data = result.data
+      } else if (result.action === "break") {
+        return this.checkDataAndReturn(context, { success: true, data: result.data })
       }
     }
 
-    return this.checkDataAndReturn(context, resultData)
+    return this.checkDataAndReturn(context, validationResult)
   }
 
   public coerce(data: unknown): RETURN_TYPE {
@@ -150,34 +174,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   }
 
   public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
-    const context = new ParsingContext()
-
-    let resultData: InternalParsingResult<RETURN_TYPE> | undefined = undefined
-    for (const coerceBeforeHook of this.validationStorage.beforeCoerceHooks) {
-      const result = coerceBeforeHook.call(this, data, context)
-      if (result.success) {
-        data = result.data
-      } else {
-        resultData = result
-        break
-      }
-    }
-
-    // If resultData is set here we know that there has already been an error, and we can return early
-    if (resultData) {
-      return this.checkDataAndReturn(context, resultData)
-    }
-
-    resultData = this._coerce(data, context)
-    if (resultData.success) {
-      for (const coerceAfterHook of this.validationStorage.afterCoerceHooks) {
-        resultData = coerceAfterHook.call(this, resultData.data, context)
-        // If there is an error return early
-        if (!resultData.success) break
-      }
-    }
-
-    return this.checkDataAndReturn(context, resultData)
+    return this.run(data, "coerce")
   }
 
   private checkDataAndReturn(
@@ -232,19 +229,15 @@ export abstract class LuftBaseType<RETURN_TYPE> {
 
   public default(defaultValue: RETURN_TYPE): this {
     const copy = this.clone()
-    copy.validationStorage.defaultValue = { isSet: true, value: defaultValue }
-    return copy.beforeHook(copy.returnDefault) as this
+    copy.validationStorage.default = { isSet: true, value: defaultValue }
+    return copy.beforeHook(returnDefault) as this
   }
 
-  public beforeHook(
-    ...callbacks: ((this: this, value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
-  ): this {
+  public beforeHook(...callbacks: ValidationHook<this, unknown, unknown, RETURN_TYPE>[]): this {
     return this.beforeValidate(...callbacks).beforeCoerce(...callbacks)
   }
 
-  public beforeValidate(
-    ...callbacks: ((this: this, value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
-  ): this {
+  public beforeValidate(...callbacks: ValidationHook<this, unknown, unknown, RETURN_TYPE>[]): this {
     const copy = this.clone()
 
     for (const cb of callbacks) {
@@ -255,9 +248,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     return copy as this
   }
 
-  public beforeCoerce(
-    ...callbacks: ((this: this, value: unknown, context: ParsingContext) => InternalParsingResult<unknown>)[]
-  ): this {
+  public beforeCoerce(...callbacks: ValidationHook<this, unknown, unknown, RETURN_TYPE>[]): this {
     const copy = this.clone()
 
     for (const cb of callbacks) {
@@ -267,15 +258,11 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     return copy as this
   }
 
-  public afterHook(
-    ...callbacks: ((this: this, value: RETURN_TYPE, context: ParsingContext) => InternalParsingResult<RETURN_TYPE>)[]
-  ): this {
+  public afterHook(...callbacks: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>[]): this {
     return this.afterValidate(...callbacks).afterCoerce(...callbacks)
   }
 
-  public afterValidate(
-    ...callbacks: ((this: this, value: RETURN_TYPE, context: ParsingContext) => InternalParsingResult<RETURN_TYPE>)[]
-  ): this {
+  public afterValidate(...callbacks: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>[]): this {
     const copy = this.clone()
 
     for (const cb of callbacks) {
@@ -285,9 +272,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     return copy as this
   }
 
-  public afterCoerce(
-    ...callbacks: ((this: this, value: RETURN_TYPE, context: ParsingContext) => InternalParsingResult<RETURN_TYPE>)[]
-  ): this {
+  public afterCoerce(...callbacks: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>[]): this {
     const copy = this.clone()
 
     for (const cb of callbacks) {
@@ -295,21 +280,6 @@ export abstract class LuftBaseType<RETURN_TYPE> {
       if (!hasCb) copy.validationStorage.afterCoerceHooks.push(cb)
     }
     return copy as this
-  }
-
-  private logDeprecated(value: unknown, context: ParsingContext): InternalParsingResult<unknown> {
-    console.log(`Usage of deprecated type ${getTypeOf(this)} at`, context.path)
-    return { success: true, data: value }
-  }
-
-  private returnDefault(data: unknown): InternalParsingResult<unknown> {
-    if ((data === undefined || data === null) && this.validationStorage.defaultValue.isSet) {
-      return {
-        success: true,
-        data: this.validationStorage.defaultValue.value,
-      }
-    }
-    return { success: true, data: data }
   }
 }
 

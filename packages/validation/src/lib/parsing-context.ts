@@ -4,6 +4,8 @@ export class ParsingContext {
   private _issues: ParsingError[] = []
   public path: Readonly<string | number[]> = []
 
+  constructor(public readonly mode: "coerce" | "validate") {}
+
   public addIssue(...issue: ParsingError[]): ParsingContext {
     this._issues.push(...issue)
     return this
@@ -34,10 +36,10 @@ export class ParsingContext {
   }
 
   public clone() {
-    return new ParsingContext().stepInto(...this.path).addIssue(...this._issues.map(i => ({ ...i })))
+    return new ParsingContext(this.mode).stepInto(...this.path).addIssue(...this._issues.map(i => ({ ...i })))
   }
 
   public cloneEmpty() {
-    return new ParsingContext().stepInto(...this.path)
+    return new ParsingContext(this.mode).stepInto(...this.path)
   }
 }
