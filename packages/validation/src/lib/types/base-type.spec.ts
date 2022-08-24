@@ -67,8 +67,11 @@ test("Test default", () => {
   expect(validator.default("hello").schema).toStrictEqual(validator.schema)
   expect(validator.default("hello").validationStorage).not.toBe(validator.validationStorage)
   expect(validator.default("hello").validationStorage).toStrictEqual({
-    ...validator.validationStorage,
-    default: "hello",
+    ...validator.default("").validationStorage,
+    defaultValue: {
+      isSet: true,
+      value: "hello",
+    },
   })
 
   expect(validator.validateSave(undefined).success).toBe(false)
