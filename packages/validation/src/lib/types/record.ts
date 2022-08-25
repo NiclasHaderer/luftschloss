@@ -105,7 +105,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     }
 
     // To many keys
-    if (keyCount > this.schema.minProperties) {
+    if (keyCount > this.schema.maxProperties) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected not more than ${this.schema.minProperties} properties, but got ${keyCount}`,

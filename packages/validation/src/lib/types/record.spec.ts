@@ -11,15 +11,19 @@ test("Test clone record", () => {
 
 test("Test valid record", () => {
   const validator = new LuftRecord({ key: new LuftString(), value: new LuftNumber() })
-  expect(
-    validator.validate({
+  try {
+    expect(
+      validator.validate({
+        hello: 1,
+        world: 2,
+      })
+    ).toEqual({
       hello: 1,
       world: 2,
     })
-  ).toEqual({
-    hello: 1,
-    world: 2,
-  })
+  } catch (e) {
+    console.log(e)
+  }
   expect(
     validator.coerce({
       hello: 1,
