@@ -1,5 +1,6 @@
 import { LuftInfer, SuccessfulParsingResult } from "./base-type"
 import { LuftNumber } from "./number"
+import { LuftValidationError } from "../validation-error"
 
 test("Test if correct number is parsed", () => {
   const numberSchema = new LuftNumber()
@@ -68,4 +69,12 @@ test("Clone number", () => {
   expect(clone).toStrictEqual(numberSchema)
   expect(clone).not.toBe(numberSchema)
   expect(clone.schema).toEqual(numberSchema.schema)
+})
+
+test("Number: Multiple of", () => {
+  const numberSchema = new LuftNumber().multipleOf(10.1)
+  expect(() => numberSchema.validate(2)).toThrow(LuftValidationError)
+  expect(numberSchema.validate(10.1)).toBe(10.1)
+  expect(numberSchema.validate(20.2)).toBe(20.2)
+  expect(numberSchema.validate(-30.3)).toBe(-30.3)
 })

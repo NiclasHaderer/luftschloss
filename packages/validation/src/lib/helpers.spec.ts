@@ -9,9 +9,13 @@ test("Get type of value", () => {
   expect(getTypeOf(0)).toBe("number")
   expect(getTypeOf(1)).toBe("number")
   expect(getTypeOf(1.1)).toBe("float")
+
   class C {}
+
   expect(getTypeOf(new C())).toBe("C")
   expect(getTypeOf(NaN)).toBe("NaN")
   expect(getTypeOf(Infinity)).toBe("Infinity")
   expect(getTypeOf(-Infinity)).toBe("-Infinity")
+  expect(getTypeOf([])).toBe("array")
+  expect(getTypeOf({})).toBe("object")
 })

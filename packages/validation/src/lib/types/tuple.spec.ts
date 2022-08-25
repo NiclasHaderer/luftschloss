@@ -1,4 +1,4 @@
-import { LuftParsingError } from "../parsing-error"
+import { LuftValidationError } from "../validation-error"
 import { LuftNumber } from "./number"
 import { LuftRegexp } from "./regexp"
 import { LuftString } from "./string"
@@ -26,16 +26,16 @@ test("Test valid types", () => {
 
 test("Test invalid types", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber(), new LuftString()] })
-  expect(() => validator.validate([1, "2", "3"])).toThrow(LuftParsingError)
-  expect(() => validator.validate([1, "2"])).toThrow(LuftParsingError)
-  expect(() => validator.validate(["2", "3"])).toThrow(LuftParsingError)
+  expect(() => validator.validate([1, "2", "3"])).toThrow(LuftValidationError)
+  expect(() => validator.validate([1, "2"])).toThrow(LuftValidationError)
+  expect(() => validator.validate(["2", "3"])).toThrow(LuftValidationError)
 
   const validator2 = new LuftTuple({ types: [new LuftRegexp({ regex: /\d/ }), new LuftNumber(), new LuftString()] })
-  expect(() => validator2.validate(["_", 2, "3"])).toThrow(LuftParsingError)
-  expect(() => validator2.validate([])).toThrow(LuftParsingError)
-  expect(() => validator2.validate("hello")).toThrow(LuftParsingError)
-  expect(() => validator2.validate(2)).toThrow(LuftParsingError)
-  expect(() => validator2.validate({})).toThrow(LuftParsingError)
+  expect(() => validator2.validate(["_", 2, "3"])).toThrow(LuftValidationError)
+  expect(() => validator2.validate([])).toThrow(LuftValidationError)
+  expect(() => validator2.validate("hello")).toThrow(LuftValidationError)
+  expect(() => validator2.validate(2)).toThrow(LuftValidationError)
+  expect(() => validator2.validate({})).toThrow(LuftValidationError)
 })
 
 test("Test coercion", () => {
@@ -48,12 +48,12 @@ test("Test parse csv", () => {
     types: [new LuftNumber().parseString(true), new LuftNumber().parseString(true), new LuftString()],
   })
   expect(validator.parseWith("csv").coerce("1,2,3")).toEqual([1, 2, "3"])
-  expect(() => validator.coerce("1, 2, 3")).toThrow(LuftParsingError)
+  expect(() => validator.coerce("1, 2, 3")).toThrow(LuftValidationError)
 })
 
 test("Test parse json", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber(), new LuftString()] })
   expect(validator.parseWith("json").coerce('[1,2,"3"]')).toEqual([1, 2, "3"])
-  expect(() => validator.parseWith("json").coerce('[1,2,3"]')).toThrow(LuftParsingError)
-  expect(() => validator.coerce('[1,2,"3"]')).toThrow(LuftParsingError)
+  expect(() => validator.parseWith("json").coerce('[1,2,3"]')).toThrow(LuftValidationError)
+  expect(() => validator.coerce('[1,2,"3"]')).toThrow(LuftValidationError)
 })

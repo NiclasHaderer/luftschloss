@@ -1,5 +1,5 @@
 import { createInvalidTypeIssue } from "../helpers"
-import { LuftErrorCodes, LuftParsingUsageError, UnionError } from "../parsing-error"
+import { LuftErrorCodes, LuftValidationError, LuftValidationUsageError, UnionError } from "../validation-error"
 import {
   LuftNull,
   LuftType,
@@ -9,6 +9,7 @@ import {
   UnsuccessfulParsingResult,
 } from "./base-type"
 import { LuftString } from "./string"
+import { LuftNumber } from "./number"
 
 test("Test undefined", () => {
   const validator = new LuftUndefined()
@@ -136,13 +137,13 @@ test("Test invalid hooks", () => {
   const invalidFalse = new LuftString().beforeValidate((value, context) => {
     return { action: "abort" }
   })
-  expect(() => invalidFalse.validate("hello")).toThrow(LuftParsingUsageError)
+  expect(() => invalidFalse.validate("hello")).toThrow(LuftValidationUsageError)
 
   const invalidTrue = new LuftString().beforeValidate((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
     return { action: "continue", data: value }
   })
-  expect(() => invalidTrue.validate("hello")).toThrow(LuftParsingUsageError)
+  expect(() => invalidTrue.validate("hello")).toThrow(LuftValidationUsageError)
 })
 
 test("Test deprecated", () => {
@@ -157,4 +158,41 @@ test("Test deprecated", () => {
   expect(validator.validateSave("hello").success).toBe(true)
   expect(loggedValue).toStrictEqual(["Detected deprecated usage of LuftString at", []])
   global.console.log = oldLog
+})
+
+test("BaseType: description", () => {
+  const validator = new LuftString().description("hello world")
+  expect(validator.validationStorage.description).toBe("hello world")
+})
+
+test("BaseType: after hook continue", () => {
+  const validator = new LuftNumber()
+    .afterHook(value => ({
+      action: "continue",
+      data: value * 2,
+    }))
+    .afterHook(value => ({ action: "continue", data: value * 2 }))
+  expect(validator.validate(3)).toBe(12)
+  expect(validator.validate(4.5)).toBe(18)
+})
+
+test("BaseType: after hook break", () => {
+  const validator = new LuftNumber()
+    .afterHook(value => ({
+      action: "break",
+      data: value * 2,
+    }))
+    .afterHook(value => ({ action: "continue", data: value * 2 }))
+  expect(validator.validate(3)).toBe(6)
+  expect(validator.validate(4.5)).toBe(9)
+})
+
+test("BaseType: after hook error", () => {
+  const validator = new LuftNumber().afterHook((value, context) => {
+    context.addIssue({ code: LuftErrorCodes.PARSING_ISSUE, parser: "non", path: [], message: "not working" })
+    return {
+      action: "abort",
+    }
+  })
+  expect(() => validator.validate(3)).toThrow(LuftValidationError)
 })

@@ -1,4 +1,4 @@
-import { LuftParsingError } from "../parsing-error"
+import { LuftValidationError } from "../validation-error"
 import { LuftLiteral } from "./literal"
 
 test("Test successful literal validation", () => {
@@ -22,5 +22,5 @@ test("Test case insensitive match", () => {
   expect(caseInsensitive.coerce("Hello")).toBe("hello")
   expect(() => {
     schemaValidator.validate("Hello")
-  }).toThrow(LuftParsingError)
+  }).toThrow(LuftValidationError)
 })

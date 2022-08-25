@@ -19,52 +19,52 @@ export const LuftErrorCodes = {
 
 export type LuftErrorCodes = typeof LuftErrorCodes[keyof typeof LuftErrorCodes]
 
-type BaseParsingError = {
+type BaseValidationError = {
   code: LuftErrorCodes
   path: (string | number)[]
   message: string
 }
 
-export type InvalidTypeError = BaseParsingError & {
+export type InvalidTypeError = BaseValidationError & {
   code: "INVALID_TYPE"
   expectedType: string[]
   receivedType: string
 }
 
-export type UnionError = BaseParsingError &
+export type UnionError = BaseValidationError &
   Omit<InvalidTypeError, "code"> & {
     code: "INVALID_UNION"
-    errors: BaseParsingError[]
+    errors: BaseValidationError[]
   }
 
-export type NotUniqueError = BaseParsingError & {
+export type NotUniqueError = BaseValidationError & {
   code: "NOT_UNIQUE"
 }
 
-export type MultipleOfError = BaseParsingError & {
+export type MultipleOfError = BaseValidationError & {
   code: "MULTIPLE_OF"
   multipleOf: number
 }
 
-export type InvalidValueError = BaseParsingError & {
+export type InvalidValueError = BaseValidationError & {
   code: "INVALID_VALUE"
   allowedValues: string[]
   receivedValue: string
 }
 
-export type InvalidLengthError = BaseParsingError & {
+export type InvalidLengthError = BaseValidationError & {
   code: "INVALID_LENGTH"
   maxLen: number
   minLen: number
   actualLen: number
 }
 
-export type MissingKeysError = BaseParsingError & {
+export type MissingKeysError = BaseValidationError & {
   code: "MISSING_KEYS"
   missingKeys: string[]
 }
 
-export type InvalidRangeError = BaseParsingError & {
+export type InvalidRangeError = BaseValidationError & {
   code: "INVALID_RANGE"
   min: number
   max: number
@@ -73,17 +73,17 @@ export type InvalidRangeError = BaseParsingError & {
   maxCompare: "<=" | "<"
 }
 
-export type AdditionalKeysError = BaseParsingError & {
+export type AdditionalKeysError = BaseValidationError & {
   code: "TO_MANY_KEYS"
   additionalKeys: string[]
 }
 
-export type StringParsingError = BaseParsingError & {
+export type StringParsingError = BaseValidationError & {
   code: "PARSING_ISSUE"
   parser: string
 }
 
-export type ParsingError =
+export type ValidationError =
   | UnionError
   | InvalidTypeError
   | MissingKeysError
@@ -95,10 +95,10 @@ export type ParsingError =
   | NotUniqueError
   | MultipleOfError
 
-export class LuftParsingError extends Error {
-  public constructor(public readonly issues: ParsingError[], message?: string) {
+export class LuftValidationError extends Error {
+  public constructor(message: string, public readonly issues: ValidationError[]) {
     super(message)
   }
 }
 
-export class LuftParsingUsageError extends Error {}
+export class LuftValidationUsageError extends Error {}

@@ -5,7 +5,7 @@
  */
 
 import { isArray } from "@luftschloss/common"
-import { InvalidTypeError, LuftErrorCodes } from "./parsing-error"
+import { InvalidTypeError, LuftErrorCodes } from "./validation-error"
 import { ParsingContext } from "./parsing-context"
 
 export const getTypeOf = (value: unknown) => {
@@ -13,7 +13,7 @@ export const getTypeOf = (value: unknown) => {
   if (type === "object") {
     if (isArray(value)) return "array" as const
     if (value === null) return "null" as const
-    if (type.constructor.name === "Object") return "object" as const
+    if ((value as object).constructor.name === "Object") return "object" as const
     return (value as object).constructor.name
   }
   if (type === "number") {

@@ -27,9 +27,4 @@ const internalDeepCopy = <T>(object: T): T => {
   return newObject
 }
 
-export let deepCopy: <T>(object: T) => T
-if (typeof structuredClone === "undefined") {
-  deepCopy = internalDeepCopy
-} else {
-  deepCopy = structuredClone
-}
+export const deepCopy: <T>(object: T) => T = typeof structuredClone === "undefined" ? internalDeepCopy : structuredClone

@@ -1,4 +1,4 @@
-import { LuftParsingError } from "../parsing-error"
+import { LuftValidationError } from "../validation-error"
 import { LuftNumber } from "./number"
 import { LuftRecord } from "./record"
 import { LuftString } from "./string"
@@ -11,19 +11,15 @@ test("Test clone record", () => {
 
 test("Test valid record", () => {
   const validator = new LuftRecord({ key: new LuftString(), value: new LuftNumber() })
-  try {
-    expect(
-      validator.validate({
-        hello: 1,
-        world: 2,
-      })
-    ).toEqual({
+  expect(
+    validator.validate({
       hello: 1,
       world: 2,
     })
-  } catch (e) {
-    console.log(e)
-  }
+  ).toEqual({
+    hello: 1,
+    world: 2,
+  })
   expect(
     validator.coerce({
       hello: 1,
@@ -42,8 +38,8 @@ test("Test invalid record", () => {
       hello: "1",
       world: 2,
     })
-  ).toThrow(LuftParsingError)
-  expect(() => validator.validate("hello")).toThrow(LuftParsingError)
+  ).toThrow(LuftValidationError)
+  expect(() => validator.validate("hello")).toThrow(LuftValidationError)
   expect(
     validator.coerce({
       hello: "1",
@@ -54,6 +50,18 @@ test("Test invalid record", () => {
 
 test("Test non empty", () => {
   const validator = new LuftRecord({ key: new LuftString(), value: new LuftNumber() })
-  expect(() => validator.validate({})).not.toThrow(LuftParsingError)
-  expect(() => validator.nonEmpty(true).validate({})).toThrow(LuftParsingError)
+  expect(() => validator.validate({})).not.toThrow(LuftValidationError)
+  expect(() => validator.nonEmpty(true).validate({})).toThrow(LuftValidationError)
+})
+
+test("Test to many keys", () => {
+  const validator = new LuftRecord({ key: new LuftString(), value: new LuftNumber() }).maxProperties(2)
+  expect(() => validator.validate({ a: 1, b: 2, c: 3 })).toThrow(LuftValidationError)
+  expect(() => validator.validate({ a: 1, b: 2 })).not.toThrow(LuftValidationError)
+})
+
+test("Test to few keys", () => {
+  const validator = new LuftRecord({ key: new LuftString(), value: new LuftNumber() }).minProperties(2)
+  expect(() => validator.validate({ a: 1 })).toThrow(LuftValidationError)
+  expect(() => validator.validate({ a: 1, b: 2 })).not.toThrow(LuftValidationError)
 })

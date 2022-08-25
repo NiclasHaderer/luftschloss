@@ -7,7 +7,7 @@
 import { deepCopy, uniqueList } from "@luftschloss/common"
 import { createInvalidTypeIssue, getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
-import { LuftErrorCodes, LuftParsingError, LuftParsingUsageError, ParsingError } from "../parsing-error"
+import { LuftErrorCodes, LuftValidationError, LuftValidationUsageError, ValidationError } from "../validation-error"
 import { logDeprecated, returnDefault } from "./base-validation-functions"
 
 export type LuftType = LuftBaseType<never> | LuftBaseType<any>
@@ -29,7 +29,7 @@ export type SuccessfulParsingResult<T> = {
 }
 export type UnsuccessfulParsingResult = {
   success: false
-  issues: ParsingError[]
+  issues: ValidationError[]
 }
 
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
@@ -125,7 +125,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     if (result.success) {
       return result.data
     }
-    throw new LuftParsingError(result.issues, `Could not validate data \n${result.issues.join("\n")}`)
+    throw new LuftValidationError(`Could not validate data \n${result.issues.join("\n")}`, result.issues)
   }
 
   public validateSave(data: unknown): ParsingResult<RETURN_TYPE> {
@@ -170,7 +170,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     if (result.success) {
       return result.data
     }
-    throw new LuftParsingError(result.issues, `Could not coerce data \n${result.issues.join("\n")}`)
+    throw new LuftValidationError(`Could not coerce data \n${result.issues.join("\n")}`, result.issues)
   }
 
   public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
@@ -183,13 +183,13 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   ): ParsingResult<RETURN_TYPE> {
     // Issues, but no success
     if (context.hasIssues && resultData.success) {
-      throw new LuftParsingUsageError(
+      throw new LuftValidationUsageError(
         "Context has issues, but the parsing result is marked as valid. Please check if your parser added issues if he returned false"
       )
     }
     // No success, but also no issues
     else if (!context.hasIssues && !resultData.success) {
-      throw new LuftParsingUsageError(
+      throw new LuftValidationUsageError(
         "Context does not have issues, but the parsing result is marked as valid. Please add issues if the result is not valid."
       )
     }
@@ -347,7 +347,7 @@ export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftBaseType<L
     mode: "_validate" | "_coerce" = "_validate"
   ): InternalParsingResult<LuftInfer<T[number]>> {
     const validators = this.schema.types as unknown as InternalLuftBaseType<LuftInfer<T[number]>>[]
-    const newErrors: ParsingError[] = []
+    const newErrors: ValidationError[] = []
     for (const validator of validators) {
       const customContext = context.cloneEmpty()
       const result = validator[mode](data, customContext)

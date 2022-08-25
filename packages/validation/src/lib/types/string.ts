@@ -5,7 +5,7 @@
  */
 
 import { createInvalidTypeIssue } from "../helpers"
-import { LuftErrorCodes } from "../parsing-error"
+import { LuftErrorCodes } from "../validation-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 import { deepCopy } from "@luftschloss/common"

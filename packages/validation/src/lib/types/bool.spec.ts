@@ -1,13 +1,13 @@
 import { LuftBool } from "./bool"
-import { LuftParsingError } from "../parsing-error"
+import { LuftValidationError } from "../validation-error"
 
 test("Test valid bool types", () => {
   const validator = new LuftBool()
   expect(validator.validate(true)).toBe(true)
   expect(validator.validate(false)).toBe(false)
 
-  expect(() => validator.validate("true")).toThrowError(LuftParsingError)
-  expect(() => validator.validate("false")).toThrowError(LuftParsingError)
+  expect(() => validator.validate("true")).toThrowError(LuftValidationError)
+  expect(() => validator.validate("false")).toThrowError(LuftValidationError)
 })
 
 test("Test parse bool string", () => {
@@ -16,7 +16,7 @@ test("Test parse bool string", () => {
   expect(validator.coerce("tRue")).toBe(true)
   expect(validator.coerce("false")).toBe(false)
   expect(validator.coerce("False")).toBe(false)
-  expect(() => validator.coerce("Falsee")).toThrowError(LuftParsingError)
+  expect(() => validator.coerce("Falsee")).toThrowError(LuftValidationError)
 })
 
 test("Test clone", () => {

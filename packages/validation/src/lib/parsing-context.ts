@@ -1,12 +1,12 @@
-import { ParsingError } from "./parsing-error"
+import { ValidationError } from "./validation-error"
 
 export class ParsingContext {
-  private _issues: ParsingError[] = []
+  private _issues: ValidationError[] = []
   public path: Readonly<string | number[]> = []
 
   constructor(public readonly mode: "coerce" | "validate") {}
 
-  public addIssue(...issue: ParsingError[]): ParsingContext {
+  public addIssue(...issue: ValidationError[]): ParsingContext {
     this._issues.push(...issue)
     return this
   }

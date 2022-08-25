@@ -7,7 +7,7 @@
 import { LuftUUIDString } from "./uuid-string"
 import { number } from "zod"
 import { UnsuccessfulParsingResult } from "./base-type"
-import { InvalidTypeError, LuftErrorCodes } from "../parsing-error"
+import { InvalidTypeError, LuftErrorCodes } from "../validation-error"
 
 test("Valid uuid", () => {
   const validator = new LuftUUIDString()

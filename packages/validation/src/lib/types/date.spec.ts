@@ -1,5 +1,5 @@
 import { LuftDate } from "./date"
-import { LuftParsingError } from "../parsing-error"
+import { LuftValidationError, LuftValidationUsageError } from "../validation-error"
 
 test("Test correct type", () => {
   const validator = new LuftDate()
@@ -30,7 +30,7 @@ test("Coerce string", () => {
 
   expect(() => {
     expect(validator.coerce("2022-08-missing-T18:14:45.571Z"))
-  }).toThrow(LuftParsingError)
+  }).toThrow(LuftValidationError)
 })
 
 test("Coerce number", () => {
@@ -41,9 +41,14 @@ test("Coerce number", () => {
 
   expect(() => {
     expect(validator.coerce(NaN))
-  }).toThrow(LuftParsingError)
+  }).toThrow(LuftValidationError)
 
   expect(() => {
     expect(validator.coerce(Infinity))
-  }).toThrow(LuftParsingError)
+  }).toThrow(LuftValidationError)
+})
+
+test("Date: invalid after string", () => {
+  const validator = new LuftDate()
+  expect(() => validator.after("1kzgkuzukgz")).toThrow(LuftValidationUsageError)
 })

@@ -5,7 +5,7 @@
  */
 
 import { createInvalidTypeIssue } from "../helpers"
-import { LuftErrorCodes } from "../parsing-error"
+import { LuftErrorCodes, LuftValidationUsageError } from "../validation-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 import { deepCopy } from "@luftschloss/common"
@@ -63,7 +63,7 @@ export class LuftDate extends LuftBaseType<Date> {
 
     if (typeof date === "string") {
       const parsedDate = Date.parse(date)
-      if (isNaN(parsedDate)) throw new Error(`Could not parse date: ${date}`)
+      if (isNaN(parsedDate)) throw new LuftValidationUsageError(`Could not parse date: ${date}`)
       return parsedDate
     }
 

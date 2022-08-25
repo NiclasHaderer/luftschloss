@@ -1,4 +1,4 @@
-import { LuftParsingError } from "../parsing-error"
+import { LuftValidationError } from "../validation-error"
 import { LuftArray } from "./array"
 import { LuftInt } from "./int"
 import { LuftString } from "./string"
@@ -49,20 +49,26 @@ test("Parse csv", () => {
   const validator = new LuftArray({ type: new LuftInt().parseString(true) })
   const data = validator.parseWith("csv").coerce("1, 2, 3, 4")
   expect(data).toEqual([1, 2, 3, 4])
-  expect(() => validator.coerce(["1, 2, 3, 4"])).toThrow(LuftParsingError)
-  expect(() => validator.coerce("1, 2")).toThrow(LuftParsingError)
+  expect(() => validator.coerce(["1, 2, 3, 4"])).toThrow(LuftValidationError)
+  expect(() => validator.coerce("1, 2")).toThrow(LuftValidationError)
 })
 
 test("Parse json", () => {
   const validator = new LuftArray({ type: new LuftInt().parseString(true) })
   const data = validator.parseWith("json").coerce("[1,2,3,4]")
   expect(data).toEqual([1, 2, 3, 4])
-  expect(() => validator.coerce(["1, 2, 3, 4"])).toThrow(LuftParsingError)
-  expect(() => validator.parseWith("json").coerce("no-json")).toThrow(LuftParsingError)
+  expect(() => validator.coerce(["1, 2, 3, 4"])).toThrow(LuftValidationError)
+  expect(() => validator.parseWith("json").coerce("no-json")).toThrow(LuftValidationError)
 })
 
 test("Coerce iterable", () => {
   const validator = new LuftArray({ type: new LuftInt() })
-  expect(() => validator.validate([1, 2, 3].entries())).toThrow(LuftParsingError)
+  expect(() => validator.validate([1, 2, 3].entries())).toThrow(LuftValidationError)
   expect(validator.coerce(toIterator([1, 2, 3]))).toEqual([1, 2, 3])
+})
+
+test("Array test unique", () => {
+  const validator = new LuftArray({ type: new LuftInt() }).unique(true)
+  expect(validator.validate([1, 2])).toEqual([1, 2])
+  expect(() => validator.validate([1, 2, 2])).toThrow(LuftValidationError)
 })

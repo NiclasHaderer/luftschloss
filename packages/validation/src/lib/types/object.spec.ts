@@ -1,4 +1,4 @@
-import { AdditionalKeysError, LuftErrorCodes, LuftParsingError, MissingKeysError } from "../parsing-error"
+import { AdditionalKeysError, LuftErrorCodes, LuftValidationError, MissingKeysError } from "../validation-error"
 import { UnsuccessfulParsingResult } from "./base-type"
 import { LuftNumber } from "./number"
 import { LuftObject } from "./object"
@@ -73,7 +73,7 @@ test("Test string parsing", () => {
     nested: { hello: "nested hello", world: 2 },
   })
 
-  expect(() => validator.coerce("not-parsable")).toThrow(LuftParsingError)
+  expect(() => validator.coerce("not-parsable")).toThrow(LuftValidationError)
 })
 
 test("Test missing keys undefined", () => {
@@ -84,7 +84,7 @@ test("Test missing keys undefined", () => {
     },
   })
 
-  expect(() => validator.coerce({})).toThrow(LuftParsingError)
+  expect(() => validator.coerce({})).toThrow(LuftValidationError)
   expect(validator.treatMissingKeyAs("undefined").coerce({})).toEqual({ hello: undefined, world: undefined })
 })
 

@@ -1,6 +1,6 @@
 import { LuftString } from "./string"
 import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type"
-import { InvalidLengthError, InvalidTypeError, LuftErrorCodes } from "../parsing-error"
+import { InvalidLengthError, InvalidTypeError, LuftErrorCodes } from "../validation-error"
 
 test("Test types", () => {
   const validator = new LuftString()

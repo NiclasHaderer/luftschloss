@@ -1,6 +1,6 @@
 import { LuftInt } from "./int"
 import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type"
-import { InvalidTypeError, LuftErrorCodes } from "../parsing-error"
+import { InvalidTypeError, LuftErrorCodes, LuftValidationError } from "../validation-error"
 
 test("Test float", () => {
   const validator = new LuftInt()
@@ -80,4 +80,12 @@ test("Use modifiers", () => {
   numberSchema = numberSchema.nonPositive()
   expect(numberSchema.validateSave(0).success).toBe(true)
   expect(numberSchema.validateSave(-1).success).toBe(true)
+})
+
+test("Int: Multiple of", () => {
+  const numberSchema = new LuftInt().multipleOf(10)
+  expect(() => numberSchema.validate(2)).toThrow(LuftValidationError)
+  expect(numberSchema.validate(10)).toBe(10)
+  expect(numberSchema.validate(20)).toBe(20)
+  expect(numberSchema.validate(-30)).toBe(-30)
 })

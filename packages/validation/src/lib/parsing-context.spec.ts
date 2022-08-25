@@ -1,5 +1,5 @@
 import { ParsingContext } from "./parsing-context"
-import { LuftErrorCodes } from "./parsing-error"
+import { LuftErrorCodes } from "./validation-error"
 
 test("Adding new issue works", () => {
   const context = new ParsingContext("validate")

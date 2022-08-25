@@ -11,5 +11,5 @@
 export * from "./types"
 export * from "./factories"
 export * from "./parsing-context"
-export * from "./parsing-error"
+export * from "./validation-error"
 export { getTypeOf } from "./helpers"
