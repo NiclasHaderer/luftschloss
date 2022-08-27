@@ -54,10 +54,17 @@ export type InvalidValueError = BaseValidationError & {
 
 export type InvalidLengthError = BaseValidationError & {
   code: "INVALID_LENGTH"
-  maxLen: number
-  minLen: number
   actualLen: number
-}
+} & (
+    | {
+        maxLen: number | undefined
+        minLen: number
+      }
+    | {
+        maxLen: number
+        minLen: number | undefined
+      }
+  )
 
 export type MissingKeysError = BaseValidationError & {
   code: "MISSING_KEYS"
@@ -66,12 +73,19 @@ export type MissingKeysError = BaseValidationError & {
 
 export type InvalidRangeError = BaseValidationError & {
   code: "INVALID_RANGE"
-  min: number
-  max: number
   actual: number
   minCompare: ">=" | ">"
   maxCompare: "<=" | "<"
-}
+} & (
+    | {
+        min: number
+        max: number | undefined
+      }
+    | {
+        min: number | undefined
+        max: number
+      }
+  )
 
 export type AdditionalKeysError = BaseValidationError & {
   code: "TO_MANY_KEYS"

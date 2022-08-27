@@ -10,8 +10,6 @@ import { InternalParsingResult } from "./base-type"
 import { LuftNumber, LuftNumberSchema } from "./number"
 import { deepCopy } from "@luftschloss/common"
 
-// TODO check usages of Infinity and -Infinity
-
 type LuftIntSchema = LuftNumberSchema & {
   roundWith: "floor" | "ceil" | "trunc" | "round" | "none"
 }
@@ -22,8 +20,8 @@ export class LuftInt extends LuftNumber {
 
   constructor(
     schema: LuftIntSchema = {
-      min: -Infinity,
-      max: Infinity,
+      min: undefined,
+      max: undefined,
       allowNan: false,
       minCompare: ">=",
       maxCompare: "<=",
@@ -48,19 +46,19 @@ export class LuftInt extends LuftNumber {
     return super.allowNaN(allow) as LuftInt
   }
 
-  public min(number: number): LuftInt {
+  public min(number: number | undefined): LuftInt {
     return super.min(number) as LuftInt
   }
 
-  public minEq(number: number): LuftInt {
+  public minEq(number: number | undefined): LuftInt {
     return super.minEq(number) as LuftInt
   }
 
-  public max(number: number): LuftInt {
+  public max(number: number | undefined): LuftInt {
     return super.max(number) as LuftInt
   }
 
-  public maxEq(number: number): LuftInt {
+  public maxEq(number: number | undefined): LuftInt {
     return super.maxEq(number) as LuftInt
   }
 

@@ -15,11 +15,11 @@ export class LuftDate extends LuftBaseType<Date> {
 
   constructor(
     public readonly schema: {
-      after: number
-      before: number
+      after: number | undefined
+      before: number | undefined
       minCompare: ">=" | ">"
       maxCompare: "<=" | "<"
-    } = { after: -Infinity, before: Infinity, minCompare: ">=", maxCompare: "<=" }
+    } = { after: undefined, before: undefined, minCompare: ">=", maxCompare: "<=" }
   ) {
     super()
   }
@@ -28,30 +28,30 @@ export class LuftDate extends LuftBaseType<Date> {
     return new LuftDate({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
-  public after(date: Date | number | string): LuftDate {
+  public after(date: Date | number | string | undefined): LuftDate {
     const newValidator = this.clone()
-    newValidator.schema.after = this.toDateNumber(date)
+    newValidator.schema.after = date !== undefined ? this.toDateNumber(date) : date
     newValidator.schema.minCompare = ">"
     return newValidator
   }
 
-  public before(date: Date | number | string): LuftDate {
+  public before(date: Date | number | string | undefined): LuftDate {
     const newValidator = this.clone()
-    newValidator.schema.before = this.toDateNumber(date)
+    newValidator.schema.before = date !== undefined ? this.toDateNumber(date) : date
     newValidator.schema.maxCompare = "<"
     return newValidator
   }
 
-  public afterEq(date: Date | number | string): LuftDate {
+  public afterEq(date: Date | number | string | undefined): LuftDate {
     const newValidator = this.clone()
-    newValidator.schema.after = this.toDateNumber(date)
+    newValidator.schema.after = date !== undefined ? this.toDateNumber(date) : date
     newValidator.schema.minCompare = ">="
     return newValidator
   }
 
-  public beforeEq(date: Date | number | string): LuftDate {
+  public beforeEq(date: Date | number | string | undefined): LuftDate {
     const newValidator = this.clone()
-    newValidator.schema.before = this.toDateNumber(date)
+    newValidator.schema.before = date !== undefined ? this.toDateNumber(date) : date
     newValidator.schema.maxCompare = "<="
     return newValidator
   }
@@ -100,12 +100,12 @@ export class LuftDate extends LuftBaseType<Date> {
       }
     }
 
-    if (this.isToEarly(data)) {
+    if (this.schema.after && this.isToEarly(data, this.schema.after)) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected date after ${this.schema.after}, but got ${data.getTime()}`,
         path: [...context.path],
-        max: this.schema.before ?? Infinity,
+        max: this.schema.before,
         min: this.schema.after,
         actual: data.getTime(),
         maxCompare: this.schema.maxCompare,
@@ -114,13 +114,13 @@ export class LuftDate extends LuftBaseType<Date> {
       return { success: false }
     }
 
-    if (this.isToLate(data)) {
+    if (this.schema.before && this.isToLate(data, this.schema.before)) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected date before ${this.schema.before}, but got ${data.getTime()}`,
         path: [...context.path],
         max: this.schema.before,
-        min: this.schema.after ?? -Infinity,
+        min: this.schema.after,
         actual: data.getTime(),
         maxCompare: this.schema.maxCompare,
         minCompare: this.schema.minCompare,
@@ -134,19 +134,19 @@ export class LuftDate extends LuftBaseType<Date> {
     }
   }
 
-  private isToLate(data: Date): boolean {
+  private isToLate(data: Date, expected: number): boolean {
     if (this.schema.maxCompare === "<") {
-      return !(data.getTime() < this.schema.before)
+      return !(data.getTime() < expected)
     } else {
-      return !(data.getTime() <= this.schema.before)
+      return !(data.getTime() <= expected)
     }
   }
 
-  private isToEarly(data: Date): boolean {
+  private isToEarly(data: Date, expected: number): boolean {
     if (this.schema.minCompare === ">") {
-      return !(data.getTime() > this.schema.after)
+      return !(data.getTime() > expected)
     } else {
-      return !(data.getTime() >= this.schema.after)
+      return !(data.getTime() >= expected)
     }
   }
 }

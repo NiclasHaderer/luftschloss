@@ -16,9 +16,7 @@ export class LuftString extends LuftBaseType<string> {
   }
 
   constructor(
-    public override readonly schema: { minLength: number; maxLength: number; trim: boolean } = {
-      minLength: -Infinity,
-      maxLength: Infinity,
+    public override readonly schema: { minLength?: number; maxLength?: number; trim: boolean } = {
       trim: false,
     }
   ) {
@@ -29,13 +27,13 @@ export class LuftString extends LuftBaseType<string> {
     return new LuftString({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
-  public min(minLength: number): LuftString {
+  public min(minLength: number | undefined): LuftString {
     const newValidator = this.clone()
     newValidator.schema.minLength = minLength
     return newValidator
   }
 
-  public max(maxLength: number): LuftString {
+  public max(maxLength: number | undefined): LuftString {
     const newValidator = this.clone()
     newValidator.schema.maxLength = maxLength
     return newValidator
@@ -56,7 +54,7 @@ export class LuftString extends LuftBaseType<string> {
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {
     if (typeof data === "string") {
-      if (data.length > this.schema.maxLength) {
+      if (this.schema.maxLength !== undefined && data.length > this.schema.maxLength) {
         context.addIssue({
           code: LuftErrorCodes.INVALID_LENGTH,
           path: [...context.path],
@@ -70,7 +68,7 @@ export class LuftString extends LuftBaseType<string> {
         }
       }
 
-      if (data.length < this.schema.minLength) {
+      if (this.schema.minLength && data.length < this.schema.minLength) {
         context.addIssue({
           code: LuftErrorCodes.INVALID_LENGTH,
           path: [...context.path],

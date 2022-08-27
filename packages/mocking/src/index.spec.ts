@@ -2,8 +2,6 @@ import { isArray } from "@luftschloss/common"
 import { luft } from "@luftschloss/validation"
 import { mockAll } from "./types/all"
 
-// TODO check for schema limitations and Infinity traps (Perhaps replace Infinity with Number.MAX_VALUE || Number.MAX_SAFE_INTEGER)
-
 test("Mock any generation", () => {
   const validator = luft.any()
   for (let i = 0; i < 100; i++) {

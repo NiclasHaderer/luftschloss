@@ -6,7 +6,7 @@
 
 export type ValueOf<T> = T[keyof T]
 
-export type Constructor<CLAZZ, ARGS extends []> = new (...args: ARGS) => CLAZZ
+export type Constructor<CLAZZ, ARGS extends any[]> = new (...args: ARGS) => CLAZZ
 
 export type Func = (...args: any) => any
 

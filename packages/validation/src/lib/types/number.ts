@@ -8,11 +8,11 @@ import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../validation-error"
 import { InternalParsingResult, LuftBaseType } from "./base-type"
-import { deepCopy } from "@luftschloss/common"
+import { deepCopy, floatSafeModulo } from "@luftschloss/common"
 
 export type LuftNumberSchema = {
-  min: number
-  max: number
+  min: number | undefined
+  max: number | undefined
   allowNan: boolean
   minCompare: ">=" | ">"
   maxCompare: "<=" | "<"
@@ -25,13 +25,13 @@ export class LuftNumber extends LuftBaseType<number> {
 
   constructor(
     public override readonly schema: LuftNumberSchema = {
-      min: -Infinity,
-      max: Infinity,
+      min: undefined,
+      max: undefined,
+      multipleOf: undefined,
       allowNan: false,
       minCompare: ">=",
       maxCompare: "<=",
       parseString: false,
-      multipleOf: undefined,
     }
   ) {
     super()
@@ -53,28 +53,28 @@ export class LuftNumber extends LuftBaseType<number> {
     return newValidator
   }
 
-  public min(number: number): LuftNumber {
+  public min(number: number | undefined): LuftNumber {
     const newValidator = this.clone()
     newValidator.schema.min = number
     newValidator.schema.minCompare = ">"
     return newValidator
   }
 
-  public minEq(number: number): LuftNumber {
+  public minEq(number: number | undefined): LuftNumber {
     const newValidator = this.clone()
     newValidator.schema.min = number
     newValidator.schema.minCompare = ">="
     return newValidator
   }
 
-  public max(number: number): LuftNumber {
+  public max(number: number | undefined): LuftNumber {
     const newValidator = this.clone()
     newValidator.schema.max = number
     newValidator.schema.maxCompare = "<"
     return newValidator
   }
 
-  public maxEq(number: number): LuftNumber {
+  public maxEq(number: number | undefined): LuftNumber {
     const newValidator = this.clone()
     newValidator.schema.max = number
     newValidator.schema.maxCompare = "<="
@@ -123,22 +123,20 @@ export class LuftNumber extends LuftBaseType<number> {
     if (isNaN(data)) return { success: true, data: NaN }
 
     // Check for multipleOf
-    if (this.schema.multipleOf !== undefined) {
-      if (Math.abs(data % this.schema.multipleOf) !== 0) {
-        context.addIssue({
-          code: LuftErrorCodes.MULTIPLE_OF,
-          message: `${data} is not a multiple of ${this.schema.multipleOf}`,
-          path: [...context.path],
-          multipleOf: this.schema.multipleOf,
-        })
-        return {
-          success: false,
-        }
+    if (this.schema.multipleOf !== undefined && floatSafeModulo(data, this.schema.multipleOf) !== 0) {
+      context.addIssue({
+        code: LuftErrorCodes.MULTIPLE_OF,
+        message: `${data} is not a multiple of ${this.schema.multipleOf}`,
+        path: [...context.path],
+        multipleOf: this.schema.multipleOf,
+      })
+      return {
+        success: false,
       }
     }
 
     // To small
-    if (this.isToSmall(data)) {
+    if (this.schema.min !== undefined && this.isToSmall(data)) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected value greater than ${this.schema.min} but got ${data}`,
@@ -153,7 +151,7 @@ export class LuftNumber extends LuftBaseType<number> {
     }
 
     // To large
-    if (this.isToLarge(data)) {
+    if (this.schema.max !== undefined && this.isToLarge(data)) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Number to large. Expected value smaller than ${this.schema.max} but got ${data}`,
@@ -174,6 +172,7 @@ export class LuftNumber extends LuftBaseType<number> {
   }
 
   private isToSmall(data: number): boolean {
+    if (this.schema.min === undefined) return false
     if (this.schema.minCompare === ">") {
       return !(data > this.schema.min)
     } else {
@@ -182,6 +181,8 @@ export class LuftNumber extends LuftBaseType<number> {
   }
 
   private isToLarge(data: number): boolean {
+    if (this.schema.max === undefined) return false
+
     if (this.schema.maxCompare === "<") {
       return !(data < this.schema.max)
     } else {

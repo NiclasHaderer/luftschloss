@@ -34,7 +34,7 @@ test("Test max length", () => {
   expect(unsuccessfulResult.success).toBe(false)
   expect((unsuccessfulResult as UnsuccessfulParsingResult).issues.length).toBe(1)
   expect((unsuccessfulResult as UnsuccessfulParsingResult).issues[0].code).toBe(LuftErrorCodes.INVALID_LENGTH)
-  expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).minLen).toBe(-Infinity)
+  expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).minLen).toBe(undefined)
   expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).maxLen).toBe(10)
   expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).actualLen).toBe(11)
 })
@@ -47,7 +47,7 @@ test("Test min length", () => {
   expect((unsuccessfulResult as UnsuccessfulParsingResult).issues.length).toBe(1)
   expect((unsuccessfulResult as UnsuccessfulParsingResult).issues[0].code).toBe(LuftErrorCodes.INVALID_LENGTH)
   expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).minLen).toBe(2)
-  expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).maxLen).toBe(Infinity)
+  expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).maxLen).toBe(undefined)
   expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).actualLen).toBe(1)
 })
 

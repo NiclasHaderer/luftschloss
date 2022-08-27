@@ -32,7 +32,6 @@ type LuftObjectConstructor = {
   treatMissingKeyAs: "error" | "undefined"
   ignoreUnknownKeys: boolean
   tryParseString: boolean
-  name?: string
 }
 
 const getAdditionalKeys = (toManyKeys: string[], allKeys: string[]): string[] =>
@@ -58,7 +57,6 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     treatMissingKeyAs = "error",
     ignoreUnknownKeys = true,
     tryParseString = false,
-    name,
     type,
   }: Partial<LuftObjectConstructor> & {
     type: T
@@ -68,7 +66,6 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
       treatMissingKeyAs,
       ignoreUnknownKeys,
       type,
-      name,
       tryParseString,
     }
   }
@@ -90,7 +87,6 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
         ...copyValidatorObject(this.schema.type),
         ...copyValidatorObject(object),
       },
-      name,
     })
   }
 
@@ -108,7 +104,6 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     return new LuftObject<Pick<T, KEY>>({
       ...this.schema,
       type: finishedObject as Pick<T, KEY>,
-      name,
     })
   }
 
@@ -122,7 +117,6 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     return new LuftObject<ObjectPartial<T>>({
       ...this.schema,
       type: newType as ObjectPartial<T>,
-      name,
     }).treatMissingKeyAs("undefined")
   }
 
@@ -141,12 +135,6 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     const newValidator = this.clone()
     newValidator.schema.ignoreUnknownKeys = ignore
     return newValidator
-  }
-
-  public named(name: string): LuftObject<T> {
-    const clone = this.clone()
-    clone.schema.name = name
-    return clone
   }
 
   public treatMissingKeyAs(treatAs: "error" | "undefined"): LuftObject<T> {

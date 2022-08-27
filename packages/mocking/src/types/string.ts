@@ -11,7 +11,8 @@ export const trimUntilFits = (stringToReturn: string, stringGenerator: () => str
 
 export const mockString = (validator: LuftString, filedName?: string): LuftInfer<LuftString> => {
   const min = validator.schema.minLength < 0 ? 0 : validator.schema.minLength
-  const max = validator.schema.maxLength === Infinity ? Math.max(1000, min + 1000) : validator.schema.maxLength
+  const max = Math.min(validator.schema.maxLength, min + 10000)
+
   const factoryName = stringFactory(filedName)
   const stringGenerator: () => string = StringFactories[factoryName]
 

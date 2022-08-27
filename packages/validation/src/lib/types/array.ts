@@ -12,8 +12,8 @@ import { deepCopy } from "@luftschloss/common"
 
 type LuftArrayConstructor = {
   parser: "json" | "csv" | "nothing"
-  maxLength: number
-  minLength: number
+  maxLength: number | undefined
+  minLength: number | undefined
   unique: boolean
 }
 
@@ -24,9 +24,9 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
   public constructor({
     type,
     parser = "nothing",
-    maxLength = Infinity,
+    maxLength = undefined,
+    minLength = undefined,
     unique = false,
-    minLength = 0,
   }: Partial<LuftArrayConstructor> & { type: ARRAY_TYPE }) {
     super()
     this.schema = { type, parser, maxLength, minLength, unique }
@@ -45,13 +45,13 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     return newValidator
   }
 
-  public minLength(minLength: number): LuftArray<ARRAY_TYPE> {
+  public minLength(minLength: number | undefined): LuftArray<ARRAY_TYPE> {
     const newValidator = this.clone()
     newValidator.schema.minLength = minLength
     return newValidator
   }
 
-  public maxLength(minLength: number): LuftArray<ARRAY_TYPE> {
+  public maxLength(minLength: number | undefined): LuftArray<ARRAY_TYPE> {
     const newValidator = this.clone()
     newValidator.schema.maxLength = minLength
     return newValidator
@@ -129,7 +129,7 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     }
 
     // Check if the array is too long
-    if (data.length > this.schema.maxLength) {
+    if (this.schema.maxLength !== undefined && data.length > this.schema.maxLength) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_LENGTH,
         path: [...context.path],
@@ -144,7 +144,7 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     }
 
     // Check if the array is too short
-    if (data.length < this.schema.minLength) {
+    if (this.schema.minLength !== undefined && data.length < this.schema.minLength) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_LENGTH,
         path: [...context.path],

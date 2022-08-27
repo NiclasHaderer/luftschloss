@@ -61,7 +61,7 @@ test("Use modifiers", () => {
   expect(numberSchema.schema.max).toBe(0)
 
   // Reset options
-  numberSchema = numberSchema.max(Infinity).min(-Infinity)
+  numberSchema = numberSchema.max(undefined).min(undefined)
 
   // Check 0
   numberSchema = numberSchema.positive()
@@ -72,7 +72,7 @@ test("Use modifiers", () => {
   expect(numberSchema.validateSave(1).success).toBe(true)
 
   // Reset options
-  numberSchema = numberSchema.max(Infinity).min(-Infinity)
+  numberSchema = numberSchema.max(undefined).min(undefined)
 
   numberSchema = numberSchema.negative()
   expect(numberSchema.validateSave(0).success).toBe(false)

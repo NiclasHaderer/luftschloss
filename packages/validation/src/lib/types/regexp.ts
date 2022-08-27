@@ -11,12 +11,12 @@ import { LuftString } from "./string"
 import { deepCopy } from "@luftschloss/common"
 
 export class LuftRegexp extends LuftString {
-  public readonly schema: { regex: RegExp; minLength: number; maxLength: number; trim: boolean }
+  public readonly schema: { regex: RegExp; minLength?: number; maxLength?: number; trim: boolean }
 
   public constructor({
     regex,
-    minLength = -Infinity,
-    maxLength = Infinity,
+    minLength,
+    maxLength,
     trim = false,
   }: {
     regex: RegExp

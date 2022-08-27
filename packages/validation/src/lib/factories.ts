@@ -30,7 +30,7 @@ export const literal = <T extends string | number | boolean>(types: ReadonlyArra
 export const never = () => new LuftNever()
 export const nullFactory = () => new LuftNull()
 export const number = () => new LuftNumber()
-export const object = <T extends Record<string, LuftType>>(type: T, name?: string) => new LuftObject({ type, name })
+export const object = <T extends Record<string, LuftType>>(type: T) => new LuftObject({ type })
 export const record = <KEY extends LuftRecordKey, VALUE extends LuftType>(key: KEY, value: VALUE) =>
   new LuftRecord({
     key,

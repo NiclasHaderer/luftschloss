@@ -23,16 +23,16 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     key: KEY
     value: VALUE
     nonEmpty: boolean
-    minProperties: number
-    maxProperties: number
+    minProperties: number | undefined
+    maxProperties: number | undefined
   }
 
   constructor({
     nonEmpty = false,
     key,
     value,
-    maxProperties = Number.MAX_SAFE_INTEGER,
-    minProperties = 0,
+    maxProperties,
+    minProperties,
   }: {
     key: KEY
     value: VALUE
@@ -52,13 +52,13 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     }).replaceValidationStorage(deepCopy(this.validationStorage))
   }
 
-  public minProperties(min: number) {
+  public minProperties(min: number | undefined) {
     const clone = this.clone()
     clone.schema.minProperties = min
     return clone
   }
 
-  public maxProperties(max: number) {
+  public maxProperties(max: number | undefined) {
     const clone = this.clone()
     clone.schema.maxProperties = max
     return clone
@@ -90,7 +90,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     const keyCount = Object.keys(data).length
 
     // To few keys
-    if (keyCount < this.schema.minProperties) {
+    if (this.schema.minProperties !== undefined && keyCount < this.schema.minProperties) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected at least ${this.schema.minProperties} properties, but got ${keyCount}`,
@@ -105,7 +105,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     }
 
     // To many keys
-    if (keyCount > this.schema.maxProperties) {
+    if (this.schema.maxProperties !== undefined && keyCount > this.schema.maxProperties) {
       context.addIssue({
         code: LuftErrorCodes.INVALID_RANGE,
         message: `Expected not more than ${this.schema.minProperties} properties, but got ${keyCount}`,
@@ -125,7 +125,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
         message: "Record is empty",
         path: [...context.path],
         actualLen: 0,
-        maxLen: Infinity,
+        maxLen: undefined,
         minLen: 0,
       })
       return { success: false }
