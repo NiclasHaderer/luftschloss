@@ -46,7 +46,7 @@ export class ApiRoute<URL_PARAMS extends LuftObject<any>, BODY extends LuftType,
     return this.router
   }
 
-  public info(): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+  public info(infoModifier: () => void): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
     // TODO
     return this
   }

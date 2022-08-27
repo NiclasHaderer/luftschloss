@@ -167,10 +167,12 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     data = [...data]
     // Check every element of the array for the right type
     for (let i = 0; i < (data as unknown[]).length; ++i) {
+      context.stepInto(i.toString())
       const result = (this.schema.type as unknown as InternalLuftBaseType<unknown>)[mode](
         (data as unknown[])[i],
         context
       )
+      context.stepOut()
       if (result.success) {
         // Save the returned data, because there mey have been some coerced values
         ;(data as unknown[])[i] = result.data

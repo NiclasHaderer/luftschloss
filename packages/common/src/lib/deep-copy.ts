@@ -7,10 +7,9 @@
 import { Func } from "./types"
 import { isArray, saveObject } from "./utils"
 
-// TODO remove as soon as jest28 is shipped with nx
 const isObject = (value: unknown): value is Record<string, unknown> => value instanceof Object
 const isFunction = (value: unknown): value is Func => typeof value === "function"
-const internalDeepCopy = <T>(object: T): T => {
+export const deepCopy = <T>(object: T): T => {
   if (isFunction(object)) return object
   if (!isObject(object)) return object
 
@@ -26,5 +25,3 @@ const internalDeepCopy = <T>(object: T): T => {
   }
   return newObject
 }
-
-export const deepCopy: <T>(object: T) => T = typeof structuredClone === "undefined" ? internalDeepCopy : structuredClone

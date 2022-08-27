@@ -3,7 +3,6 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { jsonParser } from "@luftschloss/body"
 import { OpenApiSchema } from "@luftschloss/openapi-schema"
 import { normalizePath, saveObject, withDefaults } from "@luftschloss/common"
 import {
@@ -21,6 +20,7 @@ import {
   withServerBase,
 } from "@luftschloss/server"
 import { ApiRouter } from "./api.router"
+import { jsonParser } from "@luftschloss/body"
 
 type ApiServerArgs = { generateOpenApi: boolean }
 
@@ -53,7 +53,6 @@ export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {
 
 export const apiServer = (args: Partial<ApiServerArgs> = saveObject()) => {
   const { generateOpenApi } = withDefaults<ApiServerArgs>(args, { generateOpenApi: true })
-
   const server = new ApiServer(generateOpenApi)
   server
     .pipe(loggerMiddleware())
@@ -61,13 +60,11 @@ export const apiServer = (args: Partial<ApiServerArgs> = saveObject()) => {
     .pipe(noContentSniff())
     .pipe(jsonParser())
     .pipe(poweredBy())
-
   server
     .addPathValidator(intPathValidator())
     .addPathValidator(numberPathValidator())
     .addPathValidator(pathPathValidator())
     .addPathValidator(stringPathValidator())
     .addPathValidator(uuidPathValidator())
-
   return server
 }

@@ -119,8 +119,10 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     const newData = saveObject<Record<LuftInfer<KEY>, LuftInfer<VALUE>>>()
     let failAtEnd = false
     for (const [key, value] of Object.entries(data)) {
+      context.stepInto(key)
       const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>)[mode](key, context)
       const parsedValue = (this.schema.value as unknown as InternalLuftBaseType<unknown>)[mode](value, context)
+      context.stepOut()
 
       if (parsedKey.success && parsedValue.success) {
         ;(newData as Record<string | number, unknown>)[parsedKey.data as string | number] = parsedValue.data

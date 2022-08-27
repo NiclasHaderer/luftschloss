@@ -57,7 +57,7 @@ export class GenericEventEmitter<T extends Record<string, unknown>> {
       if (!this.onCompleteEventMap.has(event)) {
         this.onCompleteEventMap.set(event, new Set<EventCallback<ValueOf<T>>>())
       }
-      const eventHandlers = this.onEventMap.get(event)!
+      const eventHandlers = this.onCompleteEventMap.get(event)!
       eventHandlers.add((data: DATA) => resolve(data))
     })
   }

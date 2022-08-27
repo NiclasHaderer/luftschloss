@@ -10,7 +10,8 @@
         "outputPath": "dist/apps/demo-openapi",
         "main": "apps/demo-openapi/src/main.ts",
         "tsConfig": "apps/demo-openapi/tsconfig.app.json",
-        "assets": ["apps/demo-openapi/src/assets"]
+        "assets": ["apps/demo-openapi/src/assets"],
+        "sourceMap": true
       },
       "configurations": {
         "production": {

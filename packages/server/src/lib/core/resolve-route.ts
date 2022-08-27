@@ -80,6 +80,6 @@ export const getAvailableMethods = (endpoint: Record<HTTP_METHODS, ROUTE_HANDLER
  */
 export const extractParamsFromMatch = (match: RegExpMatchArray): Record<string, unknown> => {
   return {
-    ...(match.groups || {}),
+    ...(match.groups || saveObject()),
   }
 }

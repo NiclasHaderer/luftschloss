@@ -21,6 +21,7 @@ export const escapeRegexString = (s: string): string => s.replace(/[.*+?^${}()|[
 
 export const saveObject = <T extends Record<string, unknown>>(): T => {
   const tmp = {} as T
+  ;(tmp as any).__proto__ = { ...(tmp as any).__proto__ }
   Object.freeze(tmp.__proto__)
   return tmp
 }

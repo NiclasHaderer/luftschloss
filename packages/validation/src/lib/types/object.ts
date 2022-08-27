@@ -91,7 +91,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     const finishedObject = keys.reduce((acc, key) => {
       acc[key] = this.schema.type[key].clone()
       return acc
-    }, {} as Record<string, LuftType>)
+    }, saveObject<Record<string, LuftType>>())
 
     return new LuftObject<Pick<T, KEY>>({
       ...this.schema,
@@ -104,7 +104,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     const newType = Object.keys(this.schema.type).reduce((acc, key) => {
       acc[key] = type[key].optional()
       return acc
-    }, {} as Record<string, LuftType>)
+    }, saveObject<Record<string, LuftType>>())
 
     return new LuftObject<ObjectPartial<T>>({
       ...this.schema,
@@ -116,7 +116,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     const clonedType = Object.keys(this.schema.type).reduce((acc, key) => {
       ;(acc as Record<string, LuftType>)[key] = this.schema.type[key].clone()
       return acc
-    }, {} as T)
+    }, saveObject<T>())
 
     return new LuftObject({ ...this.schema, type: clonedType }).replaceValidationStorage(
       deepCopy(this.validationStorage)
@@ -216,11 +216,14 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
         continue
       }
 
+      context.stepInto(key)
       // Validate the retrieved value
-      const a = (validator as InternalLuftBaseType<unknown>)[mode]((data as Record<string, unknown>)[key], context)
-      if (a.success) {
+      const result = (validator as InternalLuftBaseType<unknown>)[mode]((data as Record<string, unknown>)[key], context)
+      context.stepOut()
+
+      if (result.success) {
         // Save the (potentially) coerced value in the new object
-        ;(parsedObject as Record<string, unknown>)[key] = a.data
+        ;(parsedObject as Record<string, unknown>)[key] = result.data
       } else {
         failAtEnd = true
       }

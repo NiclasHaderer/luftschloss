@@ -24,5 +24,3 @@ router.mount(router2, { basePath: "test" })
 
 server.mount(router, { basePath: "hello" })
 server.listen()
-
-structuredClone({})
