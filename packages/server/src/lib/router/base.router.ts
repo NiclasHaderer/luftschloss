@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { ByLazy, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/common"
+import { ByLazy, escapeRegexString, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -42,7 +42,7 @@ export class RouterBase implements Router {
     // Setup not complete, do not cache value
     if (!self.completePath) return [SKIP_CACHE, undefined]
     // Does not contain regex, so just return undefined
-    if (!containsRegex(self.completePath)) return undefined
+    if (!containsRegex(self.completePath)) return new RegExp(escapeRegexString(self.completePath))
     // Build the regex with an open end, because the router is not an actual handler. It just has to match the beginning
     // of the requested path.
     return pathToRegex(self.completePath, self.pathValidators, true)
@@ -120,11 +120,7 @@ export class RouterBase implements Router {
    * @returns True if the router can handle the path, false otherwise
    */
   public canHandle(path: string): boolean {
-    if (this.completePathRegex) {
-      return this.completePathRegex.test(path)
-    }
-    // Can be assumed as not null, because the router has to be locked before it can be used
-    return this.completePath!.startsWith(path)
+    return this.completePathRegex!.test(path)
   }
 
   private propagateStartup(): void {

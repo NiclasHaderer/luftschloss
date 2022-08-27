@@ -1,4 +1,4 @@
-import { apiServer } from "@luftschloss/openapi"
+import { apiServer, swaggerRouter } from "@luftschloss/openapi"
 import { luft } from "@luftschloss/validation"
 
 const main = async () => {
@@ -12,9 +12,10 @@ const main = async () => {
         hello: luft.string(),
       }),
     })
-    .handle((url, body) => {
+    .handle(url => {
       return url
     })
+  server.mount(swaggerRouter())
   server.listen()
 }
 main()
