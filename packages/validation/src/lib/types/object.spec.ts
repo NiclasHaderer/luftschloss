@@ -18,14 +18,14 @@ const getObjectValidator = () =>
     },
   })
 
-test("Validate valid object", () => {
+test("ObjectType: valid object", () => {
   const validator = getObjectValidator()
   const result = validator.validateSave({ hello: "hello", world: 1, nested: { hello: "nested hello", world: 2 } })
   expect(result.success).toBe(true)
   expect(validator.validateSave("hello").success).toBe(false)
 })
 
-test("Test missing keys", () => {
+test("ObjectType: missing keys", () => {
   const validator = getObjectValidator()
   const result = validator.validateSave({ hello: "hello", world: 1, nested: { hello: "nested hello" } })
   expect(result.success).toBe(false)
@@ -35,7 +35,7 @@ test("Test missing keys", () => {
   expect((unsuccessful.issues[0] as MissingKeysError).missingKeys).toEqual(["world"])
 })
 
-test("Test to many keys", () => {
+test("ObjectType: to many keys", () => {
   const validator = getObjectValidator().ignoreUnknownKeys(false)
 
   const result = validator.validateSave({
@@ -51,7 +51,7 @@ test("Test to many keys", () => {
   expect((unsuccessful.issues[0] as AdditionalKeysError).additionalKeys).toEqual(["toMany"])
 })
 
-test("Test stripping unnecessary keys from object", () => {
+test("ObjectType: strip unnecessary keys", () => {
   const validator = getObjectValidator()
   expect(
     validator.validate({ hello: "hello", world: 1, toMany: 3, nested: { hello: "nested hello", world: 2 } })
@@ -62,7 +62,7 @@ test("Test stripping unnecessary keys from object", () => {
   })
 })
 
-test("Test string parsing", () => {
+test("ObjectType: string parsing", () => {
   const validator = getObjectValidator().tryParseString(true)
 
   expect(
@@ -76,7 +76,7 @@ test("Test string parsing", () => {
   expect(() => validator.coerce("not-parsable")).toThrow(LuftValidationError)
 })
 
-test("Test missing keys undefined", () => {
+test("ObjectType: missing keys", () => {
   const validator = new LuftObject({
     type: {
       hello: new LuftString().optional(),
@@ -88,7 +88,7 @@ test("Test missing keys undefined", () => {
   expect(validator.treatMissingKeyAs("undefined").coerce({})).toEqual({ hello: undefined, world: undefined })
 })
 
-test("Test omit", () => {
+test("ObjectType: omit", () => {
   const validator = getObjectValidator().omit(["world", "hello"])
   const result = validator.validate({ hello: "hello", world: 1, nested: { hello: "nested hello", world: 2 } })
   expect(result).toEqual({
@@ -98,7 +98,7 @@ test("Test omit", () => {
   expect(result.nested.world).toBe(2)
 })
 
-test("Test pick", () => {
+test("ObjectType: pick", () => {
   const validator = getObjectValidator().pick(["nested"])
   const result = validator.validate({ hello: "hello", world: 1, nested: { hello: "nested hello", world: 2 } })
   expect(result).toEqual({
@@ -108,7 +108,7 @@ test("Test pick", () => {
   expect(result.nested.world).toBe(2)
 })
 
-test("Test partial", () => {
+test("ObjectType: partial", () => {
   const validator = getObjectValidator().partial().treatMissingKeyAs("undefined")
   const result1 = validator.validate({})
   expect(result1).toEqual({})
@@ -119,7 +119,7 @@ test("Test partial", () => {
   expect(result?.nested?.world).toBe(2)
 })
 
-test("Test merge", () => {
+test("ObjectType: merge", () => {
   let validator: LuftObject<any> = getObjectValidator()
   expect(validator.validateSave({}).success).toBe(false)
   validator = validator.partial()
@@ -131,7 +131,7 @@ test("Test merge", () => {
   expect(validator.validate({ newKey: "newKey" })).toEqual({ newKey: "newKey" })
 })
 
-test("Test extend", () => {
+test("ObjectType: extend", () => {
   let validator: LuftObject<any> = getObjectValidator()
   expect(validator.validateSave({}).success).toBe(false)
   validator = validator.partial()

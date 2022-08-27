@@ -1,6 +1,6 @@
 import { LuftNever } from "./never"
 
-test("Test that no value is allowed for the never type", () => {
+test("NeverType: that no value is allowed for the never type", () => {
   const validator = new LuftNever()
   let parsingSucceeded: boolean
   parsingSucceeded = validator.validateSave("hello").success
@@ -23,7 +23,7 @@ test("Test that no value is allowed for the never type", () => {
   expect(coercionSucceeded).toBe(false)
 })
 
-test("Test any schema clone", () => {
+test("NeverType: any schema clone", () => {
   const validator = new LuftNever()
   expect(validator).not.toBe(validator.clone())
   expect(validator.clone()).toStrictEqual(validator)

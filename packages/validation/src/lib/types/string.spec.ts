@@ -2,7 +2,7 @@ import { LuftString } from "./string"
 import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type"
 import { InvalidLengthError, InvalidTypeError, LuftErrorCodes } from "../validation-error"
 
-test("Test types", () => {
+test("StringType: validation", () => {
   const validator = new LuftString()
   expect(validator.validateSave("").success).toBe(true)
   expect(validator.validateSave("hello").success).toBe(true)
@@ -16,7 +16,7 @@ test("Test types", () => {
   expect(validator.coerceSave(Infinity).success).toBe(false)
 })
 
-test("Test trim types", () => {
+test("StringType: trim", () => {
   const validator = new LuftString()
   const trimValidator = validator.trim(true)
   const trimmedResult = trimValidator.coerceSave("    fd      ")
@@ -27,7 +27,7 @@ test("Test trim types", () => {
   expect((untrimmedResult as SuccessfulParsingResult<string>).data).toBe("    fd      ")
 })
 
-test("Test max length", () => {
+test("StringType: max length", () => {
   const validator = new LuftString().max(10)
   expect(validator.validateSave("0123456789").success).toBe(true)
   const unsuccessfulResult = validator.validateSave("0123456789-")
@@ -39,7 +39,7 @@ test("Test max length", () => {
   expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).actualLen).toBe(11)
 })
 
-test("Test min length", () => {
+test("StringType: min length", () => {
   const validator = new LuftString().min(2).trim(true)
   expect(validator.validateSave("123").success).toBe(true)
   const unsuccessfulResult = validator.coerceSave("1  ")
@@ -51,7 +51,7 @@ test("Test min length", () => {
   expect(((unsuccessfulResult as UnsuccessfulParsingResult).issues[0] as InvalidLengthError).actualLen).toBe(1)
 })
 
-test("Test invalid type for string", () => {
+test("StringType: invalid type", () => {
   const validator = new LuftString()
   expect(validator.validateSave(2).success).toBe(false)
   expect(validator.validateSave(null).success).toBe(false)

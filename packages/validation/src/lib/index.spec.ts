@@ -6,6 +6,6 @@
 
 import "./index"
 
-test("Only exists to pick up coverage for files which are not tested", () => {
+test("LuftIndex: collect code coverage", () => {
   expect(true).toBe(true)
 })

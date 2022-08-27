@@ -11,7 +11,7 @@ import {
 import { LuftString } from "./string"
 import { LuftNumber } from "./number"
 
-test("Test undefined", () => {
+test("BaseType: undefined", () => {
   const validator = new LuftUndefined()
   expect(validator.validateSave(null).success).toBe(false)
   expect(validator.validateSave("null").success).toBe(false)
@@ -22,7 +22,7 @@ test("Test undefined", () => {
   expect((validator.coerceSave(undefined) as SuccessfulParsingResult<unknown>).data).toBe(undefined)
 })
 
-test("Test null", () => {
+test("BaseType: null", () => {
   const validator = new LuftNull()
   expect(validator.validateSave(null).success).toBe(true)
   expect(validator.validateSave("null").success).toBe(false)
@@ -33,7 +33,7 @@ test("Test null", () => {
   expect((validator.coerceSave(null) as SuccessfulParsingResult<null>).data).toBe(null)
 })
 
-test("Test union", () => {
+test("BaseType: union", () => {
   const validator = new LuftUnion({ types: [new LuftNull(), new LuftString()] })
   expect(validator.validateSave(null).success).toBe(true)
   expect(validator.validateSave("Hello world").success).toBe(true)
@@ -48,7 +48,7 @@ test("Test union", () => {
   expect((unsuccessfulResult.issues[0] as UnionError).receivedType).toEqual("T")
 })
 
-test("Test optional, nullish, nullable", () => {
+test("BaseType: optional, nullish, nullable", () => {
   let validator: LuftType = new LuftString()
   expect(validator.validateSave(undefined).success).toBe(false)
   validator = validator.optional()
@@ -62,7 +62,7 @@ test("Test optional, nullish, nullable", () => {
   expect(validator.validateSave("").success).toBe(true)
 })
 
-test("Test default", () => {
+test("BaseType: default", () => {
   const validator = new LuftString()
   expect(validator.default("hello")).not.toBe(validator)
   expect(validator.default("hello").schema).toStrictEqual(validator.schema)
@@ -83,7 +83,7 @@ test("Test default", () => {
   expect(validator.default("hello").coerce("world")).toBe("world")
 })
 
-test("Test adding validator", () => {
+test("BaseType: adding validator", () => {
   const validator = new LuftString()
   let newValidator = validator.beforeValidate(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
@@ -99,13 +99,13 @@ test("Test adding validator", () => {
   expect(validator).not.toBe(newValidator)
 })
 
-test("Test or", () => {
+test("BaseType: or", () => {
   const validator = new LuftString()
   expect(validator.validateSave(null).success).toBe(false)
   expect(validator.or(new LuftNull()).validateSave(null).success).toBe(true)
 })
 
-test("Test before validate hook", () => {
+test("BaseType: before validate hook", () => {
   const alwaysFalse = new LuftString().beforeValidate((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
     return { action: "abort" }
@@ -119,7 +119,7 @@ test("Test before validate hook", () => {
   expect(addWorld.clone().coerce("hello")).toBe("hello")
 })
 
-test("Test before coerce hook", () => {
+test("BaseType: before coerce hook", () => {
   const alwaysFalse = new LuftString().beforeCoerce((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
     return { action: "abort" }
@@ -133,7 +133,7 @@ test("Test before coerce hook", () => {
   expect(addWorld.validate("hello")).toBe("hello")
 })
 
-test("Test invalid hooks", () => {
+test("BaseType: invalid hooks", () => {
   const invalidFalse = new LuftString().beforeValidate((value, context) => {
     return { action: "abort" }
   })
@@ -146,7 +146,7 @@ test("Test invalid hooks", () => {
   expect(() => invalidTrue.validate("hello")).toThrow(LuftValidationUsageError)
 })
 
-test("Test deprecated", () => {
+test("BaseType: deprecated", () => {
   const validator = new LuftString().deprecated(true)
   let loggedValue
 
@@ -195,4 +195,11 @@ test("BaseType: after hook error", () => {
     }
   })
   expect(() => validator.validate(3)).toThrow(LuftValidationError)
+})
+
+test("BaseType: name", () => {
+  const validator = new LuftNumber().named("hello-my-name-is-string")
+  expect(validator.validationStorage.name).toBe("hello-my-name-is-string")
+  expect(validator.clone().validationStorage.name).toBe("hello-my-name-is-string")
+  expect(validator.named(undefined).clone().validationStorage.name).toBe(undefined)
 })

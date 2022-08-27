@@ -1,13 +1,13 @@
 import { LuftDate } from "./date"
 import { LuftValidationError, LuftValidationUsageError } from "../validation-error"
 
-test("Test correct type", () => {
+test("DateType: correct type", () => {
   const validator = new LuftDate()
   expect(validator.validateSave(new Date()).success).toBe(true)
   expect(validator.validateSave("(new Date())").success).toBe(false)
 })
 
-test("Test date range", () => {
+test("DateType: date range", () => {
   const validator = new LuftDate()
   const date = new Date()
 
@@ -22,7 +22,7 @@ test("Test date range", () => {
   expect(validator.afterEq(date).validateSave(date).success).toBe(true)
 })
 
-test("Coerce string", () => {
+test("DateType: string parsing", () => {
   const validator = new LuftDate()
   const date = new Date()
   const result = validator.coerce(date.toISOString())
@@ -33,7 +33,7 @@ test("Coerce string", () => {
   }).toThrow(LuftValidationError)
 })
 
-test("Coerce number", () => {
+test("DateType: coerce number", () => {
   const validator = new LuftDate()
   const date = new Date()
   const result = validator.coerce(date.getTime())
@@ -48,7 +48,7 @@ test("Coerce number", () => {
   }).toThrow(LuftValidationError)
 })
 
-test("Date: invalid after string", () => {
+test("DateType: invalid after string", () => {
   const validator = new LuftDate()
   expect(() => validator.after("1kzgkuzukgz")).toThrow(LuftValidationUsageError)
 })

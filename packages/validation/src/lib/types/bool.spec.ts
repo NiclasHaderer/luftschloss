@@ -1,7 +1,7 @@
 import { LuftBool } from "./bool"
 import { LuftValidationError } from "../validation-error"
 
-test("Test valid bool types", () => {
+test("BoolType: valid bool types", () => {
   const validator = new LuftBool()
   expect(validator.validate(true)).toBe(true)
   expect(validator.validate(false)).toBe(false)
@@ -10,7 +10,7 @@ test("Test valid bool types", () => {
   expect(() => validator.validate("false")).toThrowError(LuftValidationError)
 })
 
-test("Test parse bool string", () => {
+test("BoolType: parse bool string", () => {
   const validator = new LuftBool().parseString(true)
   expect(validator.coerce("true")).toBe(true)
   expect(validator.coerce("tRue")).toBe(true)
@@ -19,7 +19,7 @@ test("Test parse bool string", () => {
   expect(() => validator.coerce("Falsee")).toThrowError(LuftValidationError)
 })
 
-test("Test clone", () => {
+test("BoolType: clone", () => {
   const validator = new LuftBool()
   expect(validator).not.toBe(validator.clone())
   expect(validator.schema).not.toBe(validator.clone().schema)

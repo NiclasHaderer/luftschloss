@@ -16,7 +16,7 @@ import {
   LuftUUIDString,
 } from "./types"
 
-test("Test if different factories return the same as the default constructor", () => {
+test("LuftFactories: different factories return the same as the default constructor", () => {
   expect(luft.any()).toStrictEqual(new LuftAny())
   expect(luft.array(luft.string())).toStrictEqual(new LuftArray({ type: new LuftString() }))
   expect(luft.date()).toStrictEqual(new LuftDate())

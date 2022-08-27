@@ -2,33 +2,30 @@ import { LuftInfer, SuccessfulParsingResult } from "./base-type"
 import { LuftNumber } from "./number"
 import { LuftValidationError } from "../validation-error"
 
-test("Test if correct number is parsed", () => {
+test("NumberType: correct validation", () => {
   const numberSchema = new LuftNumber()
   const result = numberSchema.validateSave(1)
   expect(result.success).toBe(true)
   expect((result as SuccessfulParsingResult<LuftInfer<LuftNumber>>).data).toBe(1)
 })
 
-test("Test invalid type", () => {
+test("NumberType: invalid type", () => {
   const numberSchema = new LuftNumber()
   const result = numberSchema.validateSave("no-number")
   expect(result.success).toBe(false)
 })
 
-test("NaN not accepted", () => {
-  const numberSchema = new LuftNumber()
-  const result = numberSchema.validateSave(NaN)
+test("NumberType: NaN", () => {
+  let numberSchema = new LuftNumber()
+  let result = numberSchema.validateSave(NaN)
   expect(result.success).toBe(false)
-})
-
-test("NaN accepted", () => {
-  const numberSchema = new LuftNumber().allowNaN(true)
-  const result = numberSchema.validateSave(NaN)
+  numberSchema = numberSchema.allowNaN(true)
+  result = numberSchema.validateSave(NaN)
   expect(result.success).toBe(true)
   expect((result as SuccessfulParsingResult<LuftInfer<LuftNumber>>).data).toBe(NaN)
 })
 
-test("Invalid negative range", () => {
+test("NumberType: min max", () => {
   const numberSchema = new LuftNumber().min(-10).max(10)
   // Invalid numbers
   const result1 = numberSchema.validateSave(-11)
@@ -43,7 +40,7 @@ test("Invalid negative range", () => {
   expect(result4.success).toBe(true)
 })
 
-test("Parse string coercion", () => {
+test("NumberType: parse string", () => {
   let numberSchema = new LuftNumber().parseString(true)
   const result1 = numberSchema.coerceSave("9.6")
   expect(result1.success).toBe(true)
@@ -63,7 +60,7 @@ test("Parse string coercion", () => {
   expect((result4 as SuccessfulParsingResult<LuftInfer<LuftNumber>>).data).toBe(NaN)
 })
 
-test("Clone number", () => {
+test("NumberType: clone", () => {
   const numberSchema = new LuftNumber()
   const clone = numberSchema.clone()
   expect(clone).toStrictEqual(numberSchema)
@@ -71,10 +68,11 @@ test("Clone number", () => {
   expect(clone.schema).toEqual(numberSchema.schema)
 })
 
-test("Number: Multiple of", () => {
+test("NumberType: multiple", () => {
   const numberSchema = new LuftNumber().multipleOf(10.1)
   expect(() => numberSchema.validate(2)).toThrow(LuftValidationError)
   expect(numberSchema.validate(10.1)).toBe(10.1)
   expect(numberSchema.validate(20.2)).toBe(20.2)
+  // Don't remove. this tests floating point percision
   expect(numberSchema.validate(-30.3)).toBe(-30.3)
 })

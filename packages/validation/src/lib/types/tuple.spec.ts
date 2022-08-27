@@ -10,21 +10,21 @@ function* toIterator(data: unknown[]): Iterable<unknown> {
   }
 }
 
-test("Test tuple clone", () => {
+test("TupleType: clone", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber()] })
   const clone = validator.clone()
   expect(clone).not.toBe(validator)
   expect(clone).toStrictEqual(validator)
 })
 
-test("Test valid types", () => {
+test("TupleType: valid types", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber(), new LuftString()] })
   expect(validator.validate([1, 2, "3"])).toEqual([1, 2, "3"])
   const validator2 = new LuftTuple({ types: [new LuftRegexp({ regex: /\d/ }), new LuftNumber(), new LuftString()] })
   expect(validator2.validate(["1", 2, "3"])).toEqual(["1", 2, "3"])
 })
 
-test("Test invalid types", () => {
+test("TupleType: invalid types", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber(), new LuftString()] })
   expect(() => validator.validate([1, "2", "3"])).toThrow(LuftValidationError)
   expect(() => validator.validate([1, "2"])).toThrow(LuftValidationError)
@@ -38,12 +38,12 @@ test("Test invalid types", () => {
   expect(() => validator2.validate({})).toThrow(LuftValidationError)
 })
 
-test("Test coercion", () => {
+test("TupleType: coercion", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber(), new LuftString()] })
   expect(validator.coerce(toIterator([1, 2, "3"]))).toEqual([1, 2, "3"])
 })
 
-test("Test parse csv", () => {
+test("TupleType: parse csv", () => {
   const validator = new LuftTuple({
     types: [new LuftNumber().parseString(true), new LuftNumber().parseString(true), new LuftString()],
   })
@@ -51,7 +51,7 @@ test("Test parse csv", () => {
   expect(() => validator.coerce("1, 2, 3")).toThrow(LuftValidationError)
 })
 
-test("Test parse json", () => {
+test("TupleType: parse json", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber(), new LuftString()] })
   expect(validator.parseWith("json").coerce('[1,2,"3"]')).toEqual([1, 2, "3"])
   expect(() => validator.parseWith("json").coerce('[1,2,3"]')).toThrow(LuftValidationError)

@@ -1,6 +1,6 @@
 import { getTypeOf } from "./helpers"
 
-test("Get type of value", () => {
+test("LuftTypeHelpers: Get type of value", () => {
   expect(getTypeOf(null)).toBe("null")
   expect(getTypeOf(undefined)).toBe("undefined")
   // Check all possible types for getTypeOf

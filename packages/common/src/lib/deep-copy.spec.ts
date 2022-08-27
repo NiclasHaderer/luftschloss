@@ -1,6 +1,6 @@
 import { deepCopy } from "./deep-copy"
 
-test("Test copy shallow object", () => {
+test("DeepCopy: shallow object", () => {
   const object = {
     a: 1,
     b: 2,
@@ -15,7 +15,7 @@ test("Test copy shallow object", () => {
   expect(copy.c).not.toBe(object.c)
 })
 
-test("Test copy with function", () => {
+test("DeepCopy: function", () => {
   const object = {
     a: 1,
     b: 2,
@@ -32,7 +32,7 @@ test("Test copy with function", () => {
   expect(copy.c.func).toBe(object.c.func)
 })
 
-test("Test array copy", () => {
+test("DeepCopy: array", () => {
   const object = {
     a: 1,
     b: 2,

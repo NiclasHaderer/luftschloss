@@ -1,7 +1,7 @@
 import { ParsingContext } from "./parsing-context"
 import { LuftErrorCodes } from "./validation-error"
 
-test("Adding new issue works", () => {
+test("LuftParsingContext: add new issue", () => {
   const context = new ParsingContext("validate")
   expect(context.hasIssues).toBe(false)
   context.addIssue({ code: LuftErrorCodes.PARSING_ISSUE, path: [], message: "test", parser: "none" })
@@ -10,7 +10,7 @@ test("Adding new issue works", () => {
   expect(context.issues[0]).toEqual({ code: LuftErrorCodes.PARSING_ISSUE, path: [], message: "test", parser: "none" })
 })
 
-test("Clone issues works", () => {
+test("LuftParsingContext: clone", () => {
   const context = new ParsingContext("coerce").stepInto("hello", "world", 1)
 
   expect(context.hasIssues).toBe(false)
@@ -19,7 +19,7 @@ test("Clone issues works", () => {
   expect(clonedIssue).toStrictEqual(context)
 })
 
-test("Clone empty issues works", () => {
+test("LuftParsingContext: clone empty", () => {
   const context = new ParsingContext("validate").stepInto("hello", "world", 1)
   expect(context.hasIssues).toBe(false)
   context.addIssue({ code: LuftErrorCodes.PARSING_ISSUE, path: [], message: "test", parser: "none" })
@@ -28,7 +28,7 @@ test("Clone empty issues works", () => {
   expect(clonedIssue.path).toEqual(["hello", "world", 1])
 })
 
-test("Step in and step out work", () => {
+test("LuftParsingContext: step in and out", () => {
   const context = new ParsingContext("coerce")
   expect(context.hasIssues).toBe(false)
   expect(context.path).toEqual([])

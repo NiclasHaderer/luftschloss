@@ -1,7 +1,7 @@
 import { LuftValidationError } from "../validation-error"
 import { LuftLiteral } from "./literal"
 
-test("Test successful literal validation", () => {
+test("LiteralType: successful literal validation", () => {
   const schemaValidator = new LuftLiteral({ types: ["hello", "world", true, 2] })
   expect(schemaValidator.validateSave("hello").success).toBe(true)
   expect(schemaValidator.validateSave("world").success).toBe(true)
@@ -15,7 +15,7 @@ test("Test successful literal validation", () => {
   expect(schemaValidator.validateSave([]).success).toBe(false)
 })
 
-test("Test case insensitive match", () => {
+test("LiteralType: case insensitive match", () => {
   const schemaValidator = new LuftLiteral({ types: ["hello", "world", true, 2] })
   const caseInsensitive = schemaValidator.ignoreCase(true)
   expect(caseInsensitive.validate("Hello")).toBe("Hello")

@@ -9,7 +9,7 @@ import { number } from "zod"
 import { UnsuccessfulParsingResult } from "./base-type"
 import { InvalidTypeError, LuftErrorCodes } from "../validation-error"
 
-test("Valid uuid", () => {
+test("UUIDType: validation", () => {
   const validator = new LuftUUIDString()
   expect(validator.validateSave("123e4567-e89b-12d3-a456-426614174000").success).toBe(true)
   expect(validator.validateSave("38f2d506-167b-11ed-861d-0242ac120002").success).toBe(true)

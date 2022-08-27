@@ -47,6 +47,7 @@ export interface LuftValidationStorage<RETURN_TYPE> {
     | { isSet: false; value: undefined }
   deprecated: boolean
   description: string | undefined
+  name: string | undefined
 }
 
 export type HookResult<CONTINUE, BREAK = CONTINUE> =
@@ -88,9 +89,10 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     default: { isSet: false, value: undefined },
     deprecated: false,
     description: undefined,
+    name: undefined,
   }
 
-  public get validationStorage() {
+  public get validationStorage(): LuftValidationStorage<RETURN_TYPE> {
     return this._validationStorage
   }
 
@@ -114,9 +116,15 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     return copy.beforeHook(logDeprecated) as this
   }
 
-  public description(description: string): this {
+  public description(description: string | undefined): this {
     const copy = this.clone()
     copy.validationStorage.description = description
+    return copy as this
+  }
+
+  public named(name: string | undefined): this {
+    const copy = this.clone()
+    copy.validationStorage.name = name
     return copy as this
   }
 

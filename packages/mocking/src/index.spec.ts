@@ -2,7 +2,7 @@ import { isArray } from "@luftschloss/common"
 import { luft } from "@luftschloss/validation"
 import { mockAll } from "./types/all"
 
-test("Mock any generation", () => {
+test("Mocking: any generation", () => {
   const validator = luft.any()
   for (let i = 0; i < 100; i++) {
     const result = mockAll(validator)
@@ -10,7 +10,7 @@ test("Mock any generation", () => {
   }
 })
 
-test("Mock array generation 1", () => {
+test("Mocking: array generation 1", () => {
   const validator = luft.array(luft.bool()).maxLength(10).minLength(5)
   for (let i = 0; i < 100; i++) {
     const result = mockAll(validator)
@@ -22,19 +22,19 @@ test("Mock array generation 1", () => {
   }
 })
 
-test("Mock array generation 2", () => {
+test("Mocking: array generation 2", () => {
   const validator = luft.array(luft.int()).maxLength(10).minLength(5)
   const result1 = mockAll(validator)
   expect(validator.validate(result1)).toStrictEqual(result1)
 })
 
-test("Mock array generation 3", () => {
+test("Mocking: array generation 3", () => {
   const validator = luft.array(luft.date()).maxLength(10).minLength(5)
   const result1 = mockAll(validator)
   expect(validator.validate(result1)).toStrictEqual(result1)
 })
 
-test("Mock array generation 4", () => {
+test("Mocking: array generation 4", () => {
   const validator = luft
     .array(
       luft.object({
@@ -48,12 +48,12 @@ test("Mock array generation 4", () => {
   expect(validator.validate(result1)).toStrictEqual(result1)
 })
 
-test("Mock bool generation", () => {
+test("Mocking: bool generation", () => {
   const result = mockAll(luft.bool())
   expect(typeof result).toBe("boolean")
 })
 
-test("Mock date generation", () => {
+test("Mocking: date generation", () => {
   for (let i = 0; i < 1000; i++) {
     const min = Date.now() - 2000
     const max = Date.now()
@@ -66,7 +66,7 @@ test("Mock date generation", () => {
   }
 })
 
-test("Mock int generation 1", () => {
+test("Mocking: int generation 1", () => {
   for (let i = 0; i < 1000; i++) {
     const min = -30
     const max = 20
@@ -79,7 +79,7 @@ test("Mock int generation 1", () => {
     expect(validator.validate(result)).toBe(result)
   }
 })
-test("Mock int generation 2", () => {
+test("Mocking: int generation 2", () => {
   for (let i = 0; i < 1000; i++) {
     const validator = luft.int()
     const result = mockAll(validator)
@@ -89,7 +89,7 @@ test("Mock int generation 2", () => {
   }
 })
 
-test("Mock literal generation", () => {
+test("Mocking: literal generation", () => {
   const literals = [1, "hello", true] as const
   const validator = luft.literal(literals)
   for (let i = 0; i < 100; i++) {
@@ -99,19 +99,19 @@ test("Mock literal generation", () => {
   }
 })
 
-test("Mock never generation", () => {
+test("Mocking: never generation", () => {
   const validator = luft.never()
   expect(() => mockAll(validator)).toThrow(Error("Never cannot be mocked"))
 })
 
-test("Mock null generation", () => {
+test("Mocking: null generation", () => {
   const validator = luft.null()
   const result = mockAll(validator)
   expect(result).toBeNull()
   expect(validator.validate(result)).toStrictEqual(result)
 })
 
-test("Mock number generation 1", () => {
+test("Mocking: number generation 1", () => {
   for (let i = 0; i < 1000; i++) {
     const min = -30
     const max = 20
@@ -124,7 +124,7 @@ test("Mock number generation 1", () => {
   }
 })
 
-test("Mock number generation 2", () => {
+test("Mocking: number generation 2", () => {
   for (let i = 0; i < 1000; i++) {
     const validator = luft.number()
     const result = mockAll(validator)
@@ -133,7 +133,7 @@ test("Mock number generation 2", () => {
   }
 })
 
-test("Mock object generator", () => {
+test("Mocking: object generator", () => {
   const validator = luft.object({
     hello: luft.string(),
     world: luft.number(),
@@ -146,7 +146,7 @@ test("Mock object generator", () => {
   expect(validator.validate(result)).toStrictEqual(result)
 })
 
-test("Mock object generator", () => {
+test("Mocking: object generator", () => {
   const validator = luft.object({
     name: luft.string(),
     address: luft.string(),
@@ -157,7 +157,7 @@ test("Mock object generator", () => {
   expect(validator.validate(result)).toStrictEqual(result)
 })
 
-test("Mock record generator", () => {
+test("Mocking: record generator", () => {
   const validator = luft.record(
     luft.string().min(10).max(20),
     luft.object({
@@ -172,7 +172,7 @@ test("Mock record generator", () => {
   expect([...Object.keys(result)].every(k => k.length >= 10 && k.length <= 20)).toBe(true)
 })
 
-test("Mock string 1", () => {
+test("Mocking: string 1", () => {
   const validator = luft.string().min(10).max(20).trim(true)
   for (let i = 0; i < 1000; i++) {
     const result = mockAll(validator)
@@ -184,7 +184,7 @@ test("Mock string 1", () => {
   }
 })
 
-test("Mock string 2", () => {
+test("Mocking: string 2", () => {
   const validator = luft.string()
   for (let i = 0; i < 1000; i++) {
     const result = mockAll(validator)
@@ -193,30 +193,32 @@ test("Mock string 2", () => {
   }
 })
 
-test("Mock tuple", () => {
+test("Mocking: tuple", () => {
   const validator = luft.tuple([luft.string(), luft.number(), luft.bool()])
   const result = mockAll(validator)
   expect(validator.validate(result)).toStrictEqual(result)
 })
 
-test("Mock undefined", () => {
+test("Mocking: undefined", () => {
   const validator = luft.undefined()
   const result = mockAll(validator)
   expect(result).toBeUndefined()
 })
 
-test("Mock union", () => {
+test("Mocking: union", () => {
   const validator = luft.union([luft.string(), luft.number(), luft.bool()])
   const result = mockAll(validator)
   expect(["string", "number", "bool"]).toContain(typeof result)
 })
 
-test("Mock regex", () => {
+test("Mocking: regex", () => {
   const validator = luft.regex(/\d/)
-  expect(() => mockAll(validator)).toThrow("Could not find a faker for LuftRegex")
+  expect(() => mockAll(validator)).toThrow(
+    "Could not find mocking factory for LuftRegex. Add one yourself with `registerMock`"
+  )
 })
 
-test("Mock uuid", () => {
+test("Mocking: uuid", () => {
   const validator = luft.uuid()
   for (let i = 0; i < 100; i++) {
     const result = mockAll(validator)

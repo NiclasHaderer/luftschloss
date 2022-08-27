@@ -1,15 +1,15 @@
 import { deepCopy } from "./deep-copy"
 import { deepEquals } from "./deep-equals"
 
-test("Check if null and null are equal", () => {
+test("DeepEqual: null and null are equal", () => {
   expect(deepEquals(null, null)).toBe(true)
 })
 
-test("Check if null and undefined are equal", () => {
+test("DeepEqual: null and undefined are not equal", () => {
   expect(deepEquals(null, undefined)).toBe(false)
 })
 
-test("Check if equal function can deal with nullable values", () => {
+test("DeepEqual: equal function dealing with nullable", () => {
   expect(
     deepEquals(
       {
@@ -26,26 +26,13 @@ test("Check if equal function can deal with nullable values", () => {
   ).toBe(false)
 })
 
-test("Check if two equal primitives are equal", () => {
+test("DeepEqual: primitives are equal", () => {
   expect(deepEquals("my string", "my string")).toBe(true)
-})
-
-test("Check if two equal primitives are equal", () => {
-  expect(deepEquals("my string", "my string")).toBe(true)
-})
-
-test("Check if two different primitives are equal", () => {
+  expect(deepEquals(1, "my string")).toBe(false)
   expect(deepEquals(1, "my string")).toBe(false)
 })
 
-test("Check if two different primitives are equal", () => {
-  expect(deepEquals(1, "my string")).toBe(false)
-})
-
-test("Check if two different primitives are equal", () => {
-  expect(deepEquals(1, "my string")).toBe(false)
-})
-test("Check complex json", () => {
+test("DeepEqual: complex object", () => {
   const largeJson = {
     feeds: [
       {

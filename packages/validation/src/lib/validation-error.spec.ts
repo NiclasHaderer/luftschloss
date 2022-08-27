@@ -1,6 +1,6 @@
 import { LuftErrorCodes, LuftValidationError } from "./validation-error"
 
-test("Create new parsing error", () => {
+test("LuftValidationError: create", () => {
   const error = new LuftValidationError("test", [])
   expect(error.issues).toEqual([])
   const error1 = new LuftValidationError("test", [
