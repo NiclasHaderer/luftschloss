@@ -7,14 +7,14 @@
 import { jsonParser } from "@luftschloss/body"
 import * as OpenApi from "@luftschloss/openapi-schema"
 import { HTTP_METHODS, RouterBase } from "@luftschloss/server"
-import { z, ZodNever, ZodObject } from "zod"
 import { ApiRoute, RouterParams } from "./api.route"
-import { ZodApiType } from "./types"
+import { luft, LuftInfer, LuftNever, LuftObject, LuftType } from "@luftschloss/validation"
 
-export type OpenApiHandler<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType> = (
-  url: z.infer<URL_PARAMS>,
-  body: z.infer<BODY>
-) => z.infer<RESPONSE> | Promise<z.infer<RESPONSE>>
+export type OpenApiHandler<
+  URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+  BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
+  RESPONSE extends LuftObject<Record<string, LuftType>>
+> = (url: LuftInfer<URL_PARAMS>, body: LuftInfer<BODY>) => LuftInfer<RESPONSE> | Promise<LuftInfer<RESPONSE>>
 
 export class ApiRouter extends RouterBase {
   public get apiRoutes(): OpenApi.Paths {
@@ -22,7 +22,11 @@ export class ApiRouter extends RouterBase {
     return {}
   }
 
-  public handle<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType>(
+  public handle<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(
     method: HTTP_METHODS | HTTP_METHODS[] | "*",
     url: string,
     params: RouterParams<URL_PARAMS, BODY, RESPONSE>
@@ -35,52 +39,62 @@ export class ApiRouter extends RouterBase {
   }
 
   public delete<
-    URL_PARAMS extends ZodObject<any> | ZodNever,
-    BODY extends ZodObject<any> | ZodNever,
-    RESPONSE extends ZodObject<any> | ZodNever
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    BODY extends LuftObject<Record<string, LuftType>>,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
   >(url: string, params: RouterParams<URL_PARAMS, BODY, RESPONSE>): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
     return this.handle("DELETE", url, params)
   }
 
-  public get<URL_PARAMS extends ZodObject<any>, RESPONSE extends ZodObject<any>>(
+  public get<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(
     url: string,
-    params: Omit<RouterParams<URL_PARAMS, ZodNever, RESPONSE>, "body">
-  ): ApiRoute<URL_PARAMS, ZodNever, RESPONSE> {
-    return this.handle("GET", url, { ...params, body: z.never() })
+    params: Omit<RouterParams<URL_PARAMS, LuftNever, RESPONSE>, "body">
+  ): ApiRoute<URL_PARAMS, LuftNever, RESPONSE> {
+    return this.handle("GET", url, { ...params, body: luft.never() })
   }
 
-  public head<URL_PARAMS extends ZodApiType, RESPONSE extends ZodApiType>(
+  public head<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(
     url: string,
-    params: Omit<RouterParams<URL_PARAMS, ZodNever, RESPONSE>, "body">
-  ): ApiRoute<URL_PARAMS, ZodNever, RESPONSE> {
-    return this.handle("HEAD", url, { ...params, body: z.never() })
+    params: Omit<RouterParams<URL_PARAMS, LuftNever, RESPONSE>, "body">
+  ): ApiRoute<URL_PARAMS, LuftNever, RESPONSE> {
+    return this.handle("HEAD", url, { ...params, body: luft.never() })
   }
 
-  public patch<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType>(
-    url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+  public patch<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    BODY extends LuftObject<Record<string, LuftType>>,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(url: string, params: RouterParams<URL_PARAMS, BODY, RESPONSE>): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
     return this.handle("PATCH", url, params)
   }
 
-  public options<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType>(
-    url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+  public options<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    BODY extends LuftObject<Record<string, LuftType>>,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(url: string, params: RouterParams<URL_PARAMS, BODY, RESPONSE>): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
     return this.handle("OPTIONS", url, params)
   }
 
-  public post<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType>(
-    url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+  public post<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    BODY extends LuftObject<Record<string, LuftType>>,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(url: string, params: RouterParams<URL_PARAMS, BODY, RESPONSE>): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
     return this.handle("POST", url, params)
   }
 
-  public put<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType>(
-    url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+  public put<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    BODY extends LuftObject<Record<string, LuftType>>,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(url: string, params: RouterParams<URL_PARAMS, BODY, RESPONSE>): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
     return this.handle("PUT", url, params)
   }
 }

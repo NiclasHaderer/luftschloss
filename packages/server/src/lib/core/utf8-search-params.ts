@@ -59,7 +59,7 @@ export class UTF8SearchParams extends URLSearchParams {
     }
   }
 
-  public asObject<T extends Record<string, string[]>>(): T {
+  public encode<T extends Record<string, string[]>>(): T {
     const o = saveObject<T>()
     for (const key of this.keys()) {
       //eslint-disable-next-line @typescript-eslint/no-extra-semi

@@ -13,22 +13,24 @@ import {
   RouteCollector,
   Status,
 } from "@luftschloss/server"
-import { TypeOf, ZodArray, ZodNever, ZodObject, ZodSet, ZodTuple } from "zod"
-import { ZodRawShape } from "zod/lib/types"
 import { ApiRouter, OpenApiHandler } from "./api.router"
-import { ZodApiType } from "./types"
+import { LuftInfer, LuftNever, LuftObject, LuftType } from "@luftschloss/validation"
 
 export interface RouterParams<
-  URL_PARAMS extends ZodObject<any> | ZodNever,
-  BODY extends ZodObject<any> | ZodNever,
-  RESPONSE extends ZodObject<any> | ZodNever
+  URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+  BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
+  RESPONSE extends LuftObject<Record<string, LuftType>>
 > {
   url: URL_PARAMS
   body: BODY
   response: RESPONSE
 }
 
-export class ApiRoute<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType> {
+export class ApiRoute<
+  URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+  BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
+  RESPONSE extends LuftObject<Record<string, LuftType>>
+> {
   public constructor(
     private router: ApiRouter,
     private collector: RouteCollector,
@@ -57,56 +59,41 @@ export class ApiRoute<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RE
     return this
   }
 
-  private wrapWithOpenApi<URL_PARAMS extends ZodApiType, BODY extends ZodApiType, RESPONSE extends ZodApiType>(
+  private wrapWithOpenApi<
+    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
+    BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
+    RESPONSE extends LuftObject<Record<string, LuftType>>
+  >(
     params: RouterParams<URL_PARAMS, BODY, RESPONSE>,
     handler: OpenApiHandler<URL_PARAMS, BODY, RESPONSE>,
     parseBody: boolean
   ): ROUTE_HANDLER {
     return async (request: LRequest, response: LResponse): Promise<void> => {
-      const pathParams = request.pathParams()
-      const urlParams = {
-        ...pathParams,
-      } as Record<string, any>
-
-      const queryParams = request.urlParams
-
-      // TODO check if the request parameter object has only allowed keys ZodUrlApiType
-      if (!(params.url instanceof ZodNever)) {
-        const keys = Object.keys(params.url.shape as ZodRawShape)
-        for (const key of keys) {
-          let zodValue = params.url.shape[key]
-          if (typeof zodValue.unwrap === "function") {
-            zodValue = zodValue.unwrap()
-          }
-
-          if (
-            (zodValue instanceof ZodArray || zodValue instanceof ZodSet || zodValue instanceof ZodTuple) &&
-            queryParams.has(key)
-          ) {
-            urlParams[key] = queryParams.getAll(key)
-          } else if (queryParams.has(key)) {
-            urlParams[key] = queryParams.get(key)
-          }
-        }
+      const pathParams = {
+        ...request.pathParams(),
+        ...request.urlParams.encode(),
       }
 
-      const reqUrlParsed = params.url.parse(urlParams)
+      // TODO add a pre validation function to the types which will extract a query param (if it is alone into a single one)
+      const reqUrlParsed = params.url.coerceSave(pathParams)
       if (!reqUrlParsed.success) {
-        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, reqUrlParsed.error.errors)
+        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, reqUrlParsed.issues)
       }
 
-      let body = null
+      let body: LuftInfer<BODY> | null = null
       if (parseBody) {
-        body = await request.json()
-        const reqBodyParsed = params.body.safeParse(body)
+        const rawBody = await request.json()
+        const reqBodyParsed = params.body.coerceSave(rawBody)
         if (!reqBodyParsed.success) {
-          throw new HTTPException(Status.HTTP_400_BAD_REQUEST, reqBodyParsed.error.errors)
+          throw new HTTPException(Status.HTTP_400_BAD_REQUEST, reqBodyParsed.issues)
         }
+        body = reqBodyParsed.data as LuftInfer<BODY>
       }
-      const responseBody = await handler(urlParams, body as TypeOf<BODY>)
-      const resBodyParsed = params.response.safeParse(responseBody)
+      const responseBody = await handler(reqUrlParsed.data as LuftInfer<URL_PARAMS>, body as LuftInfer<BODY>)
+
+      const resBodyParsed = params.response.validateSave(responseBody)
       if (!resBodyParsed.success) {
-        throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, resBodyParsed.error.errors)
+        throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, resBodyParsed.issues)
       }
       response.json(resBodyParsed.data)
     }

@@ -21,7 +21,7 @@ export const textParser = (
   const completeOptions = withDefaults<TextParserOptions>(options, {
     parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
       const str = buffer.toString(encoding)
-      return new UTF8SearchParams(str).asObject()
+      return new UTF8SearchParams(str).encode()
     },
     maxBodySize: 100,
   })
