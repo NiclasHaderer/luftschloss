@@ -1,4 +1,7 @@
 {
   "name": "@luftschloss/openapi-schema",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=18"
+  }
 }
