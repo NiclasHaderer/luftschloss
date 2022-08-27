@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker"
 import Fuse from "fuse.js"
 
-const DEFAULT_FACTORY: StringFactory = "word"
+const DEFAULT_FACTORY: StringFactory = "random"
 
 // Use the following script to get the methods of faker
 // [...document.querySelector(".root").querySelectorAll("li a")].map(element => element.innerText).join("\n")
@@ -216,6 +216,8 @@ export const StringFactories = {
   noun: () => faker.word.noun(),
   preposition: () => faker.word.preposition(),
   verb: () => faker.word.verb(),
+  // Random
+  random: () => faker.datatype.string(),
 }
 export type StringFactory = keyof typeof StringFactories
 
