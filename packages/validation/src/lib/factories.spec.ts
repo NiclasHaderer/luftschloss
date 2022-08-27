@@ -10,7 +10,7 @@ import {
   LuftNumber,
   LuftObject,
   LuftRecord,
-  LuftRegexp,
+  LuftRegex,
   LuftString,
   LuftTuple,
   LuftUUIDString,
@@ -29,7 +29,7 @@ test("LuftFactories: different factories return the same as the default construc
   expect(luft.record(luft.string(), luft.number())).toStrictEqual(
     new LuftRecord({ key: new LuftString(), value: new LuftNumber() })
   )
-  expect(luft.regex(/\d/)).toStrictEqual(new LuftRegexp({ regex: /\d/ }))
+  expect(luft.regex(/\d/)).toStrictEqual(new LuftRegex({ regex: /\d/ }))
   expect(luft.string()).toStrictEqual(new LuftString())
   expect(luft.tuple([luft.string(), luft.number()])).toStrictEqual(
     new LuftTuple({ types: [new LuftString(), new LuftNumber()] })

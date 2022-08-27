@@ -11,7 +11,7 @@ import {
   LuftObject,
   LuftRecord,
   LuftRecordKey,
-  LuftRegexp,
+  LuftRegex,
   LuftString,
   LuftTuple,
   LuftType,
@@ -36,7 +36,7 @@ export const record = <KEY extends LuftRecordKey, VALUE extends LuftType>(key: K
     key,
     value,
   })
-export const regex = (regex: RegExp) => new LuftRegexp({ regex })
+export const regex = (regex: RegExp) => new LuftRegex({ regex })
 export const string = () => new LuftString()
 export const tuple = <T extends LuftType>(types: ReadonlyArray<T>) => new LuftTuple({ types })
 export const undefinedFactory = () => new LuftUndefined()

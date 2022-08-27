@@ -10,7 +10,7 @@ import { InternalParsingResult } from "./base-type"
 import { LuftString } from "./string"
 import { deepCopy } from "@luftschloss/common"
 
-export class LuftRegexp extends LuftString {
+export class LuftRegex extends LuftString {
   public readonly schema: { regex: RegExp; minLength?: number; maxLength?: number; trim: boolean }
 
   public constructor({
@@ -37,8 +37,8 @@ export class LuftRegexp extends LuftString {
     throw new Error("Setting of supported types is not allowed")
   }
 
-  public clone(): LuftRegexp {
-    return new LuftRegexp({
+  public clone(): LuftRegex {
+    return new LuftRegex({
       ...this.schema,
       regex: new RegExp(this.schema.regex.source, this.schema.regex.flags),
     }).replaceValidationStorage(deepCopy(this.validationStorage))

@@ -10,10 +10,10 @@ import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../validation-error"
 import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftType, LuftUnion } from "./base-type"
 import { LuftNumber } from "./number"
-import { LuftRegexp } from "./regexp"
+import { LuftRegex } from "./regexp"
 import { LuftString } from "./string"
 
-export type LuftRecordKey = LuftString | LuftNumber | LuftRegexp | LuftUnion<(LuftString | LuftNumber | LuftRegexp)[]>
+export type LuftRecordKey = LuftString | LuftNumber | LuftRegex | LuftUnion<(LuftString | LuftNumber | LuftRegex)[]>
 
 export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> extends LuftBaseType<
   Record<LuftInfer<KEY>, LuftInfer<VALUE>>
@@ -22,13 +22,11 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
   public readonly schema: {
     key: KEY
     value: VALUE
-    nonEmpty: boolean
     minProperties: number | undefined
     maxProperties: number | undefined
   }
 
   constructor({
-    nonEmpty = false,
     key,
     value,
     maxProperties,
@@ -36,12 +34,11 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
   }: {
     key: KEY
     value: VALUE
-    nonEmpty?: boolean
     minProperties?: number
     maxProperties?: number
   }) {
     super()
-    this.schema = { nonEmpty, key, value, minProperties, maxProperties }
+    this.schema = { key, value, minProperties, maxProperties }
   }
 
   public clone(): LuftRecord<KEY, VALUE> {
@@ -66,7 +63,7 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
 
   public nonEmpty(nonEmpty: boolean) {
     const clone = this.clone()
-    clone.schema.nonEmpty = nonEmpty
+    clone.schema.minProperties = nonEmpty ? 1 : 0
     return clone
   }
 
@@ -115,18 +112,6 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
         actual: keyCount,
         maxCompare: "<=",
         minCompare: ">=",
-      })
-      return { success: false }
-    }
-
-    if (this.schema.nonEmpty && Object.keys(data).length === 0) {
-      context.addIssue({
-        code: LuftErrorCodes.INVALID_LENGTH,
-        message: "Record is empty",
-        path: [...context.path],
-        actualLen: 0,
-        maxLen: undefined,
-        minLen: 0,
       })
       return { success: false }
     }

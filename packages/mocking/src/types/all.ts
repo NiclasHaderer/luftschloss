@@ -35,7 +35,7 @@ import { mockTuple } from "./tuple"
 import { mockUndefined } from "./undefined"
 import { mockUnion } from "./union"
 import { mockUUID } from "./uuid"
-import { getCustomMock } from "./register-type"
+import { getCustomMock } from "./register-custom"
 
 export const mockAll = <T extends LuftType>(validator: T, fieldName?: string): LuftInfer<T> => {
   // Null

@@ -1,6 +1,6 @@
 import { LuftValidationError } from "../validation-error"
 import { LuftNumber } from "./number"
-import { LuftRegexp } from "./regexp"
+import { LuftRegex } from "./regexp"
 import { LuftString } from "./string"
 import { LuftTuple } from "./tuple"
 
@@ -20,7 +20,7 @@ test("TupleType: clone", () => {
 test("TupleType: valid types", () => {
   const validator = new LuftTuple({ types: [new LuftNumber(), new LuftNumber(), new LuftString()] })
   expect(validator.validate([1, 2, "3"])).toEqual([1, 2, "3"])
-  const validator2 = new LuftTuple({ types: [new LuftRegexp({ regex: /\d/ }), new LuftNumber(), new LuftString()] })
+  const validator2 = new LuftTuple({ types: [new LuftRegex({ regex: /\d/ }), new LuftNumber(), new LuftString()] })
   expect(validator2.validate(["1", 2, "3"])).toEqual(["1", 2, "3"])
 })
 
@@ -30,7 +30,7 @@ test("TupleType: invalid types", () => {
   expect(() => validator.validate([1, "2"])).toThrow(LuftValidationError)
   expect(() => validator.validate(["2", "3"])).toThrow(LuftValidationError)
 
-  const validator2 = new LuftTuple({ types: [new LuftRegexp({ regex: /\d/ }), new LuftNumber(), new LuftString()] })
+  const validator2 = new LuftTuple({ types: [new LuftRegex({ regex: /\d/ }), new LuftNumber(), new LuftString()] })
   expect(() => validator2.validate(["_", 2, "3"])).toThrow(LuftValidationError)
   expect(() => validator2.validate([])).toThrow(LuftValidationError)
   expect(() => validator2.validate("hello")).toThrow(LuftValidationError)

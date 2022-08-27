@@ -57,14 +57,14 @@ export interface ObjectSchema<SCHEMA extends AllSchemas = AllSchemas> extends Co
   }
   additionalProperties?: SCHEMA
   unevaluatedProperties?: SCHEMA
+  propertyNames?: StringSchema | CommonSchema
   minProperties?: number
   maxProperties?: number
-  propertyNames?: StringSchema | boolean
 }
 
 export interface ArraySchema<SCHEMA extends AllSchemas = AllSchemas> extends CommonSchema<SCHEMA> {
   type: "array"
-  items?: SCHEMA | SCHEMA[]
+  items?: SCHEMA
   prefixItems?: SCHEMA[]
   contains?: SCHEMA
   minContains?: number
@@ -142,10 +142,11 @@ export type AllSchemas =
   | BooleanSchema
   | NullSchema
   | boolean
+  | CommonSchema
 
 /**
  * Json schema 2020-12
- *
+ *unde
  * For explanations and examples see
  * https://json-schema.org/understanding-json-schema
  * https://opis.io/json-schema/
