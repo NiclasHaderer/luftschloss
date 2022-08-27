@@ -14,23 +14,15 @@ import {
   Status,
 } from "@luftschloss/server"
 import { ApiRouter, OpenApiHandler } from "./api.router"
-import { LuftInfer, LuftNever, LuftObject, LuftType } from "@luftschloss/validation"
+import { LuftInfer, LuftObject, LuftType } from "@luftschloss/validation"
 
-export interface RouterParams<
-  URL_PARAMS extends LuftObject<Record<string, LuftType>>,
-  BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
-  RESPONSE extends LuftObject<Record<string, LuftType>>
-> {
+export interface RouterParams<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType> {
   url: URL_PARAMS
   body: BODY
   response: RESPONSE
 }
 
-export class ApiRoute<
-  URL_PARAMS extends LuftObject<Record<string, LuftType>>,
-  BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
-  RESPONSE extends LuftObject<Record<string, LuftType>>
-> {
+export class ApiRoute<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType> {
   public constructor(
     private router: ApiRouter,
     private collector: RouteCollector,
@@ -59,11 +51,7 @@ export class ApiRoute<
     return this
   }
 
-  private wrapWithOpenApi<
-    URL_PARAMS extends LuftObject<Record<string, LuftType>>,
-    BODY extends LuftObject<Record<string, LuftType>> | LuftNever,
-    RESPONSE extends LuftObject<Record<string, LuftType>>
-  >(
+  private wrapWithOpenApi<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType>(
     params: RouterParams<URL_PARAMS, BODY, RESPONSE>,
     handler: OpenApiHandler<URL_PARAMS, BODY, RESPONSE>,
     parseBody: boolean

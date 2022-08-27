@@ -18,8 +18,6 @@ import {
   LuftUnion,
 } from "./base-type"
 
-// TODO deepPartial
-
 type ExtractType<T extends Record<string, LuftType>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
 }
@@ -70,17 +68,11 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     }
   }
 
-  public extend<NEW_TYPE extends Record<string, LuftType>>(
-    object: LuftObject<NEW_TYPE>,
-    name?: string
-  ): LuftObject<T & NEW_TYPE> {
-    return this.merge(object.schema.type, name)
+  public extend<NEW_TYPE extends Record<string, LuftType>>(object: LuftObject<NEW_TYPE>): LuftObject<T & NEW_TYPE> {
+    return this.merge(object.schema.type)
   }
 
-  public merge<NEW_OBJECT extends Record<string, LuftType>>(
-    object: NEW_OBJECT,
-    name?: string
-  ): LuftObject<T & NEW_OBJECT> {
+  public merge<NEW_OBJECT extends Record<string, LuftType>>(object: NEW_OBJECT): LuftObject<T & NEW_OBJECT> {
     return new LuftObject({
       ...this.schema,
       type: {
@@ -90,12 +82,12 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     })
   }
 
-  public omit<KEY extends keyof T & string>(keys: KEY[], name?: string): LuftObject<Omit<T, KEY>> {
+  public omit<KEY extends keyof T & string>(keys: KEY[]): LuftObject<Omit<T, KEY>> {
     const keysToPick = getMissingKeys(keys, Object.keys(this.schema.type))
-    return this.pick(keysToPick, name) as LuftObject<Omit<T, KEY>>
+    return this.pick(keysToPick) as LuftObject<Omit<T, KEY>>
   }
 
-  public pick<KEY extends keyof T & string>(keys: KEY[], name?: string): LuftObject<Pick<T, KEY>> {
+  public pick<KEY extends keyof T & string>(keys: KEY[]): LuftObject<Pick<T, KEY>> {
     const finishedObject = keys.reduce((acc, key) => {
       acc[key] = this.schema.type[key].clone()
       return acc
@@ -107,7 +99,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     })
   }
 
-  public partial(name?: string): LuftObject<ObjectPartial<T>> {
+  public partial(): LuftObject<ObjectPartial<T>> {
     const type = this.schema.type
     const newType = Object.keys(this.schema.type).reduce((acc, key) => {
       acc[key] = type[key].optional()
