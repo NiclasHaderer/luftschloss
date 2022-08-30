@@ -71,13 +71,12 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     data: unknown,
     context: ParsingContext
   ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
-    return this._validate(data, context, "_coerce")
+    return this._validate(data, context)
   }
 
   protected _validate(
     data: unknown,
-    context: ParsingContext,
-    mode: "_validate" | "_coerce" = "_validate"
+    context: ParsingContext
   ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
     if (typeof data !== "object" || data === null) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
@@ -120,8 +119,8 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     let failAtEnd = false
     for (const [key, value] of Object.entries(data)) {
       context.stepInto(key)
-      const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>)[mode](key, context)
-      const parsedValue = (this.schema.value as unknown as InternalLuftBaseType<unknown>)[mode](value, context)
+      const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>).run(key, context)
+      const parsedValue = (this.schema.value as unknown as InternalLuftBaseType<unknown>).run(value, context)
       context.stepOut()
 
       if (parsedKey.success && parsedValue.success) {

@@ -14,7 +14,15 @@ import {
   Status,
 } from "@luftschloss/server"
 import { ApiRouter } from "./api.router"
-import { LuftInfer, LuftObject } from "@luftschloss/validation"
+import {
+  LuftArray,
+  LuftInfer,
+  LuftObject,
+  LuftTuple,
+  LuftType,
+  LuftUnion,
+  ValidationHook,
+} from "@luftschloss/validation"
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type OpenApiHandler<
@@ -59,13 +67,16 @@ export class ApiRoute<
     private method: HTTP_METHODS | HTTP_METHODS[] | "*",
     private url: string,
     private validators: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
-  ) {}
+  ) {
+    this.validators.query = extractSingleElementFromList(this.validators.query)
+    this.validators.headers = extractSingleElementFromList(this.validators.headers)
+  }
 
   public handle(callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ApiRouter {
     if (Array.isArray(this.method)) {
-      this.method.forEach(m => this.collector.add(this.url, m, this.wrapWithOpenApi(this.validators, callHandler)))
+      this.method.forEach(m => this.collector.add(this.url, m, this.wrapWithOpenApi(callHandler)))
     } else {
-      this.collector.add(this.url, this.method, this.wrapWithOpenApi(this.validators, callHandler))
+      this.collector.add(this.url, this.method, this.wrapWithOpenApi(callHandler))
     }
     return this.router
   }
@@ -76,18 +87,26 @@ export class ApiRoute<
     return this
   }
 
-  private wrapWithOpenApi(
-    params: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>,
-    handler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
-  ): ROUTE_HANDLER {
+  private wrapWithOpenApi(handler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ROUTE_HANDLER {
     return async (request: LRequest, response: LResponse): Promise<void> => {
-      const parsedPath = await parseAndError(params.path, () => request.path, "path")
-      // TODO add a pre validation function to the types which will extract a query param (if it is alone into a single one)
-      const parsedQuery = await parseAndError(params.query, () => request.url.searchParams.encode(), "query")
-      const parsedBody = await parseAndError(params.body, () => request.json(), "body")
-      // TODO add a pre validation function to the types which will extract a query param (if it is alone into a single one)
-      const parsedHeaders = await parseAndError(params.headers, () => params.headers, "headers")
+      // Path
+      const parsedPath = await parseAndError(this.validators.path, () => request.pathParams(), "path")
 
+      // Query
+      const parsedQuery = await parseAndError(this.validators.query, () => request.url.searchParams.encode(), "query")
+
+      // Body
+      const ignoreBody = this.method === "GET" || this.method === "HEAD"
+      const parsedBody = await parseAndError<BODY>(
+        ignoreBody ? (undefined as BODY) : this.validators.body,
+        () => request.json(),
+        "body"
+      )
+
+      // Headers
+      const parsedHeaders = await parseAndError(this.validators.headers, () => request.headers.encode(), "headers")
+
+      // Response
       const result = await handler({
         path: parsedPath,
         body: parsedBody,
@@ -96,12 +115,12 @@ export class ApiRoute<
       })
 
       const parsedResult = await parseAndError(
-        params.response,
+        this.validators.response,
         () => result,
         "response",
         Status.HTTP_500_INTERNAL_SERVER_ERROR
       )
-      parsedResult ? response.json(parsedResult) : response.empty()
+      parsedResult ? await response.json(parsedResult).end() : await response.empty().end()
     }
   }
 }
@@ -116,7 +135,27 @@ const parseAndError = async <T extends LuftObject<any> | undefined>(
   const data = await getData()
   const parsedData = validator.coerceSave(data)
   if (!parsedData.success) {
-    throw new HTTPException(statusCode, { errors: parsedData.issues, location: location })
+    throw new HTTPException(statusCode, { issues: parsedData.issues, location: location })
   }
   return parsedData.data as T extends LuftObject<any> ? LuftInfer<T> : undefined
+}
+
+const extractSingleElementFromList = <T extends LuftObject<Record<string, LuftType>> | undefined>(validator: T): T => {
+  if (validator === undefined) return undefined as T
+
+  const extract: ValidationHook<unknown, unknown, unknown> = (value: unknown) => {
+    if (Array.isArray(value) && value.length === 1) return { action: "continue", data: value[0] }
+    return { action: "continue", data: value }
+  }
+
+  const applyExtract = (validators: LuftType[]) => {
+    for (const v of validators) {
+      if (v instanceof LuftUnion) applyExtract(v.schema.types)
+      else if (!(v instanceof LuftArray) && !(v instanceof LuftTuple)) v.beforeHook(extract as any, false)
+    }
+  }
+
+  const copy = validator.clone()
+  applyExtract(Object.values(Object.values(copy.schema.type)))
+  return copy as T
 }

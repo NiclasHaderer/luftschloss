@@ -155,14 +155,10 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
         return { success: false }
       }
     }
-    return this._validate(data, context, "_coerce")
+    return this._validate(data, context)
   }
 
-  protected override _validate(
-    data: unknown,
-    context: ParsingContext,
-    mode: "_coerce" | "_validate" = "_validate"
-  ): InternalParsingResult<ExtractType<T>> {
+  protected override _validate(data: unknown, context: ParsingContext): InternalParsingResult<ExtractType<T>> {
     // Wrong type
     if (typeof data !== "object" || data === null) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
@@ -218,7 +214,10 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
 
       context.stepInto(key)
       // Validate the retrieved value
-      const result = (validator as InternalLuftBaseType<unknown>)[mode]((data as Record<string, unknown>)[key], context)
+      const result = (validator as unknown as InternalLuftBaseType<unknown>).run(
+        (data as Record<string, unknown>)[key],
+        context
+      )
       context.stepOut()
 
       if (result.success) {

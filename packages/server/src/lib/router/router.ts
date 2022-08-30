@@ -20,6 +20,7 @@ export type ResolvedRoute = {
   middlewares: Readonly<Middleware>[]
   executor: ROUTE_HANDLER
   status: LookupResultStatus
+  pathParams: Record<string, unknown>
 }
 
 export interface Router {

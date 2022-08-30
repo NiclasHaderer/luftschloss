@@ -7,7 +7,7 @@
 import { Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaults } from "@luftschloss/common"
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
-import { MountingOptions, Router } from "../router"
+import { MountingOptions, ResolvedRoute, Router } from "../router"
 import { RequestImpl } from "./request-impl"
 import { ResponseImpl } from "./response-impl"
 import { ReadonlyMiddlewares } from "../middleware"
@@ -70,14 +70,11 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       const request = new RequestImpl(req)
       const response = new ResponseImpl(res, request)
       const route = this.resolveRoute(request.path, request.method)
+      request.setPathParams(route.pathParams)
       await this.executeRequest(request, response, route)
     }
 
-    private async executeRequest(
-      request: RequestImpl,
-      response: ResponseImpl,
-      route: ReturnType<Router["resolveRoute"]>
-    ) {
+    private async executeRequest(request: RequestImpl, response: ResponseImpl, route: ResolvedRoute) {
       const middlewareLength = route.middlewares.length
       const next = async (
         request: LRequest,

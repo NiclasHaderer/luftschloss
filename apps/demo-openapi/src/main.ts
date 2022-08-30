@@ -11,10 +11,9 @@ const main = async () => {
       response: luft.object({
         hello: luft.string(),
       }),
-      headers: undefined,
-      path: undefined,
+      path: luft.object({}),
     })
-    .handle(({ query }) => {
+    .handle(({ query, path, body, headers }) => {
       return query
     })
   server.mount(swaggerRouter())

@@ -85,13 +85,13 @@ test("BaseType: default", () => {
 
 test("BaseType: adding validator", () => {
   const validator = new LuftString()
-  let newValidator = validator.beforeValidate(value => ({ action: "continue", data: value }))
+  let newValidator = validator.beforeValidateHook(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.beforeCoerce(value => ({ action: "continue", data: value }))
+  newValidator = validator.beforeCoerceHook(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.afterValidate(value => ({ action: "continue", data: value }))
+  newValidator = validator.afterValidateHook(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
-  newValidator = validator.afterCoerce(value => ({ action: "continue", data: value }))
+  newValidator = validator.afterCoerceHook(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
   newValidator = validator.beforeHook(value => ({ action: "continue", data: value }))
   expect(validator).not.toBe(newValidator)
@@ -106,13 +106,13 @@ test("BaseType: or", () => {
 })
 
 test("BaseType: before validate hook", () => {
-  const alwaysFalse = new LuftString().beforeValidate((value, context) => {
+  const alwaysFalse = new LuftString().beforeValidateHook((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
     return { action: "abort" }
   })
   expect(alwaysFalse.validateSave("hello").success).toBe(false)
 
-  const addWorld = new LuftString().beforeValidate((value, context) => {
+  const addWorld = new LuftString().beforeValidateHook((value, context) => {
     return { action: "continue", data: value + " world" }
   })
   expect(addWorld.clone().validate("hello")).toBe("hello world")
@@ -120,13 +120,13 @@ test("BaseType: before validate hook", () => {
 })
 
 test("BaseType: before coerce hook", () => {
-  const alwaysFalse = new LuftString().beforeCoerce((value, context) => {
+  const alwaysFalse = new LuftString().beforeCoerceHook((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
     return { action: "abort" }
   })
   expect(alwaysFalse.coerceSave("hello").success).toBe(false)
 
-  const addWorld = new LuftString().beforeCoerce((value, context) => {
+  const addWorld = new LuftString().beforeCoerceHook((value, context) => {
     return { action: "continue", data: value + " world" }
   })
   expect(addWorld.coerce("hello")).toBe("hello world")
@@ -134,12 +134,12 @@ test("BaseType: before coerce hook", () => {
 })
 
 test("BaseType: invalid hooks", () => {
-  const invalidFalse = new LuftString().beforeValidate((value, context) => {
+  const invalidFalse = new LuftString().beforeValidateHook((value, context) => {
     return { action: "abort" }
   })
   expect(() => invalidFalse.validate("hello")).toThrow(LuftValidationUsageError)
 
-  const invalidTrue = new LuftString().beforeValidate((value, context) => {
+  const invalidTrue = new LuftString().beforeValidateHook((value, context) => {
     context.addIssue(createInvalidTypeIssue(value, ["string"], context))
     return { action: "continue", data: value }
   })

@@ -68,14 +68,12 @@ export type ValidationHook<ThisArg, VALUE, CONTINUE, BREAK = CONTINUE> = (
   value: VALUE,
   context: ParsingContext,
   // TODO improve validator typ in ValidationHook
-  validation: LuftType
+  validator: LuftType
 ) => HookResult<CONTINUE, BREAK>
 
 export type InternalLuftBaseType<OUT_TYPE> = {
-  _validate(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
-
-  _coerce(data: unknown, context: ParsingContext): InternalParsingResult<OUT_TYPE>
-} & LuftBaseType<OUT_TYPE>
+  run(data: unknown, mode: ParsingContext): ParsingResult<OUT_TYPE>
+} & Omit<LuftBaseType<OUT_TYPE>, "run">
 
 export abstract class LuftBaseType<RETURN_TYPE> {
   public abstract readonly schema: Record<string, unknown>
@@ -137,13 +135,12 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   }
 
   public validateSave(data: unknown): ParsingResult<RETURN_TYPE> {
-    return this.run(data, "validate")
+    const context = new ParsingContext("validate")
+    return this.run(data, context)
   }
 
-  private run(data: unknown, mode: "validate" | "coerce") {
-    const context = new ParsingContext(mode)
-
-    const hookAccess = ({ validate: "Validate", coerce: "Coerce" } as const)[mode]
+  private run(data: unknown, context: ParsingContext): ParsingResult<RETURN_TYPE> {
+    const hookAccess = ({ validate: "Validate", coerce: "Coerce" } as const)[context.mode]
     for (const beforeHook of this.validationStorage[`before${hookAccess}Hooks`]) {
       const result = beforeHook.call(this, data, context, this)
 
@@ -156,7 +153,7 @@ export abstract class LuftBaseType<RETURN_TYPE> {
       }
     }
 
-    const validationResult = this[`_${mode}`](data, context)
+    const validationResult = this[`_${context.mode}`](data, context)
     if (!validationResult.success) return this.checkDataAndReturn(context, validationResult)
 
     for (const afterHook of this.validationStorage[`after${hookAccess}Hooks`]) {
@@ -182,7 +179,8 @@ export abstract class LuftBaseType<RETURN_TYPE> {
   }
 
   public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
-    return this.run(data, "coerce")
+    const context = new ParsingContext("validate")
+    return this.run(data, context)
   }
 
   private checkDataAndReturn(
@@ -241,52 +239,39 @@ export abstract class LuftBaseType<RETURN_TYPE> {
     return copy.beforeHook(returnDefault) as this
   }
 
-  public beforeHook(...callbacks: ValidationHook<this, unknown, unknown, RETURN_TYPE>[]): this {
-    return this.beforeValidate(...callbacks).beforeCoerce(...callbacks)
+  public beforeHook(callback: ValidationHook<this, unknown, unknown, RETURN_TYPE>, clone = true): this {
+    return this.beforeValidateHook(callback, clone).beforeCoerceHook(callback, clone)
   }
 
-  public beforeValidate(...callbacks: ValidationHook<this, unknown, unknown, RETURN_TYPE>[]): this {
-    const copy = this.clone()
-
-    for (const cb of callbacks) {
-      const hasCb = copy.validationStorage.beforeValidateHooks.includes(cb)
-      if (!hasCb) copy.validationStorage.beforeValidateHooks.push(cb)
-    }
-
+  public beforeValidateHook(callback: ValidationHook<this, unknown, unknown, RETURN_TYPE>, clone = true): this {
+    const copy = clone ? this.clone() : this
+    const hasCb = copy.validationStorage.beforeValidateHooks.includes(callback)
+    if (!hasCb) copy.validationStorage.beforeValidateHooks.push(callback)
     return copy as this
   }
 
-  public beforeCoerce(...callbacks: ValidationHook<this, unknown, unknown, RETURN_TYPE>[]): this {
-    const copy = this.clone()
-
-    for (const cb of callbacks) {
-      const hasCb = copy.validationStorage.beforeCoerceHooks.includes(cb)
-      if (!hasCb) copy.validationStorage.beforeCoerceHooks.push(cb)
-    }
+  public beforeCoerceHook(callback: ValidationHook<this, unknown, unknown, RETURN_TYPE>, clone = true): this {
+    const copy = clone ? this.clone() : this
+    const hasCb = copy.validationStorage.beforeCoerceHooks.includes(callback)
+    if (!hasCb) copy.validationStorage.beforeCoerceHooks.push(callback)
     return copy as this
   }
 
-  public afterHook(...callbacks: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>[]): this {
-    return this.afterValidate(...callbacks).afterCoerce(...callbacks)
+  public afterHook(callback: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>, clone = true): this {
+    return this.afterValidateHook(callback, clone).afterCoerceHook(callback, clone)
   }
 
-  public afterValidate(...callbacks: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>[]): this {
-    const copy = this.clone()
-
-    for (const cb of callbacks) {
-      const hasCb = copy.validationStorage.afterValidateHooks.includes(cb)
-      if (!hasCb) copy.validationStorage.afterValidateHooks.push(cb)
-    }
+  public afterValidateHook(callback: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>, clone = true): this {
+    const copy = clone ? this.clone() : this
+    const hasCb = copy.validationStorage.afterValidateHooks.includes(callback)
+    if (!hasCb) copy.validationStorage.afterValidateHooks.push(callback)
     return copy as this
   }
 
-  public afterCoerce(...callbacks: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>[]): this {
-    const copy = this.clone()
-
-    for (const cb of callbacks) {
-      const hasCb = copy.validationStorage.afterCoerceHooks.includes(cb)
-      if (!hasCb) copy.validationStorage.afterCoerceHooks.push(cb)
-    }
+  public afterCoerceHook(callback: ValidationHook<this, RETURN_TYPE, RETURN_TYPE>, clone = true): this {
+    const copy = clone ? this.clone() : this
+    const hasCb = copy.validationStorage.afterCoerceHooks.includes(callback)
+    if (!hasCb) copy.validationStorage.afterCoerceHooks.push(callback)
     return copy as this
   }
 }
@@ -358,7 +343,7 @@ export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftBaseType<L
     const newErrors: ValidationError[] = []
     for (const validator of validators) {
       const customContext = context.cloneEmpty()
-      const result = validator[mode](data, customContext)
+      const result = validator.run(data, customContext)
       if (result.success) {
         return result
       } else {

@@ -257,7 +257,7 @@ export class RouterBase implements Router {
       return { ...route, middlewares: [...this.middlewares] }
     } else if (route.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
       // Save the wrong method here
-      wrongMethod = { ...route, middlewares: [...this.middlewares] }
+      wrongMethod = { ...route, middlewares: [...this.middlewares], pathParams: {} }
     } else {
       // Iterate over the sub routes and call the resolveRoute method in them
       for (const { router } of this.subRouters) {
@@ -296,6 +296,7 @@ export class RouterBase implements Router {
       executor: () => {
         throw new HTTPException(Status.HTTP_404_NOT_FOUND)
       },
+      pathParams: {},
     }
   }
 }

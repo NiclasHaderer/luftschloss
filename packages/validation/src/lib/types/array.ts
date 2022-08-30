@@ -98,14 +98,10 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
       }
     }
 
-    return this._validate(data, context, "_coerce")
+    return this._validate(data, context)
   }
 
-  protected _validate(
-    data: unknown,
-    context: ParsingContext,
-    mode: "_coerce" | "_validate" = "_validate"
-  ): InternalParsingResult<LuftInfer<ARRAY_TYPE>[]> {
+  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<ARRAY_TYPE>[]> {
     // Check if the data is not an array
     if (!Array.isArray(data)) {
       // The data is not an array, so return an error
@@ -168,10 +164,7 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInf
     // Check every element of the array for the right type
     for (let i = 0; i < (data as unknown[]).length; ++i) {
       context.stepInto(i.toString())
-      const result = (this.schema.type as unknown as InternalLuftBaseType<unknown>)[mode](
-        (data as unknown[])[i],
-        context
-      )
+      const result = (this.schema.type as unknown as InternalLuftBaseType<unknown>).run((data as unknown[])[i], context)
       context.stepOut()
       if (result.success) {
         // Save the returned data, because there mey have been some coerced values
