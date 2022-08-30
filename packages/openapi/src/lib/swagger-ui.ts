@@ -19,7 +19,7 @@ export class SwaggerRouter extends RouterBase {
     return this._server as ApiServer
   }
 
-  @ByLazy<string, SwaggerRouter>(self => JSON.stringify(self.server!.openapi))
+  @ByLazy<string, SwaggerRouter>(self => JSON.stringify(self.server!.openApi))
   private json!: string
 
   public constructor(private docsUrl: string, private openApiUrl: string) {
