@@ -5,10 +5,9 @@
  */
 
 import { jsonParser } from "@luftschloss/body"
-import * as OpenApi from "@luftschloss/openapi-schema"
 import { HTTP_METHODS, RouterBase } from "@luftschloss/server"
-import { ApiRoute, RouterParams } from "./api.route"
-import { LuftObject } from "@luftschloss/validation"
+import { LuftObject, LuftType } from "@luftschloss/validation"
+import { ApiRoute, CollectedRoute, RouterParams } from "./api.route"
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -21,10 +20,13 @@ const EMPTY_OBJECT = {
 }
 
 export class ApiRouter extends RouterBase {
-  public get apiRoutes(): OpenApi.Paths {
-    // TODO fill in handle method
-    return {}
-  }
+  public readonly apiRoutes: CollectedRoute<
+    LuftObject<Record<string, LuftType>> | undefined,
+    LuftObject<Record<string, LuftType>> | undefined,
+    LuftObject<Record<string, LuftType>> | undefined,
+    LuftObject<Record<string, LuftType>> | undefined,
+    LuftObject<Record<string, LuftType>> | undefined
+  >[] = []
 
   public handle<
     PATH extends LuftObject<any> | undefined = undefined,
@@ -41,10 +43,13 @@ export class ApiRouter extends RouterBase {
       throw new Error("Router has been locked. You cannot add any new routes")
     }
 
-    return new ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>(this, this.routeCollector, method, url, {
+    const route = new ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>(this, this.routeCollector, method, url, {
       ...EMPTY_OBJECT,
       ...params,
     } as RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>)
+
+    void route.onComplete("listenerAttached").then(result => this.apiRoutes.push(result))
+    return route
   }
 
   public delete<

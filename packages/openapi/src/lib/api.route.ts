@@ -4,6 +4,7 @@
  * MIT Licensed
  */
 
+import { GenericEventEmitter } from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -13,7 +14,6 @@ import {
   RouteCollector,
   Status,
 } from "@luftschloss/server"
-import { ApiRouter } from "./api.router"
 import {
   LuftArray,
   LuftInfer,
@@ -23,6 +23,7 @@ import {
   LuftUnion,
   ValidationHook,
 } from "@luftschloss/validation"
+import { ApiRouter } from "./api.router"
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type OpenApiHandler<
@@ -54,13 +55,27 @@ export interface RouterParams<
   response: RESPONSE
 }
 
+export type CollectedRoute<
+  PATH extends LuftObject<any> | undefined,
+  QUERY extends LuftObject<any> | undefined,
+  BODY extends LuftObject<any> | undefined,
+  HEADERS extends LuftObject<any> | undefined,
+  RESPONSE extends LuftObject<any> | undefined
+> = {
+  url: string
+  method: HTTP_METHODS[]
+  validator: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+}
+
 export class ApiRoute<
   PATH extends LuftObject<any> | undefined,
   QUERY extends LuftObject<any> | undefined,
   BODY extends LuftObject<any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
   RESPONSE extends LuftObject<any> | undefined
-> {
+> extends GenericEventEmitter<{
+  listenerAttached: CollectedRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+}> {
   public constructor(
     private router: ApiRouter,
     private collector: RouteCollector,
@@ -68,6 +83,7 @@ export class ApiRoute<
     private url: string,
     private validators: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ) {
+    super()
     this.validators.query = extractSingleElementFromList(this.validators.query)
     this.validators.headers = extractSingleElementFromList(this.validators.headers)
   }
@@ -78,6 +94,15 @@ export class ApiRoute<
     } else {
       this.collector.add(this.url, this.method, this.wrapWithOpenApi(callHandler))
     }
+    this.complete("listenerAttached", {
+      url: this.url,
+      method: Array.isArray(this.method)
+        ? this.method
+        : this.method === "*"
+        ? Object.values(HTTP_METHODS)
+        : [this.method],
+      validator: this.validators,
+    })
     return this.router
   }
 
@@ -150,8 +175,9 @@ const extractSingleElementFromList = <T extends LuftObject<Record<string, LuftTy
 
   const applyExtract = (validators: LuftType[]) => {
     for (const v of validators) {
-      if (v instanceof LuftUnion) applyExtract(v.schema.types)
-      else if (!(v instanceof LuftArray) && !(v instanceof LuftTuple)) v.beforeHook(extract as any, false)
+      if (v instanceof LuftUnion) {
+        applyExtract(v.schema.types)
+      } else if (!(v instanceof LuftArray) && !(v instanceof LuftTuple)) v.beforeHook(extract as any, false)
     }
   }
 

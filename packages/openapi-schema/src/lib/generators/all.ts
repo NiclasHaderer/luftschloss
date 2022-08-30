@@ -108,5 +108,9 @@ export const generateJsonSchema = (validator: LuftType): AllSchemas => {
     return customMock(validator)
   }
 
-  throw new Error(`Could not find a faker for ${getTypeOf(validator)} . Add one yourself with \`registerMock\``)
+  throw new Error(
+    `Could not find schema generator for ${getTypeOf(
+      validator
+    )} . Add one yourself with \`registerJsonSchemaGenerator\``
+  )
 }

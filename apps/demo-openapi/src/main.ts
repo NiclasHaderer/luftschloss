@@ -16,6 +16,23 @@ const main = async () => {
     .handle(({ query, path, body, headers }) => {
       return query
     })
+  server
+    .post("", {
+      query: luft.object({
+        hello: luft.string(),
+      }),
+      response: luft.object({
+        hello: luft.string(),
+      }),
+      body: luft.object({
+        hello: luft.string(),
+        tes: luft.array(luft.number()),
+      }),
+      path: luft.object({}),
+    })
+    .handle(({ query, path, body, headers }) => {
+      return query
+    })
   server.mount(swaggerRouter())
   server.listen()
 }
