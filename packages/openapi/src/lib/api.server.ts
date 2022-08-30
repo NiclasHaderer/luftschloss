@@ -3,8 +3,8 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { OpenApiSchema } from "@luftschloss/openapi-schema"
-import { normalizePath, saveObject, withDefaults } from "@luftschloss/common"
+import { ExternalDocumentation, Info, OpenApiSchema, Server } from "@luftschloss/openapi-schema"
+import { normalizePath } from "@luftschloss/common"
 import {
   DefaultErrorHandler,
   errorMiddleware,
@@ -22,19 +22,17 @@ import {
 import { ApiRouter } from "./api.router"
 import { jsonParser } from "@luftschloss/body"
 
-type ApiServerArgs = { generateOpenApi: boolean }
+type ApiServerArgs = {
+  openApi: {
+    info: Info
+    servers?: Server[]
+    externalDocs?: ExternalDocumentation
+  }
+  generateOpenApi?: boolean
+}
 
 export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {
-  // TODO
-  public openapi: OpenApiSchema = {
-    info: {
-      title: "My fancy title",
-      version: "0.0.0",
-    },
-    openapi: "3.1.0",
-  }
-
-  public constructor(private generateOpenApi: boolean) {
+  public constructor(private generateOpenApi: boolean, public readonly openApi: OpenApiSchema) {
     super()
     this.on("routerMerged", ({ router, basePath }) => {
       if (router instanceof ApiRouter && this.generateOpenApi) {
@@ -46,14 +44,13 @@ export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {
   private collectOpenApiDefinitions({ router, basePath }: { router: ApiRouter; basePath: string }) {
     for (const [apiPath, pathItemObject] of Object.entries(router.apiRoutes)) {
       const path = normalizePath(`${basePath}/${apiPath}`)
-      // TODO
+      // const schema = generateJsonSchema()
     }
   }
 }
 
-export const apiServer = (args: Partial<ApiServerArgs> = saveObject()) => {
-  const { generateOpenApi } = withDefaults<ApiServerArgs>(args, { generateOpenApi: true })
-  const server = new ApiServer(generateOpenApi)
+export const apiServer = ({ openApi, generateOpenApi = true }: ApiServerArgs) => {
+  const server = new ApiServer(generateOpenApi, { openapi: "3.1.0", ...openApi })
   server
     .pipe(loggerMiddleware())
     .pipe(errorMiddleware({ ...DefaultErrorHandler }))

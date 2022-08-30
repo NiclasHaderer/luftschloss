@@ -26,7 +26,7 @@ export interface LResponse {
 
   empty(): this
 
-  json(object: object): this
+  json(object: object | string): this
 
   redirect(url: string | URL): this
 

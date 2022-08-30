@@ -58,9 +58,13 @@ export class ResponseImpl implements LResponse {
     return this
   }
 
-  public json(object: object): this {
+  public json(object: object | string): this {
     this.headers.append("Content-Type", "application/json")
-    this.data = JSON.stringify(object)
+    if (typeof object === "string") {
+      this.data = object
+    } else {
+      this.data = JSON.stringify(object)
+    }
     return this
   }
 

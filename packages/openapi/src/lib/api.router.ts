@@ -8,77 +8,119 @@ import { jsonParser } from "@luftschloss/body"
 import * as OpenApi from "@luftschloss/openapi-schema"
 import { HTTP_METHODS, RouterBase } from "@luftschloss/server"
 import { ApiRoute, RouterParams } from "./api.route"
-import { luft, LuftInfer, LuftNever, LuftObject, LuftType } from "@luftschloss/validation"
+import { LuftObject } from "@luftschloss/validation"
 
-export type OpenApiHandler<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType> = (
-  url: LuftInfer<URL_PARAMS>,
-  body: LuftInfer<BODY>
-) => LuftInfer<RESPONSE> | Promise<LuftInfer<RESPONSE>>
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export class ApiRouter extends RouterBase {
   public get apiRoutes(): OpenApi.Paths {
     // TODO fill in handle method
     return {}
   }
 
-  public handle<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType>(
+  public handle<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    BODY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     method: HTTP_METHODS | HTTP_METHODS[] | "*",
     url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+    params: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot add any new routes")
     }
 
-    return new ApiRoute<URL_PARAMS, BODY, RESPONSE>(this, this.routeCollector, method, url, params)
+    return new ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>(this, this.routeCollector, method, url, params)
   }
 
-  public delete<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType>(
+  public delete<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    BODY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+    params: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     return this.handle("DELETE", url, params)
   }
 
-  public get<URL_PARAMS extends LuftObject<any>, RESPONSE extends LuftType>(
+  public get<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     url: string,
-    params: Omit<RouterParams<URL_PARAMS, LuftNever, RESPONSE>, "body">
-  ): ApiRoute<URL_PARAMS, LuftNever, RESPONSE> {
-    return this.handle("GET", url, { ...params, body: luft.never() })
+    params: Omit<RouterParams<PATH, QUERY, undefined, HEADERS, RESPONSE>, "body">
+  ): ApiRoute<PATH, QUERY, undefined, HEADERS, RESPONSE> {
+    return this.handle("GET", url, { ...params, body: undefined })
   }
 
-  public head<URL_PARAMS extends LuftObject<any>, RESPONSE extends LuftType>(
+  public head<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     url: string,
-    params: Omit<RouterParams<URL_PARAMS, LuftNever, RESPONSE>, "body">
-  ): ApiRoute<URL_PARAMS, LuftNever, RESPONSE> {
-    return this.handle("HEAD", url, { ...params, body: luft.never() })
+    params: Omit<RouterParams<PATH, QUERY, undefined, HEADERS, RESPONSE>, "body">
+  ): ApiRoute<PATH, QUERY, undefined, HEADERS, RESPONSE> {
+    return this.handle("HEAD", url, { ...params, body: undefined })
   }
 
-  public patch<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType>(
+  public patch<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    BODY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+    params: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     return this.handle("PATCH", url, params)
   }
 
-  public options<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType>(
+  public options<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    BODY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+    params: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     return this.handle("OPTIONS", url, params)
   }
 
-  public post<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType>(
+  public post<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    BODY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+    params: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     return this.handle("POST", url, params)
   }
 
-  public put<URL_PARAMS extends LuftObject<any>, BODY extends LuftType, RESPONSE extends LuftType>(
+  public put<
+    PATH extends LuftObject<any> | undefined,
+    QUERY extends LuftObject<any> | undefined,
+    BODY extends LuftObject<any> | undefined,
+    HEADERS extends LuftObject<any> | undefined,
+    RESPONSE extends LuftObject<any> | undefined
+  >(
     url: string,
-    params: RouterParams<URL_PARAMS, BODY, RESPONSE>
-  ): ApiRoute<URL_PARAMS, BODY, RESPONSE> {
+    params: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     return this.handle("PUT", url, params)
   }
 }

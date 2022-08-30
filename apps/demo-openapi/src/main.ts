@@ -5,7 +5,7 @@ const main = async () => {
   const server = apiServer()
   server
     .get("", {
-      url: luft.object({
+      query: luft.object({
         hello: luft.string(),
       }),
       response: luft.object({
