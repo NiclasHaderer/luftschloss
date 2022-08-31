@@ -20,13 +20,7 @@ const EMPTY_OBJECT = {
 }
 
 export class ApiRouter extends RouterBase {
-  public readonly apiRoutes: CollectedRoute<
-    LuftObject<Record<string, LuftType>> | undefined,
-    LuftObject<Record<string, LuftType>> | undefined,
-    LuftObject<Record<string, LuftType>> | undefined,
-    LuftObject<Record<string, LuftType>> | undefined,
-    LuftObject<Record<string, LuftType>> | undefined
-  >[] = []
+  public readonly apiRoutes: CollectedRoute[] = []
 
   public handle<
     PATH extends LuftObject<any> | undefined = undefined,

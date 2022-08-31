@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-export const normalizePath = (url: string): string => {
+export const normalizePath = (url: string): `/${string}` => {
   url = `/${url}/`
   // Replace // with /
-  return url.replaceAll(/\/+/g, "/")
+  return url.replaceAll(/\/+/g, "/") as `/${string}`
 }
 
 /**

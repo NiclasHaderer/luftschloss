@@ -1,8 +1,8 @@
-import { apiServer, swaggerRouter } from "@luftschloss/openapi"
+import { apiServer, openapiElementsRouter } from "@luftschloss/openapi"
 import { luft } from "@luftschloss/validation"
 
 const main = async () => {
-  const server = apiServer({ openApi: { info: { title: "Hello world", version: "0.0.0" } } })
+  const server = apiServer()
   server
     .get("", {
       query: luft.object({
@@ -13,9 +13,8 @@ const main = async () => {
       }),
       path: luft.object({}),
     })
-    .handle(({ query, path, body, headers }) => {
-      return query
-    })
+    .handle(({ query }) => query)
+
   server
     .post("", {
       query: luft.object({
@@ -30,10 +29,9 @@ const main = async () => {
       }),
       path: luft.object({}),
     })
-    .handle(({ query, path, body, headers }) => {
-      return query
-    })
-  server.mount(swaggerRouter())
+    .handle(({ query }) => query)
+
+  server.mount(openapiElementsRouter({ openApi: { info: { title: "Hello world", version: "0.0.0" } } }))
   server.listen()
 }
 main()

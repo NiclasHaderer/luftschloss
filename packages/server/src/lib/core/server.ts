@@ -21,9 +21,9 @@ class ServerImpl extends withServerBase(DefaultRouter) {}
 export const defaultServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INTEGER } = {}): ServerBase &
   DefaultRouter => {
   const server = new ServerImpl()
-
   server.raw.setTimeout(timeout)
   server.raw.maxConnections = maxConnections
+
   server
     .pipe(loggerMiddleware())
     .pipe(errorMiddleware({ ...DefaultErrorHandler }))

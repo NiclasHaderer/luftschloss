@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { GenericEventEmitter } from "@luftschloss/common"
+import { GenericEventEmitter, normalizePath } from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -56,14 +56,14 @@ export interface RouterParams<
 }
 
 export type CollectedRoute<
-  PATH extends LuftObject<any> | undefined,
-  QUERY extends LuftObject<any> | undefined,
-  BODY extends LuftObject<any> | undefined,
-  HEADERS extends LuftObject<any> | undefined,
-  RESPONSE extends LuftObject<any> | undefined
+  PATH extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
+  QUERY extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
+  BODY extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
+  HEADERS extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
+  RESPONSE extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined
 > = {
-  url: string
-  method: HTTP_METHODS[]
+  url: `/${string}`
+  method: HTTP_METHODS
   validator: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
 }
 
@@ -74,35 +74,37 @@ export class ApiRoute<
   HEADERS extends LuftObject<any> | undefined,
   RESPONSE extends LuftObject<any> | undefined
 > extends GenericEventEmitter<{
-  listenerAttached: CollectedRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  listenerAttached: CollectedRoute
 }> {
+  private readonly methods: HTTP_METHODS[]
+
   public constructor(
     private router: ApiRouter,
     private collector: RouteCollector,
-    private method: HTTP_METHODS | HTTP_METHODS[] | "*",
+    method: HTTP_METHODS | HTTP_METHODS[] | "*",
     private url: string,
     private validators: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ) {
     super()
+    this.methods = Array.isArray(method) ? method : method === "*" ? Object.values(HTTP_METHODS) : [method]
     this.validators.query = extractSingleElementFromList(this.validators.query)
     this.validators.headers = extractSingleElementFromList(this.validators.headers)
   }
 
   public handle(callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ApiRouter {
-    if (Array.isArray(this.method)) {
-      this.method.forEach(m => this.collector.add(this.url, m, this.wrapWithOpenApi(callHandler)))
-    } else {
-      this.collector.add(this.url, this.method, this.wrapWithOpenApi(callHandler))
+    this.methods.forEach(m => this.collector.add(this.url, m, this.wrapWithOpenApi(callHandler)))
+
+    for (const method of this.methods) {
+      this.complete("listenerAttached", {
+        url: normalizePath(this.url),
+        method: method,
+        validator: {
+          ...this.validators,
+          body: method === "GET" || method === "HEAD" ? undefined : this.validators.body,
+        },
+      })
     }
-    this.complete("listenerAttached", {
-      url: this.url,
-      method: Array.isArray(this.method)
-        ? this.method
-        : this.method === "*"
-        ? Object.values(HTTP_METHODS)
-        : [this.method],
-      validator: this.validators,
-    })
+
     return this.router
   }
 
@@ -121,7 +123,7 @@ export class ApiRoute<
       const parsedQuery = await parseAndError(this.validators.query, () => request.url.searchParams.encode(), "query")
 
       // Body
-      const ignoreBody = this.method === "GET" || this.method === "HEAD"
+      const ignoreBody = request.method === "GET" || request.method === "HEAD"
       const parsedBody = await parseAndError<BODY>(
         ignoreBody ? (undefined as BODY) : this.validators.body,
         () => request.json(),
