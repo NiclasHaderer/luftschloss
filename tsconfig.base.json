@@ -7,7 +7,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "importHelpers": true,
+    "importHelpers": false,
     "target": "ES2021",
     "module": "esnext",
     "lib": ["ES2021"],
