@@ -6,7 +6,7 @@
 
 import { jsonParser } from "@luftschloss/body"
 import { HTTP_METHODS, RouterBase } from "@luftschloss/server"
-import { LuftObject, LuftType } from "@luftschloss/validation"
+import { LuftObject } from "@luftschloss/validation"
 import { ApiRoute, CollectedRoute, RouterParams } from "./api.route"
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
