@@ -4,7 +4,8 @@
  * MIT Licensed
  */
 
-import { GenericEventEmitter, normalizePath } from "@luftschloss/common"
+import { DeepPartial, GenericEventEmitter, normalizePath } from "@luftschloss/common"
+import { Operation } from "@luftschloss/openapi-schema"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -65,6 +66,7 @@ export type CollectedRoute<
   path: `/${string}`
   method: HTTP_METHODS
   validator: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  info: DeepPartial<Operation>
 }
 
 export class ApiRoute<
@@ -77,6 +79,7 @@ export class ApiRoute<
   listenerAttached: CollectedRoute
 }> {
   private readonly methods: HTTP_METHODS[]
+  private infoObject?: DeepPartial<Operation>
 
   public constructor(
     private router: ApiRouter,
@@ -102,15 +105,15 @@ export class ApiRoute<
           ...this.validators,
           body: method === "GET" || method === "HEAD" ? undefined : this.validators.body,
         },
+        info: this.infoObject || {},
       })
     }
 
     return this.router
   }
 
-  public info(infoModifier: () => void): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    // TODO give the ability to merge in an info object for the path.
-    //  Perhaps only allow an object which will be merged
+  public info(info: DeepPartial<Operation>): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    this.infoObject = info
     return this
   }
 

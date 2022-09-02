@@ -13,7 +13,7 @@ export class SwaggerRouter extends OpenApiUiRouter {
           name="description"
           content="SwaggerUI"
         />
-        <title>SwaggerUI}</title>
+        <title>SwaggerUI</title>
         <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css" />
       </head>
       <body>

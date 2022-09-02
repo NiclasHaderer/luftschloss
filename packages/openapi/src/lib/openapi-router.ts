@@ -42,10 +42,6 @@ export class OpenApiRouter extends RouterBase {
       children.push(...child.children.map(c => c.router))
 
       if (child instanceof ApiRouter) {
-        child.apiRoutes.forEach(route => {
-          console.log({ child: child.completePath, route: route.path, childI: child })
-        })
-
         apiRoutes.push(
           ...child.apiRoutes.map(route => ({
             ...route,

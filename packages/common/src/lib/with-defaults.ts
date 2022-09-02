@@ -5,6 +5,8 @@
  */
 
 import { deepCopy } from "./deep-copy"
+import { DeepPartial } from "./types"
+import { saveObject } from "./utils"
 
 const isObject = (value: unknown): value is Record<string, unknown> => value instanceof Object
 
@@ -22,8 +24,15 @@ const defaultExecutor = <T extends Record<string, unknown>>(filledPartial: T, de
   return filledPartial
 }
 
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const withDefaults = <T extends Record<string, any>>(partial: Partial<T>, defaults: T): T => {
   partial = deepCopy(partial)
   return defaultExecutor(partial as T, defaults)
+}
+
+export const mergeIn = <T extends object>(object: T, partial: DeepPartial<T>): void => {
+  const originalProto = (object as Record<string, unknown>).__proto__
+  ;(object as Record<string, unknown>).__proto__ = saveObject()
+
+  defaultExecutor(object, partial)
+  ;(object as Record<string, unknown>).__proto__ = originalProto
 }

@@ -31,3 +31,7 @@ export type CustomPropertyDescriptor<THIS extends object, KEY extends PropertyKe
     }
 
 export type Promisable<T> = T | Promise<T>
+
+export type DeepPartial<T extends object> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+}

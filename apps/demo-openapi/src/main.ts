@@ -8,11 +8,14 @@ const main = async () => {
       query: luft.object({
         hello: luft.string(),
       }),
-      response: luft.object({
-        hello: luft.string(),
-      }),
+      response: luft
+        .object({
+          hello: luft.string(),
+        })
+        .named("HelloResponse"),
       path: luft.object({}),
     })
+    .info({ summary: "Hello World" })
     .handle(({ query }) => query)
 
   server
@@ -20,9 +23,11 @@ const main = async () => {
       query: luft.object({
         hello: luft.array(luft.string().min(4).max(10)),
       }),
-      response: luft.object({
-        hello: luft.string(),
-      }),
+      response: luft
+        .object({
+          hello: luft.string(),
+        })
+        .named("Another Schema"),
       body: luft.object({
         hello: luft.string(),
         tes: luft.array(luft.number()),
