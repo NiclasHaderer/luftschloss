@@ -1,8 +1,7 @@
-import { OpenApiDocsRouter } from "./openapi-docs-router"
-import { ExternalDocumentation, Info, Server } from "@luftschloss/openapi-schema"
 import { LRequest, LResponse } from "@luftschloss/server"
+import { OpenApiUiRouter } from "./openapi-ui-router"
 
-export class OpenApiElementsRouter extends OpenApiDocsRouter {
+export class StoplightRouter extends OpenApiUiRouter {
   protected async handleDocs(_: LRequest, response: LResponse) {
     const html = `
      <!doctype html>
@@ -29,23 +28,11 @@ export class OpenApiElementsRouter extends OpenApiDocsRouter {
   }
 }
 
-type ApiServerArgs = {
-  openApi: {
-    info: Info
-    servers?: Server[]
-    externalDocs?: ExternalDocumentation
-  }
+export type StoplightRouterArgs = {
   docsUrl?: string
   openApiUrl?: string
 }
 
-export const openapiElementsRouter = ({ docsUrl = "docs", openApiUrl = "openapi", openApi }: ApiServerArgs) => {
-  return new OpenApiElementsRouter(
-    {
-      openapi: "3.1.0",
-      ...openApi,
-    },
-    docsUrl,
-    openApiUrl
-  )
+export const stoplightRouter = ({ docsUrl = "/stoplight", openApiUrl = "/openapi" }: StoplightRouterArgs = {}) => {
+  return new StoplightRouter(docsUrl, openApiUrl)
 }

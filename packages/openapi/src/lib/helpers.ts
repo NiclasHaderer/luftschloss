@@ -11,12 +11,12 @@ export const addRouteToOpenApi = (openApi: OpenApiSchema, route: CollectedRoute)
   const bodySchema = route.validator.body ? generateJsonSchema(route.validator.body) : undefined
   const responseSchema = route.validator.response ? generateJsonSchema(route.validator.response) : undefined
 
-  if (!openApi.paths[route.url]) {
-    openApi.paths[route.url] = {}
+  if (!openApi.paths[route.path]) {
+    openApi.paths[route.path] = {}
   }
 
-  openApi.paths[route.url][route.method.toLowerCase() as Lowercase<HTTP_METHODS>] = {}
-  const apiRoute = openApi.paths[route.url][route.method.toLowerCase() as Lowercase<HTTP_METHODS>]!
+  openApi.paths[route.path][route.method.toLowerCase() as Lowercase<HTTP_METHODS>] = {}
+  const apiRoute = openApi.paths[route.path][route.method.toLowerCase() as Lowercase<HTTP_METHODS>]!
   apiRoute.parameters = [
     ...getParameters(route.validator.path, "path"),
     ...getParameters(route.validator.query, "query"),

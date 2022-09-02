@@ -62,7 +62,7 @@ export type CollectedRoute<
   HEADERS extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
   RESPONSE extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined
 > = {
-  url: `/${string}`
+  path: `/${string}`
   method: HTTP_METHODS
   validator: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
 }
@@ -96,7 +96,7 @@ export class ApiRoute<
 
     for (const method of this.methods) {
       this.complete("listenerAttached", {
-        url: normalizePath(this.url),
+        path: normalizePath(this.url),
         method: method,
         validator: {
           ...this.validators,

@@ -77,7 +77,7 @@ export class RouterBase implements Router {
    * The complete path to the router including the routers mouning path
    */
   public get completePath(): string | undefined {
-    return this._completePath ? normalizePath(this._completePath) : undefined
+    return this._completePath !== undefined ? normalizePath(this._completePath) : undefined
   }
 
   public get parentRouter(): Router | undefined {

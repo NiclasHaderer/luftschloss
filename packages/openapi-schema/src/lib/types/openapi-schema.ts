@@ -1,5 +1,7 @@
 import { AllSchemas } from "./json-schema-2020-12"
 
+export type OpenApiVersions = "3.1.0" | "3.0.3" | "3.0.2" | "3.0.1" | "3.0.0"
+
 /**
  * This is the root object of the OpenAPI document.
  */
@@ -7,7 +9,7 @@ export interface OpenApiSchema {
   /**
    * REQUIRED. This string MUST be the version number of the OpenAPI Specification that the OpenAPI document uses. The openapi field SHOULD be used by tooling to interpret the OpenAPI document. This is not related to the API info.version string.
    */
-  openapi: "3.1.0"
+  openapi: OpenApiVersions
 
   /**
    * REQUIRED. Provides metadata about the API. The metadata MAY be used by tooling as required.

@@ -1,4 +1,4 @@
-import { apiServer, openapiElementsRouter } from "@luftschloss/openapi"
+import { apiServer, openApiRouter, redocRouter, stoplightRouter, swaggerRouter } from "@luftschloss/openapi"
 import { luft } from "@luftschloss/validation"
 
 const main = async () => {
@@ -18,7 +18,7 @@ const main = async () => {
   server
     .post("", {
       query: luft.object({
-        hello: luft.string(),
+        hello: luft.array(luft.string().min(4).max(10)),
       }),
       response: luft.object({
         hello: luft.string(),
@@ -29,9 +29,12 @@ const main = async () => {
       }),
       path: luft.object({}),
     })
-    .handle(({ query }) => query)
+    .handle(({ query }) => ({ hello: query.hello[0] }))
 
-  server.mount(openapiElementsRouter({ openApi: { info: { title: "Hello world", version: "0.0.0" } } }))
+  server.mount(stoplightRouter())
+  server.mount(redocRouter())
+  server.mount(swaggerRouter())
+  server.mount(openApiRouter({ openApi: { info: { title: "test", version: "1.0.0" }, openapi: "3.0.3" } }))
   server.listen()
 }
 main()
