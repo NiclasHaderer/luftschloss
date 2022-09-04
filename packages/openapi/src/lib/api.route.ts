@@ -78,43 +78,120 @@ export class ApiRoute<
 > extends GenericEventEmitter<{
   listenerAttached: CollectedRoute
 }> {
-  private readonly methods: HTTP_METHODS[]
   private infoObject?: DeepPartial<Operation>
 
   public constructor(
     private router: ApiRouter,
     private collector: RouteCollector,
-    method: HTTP_METHODS | HTTP_METHODS[] | "*",
-    private url: string,
     private validators: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ) {
     super()
-    this.methods = Array.isArray(method) ? method : method === "*" ? Object.values(HTTP_METHODS) : [method]
     this.validators.query = extractSingleElementFromList(this.validators.query)
     this.validators.headers = extractSingleElementFromList(this.validators.headers)
-  }
-
-  public handle(callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ApiRouter {
-    this.methods.forEach(m => this.collector.add(this.url, m, this.wrapWithOpenApi(callHandler)))
-
-    for (const method of this.methods) {
-      this.complete("listenerAttached", {
-        path: normalizePath(this.url),
-        method: method,
-        validator: {
-          ...this.validators,
-          body: method === "GET" || method === "HEAD" ? undefined : this.validators.body,
-        },
-        info: this.infoObject || {},
-      })
-    }
-
-    return this.router
   }
 
   public info(info: DeepPartial<Operation>): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     this.infoObject = info
     return this
+  }
+
+  public handle<T extends HTTP_METHODS | HTTP_METHODS[] | "*">(
+    method: T,
+    path: string,
+    callHandler: T extends "*"
+      ? OpenApiHandler<PATH, QUERY, BODY | undefined, HEADERS, RESPONSE>
+      : T extends "GET" | "HEAD"
+      ? OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+      : T[number] extends "GET" | "HEAD"
+      ? OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+      : "GET" extends T[number]
+      ? OpenApiHandler<PATH, QUERY, undefined | BODY, HEADERS, RESPONSE>
+      : "HEAD" extends T[number]
+      ? OpenApiHandler<PATH, QUERY, undefined | BODY, HEADERS, RESPONSE>
+      : OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    const methods: HTTP_METHODS[] = Array.isArray(method)
+      ? method
+      : method === "*"
+      ? Object.values(HTTP_METHODS)
+      : [method]
+    for (const method of methods) {
+      this.collector.add(
+        path,
+        method,
+        this.wrapWithOpenApi(callHandler as OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>)
+      )
+      this.emit("listenerAttached", {
+        path: normalizePath(path),
+        info: this.infoObject ?? {},
+        method: method,
+        validator: this.validators,
+      })
+    }
+    return this
+  }
+
+  public get(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("GET", url, callHandler)
+  }
+
+  public head(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("HEAD", url, callHandler)
+  }
+
+  public post(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("POST", url, callHandler)
+  }
+
+  public put(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("POST", url, callHandler)
+  }
+
+  public delete(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("DELETE", url, callHandler)
+  }
+
+  public options(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("OPTIONS", url, callHandler)
+  }
+
+  public trace(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("TRACE", url, callHandler)
+  }
+
+  public patch(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("PATCH", url, callHandler)
+  }
+
+  public all(
+    url: string,
+    callHandler: OpenApiHandler<PATH, QUERY, BODY | undefined, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    return this.handle("*", url, callHandler)
   }
 
   private wrapWithOpenApi(handler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ROUTE_HANDLER {

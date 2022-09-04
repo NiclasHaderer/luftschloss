@@ -4,7 +4,7 @@ import { luft } from "@luftschloss/validation"
 const main = async () => {
   const server = apiServer()
   server
-    .get("", {
+    .build({
       query: luft.object({
         hello: luft.string(),
       }),
@@ -16,10 +16,10 @@ const main = async () => {
       path: luft.object({}),
     })
     .info({ summary: "Hello World" })
-    .handle(({ query }) => query)
+    .get("", ({ query }) => query)
 
   server
-    .post("", {
+    .build({
       query: luft.object({
         hello: luft.array(luft.string().min(4).max(10)),
       }),
@@ -34,7 +34,7 @@ const main = async () => {
       }),
       path: luft.object({}),
     })
-    .handle(({ query }) => ({ hello: query.hello[0] }))
+    .post("", ({ query }) => ({ hello: query.hello[0] }))
 
   server.mount(stoplightRouter())
   server.mount(redocRouter())
