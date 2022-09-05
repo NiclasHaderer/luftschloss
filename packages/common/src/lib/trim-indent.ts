@@ -23,10 +23,12 @@ const trimTemplate = (strings: string[], args: any[]): string => {
   // TODO try to respect if a template literal is the thing with least indents
   const indentSize = Math.min(
     ...strings
-      // Break new lines
-      .flatMap(s => s.split("\n"))
-      // Ignore empty lines
-      .filter(s => !!s.trim())
+      // Break new lines in a non-flat list, so we still know where the start and end of the strings between the template literals are
+      .map(s => s.split("\n"))
+      // Ignore empty lines IF they are empty OR they are right before a template literal and therefore are the indent for this literal
+      .flatMap(brokenNonTemplateStrings =>
+        brokenNonTemplateStrings.filter((s, index, arr) => !!s.trim() || index === arr.length - 1)
+      )
       // Get the indent size
       .map(s => s.match(/^ */)?.[0].length || 0)
   )
