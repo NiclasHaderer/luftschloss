@@ -5,7 +5,7 @@
  */
 
 import { withDefaults } from "@luftschloss/common"
-import { Middleware, UTF8SearchParams } from "@luftschloss/server"
+import { HTTPException, Middleware, Status, UTF8SearchParams } from "@luftschloss/server"
 import Buffer from "buffer"
 import { commonFormParserFactory } from "./common"
 
@@ -21,7 +21,14 @@ export const formParser = (
   const completeOptions = withDefaults<FormParserOptions>(options, {
     parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
       const str = buffer.toString(encoding)
-      return new UTF8SearchParams(str).encode()
+      try {
+        return new UTF8SearchParams(str).encode()
+      } catch (e) {
+        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, {
+          message: "Could not parse form data",
+          details: (e as Error).message,
+        })
+      }
     },
     maxBodySize: 100,
   })

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { DeepPartial, normalizePath, uniqueList, withDefaults } from "@luftschloss/common"
+import { DeepPartial, normalizePath, Promisable, uniqueList, withDefaults } from "@luftschloss/common"
 import { Operation } from "@luftschloss/openapi-schema"
 import {
   HTTP_METHODS,
@@ -19,6 +19,8 @@ import {
   LuftArray,
   LuftInfer,
   LuftObject,
+  LuftRecord,
+  LuftString,
   LuftTuple,
   LuftType,
   LuftUnion,
@@ -30,24 +32,22 @@ import { ApiRouter } from "./api.router"
 export type OpenApiHandler<
   PATH extends LuftObject<any> | undefined,
   URL_PARAMS extends LuftObject<any> | undefined,
-  BODY extends LuftObject<any> | undefined,
+  BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
-  RESPONSE extends LuftObject<any> | undefined
+  RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined
 > = (args: {
-  path: PATH extends LuftObject<any> ? LuftInfer<PATH> : undefined
-  query: URL_PARAMS extends LuftObject<any> ? LuftInfer<URL_PARAMS> : undefined
-  body: BODY extends LuftObject<any> ? LuftInfer<BODY> : undefined
-  headers: HEADERS extends LuftObject<any> ? LuftInfer<HEADERS> : undefined
-}) => RESPONSE extends LuftObject<any>
-  ? LuftInfer<RESPONSE>
-  : undefined | Promise<RESPONSE extends LuftObject<any> ? LuftInfer<RESPONSE> : undefined>
+  path: PATH extends LuftType ? LuftInfer<PATH> : undefined
+  query: URL_PARAMS extends LuftType ? LuftInfer<URL_PARAMS> : undefined
+  body: BODY extends LuftType<infer T> ? T : undefined
+  headers: HEADERS extends LuftType ? LuftInfer<HEADERS> : undefined
+}) => Promisable<RESPONSE extends LuftType<infer T> ? T : undefined>
 
 export interface RouterParams<
   PATH extends LuftObject<any> | undefined,
   URL_PARAMS extends LuftObject<any> | undefined,
-  BODY extends LuftObject<any> | undefined,
+  BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
-  RESPONSE extends LuftObject<any> | undefined
+  RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined
 > {
   path: PATH
   query: URL_PARAMS
@@ -59,9 +59,25 @@ export interface RouterParams<
 export type CollectedRoute<
   PATH extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
   QUERY extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
-  BODY extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
+  BODY extends
+    | LuftObject<Record<string, LuftType>>
+    | LuftArray<LuftType>
+    | LuftRecord<LuftString, LuftType>
+    | undefined =
+    | LuftObject<Record<string, LuftType>>
+    | LuftArray<LuftType>
+    | LuftRecord<LuftString, LuftType>
+    | undefined,
   HEADERS extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
-  RESPONSE extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined
+  RESPONSE extends
+    | LuftObject<Record<string, LuftType>>
+    | LuftArray<LuftType>
+    | LuftRecord<LuftString, LuftType>
+    | undefined =
+    | LuftObject<Record<string, LuftType>>
+    | LuftArray<LuftType>
+    | LuftRecord<LuftString, LuftType>
+    | undefined
 > = {
   path: `/${string}`
   method: HTTP_METHODS
@@ -72,9 +88,9 @@ export type CollectedRoute<
 export class ApiRoute<
   PATH extends LuftObject<any> | undefined,
   QUERY extends LuftObject<any> | undefined,
-  BODY extends LuftObject<any> | undefined,
+  BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
-  RESPONSE extends LuftObject<any> | undefined
+  RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined
 > {
   private infoObject?: DeepPartial<Operation>
 
@@ -97,9 +113,9 @@ export class ApiRoute<
   public modify<
     NEW_PATH extends LuftObject<any> | undefined = PATH,
     NEW_QUERY extends LuftObject<any> | undefined = QUERY,
-    NEW_BODY extends LuftObject<any> | undefined = BODY,
+    NEW_BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined = BODY,
     NEW_HEADERS extends LuftObject<any> | undefined = HEADERS,
-    NEW_RESPONSE extends LuftObject<any> | undefined = RESPONSE
+    NEW_RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined = RESPONSE
   >(
     params: Partial<RouterParams<NEW_PATH, NEW_QUERY, NEW_BODY, NEW_HEADERS, NEW_RESPONSE>>
   ): ApiRoute<NEW_PATH, NEW_QUERY, NEW_BODY, NEW_HEADERS, NEW_RESPONSE> {
@@ -318,7 +334,7 @@ export class ApiRoute<
 
       // Body
       const ignoreBody = request.method === "GET" || request.method === "HEAD"
-      const parsedBody = await parseAndError<BODY>(
+      const parsedBody = await parseAndError(
         ignoreBody ? (undefined as BODY) : this.validators.body,
         () => request.json(),
         "body"
@@ -346,19 +362,19 @@ export class ApiRoute<
   }
 }
 
-const parseAndError = async <T extends LuftObject<any> | undefined>(
+const parseAndError = async <T extends LuftType | undefined>(
   validator: T,
   getData: () => unknown | Promise<unknown>,
   location: "query" | "headers" | "path" | "body" | "response",
   statusCode: Status = Status.HTTP_400_BAD_REQUEST
-): Promise<T extends LuftObject<any> ? LuftInfer<T> : undefined> => {
-  if (validator === undefined) return undefined as T extends LuftObject<any> ? LuftInfer<T> : undefined
+): Promise<T extends LuftType<infer TYPE> ? TYPE : undefined> => {
+  if (validator === undefined) return undefined as T extends LuftType<infer TYPE> ? TYPE : undefined
   const data = await getData()
   const parsedData = validator.coerceSave(data)
   if (!parsedData.success) {
     throw new HTTPException(statusCode, { issues: parsedData.issues, location: location })
   }
-  return parsedData.data as T extends LuftObject<any> ? LuftInfer<T> : undefined
+  return parsedData.data as T extends LuftType<infer TYPE> ? TYPE : undefined
 }
 
 const extractArrayElement: ValidationHook<unknown, unknown, unknown> = (value: unknown) => {

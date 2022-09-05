@@ -119,8 +119,8 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     let failAtEnd = false
     for (const [key, value] of Object.entries(data)) {
       context.stepInto(key)
-      const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>).run(key, context)
-      const parsedValue = (this.schema.value as unknown as InternalLuftBaseType<unknown>).run(value, context)
+      const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>).run(key, context, true)
+      const parsedValue = (this.schema.value as unknown as InternalLuftBaseType<unknown>).run(value, context, true)
       context.stepOut()
 
       if (parsedKey.success && parsedValue.success) {

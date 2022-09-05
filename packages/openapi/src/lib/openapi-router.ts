@@ -56,12 +56,8 @@ export class OpenApiRouter extends RouterBase {
 }
 
 export type OpenApiRouterArgs = {
-  openApi: {
-    info: Info
-    openapi?: OpenApiVersions
-    servers?: Server[]
-    externalDocs?: ExternalDocumentation
-  }
+  openApi: Pick<OpenApiSchema, "info"> & Partial<Omit<OpenApiSchema, "info">>
+
   openApiUrl?: string
 }
 

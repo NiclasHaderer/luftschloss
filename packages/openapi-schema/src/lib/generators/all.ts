@@ -37,6 +37,7 @@ import { generateRecordJsonSchema } from "./record"
 import { generateObjectJsonSchema } from "./object"
 import { getCustomJsonSchemaGenerator } from "./register-custom"
 
+// TODO return a schema map, because it could happen, that the schema has named sub-schemas
 export const generateJsonSchema = (validator: LuftType): AllSchemas => {
   // Null
   if (validator.constructor === LuftNull) {

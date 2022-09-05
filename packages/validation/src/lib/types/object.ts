@@ -99,6 +99,10 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
     })
   }
 
+  public get<KEY extends keyof T & string>(key: KEY): T[KEY] {
+    return this.schema.type[key].clone() as T[KEY]
+  }
+
   public partial(): LuftObject<ObjectPartial<T>> {
     const type = this.schema.type
     const newType = Object.keys(this.schema.type).reduce((acc, key) => {
@@ -216,7 +220,8 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType
       // Validate the retrieved value
       const result = (validator as unknown as InternalLuftBaseType<unknown>).run(
         (data as Record<string, unknown>)[key],
-        context
+        context,
+        true
       )
       context.stepOut()
 
