@@ -5,12 +5,7 @@ import { LuftObject, LuftType } from "@luftschloss/validation"
 import { CollectedRoute } from "./api.route"
 
 export const addRouteToOpenApi = (openApi: OpenApiSchema, route: CollectedRoute) => {
-  if (openApi.paths === undefined) {
-    openApi.paths = {}
-  }
-
-  let bodySchema = route.validator.body ? generateJsonSchema(route.validator.body) : undefined
-  let responseSchema = route.validator.response ? generateJsonSchema(route.validator.response) : undefined
+  openApi.paths = openApi.paths ?? {}
 
   if (!openApi.paths[route.path]) {
     openApi.paths[route.path] = {}
@@ -24,15 +19,33 @@ export const addRouteToOpenApi = (openApi: OpenApiSchema, route: CollectedRoute)
     ...getParameters(route.validator.headers, "header"),
   ]
 
+  if (route.validator.body) {
+    let bodySchema = generateJsonSchema(route.validator.body)
+    if (route.validator.body?.validationStorage?.name && bodySchema) {
+      openApi.components = openApi.components || {}
+      openApi.components.schemas = openApi.components.schemas || {}
+      openApi.components.schemas[route.validator.body.validationStorage.name] = bodySchema
+      bodySchema = { $ref: `#/components/schemas/${route.validator.body.validationStorage.name}` }
+    }
+
+    apiRoute.requestBody = {
+      content: {
+        "application/json": {
+          schema: bodySchema,
+        },
+      },
+    }
+  }
+
   apiRoute.responses = {}
-  if (!responseSchema) {
-    apiRoute.responses["204"] = { description: "empty" }
-  } else {
-    if (route.validator.response?.validationStorage?.name && responseSchema) {
+  if (route.validator.response) {
+    let responseSchema = generateJsonSchema(route.validator.response)
+
+    if (route.validator.response?.validationStorage?.name) {
       openApi.components = openApi.components || {}
       openApi.components.schemas = openApi.components.schemas || {}
       openApi.components.schemas[route.validator.response.validationStorage.name] = responseSchema
-      bodySchema = { $ref: `#/components/schemas/${route.validator.response.validationStorage.name}` }
+      responseSchema = { $ref: `#/components/schemas/${route.validator.response.validationStorage.name}` }
     }
 
     apiRoute.responses.default = {
@@ -43,23 +56,8 @@ export const addRouteToOpenApi = (openApi: OpenApiSchema, route: CollectedRoute)
         },
       },
     }
-  }
-
-  if (bodySchema) {
-    if (route.validator.body?.validationStorage?.name && bodySchema) {
-      openApi.components = openApi.components || {}
-      openApi.components.schemas = openApi.components.schemas || {}
-      openApi.components.schemas[route.validator.body.validationStorage.name] = bodySchema
-      responseSchema = { $ref: `#/components/schemas/${route.validator.body.validationStorage.name}` }
-    }
-
-    apiRoute.requestBody = {
-      content: {
-        "application/json": {
-          schema: bodySchema,
-        },
-      },
-    }
+  } else {
+    apiRoute.responses["204"] = { description: "empty" }
   }
 
   mergeIn(apiRoute, route.info)

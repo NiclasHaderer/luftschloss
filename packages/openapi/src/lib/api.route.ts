@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { DeepPartial, GenericEventEmitter, normalizePath } from "@luftschloss/common"
+import { DeepPartial, normalizePath } from "@luftschloss/common"
 import { Operation } from "@luftschloss/openapi-schema"
 import {
   HTTP_METHODS,
@@ -75,9 +75,7 @@ export class ApiRoute<
   BODY extends LuftObject<any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
   RESPONSE extends LuftObject<any> | undefined
-> extends GenericEventEmitter<{
-  listenerAttached: CollectedRoute
-}> {
+> {
   private infoObject?: DeepPartial<Operation>
 
   public constructor(
@@ -85,14 +83,36 @@ export class ApiRoute<
     private collector: RouteCollector,
     private validators: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ) {
-    super()
     this.validators.query = extractSingleElementFromList(this.validators.query)
     this.validators.headers = extractSingleElementFromList(this.validators.headers)
   }
 
+  protected clone(): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+    const copied = new ApiRoute(this.router, this.collector, this.validators)
+    copied.infoObject = this.infoObject || {}
+    return copied
+  }
+
+  public modify<
+    NEW_PATH extends LuftObject<any> | undefined = PATH,
+    NEW_QUERY extends LuftObject<any> | undefined = QUERY,
+    NEW_BODY extends LuftObject<any> | undefined = BODY,
+    NEW_HEADERS extends LuftObject<any> | undefined = HEADERS,
+    NEW_RESPONSE extends LuftObject<any> | undefined = RESPONSE
+  >(
+    params: Partial<RouterParams<NEW_PATH, NEW_QUERY, NEW_BODY, NEW_HEADERS, NEW_RESPONSE>>
+  ): ApiRoute<NEW_PATH, NEW_QUERY, NEW_BODY, NEW_HEADERS, NEW_RESPONSE> {
+    const clone = this.clone() as unknown as ApiRoute<NEW_PATH, NEW_QUERY, NEW_BODY, NEW_HEADERS, NEW_RESPONSE>
+    clone.validators = { ...clone.validators, ...params }
+    clone.validators.query = extractSingleElementFromList(clone.validators.query)
+    clone.validators.headers = extractSingleElementFromList(clone.validators.headers)
+    return clone
+  }
+
   public info(info: DeepPartial<Operation>): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    this.infoObject = info
-    return this
+    const clone = this.clone()
+    clone.infoObject = info
+    return clone
   }
 
   public handle<T extends HTTP_METHODS | HTTP_METHODS[] | "*">(
@@ -121,7 +141,7 @@ export class ApiRoute<
         method,
         this.wrapWithOpenApi(callHandler as OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>)
       )
-      this.emit("listenerAttached", {
+      this.router.apiRoutes.push({
         path: normalizePath(path),
         info: this.infoObject ?? {},
         method: method,
@@ -132,66 +152,156 @@ export class ApiRoute<
   }
 
   public get(
+    callHandler: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public get(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public get(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("GET", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("GET", urlOrHandler, callHandler!)
+    }
+    return this.handle("GET", "", urlOrHandler)
   }
 
   public head(
+    callHandler: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public head(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public head(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, undefined, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("HEAD", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("HEAD", urlOrHandler, callHandler!)
+    }
+    return this.handle("HEAD", "", urlOrHandler)
   }
 
   public post(
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public post(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public post(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("POST", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("POST", urlOrHandler, callHandler!)
+    }
+    return this.handle("POST", "", urlOrHandler)
   }
 
   public put(
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public put(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public put(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("POST", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("PUT", urlOrHandler, callHandler!)
+    }
+    return this.handle("PUT", "", urlOrHandler)
   }
 
   public delete(
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public delete(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public delete(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("DELETE", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("DELETE", urlOrHandler, callHandler!)
+    }
+    return this.handle("DELETE", "", urlOrHandler)
   }
 
   public options(
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public options(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public options(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("OPTIONS", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("OPTIONS", urlOrHandler, callHandler!)
+    }
+    return this.handle("OPTIONS", "", urlOrHandler)
   }
 
   public trace(
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public trace(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public trace(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("TRACE", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("TRACE", urlOrHandler, callHandler!)
+    }
+    return this.handle("TRACE", "", urlOrHandler)
   }
 
   public patch(
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public patch(
     url: string,
     callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public patch(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("PATCH", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("PATCH", urlOrHandler, callHandler!)
+    }
+    return this.handle("PATCH", "", urlOrHandler)
   }
 
   public all(
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public all(
     url: string,
-    callHandler: OpenApiHandler<PATH, QUERY, BODY | undefined, HEADERS, RESPONSE>
+    callHandler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>
+  public all(
+    urlOrHandler: string | OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>,
+    callHandler?: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    return this.handle("*", url, callHandler)
+    if (typeof urlOrHandler === "string") {
+      return this.handle("*", urlOrHandler, callHandler!)
+    }
+    return this.handle("*", "", urlOrHandler)
   }
 
   private wrapWithOpenApi(handler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ROUTE_HANDLER {
@@ -247,23 +357,25 @@ const parseAndError = async <T extends LuftObject<any> | undefined>(
   return parsedData.data as T extends LuftObject<any> ? LuftInfer<T> : undefined
 }
 
+const extractArrayElement: ValidationHook<unknown, unknown, unknown> = (value: unknown) => {
+  if (Array.isArray(value) && value.length === 1) return { action: "continue", data: value[0] }
+  return { action: "continue", data: value }
+}
+
 const extractSingleElementFromList = <T extends LuftObject<Record<string, LuftType>> | undefined>(validator: T): T => {
   if (validator === undefined) return undefined as T
-
-  const extract: ValidationHook<unknown, unknown, unknown> = (value: unknown) => {
-    if (Array.isArray(value) && value.length === 1) return { action: "continue", data: value[0] }
-    return { action: "continue", data: value }
-  }
 
   const applyExtract = (validators: LuftType[]) => {
     for (const v of validators) {
       if (v instanceof LuftUnion) {
         applyExtract(v.schema.types)
-      } else if (!(v instanceof LuftArray) && !(v instanceof LuftTuple)) v.beforeHook(extract as any, false)
+      } else if (!(v instanceof LuftArray) && !(v instanceof LuftTuple)) {
+        v.beforeHook(extractArrayElement as any, false)
+      }
     }
   }
 
   const copy = validator.clone()
-  applyExtract(Object.values(Object.values(copy.schema.type)))
+  applyExtract(Object.values(copy.schema.type))
   return copy as T
 }

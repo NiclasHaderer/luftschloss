@@ -12,11 +12,21 @@ const main = async () => {
         .object({
           hello: luft.string(),
         })
-        .named("HelloResponse"),
+        .named("HelloResponse")
+        .description(`This is a very nice title`),
       path: luft.object({}),
     })
-    .info({ summary: "Hello World" })
-    .get("", ({ query }) => query)
+    .info({
+      summary: "Hello World",
+      description: `
+      # Update an existing pet by Id
+      1. This is a list
+      2. This is another list item
+      3. This is the last list item
+      `,
+      tags: ["hello"],
+    })
+    .get(({ query }) => query)
 
   server
     .build({
@@ -34,7 +44,11 @@ const main = async () => {
       }),
       path: luft.object({}),
     })
-    .post("", ({ query }) => ({ hello: query.hello[0] }))
+    .post(({ query }) => ({ hello: query.hello[0] }))
+    .modify({ response: luft.object({ world: luft.number() }) })
+    .get("/hello", () => {
+      return { world: 1 }
+    })
 
   server.mount(stoplightRouter())
   server.mount(redocRouter())
@@ -42,4 +56,5 @@ const main = async () => {
   server.mount(openApiRouter({ openApi: { info: { title: "test", version: "1.0.0" }, openapi: "3.0.3" } }))
   server.listen()
 }
+
 main()
