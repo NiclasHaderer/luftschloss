@@ -19,6 +19,7 @@ const EMPTY_OBJECT = {
 
 export class ApiRouter extends RouterBase {
   public readonly apiRoutes: CollectedRoute[] = []
+  private tags: string[] = []
 
   public build<
     PATH extends LuftObject<any> | undefined = undefined,
@@ -33,10 +34,15 @@ export class ApiRouter extends RouterBase {
       throw new Error("Router has been locked. You cannot add any new routes")
     }
 
-    return new ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>(this, this.routeCollector, {
+    return new ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>(this, this.routeCollector, this.tags, {
       ...EMPTY_OBJECT,
       ...params,
     } as RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>)
+  }
+
+  public tag(...tags: string[]): ApiRouter {
+    this.tags = tags
+    return this
   }
 }
 

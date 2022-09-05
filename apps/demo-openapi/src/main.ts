@@ -1,4 +1,5 @@
-import { apiServer, openApiRouter, redocRouter, stoplightRouter, swaggerRouter } from "@luftschloss/openapi"
+import { trimIndent } from "@luftschloss/common"
+import { apiRouter, apiServer, openApiRouter, redocRouter, stoplightRouter, swaggerRouter } from "@luftschloss/openapi"
 import { luft } from "@luftschloss/validation"
 
 const main = async () => {
@@ -18,15 +19,17 @@ const main = async () => {
     })
     .info({
       summary: "Hello World",
-      description: `
+      description: trimIndent`
       # Update an existing pet by Id
-      1. This is a list
-      2. This is another list item
-      3. This is the last list item
+        1. This is a list
+        2. This is another list item
+        3. This is the last list item
       `,
       tags: ["hello"],
     })
     .get(({ query }) => query)
+    .info({ summary: "A new summary" })
+    .get("test", ({ query }) => query)
 
   server
     .build({
@@ -49,6 +52,13 @@ const main = async () => {
     .get("/hello", () => {
       return { world: 1 }
     })
+
+  const router = apiRouter().tag("aaaa")
+  router
+    .build({})
+    .info({ tags: ["hello"] })
+    .get("asdf", () => undefined)
+  server.mount(router)
 
   server.mount(stoplightRouter())
   server.mount(redocRouter())

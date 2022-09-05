@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { DeepPartial, normalizePath } from "@luftschloss/common"
+import { DeepPartial, normalizePath, uniqueList, withDefaults } from "@luftschloss/common"
 import { Operation } from "@luftschloss/openapi-schema"
 import {
   HTTP_METHODS,
@@ -81,6 +81,7 @@ export class ApiRoute<
   public constructor(
     private router: ApiRouter,
     private collector: RouteCollector,
+    private tags: string[],
     private validators: RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>
   ) {
     this.validators.query = extractSingleElementFromList(this.validators.query)
@@ -88,7 +89,7 @@ export class ApiRoute<
   }
 
   protected clone(): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
-    const copied = new ApiRoute(this.router, this.collector, this.validators)
+    const copied = new ApiRoute(this.router, this.collector, this.tags, this.validators)
     copied.infoObject = this.infoObject || {}
     return copied
   }
@@ -109,9 +110,9 @@ export class ApiRoute<
     return clone
   }
 
-  public info(info: DeepPartial<Operation>): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
+  public info(info: DeepPartial<Operation>, mergeIntoCurrent = true): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     const clone = this.clone()
-    clone.infoObject = info
+    clone.infoObject = mergeIntoCurrent ? withDefaults(info, this.infoObject || {}) : info
     return clone
   }
 
@@ -141,9 +142,12 @@ export class ApiRoute<
         method,
         this.wrapWithOpenApi(callHandler as OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>)
       )
+      const info = this.infoObject ?? {}
+      info.tags = uniqueList([...(info.tags || []), ...this.tags])
+
       this.router.apiRoutes.push({
         path: normalizePath(path),
-        info: this.infoObject ?? {},
+        info: info,
         method: method,
         validator: this.validators,
       })
