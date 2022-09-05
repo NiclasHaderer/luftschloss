@@ -26,8 +26,10 @@ const trimTemplate = (strings: string[], args: any[]): string => {
       // Break new lines in a non-flat list, so we still know where the start and end of the strings between the template literals are
       .map(s => s.split("\n"))
       // Ignore empty lines IF they are empty OR they are right before a template literal and therefore are the indent for this literal
-      .flatMap(brokenNonTemplateStrings =>
-        brokenNonTemplateStrings.filter((s, index, arr) => !!s.trim() || index === arr.length - 1)
+      .flatMap((brokenNonTemplateStrings, stringIndex) =>
+        brokenNonTemplateStrings.filter(
+          (s, index, arr) => !!s.trim() || (index === arr.length - 1 && stringIndex !== strings.length - 1)
+        )
       )
       // Get the indent size
       .map(s => s.match(/^ */)?.[0].length || 0)
@@ -49,7 +51,7 @@ const trimTemplate = (strings: string[], args: any[]): string => {
       // Pad the string with the remaining indent from the last
       const stringWithIndent = normalizedString
         .split("\n")
-        .map(s => " ".repeat(remainingIndent) + s)
+        .map((s, index) => (index === 0 ? s : " ".repeat(remainingIndent) + s))
         .join("\n")
       combinedString += stringWithIndent
     }
@@ -59,6 +61,6 @@ const trimTemplate = (strings: string[], args: any[]): string => {
 
 const trimString = (strings: string): string => {
   const newLineStrings = strings.split("\n")
-  const indentSize = Math.min(...newLineStrings.map(s => s.match(/^ */)?.[0].length || 0))
+  const indentSize = Math.min(...newLineStrings.filter(s => !!s.trim()).map(s => s.match(/^ */)?.[0].length || 0))
   return newLineStrings.map(s => s.slice(indentSize)).join("\n")
 }
