@@ -19,10 +19,10 @@ export const formParser = (
   options: Partial<FormParserOptions>
 ): Middleware => {
   const completeOptions = withDefaults<FormParserOptions>(options, {
-    parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
+    parser: (buffer: Buffer, encoding: BufferEncoding | undefined): UTF8SearchParams => {
       const str = buffer.toString(encoding)
       try {
-        return new UTF8SearchParams(str).encode()
+        return new UTF8SearchParams(str)
       } catch (e) {
         throw new HTTPException(Status.HTTP_400_BAD_REQUEST, {
           message: "Could not parse form data",
