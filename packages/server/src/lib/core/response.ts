@@ -20,7 +20,7 @@ export interface LResponse {
 
   bytes(bytes: Buffer): this
 
-  header(name: string, value: string): this
+  header(name: string, value: string | number | Iterable<string | number>): this
 
   html(text: string): this
 

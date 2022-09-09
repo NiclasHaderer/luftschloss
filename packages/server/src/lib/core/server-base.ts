@@ -13,6 +13,7 @@ import { ResponseImpl } from "./response-impl"
 import { ReadonlyMiddlewares } from "../middleware"
 import { LRequest } from "./request"
 import { LResponse } from "./response"
+import { HTTP_METHODS, LookupResultStatus } from "./route-collector.model"
 
 export type LuftServerEvents = {
   start: void
@@ -72,6 +73,18 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       const route = this.resolveRoute(request.path, request.method)
       request.setPathParams(route.pathParams)
       await this.executeRequest(request, response, route)
+    }
+
+    public resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute {
+      const route = super.resolveRoute(path, method)
+      if (method === "OPTIONS" && route.status !== LookupResultStatus.OK) {
+        return {
+          ...route,
+          status: LookupResultStatus.OK,
+          executor: async (req, res) => res.empty().header("Allow", route.availableMethods).end(),
+        }
+      }
+      return route
     }
 
     private async executeRequest(request: RequestImpl, response: ResponseImpl, route: ResolvedRoute) {

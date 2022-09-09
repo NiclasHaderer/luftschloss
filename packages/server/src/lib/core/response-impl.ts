@@ -41,8 +41,12 @@ export class ResponseImpl implements LResponse {
     return this
   }
 
-  public header(name: string, value: string): this {
-    this._headers.append(name, value)
+  public header(name: string, value: string | number | Iterable<string | number>): this {
+    if (typeof value === "number" || typeof value === "string") {
+      this._headers.append(name, value)
+    } else {
+      this._headers.appendAll(name, value)
+    }
     return this
   }
 
@@ -135,7 +139,7 @@ export class ResponseImpl implements LResponse {
       await new Promise(resolve => this.res.write(this.data, resolve))
       this.res.end()
     } else {
-      // Just in case an undefined or null is passed accidentally
+      // Just in case an undefined or null slipped through
       this.res.end(this.data ?? "")
     }
   }
