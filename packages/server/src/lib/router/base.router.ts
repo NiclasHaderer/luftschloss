@@ -278,6 +278,8 @@ export class RouterBase implements Router {
       }
     }
 
+    // TODO correct options response
+
     // Return wrong method result if there has been one
     if (wrongMethod) {
       return {

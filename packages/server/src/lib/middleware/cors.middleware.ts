@@ -25,6 +25,7 @@ type CorsMiddlewareOptions = {
     }
 )
 
+// TODO fix this
 class CorsMiddleware implements Middleware {
   public readonly name = "cors"
   public readonly version = "1.0.0"
@@ -37,12 +38,18 @@ class CorsMiddleware implements Middleware {
   ) {}
 
   public async handle(next: NextFunction, request: LRequest, response: LResponse): Promise<void> {
-    await next(request, response)
-
-    if (request.method === "OPTIONS" && request.headers.has("access-control-request-method")) {
-      this.preflightResponse(request, response)
-      return
+    try {
+      await next(request, response)
+    } catch (e) {
+      if (this.isCorsRequest(request)) this.preflightResponse(request, response)
+      throw e
     }
+
+    if (this.isCorsRequest(request)) this.preflightResponse(request, response)
+  }
+
+  private isCorsRequest(request: LRequest): boolean {
+    return request.method === "OPTIONS" && request.headers.has("access-control-request-method")
   }
 
   private preflightResponse(request: LRequest, response: LResponse) {
