@@ -75,7 +75,7 @@ export type InternalLuftBaseType<OUT_TYPE> = {
   run(data: unknown, mode: ParsingContext, skipContextValidation: boolean): ParsingResult<OUT_TYPE>
 } & Omit<LuftBaseType<OUT_TYPE>, "run">
 
-export abstract class LuftBaseType<RETURN_TYPE> {
+export abstract class LuftBaseType<RETURN_TYPE = any> {
   public abstract readonly schema: Record<string, unknown>
   public abstract readonly supportedTypes: string[]
 

@@ -1,9 +1,9 @@
 import { LuftObject, LuftType } from "@luftschloss/validation"
 import { AllSchemas, ObjectSchema } from "../types"
-import { generateJsonSchema } from "./all"
 import { saveObject } from "@luftschloss/common"
+import { GeneratedSchema, toGeneratedSchema } from "./type"
 
-export const generateObjectJsonSchema = (type: LuftObject<any>): ObjectSchema => {
+export const generateObjectJsonSchema = (type: LuftObject<any>, schemaPath: string): GeneratedSchema => {
   const objectSchema: ObjectSchema = {
     type: "object",
   }
@@ -12,10 +12,13 @@ export const generateObjectJsonSchema = (type: LuftObject<any>): ObjectSchema =>
 
   objectSchema.required = []
   objectSchema.properties = saveObject<{ [key: string]: AllSchemas }>()
+  let namedSubSchemas: { [key: string]: AllSchemas } = {}
   for (const [name, childType] of Object.entries(type.schema.type as Record<string, LuftType>)) {
     objectSchema.required.push(name)
-    objectSchema.properties[name] = generateJsonSchema(childType)
+    const valueSchema = childType.generateJsonSchema(schemaPath)
+    namedSubSchemas = { ...namedSubSchemas, ...valueSchema.named }
+    objectSchema.properties[name] = valueSchema.root
   }
 
-  return objectSchema
+  return toGeneratedSchema(type, objectSchema, schemaPath, namedSubSchemas)
 }

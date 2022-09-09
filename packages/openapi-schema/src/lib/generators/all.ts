@@ -18,7 +18,6 @@ import {
   LuftUnion,
   LuftUUIDString,
 } from "@luftschloss/validation"
-import { AllSchemas } from "../types"
 import { generateNullJsonSchema } from "./null"
 import { generateUndefinedJsonSchema } from "./undefined"
 import { generateIntJsonSchema } from "./int"
@@ -36,77 +35,77 @@ import { generateBoolJsonSchema } from "./bool"
 import { generateRecordJsonSchema } from "./record"
 import { generateObjectJsonSchema } from "./object"
 import { getCustomJsonSchemaGenerator } from "./register-custom"
+import { GeneratedSchema } from "./type"
 
-// TODO return a schema map, because it could happen, that the schema has named sub-schemas
-export const generateJsonSchema = (validator: LuftType): AllSchemas => {
+export const generateJsonSchema = (validator: LuftType, schemaPath: string): GeneratedSchema => {
   // Null
   if (validator.constructor === LuftNull) {
-    return generateNullJsonSchema(validator)
+    return generateNullJsonSchema(validator, schemaPath)
   }
   // Undefined
   if (validator.constructor === LuftUndefined) {
-    return generateUndefinedJsonSchema(validator)
+    return generateUndefinedJsonSchema(validator, schemaPath)
   }
   // Int
   if (validator.constructor === LuftInt) {
-    return generateIntJsonSchema(validator)
+    return generateIntJsonSchema(validator, schemaPath)
   }
   // Number
   if (validator.constructor === LuftNumber) {
-    return generateNumberJsonSchema(validator)
+    return generateNumberJsonSchema(validator, schemaPath)
   }
   // UUID
   if (validator.constructor === LuftUUIDString) {
-    return generateRegexJsonSchema(validator)
+    return generateRegexJsonSchema(validator, schemaPath)
   }
   // String
   if (validator.constructor === LuftString) {
-    return generateStringJsonSchema(validator)
+    return generateStringJsonSchema(validator, schemaPath)
   }
   // Union
   if (validator.constructor === LuftUnion) {
-    return generateUnionJsonSchema(validator)
+    return generateUnionJsonSchema(validator, schemaPath)
   }
   // Tuple
   if (validator.constructor === LuftTuple) {
-    return generateTupleJsonSchema(validator)
+    return generateTupleJsonSchema(validator, schemaPath)
   }
   // Never
   if (validator.constructor === LuftNever) {
-    return generateNeverJsonSchema(validator)
+    return generateNeverJsonSchema(validator, schemaPath)
   }
   // Literal
   if (validator.constructor === LuftLiteral) {
-    return generateLiteralJsonSchema(validator)
+    return generateLiteralJsonSchema(validator, schemaPath)
   }
   // Date
   if (validator.constructor === LuftDate) {
-    return generateDateJsonSchema(validator)
+    return generateDateJsonSchema(validator, schemaPath)
   }
   // Array
   if (validator.constructor === LuftArray) {
-    return generateArrayJsonSchema(validator)
+    return generateArrayJsonSchema(validator, schemaPath)
   }
   // Bool
   if (validator.constructor === LuftBool) {
-    return generateBoolJsonSchema(validator)
+    return generateBoolJsonSchema(validator, schemaPath)
   }
   // Record
   if (validator.constructor === LuftRecord) {
-    return generateRecordJsonSchema(validator)
+    return generateRecordJsonSchema(validator, schemaPath)
   }
   // Object
   if (validator.constructor === LuftObject) {
-    return generateObjectJsonSchema(validator)
+    return generateObjectJsonSchema(validator, schemaPath)
   }
   // Any
   if (validator.constructor === LuftAny) {
-    return generateAnyJsonSchema(validator)
+    return generateAnyJsonSchema(validator, schemaPath)
   }
 
   const customMock = getCustomJsonSchemaGenerator(validator)
   if (customMock) {
-    return customMock(validator)
+    return customMock(validator, schemaPath)
   }
 
   throw new Error(

@@ -1,7 +1,13 @@
-import { LuftAny } from "@luftschloss/validation"
-import { StringSchema } from "../types"
+import { LuftDate } from "@luftschloss/validation"
+import { GeneratedSchema, toGeneratedSchema } from "./type"
 
-export const generateDateJsonSchema = (type: LuftAny): StringSchema => ({
-  type: "string",
-  format: "date-time",
-})
+export const generateDateJsonSchema = (type: LuftDate, schemaPath: string): GeneratedSchema =>
+  toGeneratedSchema(
+    type,
+    {
+      type: "string",
+      format: "date-time",
+    },
+    schemaPath,
+    {}
+  )

@@ -1,7 +1,8 @@
 import { LuftInt } from "@luftschloss/validation"
 import { NumberSchema } from "../types"
+import { GeneratedSchema, toGeneratedSchema } from "./type"
 
-export const generateIntJsonSchema = (type: LuftInt): NumberSchema => {
+export const generateIntJsonSchema = (type: LuftInt, schemaPath: string): GeneratedSchema => {
   const intSchema: NumberSchema = {
     type: "integer",
   }
@@ -25,5 +26,5 @@ export const generateIntJsonSchema = (type: LuftInt): NumberSchema => {
     intSchema.multipleOf = type.schema.multipleOf
   }
 
-  return intSchema
+  return toGeneratedSchema(type, intSchema, schemaPath, {})
 }

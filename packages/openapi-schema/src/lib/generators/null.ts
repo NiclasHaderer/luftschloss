@@ -1,6 +1,5 @@
 import { LuftNull } from "@luftschloss/validation"
-import { NullSchema } from "../types"
+import { GeneratedSchema, toGeneratedSchema } from "./type"
 
-export const generateNullJsonSchema = (type: LuftNull): NullSchema => ({
-  type: "null",
-})
+export const generateNullJsonSchema = (type: LuftNull, schemaPath: string): GeneratedSchema =>
+  toGeneratedSchema(type, { type: "null" }, schemaPath, {})

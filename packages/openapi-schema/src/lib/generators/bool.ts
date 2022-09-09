@@ -1,4 +1,5 @@
 import { LuftBool } from "@luftschloss/validation"
-import { BooleanSchema } from "../types"
+import { GeneratedSchema, toGeneratedSchema } from "./type"
 
-export const generateBoolJsonSchema = (type: LuftBool): BooleanSchema => ({ type: "boolean" })
+export const generateBoolJsonSchema = (type: LuftBool, schemaPath: string): GeneratedSchema =>
+  toGeneratedSchema(type, { type: "boolean" }, schemaPath, {})

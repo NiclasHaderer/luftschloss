@@ -7,32 +7,37 @@ import {
   LuftString,
   LuftType,
 } from "@luftschloss/validation"
-import { CommonSchema, ObjectSchema, StringSchema } from "../types"
+import { CommonSchema, ObjectSchema } from "../types"
 import { generateRegexJsonSchema } from "./regex"
 import { generateStringJsonSchema } from "./string"
-import { generateJsonSchema } from "./all"
+import { GeneratedSchema, toGeneratedSchema } from "./type"
+import { generateUnionJsonSchema } from "./union"
 
-const getNameSchema = (key: LuftRecordKey): StringSchema | CommonSchema => {
+const getNameSchema = (key: LuftRecordKey, schemaPath: string): GeneratedSchema => {
   if (key instanceof LuftRegex) {
-    return generateRegexJsonSchema(key)
+    return generateRegexJsonSchema(key, schemaPath)
   } else if (key instanceof LuftInt) {
-    return { type: "string", pattern: "^[+-]?[0-9]+$" }
+    return toGeneratedSchema(key, { type: "string", pattern: "^[+-]?[0-9]+$" }, schemaPath, {})
   } else if (key instanceof LuftNumber) {
-    return { type: "string", pattern: "^[+-]?(?:[0-9]*[.])?[0-9]+$" }
+    return toGeneratedSchema(key, { type: "string", pattern: "^[+-]?(?:[0-9]*[.])?[0-9]+$" }, schemaPath, {})
   } else if (key instanceof LuftString) {
-    return generateStringJsonSchema(key)
+    return generateStringJsonSchema(key, schemaPath)
   } else {
-    return {
-      anyOf: key.schema.types.map(getNameSchema),
-    }
+    return generateUnionJsonSchema(key, schemaPath)
   }
 }
 
-export const generateRecordJsonSchema = (type: LuftRecord<LuftRecordKey, LuftType>): ObjectSchema => {
+export const generateRecordJsonSchema = (
+  type: LuftRecord<LuftRecordKey, LuftType>,
+  schemaPath: string
+): GeneratedSchema => {
+  const valueSchemas = type.schema.value.generateJsonSchema(schemaPath)
+  const keySchemas = getNameSchema(type.schema.key, schemaPath)
+
   const objectSchema: ObjectSchema = {
     type: "object",
-    additionalProperties: generateJsonSchema(type.schema.value),
-    propertyNames: getNameSchema(type.schema.key),
+    additionalProperties: valueSchemas.root,
+    propertyNames: keySchemas.root as CommonSchema,
   }
 
   if (type.schema.maxProperties !== undefined) {
@@ -43,5 +48,8 @@ export const generateRecordJsonSchema = (type: LuftRecord<LuftRecordKey, LuftTyp
     objectSchema.minProperties = type.schema.minProperties
   }
 
-  return objectSchema
+  return toGeneratedSchema(type, objectSchema, schemaPath, {
+    ...valueSchemas.named,
+    ...keySchemas.named,
+  })
 }

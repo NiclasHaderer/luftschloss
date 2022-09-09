@@ -11,5 +11,4 @@ const main = async () => {
   server.mount(swaggerRouter())
   server.listen()
 }
-
 main()
