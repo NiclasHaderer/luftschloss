@@ -326,6 +326,9 @@ export class ApiRoute<
 
   private wrapWithOpenApi(handler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ROUTE_HANDLER {
     return async (request: LRequest, response: LResponse): Promise<void> => {
+      // Set the response status code here, so it can be overwritten in the handler
+      response.status(this.validators.response?.validationStorage.status ?? request.method === "POST" ? 201 : 200)
+
       // Path
       const parsedPath = await parseAndError(this.validators.path, () => request.pathParams(), "path")
 

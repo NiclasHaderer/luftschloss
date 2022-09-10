@@ -72,7 +72,10 @@ export const addRouteToOpenApi = (openApi: OpenApiSchema, route: CollectedRoute)
     const responseSchema = route.validator.response.generateJsonSchema(SCHEMA_PATH)
     openApi.components.schemas = { ...openApi.components.schemas, ...responseSchema.named }
 
-    apiRoute.responses.default = {
+    // TODO check if union and if union schemas have status assigned then add multiple status codes
+    apiRoute.responses[
+      route.validator.response?.validationStorage.status?.code ?? route.method === "POST" ? 201 : 200
+    ] = {
       description: route.validator.response?.validationStorage.description ?? "",
       content: {
         "application/json": {

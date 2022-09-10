@@ -34,7 +34,7 @@ export type UnsuccessfulParsingResult = {
 
 export type ParsingResult<T> = SuccessfulParsingResult<T> | UnsuccessfulParsingResult
 
-export interface LuftValidationStorage<RETURN_TYPE> {
+export interface LuftValidationStorage<RETURN_TYPE = any> {
   beforeValidateHooks: ValidationHook<any, unknown, unknown, RETURN_TYPE>[]
   beforeCoerceHooks: ValidationHook<any, unknown, unknown, RETURN_TYPE>[]
   afterValidateHooks: ValidationHook<any, RETURN_TYPE, RETURN_TYPE>[]
@@ -276,6 +276,11 @@ export abstract class LuftBaseType<RETURN_TYPE = any> {
     if (!hasCb) copy.validationStorage.afterCoerceHooks.push(callback)
     return copy as this
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface LuftBaseType {
+  // status(status: Status): this
 }
 
 export class LuftUndefined extends LuftBaseType<undefined> {

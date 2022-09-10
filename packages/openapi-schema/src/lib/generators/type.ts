@@ -1,5 +1,5 @@
 import { AllSchemas } from "../types"
-import { LuftBaseType, LuftType } from "@luftschloss/validation"
+import { LuftNever, LuftType } from "@luftschloss/validation"
 
 export interface GeneratedSchema {
   named: {
@@ -9,7 +9,7 @@ export interface GeneratedSchema {
 }
 
 export const toGeneratedSchema = (
-  type: LuftType | LuftBaseType<never>,
+  type: LuftType | LuftNever,
   schema: AllSchemas,
   schemaPath: string,
   subSchemas: { [name: string]: AllSchemas }

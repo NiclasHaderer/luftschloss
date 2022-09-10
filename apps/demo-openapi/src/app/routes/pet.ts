@@ -1,5 +1,6 @@
 import { mockAll } from "@luftschloss/mocking"
 import { apiRouter } from "@luftschloss/openapi"
+import "@luftschloss/openapi"
 import { array, int, object, string } from "@luftschloss/validation"
 import { Tag } from "../models/common"
 import { Pet } from "../models/pet"
@@ -14,6 +15,7 @@ petRouter
   .info({ summary: "Update an existing pet" })
   .put(() => mockAll(Pet))
   .info({ summary: "Add a new pet to the store" })
+  .modify({ body: Pet })
   .post(() => mockAll(Pet))
 
 petRouter

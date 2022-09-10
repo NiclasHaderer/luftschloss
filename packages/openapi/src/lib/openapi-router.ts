@@ -6,11 +6,11 @@
  */
 
 import { normalizePath } from "@luftschloss/common"
-import { ExternalDocumentation, Info, OpenApiSchema, OpenApiVersions, Server } from "@luftschloss/openapi-schema"
+import { OpenApiSchema } from "@luftschloss/openapi-schema"
 import { getRootRouter, LRequest, LResponse, Router, RouterBase, ServerBase } from "@luftschloss/server"
 import { CollectedRoute } from "./api.route"
 import { ApiRouter } from "./api.router"
-import { addRouteToOpenApi } from "./helpers"
+import { addRouteToOpenApi } from "./add-route-to-openapi"
 
 export class OpenApiRouter extends RouterBase {
   public constructor(public readonly openApi: OpenApiSchema, protected openApiUrl: string) {
