@@ -12,6 +12,7 @@ import { generateRegexJsonSchema } from "./regex"
 import { generateStringJsonSchema } from "./string"
 import { GeneratedSchema, toGeneratedSchema } from "./type"
 import { generateUnionJsonSchema } from "./union"
+import { generateJsonSchema } from "./all"
 
 const getNameSchema = (key: LuftRecordKey, schemaPath: string): GeneratedSchema => {
   if (key instanceof LuftRegex) {
@@ -31,7 +32,7 @@ export const generateRecordJsonSchema = (
   type: LuftRecord<LuftRecordKey, LuftType>,
   schemaPath: string
 ): GeneratedSchema => {
-  const valueSchemas = type.schema.value.generateJsonSchema(schemaPath)
+  const valueSchemas = generateJsonSchema(type.schema.value, schemaPath)
   const keySchemas = getNameSchema(type.schema.key, schemaPath)
 
   const objectSchema: ObjectSchema = {

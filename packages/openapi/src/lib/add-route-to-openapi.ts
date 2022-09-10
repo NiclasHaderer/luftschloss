@@ -1,5 +1,5 @@
 import { mergeIn } from "@luftschloss/common"
-import { AllSchemas, OpenApiSchema, Parameter, Reference } from "@luftschloss/openapi-schema"
+import { AllSchemas, generateJsonSchema, OpenApiSchema, Parameter, Reference } from "@luftschloss/openapi-schema"
 import { HTTP_METHODS } from "@luftschloss/server"
 import { LuftObject, LuftType } from "@luftschloss/validation"
 import { CollectedRoute } from "./api.route"
@@ -54,7 +54,7 @@ export const addRouteToOpenApi = (openApi: OpenApiSchema, route: CollectedRoute)
   ]
 
   if (route.validator.body) {
-    const bodySchema = route.validator.body.generateJsonSchema(SCHEMA_PATH)
+    const bodySchema = generateJsonSchema(route.validator.body, SCHEMA_PATH)
     openApi.components.schemas = { ...openApi.components.schemas, ...bodySchema.named }
 
     apiRoute.requestBody = {
@@ -68,12 +68,12 @@ export const addRouteToOpenApi = (openApi: OpenApiSchema, route: CollectedRoute)
 
   apiRoute.responses = {}
   if (route.validator.response) {
-    const responseSchema = route.validator.response.generateJsonSchema(SCHEMA_PATH)
+    const responseSchema = generateJsonSchema(route.validator.response, SCHEMA_PATH)
     openApi.components.schemas = { ...openApi.components.schemas, ...responseSchema.named }
 
     // TODO check if union and if union schemas have status assigned then add multiple status codes
     apiRoute.responses[
-      route.validator.response?.validationStorage.status?.code ?? route.method === "POST" ? 201 : 200
+      route.validator.response?.validationStorage.status?.code ?? (route.method === "POST" ? 201 : 200)
     ] = {
       description: route.validator.response?.validationStorage.description ?? "",
       content: {
@@ -94,7 +94,7 @@ const getParameters = (
   position: "path" | "header" | "query"
 ): { param: Parameter | Reference; subSchemas: { [name: string]: AllSchemas } }[] => {
   return Object.entries(validator?.schema?.type || {}).map(([name, value]) => {
-    const subSchemas = value.generateJsonSchema(SCHEMA_PATH)
+    const subSchemas = generateJsonSchema(value, SCHEMA_PATH)
 
     return {
       param: {

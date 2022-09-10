@@ -1,9 +1,10 @@
 import { LuftArray, LuftType } from "@luftschloss/validation"
 import { ArraySchema } from "../types"
 import { GeneratedSchema, toGeneratedSchema } from "./type"
+import { generateJsonSchema } from "./all"
 
 export const generateArrayJsonSchema = (type: LuftArray<LuftType>, schemaPath: string): GeneratedSchema => {
-  const subSchemas = type.schema.type.generateJsonSchema(schemaPath)
+  const subSchemas = generateJsonSchema(type.schema.type, schemaPath)
   const arraySchema: ArraySchema = { type: "array", items: subSchemas.root }
 
   if (type.schema.unique) {

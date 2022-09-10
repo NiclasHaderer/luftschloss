@@ -1,8 +1,7 @@
 import { apiServer, openApiRouter, redocRouter, stoplightRouter, swaggerRouter } from "@luftschloss/openapi"
 import { apiDefinition } from "./app/api-definition"
 import { petRouter } from "./app/routes/pet"
-import { corsMiddleware, Status } from "@luftschloss/server"
-import { luft } from "@luftschloss/validation"
+import { corsMiddleware } from "@luftschloss/server"
 
 const main = async () => {
   const server = apiServer()
@@ -14,7 +13,7 @@ const main = async () => {
       allowOriginFunction: () => true,
     })
   )
-  server.mount(petRouter, { basePath: "/pet" })
+  server.mount(petRouter(), { basePath: "/pet" })
   server.mount(openApiRouter(apiDefinition))
   server.mount(stoplightRouter())
   server.mount(redocRouter())
@@ -22,8 +21,3 @@ const main = async () => {
   server.listen()
 }
 main()
-
-let t = luft.string().status(Status.HTTP_500_INTERNAL_SERVER_ERROR).generateJsonSchema("")
-console.log(t)
-t = luft.string().generateJsonSchema("")
-console.log(t)
