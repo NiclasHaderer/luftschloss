@@ -10,7 +10,7 @@ interface EventSubscription {
   unsubscribe(): void
 }
 
-type EventCallback<DATA> = (data: DATA) => any
+type EventCallback<DATA> = (data: DATA) => any | Promise<any>
 
 export class GenericEventEmitter<T extends Record<string, unknown>> {
   private onEventMap = new Map<keyof T, Set<EventCallback<any>>>()
@@ -19,7 +19,7 @@ export class GenericEventEmitter<T extends Record<string, unknown>> {
 
   public on<EVENT extends keyof T, DATA extends T[EVENT]>(
     event: EVENT,
-    getLastValue: true,
+    getLastValue: boolean,
     callback: EventCallback<DATA>
   ): EventSubscription
   public on<EVENT extends keyof T, DATA extends T[EVENT]>(
@@ -28,7 +28,7 @@ export class GenericEventEmitter<T extends Record<string, unknown>> {
   ): EventSubscription
   public on<EVENT extends keyof T, DATA extends T[EVENT]>(
     event: EVENT,
-    callbackOrGetLast: EventCallback<DATA> | true,
+    callbackOrGetLast: EventCallback<DATA> | boolean,
     callback?: EventCallback<DATA>
   ): EventSubscription {
     if (!this.onEventMap.has(event)) {
@@ -38,7 +38,7 @@ export class GenericEventEmitter<T extends Record<string, unknown>> {
 
     if (typeof callbackOrGetLast === "boolean") {
       eventHandlers.add(callback!)
-      if (this.lastEventData.has(event)) {
+      if (this.lastEventData.has(event) && callbackOrGetLast === true) {
         callback!(this.lastEventData.get(event) as DATA)
       }
     } else {
@@ -52,6 +52,10 @@ export class GenericEventEmitter<T extends Record<string, unknown>> {
     }
   }
 
+  public getLastData<EVENT extends keyof T>(event: EVENT): T[EVENT] | undefined {
+    return this.lastEventData.get(event)
+  }
+
   public onComplete<EVENT extends keyof T, DATA extends T[EVENT]>(event: EVENT): Promise<DATA> {
     return new Promise<DATA>(resolve => {
       if (!this.onCompleteEventMap.has(event)) {
@@ -63,28 +67,27 @@ export class GenericEventEmitter<T extends Record<string, unknown>> {
   }
 
   public emit<EVENT extends keyof T, DATA extends T[EVENT]>(event: EVENT, data: DATA): void {
+    void this.emitSync(event, data)
+  }
+
+  public async emitSync<EVENT extends keyof T, DATA extends T[EVENT]>(event: EVENT, data: DATA): Promise<void> {
     this.lastEventData.set(event, data)
 
     const handlers = this.onEventMap.get(event)
     if (!handlers) return
 
-    for (const handler of handlers) {
-      handler(data)
-    }
+    await Promise.all([...handlers].map(h => h(data)))
   }
 
-  public complete<EVENT extends keyof T, DATA extends T[EVENT]>(event: EVENT, data: DATA): void {
+  public async complete<EVENT extends keyof T, DATA extends T[EVENT]>(event: EVENT, data: DATA): Promise<void> {
     this.lastEventData.set(event, data)
 
     const handlers = this.onEventMap.get(event) || []
-    for (const handler of handlers) {
-      handler(data)
-    }
+    await Promise.all([...handlers].map(h => h(data)))
 
     const completeHandlers = this.onCompleteEventMap.get(event) || []
-    for (const handler of completeHandlers) {
-      handler(data)
-    }
+    await Promise.all([...completeHandlers].map(h => h(data)))
+
     this.onEventMap.delete(event)
     this.onCompleteEventMap.delete(event)
     this.lastEventData.delete(event)

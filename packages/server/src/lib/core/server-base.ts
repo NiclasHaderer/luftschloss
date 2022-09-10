@@ -7,12 +7,12 @@
 import { Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaults } from "@luftschloss/common"
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
-import { MountingOptions, ResolvedRoute, Router } from "../router"
-import { RequestImpl } from "./request-impl"
-import { ResponseImpl } from "./response-impl"
 import { ReadonlyMiddlewares } from "../middleware"
+import { MountingOptions, ResolvedRoute, Router } from "../router"
 import { LRequest } from "./request"
+import { RequestImpl } from "./request-impl"
 import { LResponse } from "./response"
+import { ResponseImpl } from "./response-impl"
 import { HTTP_METHODS, LookupResultStatus } from "./route-collector.model"
 
 export type LuftServerEvents = {
@@ -24,6 +24,8 @@ export type LuftServerEvents = {
 
 export interface ServerBase extends Pick<GenericEventEmitter<LuftServerEvents>, "onComplete" | "on"> {
   readonly raw: Server
+  readonly isStarted: boolean
+  readonly isShutdown: boolean
 
   listen(port?: number, hostname?: string): Promise<void>
 
@@ -47,6 +49,8 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     private readonly startTime = Date.now()
     private readonly openSockets = new Set<Duplex>()
     private readonly nodeServer = http.createServer(this.handleIncomingRequest.bind(this))
+    private _isStarted = false
+    private _isShutDown = false
 
     public constructor(...args: ARGS) {
       super(...args)
@@ -59,6 +63,14 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      */
     public get raw(): Server {
       return this.nodeServer
+    }
+
+    public get isStarted() {
+      return this._isStarted
+    }
+
+    public get isShutdown() {
+      return this._isShutDown
     }
 
     /**
@@ -166,6 +178,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       const runningServer = this.nodeServer.listen(port, hostname, () => {
         console.log(`Server is listening on http://${hostname}:${port}`)
         console.log(`Server startup took ${Date.now() - this.startTime}ms`)
+        this._isStarted = true
         this.eventDelegate.complete("start", undefined)
       })
 
@@ -195,7 +208,11 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      */
     public shutdown({ gracePeriod = 1000 } = {}): Promise<void> {
       return new Promise((resolve, reject) => {
+        if (this._isShutDown) resolve()
+        console.log("Shutting down server")
+
         this.nodeServer.close(err => {
+          this._isShutDown = true
           if (err) {
             reject(err)
           } else {
