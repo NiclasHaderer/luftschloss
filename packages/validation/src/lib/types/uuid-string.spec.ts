@@ -5,7 +5,6 @@
  */
 
 import { LuftUUIDString } from "./uuid-string"
-import { number } from "zod"
 import { UnsuccessfulParsingResult } from "./base-type"
 import { InvalidTypeError, LuftErrorCodes } from "../validation-error"
 
@@ -21,5 +20,5 @@ test("UUIDType: validation", () => {
     "/[a-fA-F\\d]{8}-[a-fA-F\\d]{4}-[a-fA-F\\d]{4}-[a-fA-F\\d]{4}-[a-fA-F\\d]{12}/",
     "string",
   ])
-  expect(validator.validateSave(number).success).toBe(false)
+  expect(validator.validateSave(34).success).toBe(false)
 })

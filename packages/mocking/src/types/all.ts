@@ -37,7 +37,7 @@ import { mockUnion } from "./union"
 import { mockUUID } from "./uuid"
 import { getCustomMock } from "./register-custom"
 
-export const mockAll = <T extends LuftType>(validator: T, fieldName?: string): LuftInfer<T> => {
+export const mockAll = <T extends LuftType | LuftNever>(validator: T, fieldName?: string): LuftInfer<T> => {
   // Null
   if (validator.constructor === LuftNull) {
     return mockNull(validator) as LuftInfer<T>
@@ -103,10 +103,12 @@ export const mockAll = <T extends LuftType>(validator: T, fieldName?: string): L
     return mockAny(validator) as LuftInfer<T>
   }
 
-  const customMock = getCustomMock(validator)
+  const customMock = getCustomMock(validator as LuftType)
   if (customMock) {
-    return customMock(validator)
+    return customMock(validator as LuftType)
   }
 
-  throw new Error(`Could not find a faker for ${getTypeOf(validator)} . Add one yourself with \`registerMock\``)
+  throw new Error(
+    `Could not find a mocking factory for ${getTypeOf(validator)}. Add one yourself with \`registerMock\``
+  )
 }

@@ -179,7 +179,7 @@ export abstract class LuftBaseType<RETURN_TYPE = any> {
   }
 
   public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
-    const context = new ParsingContext("validate")
+    const context = new ParsingContext("coerce")
     return this.run(data, context, false)
   }
 

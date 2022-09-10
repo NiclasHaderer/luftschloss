@@ -2,6 +2,8 @@ import { apiServer, openApiRouter, redocRouter, stoplightRouter, swaggerRouter }
 import { apiDefinition } from "./app/api-definition"
 import { petRouter } from "./app/routes/pet"
 import { corsMiddleware } from "@luftschloss/server"
+import "@luftschloss/openapi-schema"
+import { luft } from "@luftschloss/validation"
 
 const main = async () => {
   const server = apiServer()
@@ -21,3 +23,5 @@ const main = async () => {
   server.listen()
 }
 main()
+
+luft.string().generateJsonSchema("test")

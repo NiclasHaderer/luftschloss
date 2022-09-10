@@ -9,8 +9,8 @@ export const mockNumber = (validator: LuftNumber): LuftInfer<LuftNumber> => {
   const max = validator.schema.max
 
   return faker.datatype.number({
-    min: inclusiveMin ? min : min ? min + 0.01 : min,
-    max: inclusiveMax ? max : max ? max - 0.01 : max,
-    precision: 1,
+    min: inclusiveMin ? min : min !== undefined ? min + 0.01 : min,
+    max: inclusiveMax ? max : max !== undefined ? max - 0.01 : max,
+    precision: 0.01,
   })
 }

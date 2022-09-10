@@ -214,7 +214,7 @@ test("Mocking: union", () => {
 test("Mocking: regex", () => {
   const validator = luft.regex(/\d/)
   expect(() => mockAll(validator)).toThrow(
-    "Could not find mocking factory for LuftRegex. Add one yourself with `registerMock`"
+    "Could not find a mocking factory for LuftRegex. Add one yourself with `registerMock`"
   )
 })
 

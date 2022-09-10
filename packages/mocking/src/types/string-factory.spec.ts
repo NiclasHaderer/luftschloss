@@ -7,7 +7,7 @@ test("StringMock: factory retrieval 1", () => {
 
 test("StringMock: factory retrieval 2", () => {
   const factoryName = stringFactory("fdasdf")
-  expect(factoryName).toBe("word")
+  expect(factoryName).toBe("random")
 })
 
 test("StringMock: factory retrieval 3", () => {
