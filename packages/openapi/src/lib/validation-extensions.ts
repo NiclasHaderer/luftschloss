@@ -1,12 +1,13 @@
 import { LuftType, LuftValidationStorage } from "@luftschloss/validation"
 import { Status, toStatus } from "@luftschloss/server"
+import "@luftschloss/validation"
 
 declare module "@luftschloss/validation" {
-  export interface LuftType {
+  interface LuftType {
     status(code: Status | number): this
   }
 
-  export interface LuftValidationStorage {
+  interface LuftValidationStorage {
     status?: Status
   }
 }

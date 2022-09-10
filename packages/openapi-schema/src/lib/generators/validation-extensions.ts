@@ -1,9 +1,10 @@
 import { LuftType } from "@luftschloss/validation"
 import { GeneratedSchema } from "./type"
 import { generateJsonSchema } from "./all"
+import "@luftschloss/validation"
 
 declare module "@luftschloss/validation" {
-  export interface LuftType {
+  interface LuftType {
     generateJsonSchema(schemaPath: string): GeneratedSchema
   }
 }

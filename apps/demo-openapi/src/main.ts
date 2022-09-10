@@ -25,5 +25,5 @@ main()
 
 let t = luft.string().status(Status.HTTP_500_INTERNAL_SERVER_ERROR).generateJsonSchema("")
 console.log(t)
-t = luft.string().generateJsonSchema("").status(500)
+t = luft.string().generateJsonSchema("")
 console.log(t)

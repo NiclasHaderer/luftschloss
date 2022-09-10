@@ -1,3 +1,5 @@
+import "./validation-extensions"
+
 export * from "./all"
 export * from "./any"
 export * from "./array"
@@ -16,5 +18,3 @@ export * from "./string"
 export * from "./tuple"
 export * from "./undefined"
 export * from "./union"
-export * from "./validation-extensions"
-import "./validation-extensions"
