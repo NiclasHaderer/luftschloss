@@ -5,9 +5,10 @@
  */
 
 import LightMyRequest, { DispatchFunc, inject, InjectOptions } from "light-my-request"
-import { Options, OptionsWithBody, TestingClient, TestingServer } from "./models"
+import { Options, OptionsWithBody, TestingClient } from "./types"
+import { ServerBase } from "@luftschloss/server"
 
-export const testClient = (server: TestingServer, clientOptions?: InjectOptions | string): TestingClient => {
+export const testClient = (server: ServerBase, clientOptions?: InjectOptions | string): TestingClient => {
   server._testBootstrap()
 
   return {

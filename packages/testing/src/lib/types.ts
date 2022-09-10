@@ -5,14 +5,7 @@
  */
 
 import * as http from "http"
-import { IncomingMessage, ServerResponse } from "http"
 import { Response } from "light-my-request"
-
-export interface TestingServer {
-  handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void
-
-  _testBootstrap(): void
-}
 
 export interface Options {
   headers?: http.IncomingHttpHeaders | http.OutgoingHttpHeaders
