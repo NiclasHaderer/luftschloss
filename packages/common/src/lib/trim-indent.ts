@@ -20,7 +20,6 @@ const trimTemplate = (strings: string[], args: any[]): string => {
   strings[strings.length - 1] = strings[strings.length - 1].replace(/\n *$/, "")
 
   // Get the minimal indent for the template parts
-  // TODO try to respect if a template literal is the thing with least indents
   const indentSize = Math.min(
     ...strings
       // Break new lines in a non-flat list, so we still know where the start and end of the strings between the template literals are

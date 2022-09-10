@@ -134,29 +134,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       this.eventDelegate.emit("locked", undefined)
     }
 
-    /**
-     * The server triggers the on mount event which will cause the mountEvent of all other routers which have been attached
-     * to the server to get triggered
-     * @param routers The router or the router you want to attach to the server
-     * @param options Some options for the mounting the router
-     */
-    public override mount(routers: Router[] | Router, options: Partial<MountingOptions> = saveObject()): this {
-      const completeOptions = withDefaults<MountingOptions>(options, { basePath: "/" })
-
-      if (this.locked) {
-        throw new Error("Router has been locked. You cannot mount any new routers")
-      }
-      super.mount(routers, completeOptions)
-
-      if (!Array.isArray(routers)) {
-        routers = [routers]
-      }
-
-      // the complete path is in our case the base path, because the server is the root router
-      routers.forEach(r => r.onMount(this, this, normalizePath(completeOptions.basePath)))
-      return this
-    }
-
     public _testBootstrap(): void {
       if (this.locked) {
         throw new Error("Server was already passed to a testing client")

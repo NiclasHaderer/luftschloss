@@ -347,6 +347,7 @@ export class ApiRoute<
         headers: parsedHeaders,
       })
 
+      // TODO if union and one of the union elements is the matching element get the status code for the element
       const parsedResult: string | number | boolean | null | undefined | object | unknown[] = await parseAndError(
         this.validators.response,
         () => result,

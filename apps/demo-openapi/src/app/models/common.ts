@@ -1,4 +1,5 @@
-import { int, LuftInfer, object, string } from "@luftschloss/validation"
+import { Status } from "@luftschloss/server"
+import { int, luft, LuftInfer, object, string } from "@luftschloss/validation"
 
 export const Category = object({
   name: string(),
@@ -11,3 +12,9 @@ export const Tag = object({
   id: int().positive(),
 }).named("Tag")
 export type Tag = LuftInfer<typeof Tag>
+
+export const NotFound = object({
+  message: luft.string(),
+})
+  .named("NotFound")
+  .status(Status.HTTP_404_NOT_FOUND)

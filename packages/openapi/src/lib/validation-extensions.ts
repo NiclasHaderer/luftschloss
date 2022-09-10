@@ -16,7 +16,8 @@ declare module "@luftschloss/validation" {
 // @ts-ignore
 Object.defineProperty(LuftType.prototype, "status", {
   value: function (code: Status | number): LuftType {
-    ;(this.validationStorage as LuftValidationStorage).status = toStatus(code)
-    return this
+    const copy = this.clone()
+    ;(copy.validationStorage as LuftValidationStorage).status = toStatus(code)
+    return copy
   },
 })

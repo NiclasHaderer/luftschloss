@@ -1,8 +1,8 @@
 import { mockAll } from "@luftschloss/mocking"
 import { apiRouter } from "@luftschloss/openapi"
 import "@luftschloss/openapi"
-import { array, int, object, string } from "@luftschloss/validation"
-import { Tag } from "../models/common"
+import { array, int, object, string, union } from "@luftschloss/validation"
+import { NotFound, Tag } from "../models/common"
 import { Pet } from "../models/pet"
 import { Status } from "@luftschloss/server"
 
@@ -31,6 +31,9 @@ export const petRouter = (tag = "pet") => {
   router
     .build({ path: object({ petId: int().positive() }), response: Pet })
     .info({ summary: "Finds pet by id" })
+    .modify({
+      response: union([NotFound, Pet]),
+    })
     .get("{petId:int}", () => mockAll(Pet))
 
   router

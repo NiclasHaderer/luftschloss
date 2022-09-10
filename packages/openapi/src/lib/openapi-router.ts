@@ -8,9 +8,9 @@
 import { normalizePath } from "@luftschloss/common"
 import { OpenApiSchema } from "@luftschloss/openapi-schema"
 import { getRootRouter, LRequest, LResponse, Router, RouterBase, ServerBase } from "@luftschloss/server"
+import { addRouteToOpenApi } from "./add-route-to-openapi"
 import { CollectedRoute } from "./api.route"
 import { ApiRouter } from "./api.router"
-import { addRouteToOpenApi } from "./add-route-to-openapi"
 
 export class OpenApiRouter extends RouterBase {
   public constructor(public readonly openApi: OpenApiSchema, protected openApiUrl: string) {
@@ -61,6 +61,7 @@ export type OpenApiRouterArgs = {
   openApiUrl?: string
 }
 
+// TODO give option to add example factory
 export const openApiRouter = ({ openApi, openApiUrl = "/openapi" }: OpenApiRouterArgs) => {
   return new OpenApiRouter({ openapi: "3.1.0", ...openApi }, openApiUrl)
 }

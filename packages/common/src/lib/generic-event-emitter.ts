@@ -73,8 +73,7 @@ export class GenericEventEmitter<T extends Record<string, unknown>> {
   public async emitSync<EVENT extends keyof T, DATA extends T[EVENT]>(event: EVENT, data: DATA): Promise<void> {
     this.lastEventData.set(event, data)
 
-    const handlers = this.onEventMap.get(event)
-    if (!handlers) return
+    const handlers = this.onEventMap.get(event) || []
 
     await Promise.all([...handlers].map(h => h(data)))
   }
