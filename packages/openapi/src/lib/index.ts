@@ -4,6 +4,8 @@
  * MIT Licensed
  */
 
+import "./validation-extensions"
+
 export * from "./api.route"
 export * from "./api.router"
 export * from "./api.server"

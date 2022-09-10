@@ -10,7 +10,7 @@ export const petRouter = apiRouter().tag("pet")
 petRouter
   .build({
     body: Pet,
-    response: Pet,
+    response: Pet, // .status(Status.HTTP_418_IM_A_TEAPOT),
   })
   .info({ summary: "Update an existing pet" })
   .put(() => mockAll(Pet))

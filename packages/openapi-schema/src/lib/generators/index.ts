@@ -29,6 +29,8 @@ declare module "@luftschloss/validation" {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-LuftBaseType.prototype.generateJsonSchema = function (this, schemaPath: string): GeneratedSchema {
-  return generateJsonSchema(this, schemaPath)
-}
+Object.defineProperty(LuftBaseType.prototype, "generateJsonSchema", {
+  value: function (schemaPath: string): GeneratedSchema {
+    return generateJsonSchema(this, schemaPath)
+  },
+})

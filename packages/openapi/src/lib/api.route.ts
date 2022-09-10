@@ -16,6 +16,7 @@ import {
   Status,
 } from "@luftschloss/server"
 import {
+  getTypeOf,
   LuftArray,
   LuftInfer,
   LuftObject,
@@ -34,7 +35,7 @@ export type OpenApiHandler<
   URL_PARAMS extends LuftObject<any> | undefined,
   BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
-  RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined
+  RESPONSE extends LuftType | undefined
 > = (args: {
   path: PATH extends LuftType ? LuftInfer<PATH> : undefined
   query: URL_PARAMS extends LuftType ? LuftInfer<URL_PARAMS> : undefined
@@ -47,7 +48,7 @@ export interface RouterParams<
   URL_PARAMS extends LuftObject<any> | undefined,
   BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
-  RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined
+  RESPONSE extends LuftType | undefined
 > {
   path: PATH
   query: URL_PARAMS
@@ -69,15 +70,7 @@ export type CollectedRoute<
     | LuftRecord<LuftString, LuftType>
     | undefined,
   HEADERS extends LuftObject<Record<string, LuftType>> | undefined = LuftObject<Record<string, LuftType>> | undefined,
-  RESPONSE extends
-    | LuftObject<Record<string, LuftType>>
-    | LuftArray<LuftType>
-    | LuftRecord<LuftString, LuftType>
-    | undefined =
-    | LuftObject<Record<string, LuftType>>
-    | LuftArray<LuftType>
-    | LuftRecord<LuftString, LuftType>
-    | undefined
+  RESPONSE extends LuftType | undefined = LuftType | undefined
 > = {
   path: `/${string}`
   method: HTTP_METHODS
@@ -90,7 +83,7 @@ export class ApiRoute<
   QUERY extends LuftObject<any> | undefined,
   BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined,
   HEADERS extends LuftObject<any> | undefined,
-  RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined
+  RESPONSE extends LuftType | undefined
 > {
   private infoObject?: DeepPartial<Operation>
 
@@ -115,7 +108,7 @@ export class ApiRoute<
     NEW_QUERY extends LuftObject<any> | undefined = QUERY,
     NEW_BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined = BODY,
     NEW_HEADERS extends LuftObject<any> | undefined = HEADERS,
-    NEW_RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined = RESPONSE
+    NEW_RESPONSE extends LuftType | undefined = RESPONSE
   >(
     params: Partial<RouterParams<NEW_PATH, NEW_QUERY, NEW_BODY, NEW_HEADERS, NEW_RESPONSE>>
   ): ApiRoute<NEW_PATH, NEW_QUERY, NEW_BODY, NEW_HEADERS, NEW_RESPONSE> {
@@ -354,13 +347,27 @@ export class ApiRoute<
         headers: parsedHeaders,
       })
 
-      const parsedResult = await parseAndError(
+      const parsedResult: string | number | boolean | null | undefined | object | unknown[] = await parseAndError(
         this.validators.response,
         () => result,
         "response",
         Status.HTTP_500_INTERNAL_SERVER_ERROR
       )
-      parsedResult ? await response.json(parsedResult).end() : await response.empty().end()
+
+      if (typeof parsedResult === "object" || typeof parsedResult === "boolean") {
+        await response.json(parsedResult).end()
+      } else if (typeof parsedResult === "string") {
+        await response.text(parsedResult).end()
+      } else if (parsedResult === undefined) {
+        await response.empty().end()
+      } else if (typeof parsedResult === "number") {
+        await response.text(parsedResult.toString()).end()
+      } else {
+        throw new HTTPException(
+          Status.HTTP_500_INTERNAL_SERVER_ERROR,
+          `Cannot serialize type ${getTypeOf(parsedResult)}`
+        )
+      }
     }
   }
 }

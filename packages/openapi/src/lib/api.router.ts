@@ -6,7 +6,7 @@
 
 import { jsonParser } from "@luftschloss/body"
 import { RouterBase } from "@luftschloss/server"
-import { LuftArray, LuftObject, LuftRecord } from "@luftschloss/validation"
+import { LuftArray, LuftObject, LuftRecord, LuftType } from "@luftschloss/validation"
 import { ApiRoute, CollectedRoute, RouterParams } from "./api.route"
 
 const EMPTY_OBJECT = {
@@ -26,7 +26,7 @@ export class ApiRouter extends RouterBase {
     QUERY extends LuftObject<any> | undefined = undefined,
     BODY extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined = undefined,
     HEADERS extends LuftObject<any> | undefined = undefined,
-    RESPONSE extends LuftObject<any> | LuftArray<any> | LuftRecord<any, any> | undefined = undefined
+    RESPONSE extends LuftType | undefined = undefined
   >(
     params: Partial<RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
