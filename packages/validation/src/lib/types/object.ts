@@ -8,15 +8,7 @@ import { deepCopy, saveObject } from "@luftschloss/common"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../validation-error"
-import {
-  InternalLuftBaseType,
-  InternalParsingResult,
-  LuftBaseType,
-  LuftInfer,
-  LuftType,
-  LuftUndefined,
-  LuftUnion,
-} from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType, LuftUndefined, LuftUnion } from "./base-type"
 
 type ExtractType<T extends Record<string, LuftType>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
@@ -47,7 +39,7 @@ const copyValidatorObject = <T extends Record<string, LuftType>>(object: T): T =
   return newObject as T
 }
 
-export class LuftObject<T extends Record<string, LuftType>> extends LuftBaseType<ExtractType<T>> {
+export class LuftObject<T extends Record<string, LuftType>> extends LuftType<ExtractType<T>> {
   public readonly supportedTypes = ["object"]
   public schema: { type: T } & LuftObjectConstructor
 

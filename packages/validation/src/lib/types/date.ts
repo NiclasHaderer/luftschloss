@@ -6,11 +6,11 @@
 
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes, LuftValidationUsageError } from "../validation-error"
-import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { InternalParsingResult, LuftType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 import { deepCopy } from "@luftschloss/common"
 
-export class LuftDate extends LuftBaseType<Date> {
+export class LuftDate extends LuftType<Date> {
   public readonly supportedTypes = ["date"]
 
   constructor(

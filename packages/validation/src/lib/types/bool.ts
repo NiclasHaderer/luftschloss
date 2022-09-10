@@ -1,16 +1,16 @@
-import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { InternalParsingResult, LuftType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 import { createInvalidTypeIssue } from "../helpers"
 import { deepCopy } from "@luftschloss/common"
 
-export class LuftBool extends LuftBaseType<boolean> {
+export class LuftBool extends LuftType<boolean> {
   public readonly supportedTypes = ["bool"]
 
   constructor(public readonly schema = { parseString: false }) {
     super()
   }
 
-  public clone(): LuftBaseType<boolean> {
+  public clone(): LuftType<boolean> {
     return new LuftBool({
       ...this.schema,
     }).replaceValidationStorage(deepCopy(this.validationStorage))

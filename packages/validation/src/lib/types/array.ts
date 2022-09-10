@@ -7,7 +7,7 @@
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../validation-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftType } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType } from "./base-type"
 import { deepCopy } from "@luftschloss/common"
 
 type LuftArrayConstructor = {
@@ -17,7 +17,7 @@ type LuftArrayConstructor = {
   unique: boolean
 }
 
-export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftBaseType<LuftInfer<ARRAY_TYPE>[]> {
+export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftType<LuftInfer<ARRAY_TYPE>[]> {
   public readonly supportedTypes = ["array"]
   public readonly schema: LuftArrayConstructor & { type: ARRAY_TYPE }
 

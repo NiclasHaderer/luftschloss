@@ -5,11 +5,11 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { InternalParsingResult, LuftType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 import { deepCopy } from "@luftschloss/common"
 
-export class LuftAny extends LuftBaseType<any> {
+export class LuftAny extends LuftType<any> {
   readonly supportedTypes = ["any"]
   public readonly schema = {}
 

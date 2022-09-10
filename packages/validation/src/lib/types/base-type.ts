@@ -10,8 +10,7 @@ import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes, LuftValidationError, LuftValidationUsageError, ValidationError } from "../validation-error"
 import { logDeprecated, returnDefault } from "./base-validation-functions"
 
-export type LuftType<T = any> = LuftBaseType<T>
-export type LuftInfer<T extends LuftType | LuftBaseType<never>> = T extends LuftBaseType<infer U> ? U : never
+export type LuftInfer<T extends LuftType | LuftType<never>> = T extends LuftType<infer U> ? U : never
 
 export type InternalParsingResult<T> =
   | {
@@ -73,9 +72,9 @@ export type ValidationHook<ThisArg, VALUE, CONTINUE, BREAK = CONTINUE> = (
 
 export type InternalLuftBaseType<OUT_TYPE> = {
   run(data: unknown, mode: ParsingContext, skipContextValidation: boolean): ParsingResult<OUT_TYPE>
-} & Omit<LuftBaseType<OUT_TYPE>, "run">
+} & Omit<LuftType<OUT_TYPE>, "run">
 
-export abstract class LuftBaseType<RETURN_TYPE = any> {
+export abstract class LuftType<RETURN_TYPE = any> {
   public abstract readonly schema: Record<string, unknown>
   public abstract readonly supportedTypes: string[]
 
@@ -106,7 +105,7 @@ export abstract class LuftBaseType<RETURN_TYPE = any> {
 
   protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>
 
-  public abstract clone(): LuftBaseType<RETURN_TYPE>
+  public abstract clone(): LuftType<RETURN_TYPE>
 
   public deprecated(deprecated: boolean): this {
     const copy = this.clone()
@@ -283,7 +282,7 @@ export interface LuftBaseType {
   // status(status: Status): this
 }
 
-export class LuftUndefined extends LuftBaseType<undefined> {
+export class LuftUndefined extends LuftType<undefined> {
   public readonly schema = {}
 
   public supportedTypes = ["undefined"]
@@ -303,7 +302,7 @@ export class LuftUndefined extends LuftBaseType<undefined> {
   }
 }
 
-export class LuftNull extends LuftBaseType<null> {
+export class LuftNull extends LuftType<null> {
   public supportedTypes = ["null"]
   public readonly schema = {}
 
@@ -322,7 +321,7 @@ export class LuftNull extends LuftBaseType<null> {
   }
 }
 
-export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftBaseType<LuftInfer<T[number]>> {
+export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftType<LuftInfer<T[number]>> {
   public constructor(public readonly schema: { types: T }) {
     super()
   }

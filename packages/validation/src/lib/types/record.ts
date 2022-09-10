@@ -8,14 +8,14 @@ import { deepCopy, saveObject } from "@luftschloss/common"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../validation-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftType, LuftUnion } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType, LuftUnion } from "./base-type"
 import { LuftNumber } from "./number"
 import { LuftRegex } from "./regexp"
 import { LuftString } from "./string"
 
 export type LuftRecordKey = LuftString | LuftNumber | LuftRegex | LuftUnion<(LuftString | LuftNumber | LuftRegex)[]>
 
-export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> extends LuftBaseType<
+export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> extends LuftType<
   Record<LuftInfer<KEY>, LuftInfer<VALUE>>
 > {
   readonly supportedTypes: string[] = ["object"]

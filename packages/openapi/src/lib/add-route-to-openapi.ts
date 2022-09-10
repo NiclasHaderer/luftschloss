@@ -3,7 +3,6 @@ import { AllSchemas, OpenApiSchema, Parameter, Reference } from "@luftschloss/op
 import { HTTP_METHODS } from "@luftschloss/server"
 import { LuftObject, LuftType } from "@luftschloss/validation"
 import { CollectedRoute } from "./api.route"
-import "@luftschloss/openapi-schema"
 
 const SCHEMA_PATH = "#/components/schemas/"
 

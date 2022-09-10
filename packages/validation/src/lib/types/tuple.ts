@@ -8,13 +8,13 @@ import { deepCopy, isArray } from "@luftschloss/common"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../validation-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftBaseType, LuftInfer, LuftType } from "./base-type"
+import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType } from "./base-type"
 
 type ExtractType<T extends ReadonlyArray<LuftType>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>
 }
 
-export class LuftTuple<T extends ReadonlyArray<LuftType>> extends LuftBaseType<ExtractType<T>> {
+export class LuftTuple<T extends ReadonlyArray<LuftType>> extends LuftType<ExtractType<T>> {
   readonly supportedTypes = ["array"]
   public override readonly schema: {
     types: T

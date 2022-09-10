@@ -6,11 +6,11 @@
 
 import { createInvalidTypeIssue } from "../helpers"
 import { LuftErrorCodes } from "../validation-error"
-import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { InternalParsingResult, LuftType } from "./base-type"
 import { ParsingContext } from "../parsing-context"
 import { deepCopy } from "@luftschloss/common"
 
-export class LuftString extends LuftBaseType<string> {
+export class LuftString extends LuftType<string> {
   public get supportedTypes() {
     return ["string"]
   }

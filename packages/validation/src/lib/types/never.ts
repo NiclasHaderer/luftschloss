@@ -4,12 +4,12 @@
  * MIT Licensed
  */
 
-import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { InternalParsingResult, LuftType } from "./base-type"
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { deepCopy } from "@luftschloss/common"
 
-export class LuftNever extends LuftBaseType<never> {
+export class LuftNever extends LuftType<never> {
   readonly supportedTypes = ["never"]
   public readonly schema = {}
 

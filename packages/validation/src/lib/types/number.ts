@@ -7,7 +7,7 @@
 import { createInvalidTypeIssue } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftErrorCodes } from "../validation-error"
-import { InternalParsingResult, LuftBaseType } from "./base-type"
+import { InternalParsingResult, LuftType } from "./base-type"
 import { deepCopy, floatSafeModulo } from "@luftschloss/common"
 
 export type LuftNumberSchema = {
@@ -20,7 +20,7 @@ export type LuftNumberSchema = {
   parseString: boolean
 }
 
-export class LuftNumber extends LuftBaseType<number> {
+export class LuftNumber extends LuftType<number> {
   public readonly supportedTypes = ["number"]
 
   constructor(
