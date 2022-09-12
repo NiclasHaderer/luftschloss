@@ -226,6 +226,6 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Ext
     }
     if (failAtEnd) return { success: false }
 
-    return { success: true, data: parsedObject }
+    return { success: true, data: parsedObject, usedValidator: this }
   }
 }

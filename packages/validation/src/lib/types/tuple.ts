@@ -114,6 +114,6 @@ export class LuftTuple<T extends ReadonlyArray<LuftType>> extends LuftType<Extra
     }
 
     if (failAtEnd) return { success: false }
-    return { success: true, data: newArray as unknown as ExtractType<T> }
+    return { success: true, data: newArray as unknown as ExtractType<T>, usedValidator: this }
   }
 }

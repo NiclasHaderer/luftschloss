@@ -21,6 +21,7 @@ export class LuftAny extends LuftType<any> {
     return {
       success: true,
       data,
+      usedValidator: this,
     }
   }
 
@@ -28,6 +29,7 @@ export class LuftAny extends LuftType<any> {
     return {
       success: true,
       data,
+      usedValidator: this,
     }
   }
 }

@@ -131,6 +131,7 @@ export class LuftDate extends LuftType<Date> {
     return {
       success: true,
       data: data,
+      usedValidator: this,
     }
   }
 

@@ -322,7 +322,15 @@ export class ApiRoute<
   private wrapWithOpenApi(handler: OpenApiHandler<PATH, QUERY, BODY, HEADERS, RESPONSE>): ROUTE_HANDLER {
     return async (request: LRequest, response: LResponse): Promise<void> => {
       // Set the response status code here, so it can be overwritten in the handler
-      response.status(this.validators.response?.validationStorage.status ?? request.method === "POST" ? 201 : 200)
+      // Include the custom true to be able to see if the status gets overwritten<
+      const defaultReturnCode =
+        request.method === "POST"
+          ? { ...Status.HTTP_201_CREATED, custom: true }
+          : {
+              ...Status.HTTP_200_OK,
+              custom: true,
+            }
+      response.status(defaultReturnCode)
 
       // Path
       const parsedPath = await parseAndError(this.validators.path, () => request.pathParams(), "path")
@@ -342,7 +350,7 @@ export class ApiRoute<
       const parsedHeaders = await parseAndError(this.validators.headers, () => request.headers.encode(), "headers")
 
       // Response
-      const result = await handler({
+      const responseBody = await handler({
         path: parsedPath,
         body: parsedBody,
         query: parsedQuery,
@@ -351,26 +359,49 @@ export class ApiRoute<
         response,
       })
 
-      // TODO if union and one of the union elements is the matching element get the status code for the element
-      const parsedResult: string | number | boolean | null | undefined | object | unknown[] = await parseAndError(
-        this.validators.response,
-        () => result,
-        "response",
-        Status.HTTP_500_INTERNAL_SERVER_ERROR
-      )
+      let parsedResponseBody: string | number | boolean | null | undefined | object | unknown[]
+      if (this.validators.response === undefined) {
+        parsedResponseBody = undefined
+      } else {
+        const parsedData = this.validators.response.coerceSave(responseBody)
+        if (!parsedData.success) {
+          throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, {
+            issues: parsedData.issues,
+            location: "response",
+          })
+        } else {
+          parsedResponseBody = parsedData.data
 
-      if (typeof parsedResult === "object" || typeof parsedResult === "boolean") {
-        await response.json(parsedResult).end()
-      } else if (typeof parsedResult === "string") {
-        await response.text(parsedResult).end()
-      } else if (parsedResult === undefined) {
+          // We know that the user did not set a custom status code (because of the custom in the status object),
+          // so we can set the status code of the response validator
+          if ("custom" in response.getStatus()) {
+            // Try to get the status from the used validator and if the used validator does not have a status code
+            // use the one of the passed validator.
+            // Checking the usedValidator has to be done because only by using this technique we can get the status
+            // that was actually used to validate the data successfully (for example in case of a union first the matching
+            // validator of the union will be checked for a status code and afterwards if this validator does not have a
+            // status code look at the status code of the union).
+            const responseStatus =
+              parsedData.usedValidator.validationStorage.status ?? this.validators.response.validationStorage.status
+            if (responseStatus !== undefined) {
+              response.status(responseStatus)
+            }
+          }
+        }
+      }
+
+      if (typeof parsedResponseBody === "object" || typeof parsedResponseBody === "boolean") {
+        await response.json(parsedResponseBody).end()
+      } else if (typeof parsedResponseBody === "string") {
+        await response.text(parsedResponseBody).end()
+      } else if (parsedResponseBody === undefined) {
         await response.empty().end()
-      } else if (typeof parsedResult === "number") {
-        await response.text(parsedResult.toString()).end()
+      } else if (typeof parsedResponseBody === "number") {
+        await response.text(parsedResponseBody.toString()).end()
       } else {
         throw new HTTPException(
           Status.HTTP_500_INTERNAL_SERVER_ERROR,
-          `Cannot serialize type ${getTypeOf(parsedResult)}`
+          `Cannot serialize type ${getTypeOf(parsedResponseBody)}`
         )
       }
     }
@@ -389,7 +420,9 @@ const parseAndError = async <T extends LuftType | undefined>(
   if (!parsedData.success) {
     throw new HTTPException(statusCode, { issues: parsedData.issues, location: location })
   }
-  return parsedData.data as T extends LuftType<infer TYPE> ? TYPE : undefined
+  return { data: parsedData.data, parser: parsedData.usedValidator } as T extends LuftType<infer TYPE>
+    ? TYPE
+    : undefined
 }
 
 const extractArrayElement: ValidationHook<unknown, unknown, unknown> = (value: unknown) => {

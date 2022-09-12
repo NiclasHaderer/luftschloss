@@ -85,6 +85,7 @@ export class LuftString extends LuftType<string> {
       return {
         success: true,
         data: data,
+        usedValidator: this,
       }
     }
 

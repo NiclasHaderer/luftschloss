@@ -183,6 +183,7 @@ export class LuftArray<ARRAY_TYPE extends LuftType> extends LuftType<LuftInfer<A
     return {
       success: true,
       data: data as LuftInfer<ARRAY_TYPE>[],
+      usedValidator: this,
     }
   }
 }

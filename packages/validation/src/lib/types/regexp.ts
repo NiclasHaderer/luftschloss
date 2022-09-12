@@ -57,6 +57,7 @@ export class LuftRegex extends LuftString {
       return {
         success: true,
         data: result.data,
+        usedValidator: this,
       }
     }
 

@@ -133,6 +133,6 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
       return { success: false }
     }
 
-    return { success: true, data: newData }
+    return { success: true, data: newData, usedValidator: this }
   }
 }

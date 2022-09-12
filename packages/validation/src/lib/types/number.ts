@@ -120,7 +120,7 @@ export class LuftNumber extends LuftType<number> {
 
     // Don't bother checking if nan is smaller or larger the min/max.
     // If you want greater and smaller to work properly do not allow nan
-    if (isNaN(data)) return { success: true, data: NaN }
+    if (isNaN(data)) return { success: true, data: NaN, usedValidator: this }
 
     // Check for multipleOf
     if (this.schema.multipleOf !== undefined && floatSafeModulo(data, this.schema.multipleOf) !== 0) {
@@ -168,6 +168,7 @@ export class LuftNumber extends LuftType<number> {
     return {
       success: true,
       data: data,
+      usedValidator: this,
     }
   }
 

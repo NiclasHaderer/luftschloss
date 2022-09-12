@@ -44,6 +44,7 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
       return {
         success: true,
         data: this.nonSensitiveSchema.getCorresponding(data as T[number]),
+        usedValidator: this,
       }
     }
     return result
@@ -55,12 +56,14 @@ export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> ext
         return {
           success: true,
           data: data as T[number],
+          usedValidator: this,
         }
       }
     } else if (this.sensitiveSchema.has(data as T[number])) {
       return {
         success: true,
         data: data as T[number],
+        usedValidator: this,
       }
     }
 

@@ -29,6 +29,7 @@ export class LuftBool extends LuftType<boolean> {
         return {
           data: lower === "true",
           success: true,
+          usedValidator: this,
         }
       }
     }
@@ -44,6 +45,7 @@ export class LuftBool extends LuftType<boolean> {
     return {
       data,
       success: true,
+      usedValidator: this,
     }
   }
 }

@@ -16,6 +16,7 @@ export type InternalParsingResult<T> =
   | {
       success: true
       data: T
+      usedValidator: LuftType
     }
   | {
       success: false
@@ -25,6 +26,7 @@ export type InternalParsingResult<T> =
 export type SuccessfulParsingResult<T> = {
   success: true
   data: T
+  usedValidator: LuftType
 }
 export type UnsuccessfulParsingResult = {
   success: false
@@ -148,7 +150,15 @@ export abstract class LuftType<RETURN_TYPE = any> {
       } else if (result.action === "continue") {
         data = result.data
       } else if (result.action === "break") {
-        return this.checkDataAndReturn(context, { success: true, data: result.data }, skipContextValidation)
+        return this.checkDataAndReturn(
+          context,
+          {
+            success: true,
+            data: result.data,
+            usedValidator: this,
+          },
+          skipContextValidation
+        )
       }
     }
 
@@ -162,7 +172,15 @@ export abstract class LuftType<RETURN_TYPE = any> {
       } else if (result.action === "continue") {
         validationResult.data = result.data
       } else if (result.action === "break") {
-        return this.checkDataAndReturn(context, { success: true, data: result.data }, skipContextValidation)
+        return this.checkDataAndReturn(
+          context,
+          {
+            success: true,
+            data: result.data,
+            usedValidator: this,
+          },
+          skipContextValidation
+        )
       }
     }
 
@@ -207,6 +225,7 @@ export abstract class LuftType<RETURN_TYPE = any> {
       return {
         success: true,
         data: resultData.data,
+        usedValidator: resultData.usedValidator,
       }
     }
     // Not successful
@@ -277,11 +296,6 @@ export abstract class LuftType<RETURN_TYPE = any> {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface LuftBaseType {
-  // status(status: Status): this
-}
-
 export class LuftUndefined extends LuftType<undefined> {
   public readonly schema = {}
 
@@ -296,7 +310,7 @@ export class LuftUndefined extends LuftType<undefined> {
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
-    if (data === undefined) return { success: true, data }
+    if (data === undefined) return { success: true, data, usedValidator: this }
     context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
     return { success: false }
   }
@@ -315,7 +329,7 @@ export class LuftNull extends LuftType<null> {
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<null> {
-    if (data === null) return { success: true, data }
+    if (data === null) return { success: true, data, usedValidator: this }
     context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
     return { success: false }
   }
