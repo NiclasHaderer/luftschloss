@@ -41,6 +41,8 @@ export type OpenApiHandler<
   query: URL_PARAMS extends LuftType ? LuftInfer<URL_PARAMS> : undefined
   body: BODY extends LuftType<infer T> ? T : undefined
   headers: HEADERS extends LuftType ? LuftInfer<HEADERS> : undefined
+  request: LRequest
+  response: LResponse
 }) => Promisable<RESPONSE extends LuftType<infer T> ? T : undefined>
 
 export interface RouterParams<
@@ -345,6 +347,8 @@ export class ApiRoute<
         body: parsedBody,
         query: parsedQuery,
         headers: parsedHeaders,
+        request,
+        response,
       })
 
       // TODO if union and one of the union elements is the matching element get the status code for the element

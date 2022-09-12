@@ -4,11 +4,11 @@
  * MIT Licensed
  */
 
-import { Constructor, GenericEventEmitter, normalizePath, saveObject, withDefaults } from "@luftschloss/common"
+import { Constructor, GenericEventEmitter } from "@luftschloss/common"
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
 import { ReadonlyMiddlewares } from "../middleware"
-import { MountingOptions, ResolvedRoute, Router } from "../router"
+import { ResolvedRoute, Router } from "../router"
 import { LRequest } from "./request"
 import { RequestImpl } from "./request-impl"
 import { LResponse } from "./response"
