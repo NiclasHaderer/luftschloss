@@ -11,7 +11,7 @@ export const apiDefinition: OpenApiRouterArgs = {
     ],
     servers: [
       {
-        url: "http://127.0.0.1:3200",
+        url: "http://0.0.0.0:3200",
         description: "Local server",
       },
       { url: "https://petstore3.swagger.io/api/v3", description: "Official petstore server" },

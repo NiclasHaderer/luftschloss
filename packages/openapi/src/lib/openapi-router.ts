@@ -27,11 +27,11 @@ export class OpenApiRouter extends RouterBase {
     return response.json(this.openApi).end()
   }
 
-  private generateOpenApiSchema() {
+  private async generateOpenApiSchema() {
     const routes = this.collectRoutes(getRootRouter(this))
     // Add the routes to the openapi schema of the router
     for (const route of routes) {
-      addRouteToOpenApi(this.openApi, route)
+      await addRouteToOpenApi(this.openApi, route)
     }
   }
 

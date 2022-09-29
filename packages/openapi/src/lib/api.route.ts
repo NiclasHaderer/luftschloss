@@ -394,7 +394,7 @@ export class ApiRoute<
         await response.json(parsedResponseBody).end()
       } else if (typeof parsedResponseBody === "string") {
         await response.text(parsedResponseBody).end()
-      } else if (parsedResponseBody === undefined) {
+      } else if (parsedResponseBody === undefined || parsedResponseBody === null) {
         await response.empty().end()
       } else if (typeof parsedResponseBody === "number") {
         await response.text(parsedResponseBody.toString()).end()
