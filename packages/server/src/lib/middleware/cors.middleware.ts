@@ -8,7 +8,7 @@ import { HTTP_METHODS, LRequest, LResponse } from "../core"
 import { Middleware, NextFunction } from "./middleware"
 
 type CorsMiddlewareOptions = {
-  allowedMethods: HTTP_METHODS[] | "*"
+  allowedMethods: HTTP_METHODS[] | "*" | "ALL"
   allowedHeaders: string[] | "*"
   allowCredentials: boolean
   exposeHeaders: string[]
@@ -45,7 +45,11 @@ class CorsMiddleware implements Middleware {
       throw e
     }
 
-    if (this.isCorsRequest(request)) this.preflightResponse(request, response)
+    if (this.isCorsRequest(request)) {
+      this.preflightResponse(request, response)
+    } else {
+      this.simpleResponse(request, response)
+    }
   }
 
   private isCorsRequest(request: LRequest): boolean {
@@ -55,7 +59,7 @@ class CorsMiddleware implements Middleware {
   private preflightResponse(request: LRequest, response: LResponse) {
     // Send back all headers if all headers should be allowed
     if (this.allowAllHeaders) {
-      const requestedHeaders = request.headers.getAll("access-control-request-headers")
+      const requestedHeaders = request.headers.getAll("Access-Control-Request-Headers")
       requestedHeaders && response.headers.appendAll("Access-Control-Allow-Headers", requestedHeaders)
     }
 
@@ -68,6 +72,16 @@ class CorsMiddleware implements Middleware {
     if (this.isAllowedOrigin(request)) {
       const requestedOrigin = request.headers.get("origin")
       requestedOrigin && response.headers.append("Access-Control-Allow-Origin", requestedOrigin)
+    }
+  }
+
+  private simpleResponse(request: LRequest, response: LResponse) {
+    if (!this.isAllowedOrigin(request)) return
+    const requestedOrigin = request.headers.get("origin")
+    if (!requestedOrigin) return
+    response.headers.append("Access-Control-Allow-Origin", requestedOrigin)
+    for (const [headerName, headerValue] of Object.entries(this.defaultHeaders)) {
+      response.headers.appendAll(headerName, headerValue)
     }
   }
 
@@ -97,6 +111,8 @@ const getDefaultHeaders = (options: CorsMiddlewareOptions): Record<string, strin
 
   if (options.allowedMethods === "*") {
     headers["Access-Control-Allow-Methods"] = ["*"]
+  } else if (options.allowedMethods === "ALL") {
+    headers["Access-Control-Allow-Methods"] = Object.values(HTTP_METHODS)
   } else {
     headers["Access-Control-Allow-Methods"] = options.allowedMethods
   }
@@ -111,6 +127,7 @@ const getDefaultHeaders = (options: CorsMiddlewareOptions): Record<string, strin
   return headers
 }
 
+// TODO allow plain origin strings
 export const corsMiddleware = (options: Partial<CorsMiddlewareOptions>): Middleware => {
   const completeOptions = withDefaults(options, {
     allowOrigins: [],
