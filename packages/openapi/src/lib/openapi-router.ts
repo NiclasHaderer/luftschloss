@@ -23,8 +23,8 @@ export class OpenApiRouter extends RouterBase {
     void server.onComplete("start").then(() => this.generateOpenApiSchema())
   }
 
-  protected handleOpenApi(_: LRequest, response: LResponse): Promise<void> {
-    return response.json(this.openApi).end()
+  protected handleOpenApi(_: LRequest, response: LResponse): void {
+    response.json(this.openApi)
   }
 
   private async generateOpenApiSchema() {

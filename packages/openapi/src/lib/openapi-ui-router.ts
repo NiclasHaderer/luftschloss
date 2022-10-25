@@ -7,7 +7,7 @@
 import { LRequest, LResponse, RouterBase } from "@luftschloss/server"
 
 export abstract class OpenApiUiRouter extends RouterBase {
-  protected abstract handleDocs(_: LRequest, response: LResponse): Promise<void>
+  protected abstract handleDocs(_: LRequest, response: LResponse): Promise<void> | void
 
   public constructor(protected docsUrl: string, protected openApiUrl: string) {
     super()

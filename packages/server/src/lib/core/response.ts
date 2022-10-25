@@ -37,8 +37,6 @@ export interface LResponse {
   stream(stream: ReadStream | ReadStream[]): this
 
   text(text: string): this
-
-  end(): Promise<void>
 }
 
 export const addResponseField = <R extends LResponse, KEY extends PropertyKey>(

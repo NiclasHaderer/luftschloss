@@ -13,6 +13,7 @@ import {
   numberPathValidator,
   pathPathValidator,
   poweredBy,
+  requestCompleter,
   ServerBase,
   stringPathValidator,
   uuidPathValidator,
@@ -29,6 +30,7 @@ export const apiServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INT
 
   server
     .pipe(loggerMiddleware())
+    .pipe(requestCompleter())
     .pipe(errorMiddleware({ ...DefaultErrorHandler }))
     .pipe(noContentSniff())
     .pipe(jsonParser())

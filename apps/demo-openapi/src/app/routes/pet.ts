@@ -17,7 +17,7 @@ export const petRouter = (tag = "pet") => {
     .info({ summary: "Update an existing pet" })
     .put(() => mockAll(Pet))
     .info({ summary: "Add a new pet to the store" })
-    .modify({ body: Pet })
+    .modify({ response: Pet })
     .post(() => mockAll(Pet))
 
   router

@@ -391,13 +391,13 @@ export class ApiRoute<
       }
 
       if (typeof parsedResponseBody === "object" || typeof parsedResponseBody === "boolean") {
-        await response.json(parsedResponseBody).end()
+        await response.json(parsedResponseBody)
       } else if (typeof parsedResponseBody === "string") {
-        await response.text(parsedResponseBody).end()
+        await response.text(parsedResponseBody)
       } else if (parsedResponseBody === undefined || parsedResponseBody === null) {
-        await response.empty().end()
+        await response.empty()
       } else if (typeof parsedResponseBody === "number") {
-        await response.text(parsedResponseBody.toString()).end()
+        await response.text(parsedResponseBody.toString())
       } else {
         throw new HTTPException(
           Status.HTTP_500_INTERNAL_SERVER_ERROR,

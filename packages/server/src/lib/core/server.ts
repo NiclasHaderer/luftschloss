@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { errorMiddleware, loggerMiddleware, noContentSniff, poweredBy } from "../middleware"
+import { errorMiddleware, loggerMiddleware, noContentSniff, poweredBy, requestCompleter } from "../middleware"
 import {
   intPathValidator,
   numberPathValidator,
@@ -26,6 +26,7 @@ export const defaultServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE
 
   server
     .pipe(loggerMiddleware())
+    .pipe(requestCompleter())
     .pipe(errorMiddleware({ ...DefaultErrorHandler }))
     .pipe(noContentSniff())
     .pipe(poweredBy())

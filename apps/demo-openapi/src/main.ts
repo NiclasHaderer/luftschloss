@@ -5,15 +5,14 @@ import { corsMiddleware } from "@luftschloss/server"
 
 const main = async () => {
   const server = apiServer()
-  false &&
-    server.pipe(
-      corsMiddleware({
-        allowCredentials: true,
-        allowedHeaders: "*",
-        allowedMethods: "*",
-        allowOriginFunction: () => true,
-      })
-    )
+  server.pipe(
+    corsMiddleware({
+      allowCredentials: true,
+      allowedHeaders: "*",
+      allowedMethods: "*",
+      allowOriginFunction: () => true,
+    })
+  )
   server.mount(petRouter(), { basePath: "/pet" })
   server.mount(openApiRouter(apiDefinition))
   server.mount(stoplightRouter())

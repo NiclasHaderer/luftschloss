@@ -31,7 +31,7 @@ export class SwaggerRouter extends OpenApiUiRouter {
       </body>
       </html>
     `
-    await response.html(html).end()
+    await response.html(html)
   }
 }
 

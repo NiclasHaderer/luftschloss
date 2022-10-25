@@ -2,7 +2,7 @@ import { LRequest, LResponse } from "@luftschloss/server"
 import { OpenApiUiRouter } from "./openapi-ui-router"
 
 export class StoplightRouter extends OpenApiUiRouter {
-  protected async handleDocs(_: LRequest, response: LResponse) {
+  protected handleDocs(_: LRequest, response: LResponse) {
     const html = `
      <!doctype html>
      <html lang="en">
@@ -24,7 +24,7 @@ export class StoplightRouter extends OpenApiUiRouter {
        </body>
      </html>
     `
-    await response.html(html).end()
+    response.html(html)
   }
 }
 

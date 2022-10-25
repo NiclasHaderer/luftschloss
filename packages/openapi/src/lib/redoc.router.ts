@@ -23,7 +23,7 @@ export class RedocRouter extends OpenApiUiRouter {
        </body>
      </html>
     `
-    await response.html(html).end()
+    await response.html(html)
   }
 }
 

@@ -98,6 +98,9 @@ export class ResponseImpl implements LResponse {
     return this
   }
 
+  /**
+   * @internal
+   */
   public async end(): Promise<void> {
     try {
       // Some error happened in the end method. Perhaps a stream corrupted, etc...
@@ -132,7 +135,7 @@ export class ResponseImpl implements LResponse {
       // Pass to the error handler and the error handler will call end with the right data
       throw new HTTPException(
         Status.HTTP_500_INTERNAL_SERVER_ERROR,
-        "Server did not not send a response. Did you or one of your middlewares forget to await an async call?"
+        "Server did not not send a response. Did you or one of your middlewares/routes forget to await an async call?"
       )
     } else if (this.data instanceof Buffer) {
       // Null cannot be written to stdout and ?? checks for undefined and null

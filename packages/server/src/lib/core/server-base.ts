@@ -93,7 +93,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         return {
           ...route,
           status: LookupResultStatus.OK,
-          executor: async (req, res) => res.empty().header("Allow", route.availableMethods).end(),
+          executor: async (req, res) => res.empty().header("Allow", route.availableMethods),
         }
       }
       return route
