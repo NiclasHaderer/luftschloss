@@ -23,7 +23,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/packages/static"],
+      "outputs": ["{workspaceRoot}/coverage/packages/static"],
       "options": {
         "jestConfig": "packages/static/jest.config.ts",
         "passWithNoTests": true

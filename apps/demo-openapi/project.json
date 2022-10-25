@@ -4,14 +4,16 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/demo-openapi",
         "main": "apps/demo-openapi/src/main.ts",
         "tsConfig": "apps/demo-openapi/tsconfig.app.json",
         "assets": ["apps/demo-openapi/src/assets"],
-        "sourceMap": true
+        "sourceMap": true,
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
@@ -47,7 +49,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/demo-openapi"],
+      "outputs": ["{workspaceRoot}/coverage/apps/demo-openapi"],
       "options": {
         "jestConfig": "apps/demo-openapi/jest.config.ts",
         "passWithNoTests": true

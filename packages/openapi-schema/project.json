@@ -22,7 +22,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/packages/openapi-schema"],
+      "outputs": ["{workspaceRoot}/coverage/packages/openapi-schema"],
       "options": {
         "jestConfig": "packages/openapi-schema/jest.config.ts",
         "passWithNoTests": true

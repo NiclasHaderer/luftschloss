@@ -23,7 +23,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/packages/proxy"],
+      "outputs": ["{workspaceRoot}/coverage/packages/proxy"],
       "options": {
         "jestConfig": "packages/proxy/jest.config.ts",
         "passWithNoTests": true
