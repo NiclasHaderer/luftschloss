@@ -2,6 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/server/src",
   "projectType": "library",
+  "implicitDependencies": ["!testing"],
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",

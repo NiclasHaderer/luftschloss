@@ -4,7 +4,15 @@
  * MIT Licensed
  */
 
-import { ByLazy, escapeRegexString, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/common"
+import {
+  ByLazy,
+  escapeRegexString,
+  findIndexes,
+  normalizePath,
+  saveObject,
+  SKIP_CACHE,
+  withDefaults,
+} from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -187,22 +195,21 @@ export class RouterBase implements Router {
     return this
   }
 
-  public unPipe(...middlewaresToRemove: Middleware[]): this {
+  public unPipe(...middlewaresToRemove: (Middleware | string)[]): this {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot remove a middleware")
     }
 
-    // Reverse the middleware list to remove the last middleware with the name that was added
-    const reversedMiddlewares = this._middlewares.reverse()
-    for (const middleware of middlewaresToRemove) {
-      const middlewareIndex = reversedMiddlewares.findIndex(m => m.name === middleware.name)
+    middlewaresToRemove = middlewaresToRemove.map(middleware =>
+      typeof middleware === "object" ? middleware.name : middleware
+    )
+    const indexes = findIndexes(this._middlewares, m => middlewaresToRemove.includes(m.name))
+    const uniqueIndexes = new Set(indexes)
+    const sortedUniqueIndexes = [...uniqueIndexes].sort()
 
-      if (middlewareIndex === -1) {
-        console.warn("Middleware was not found and therefore could not be removed.")
-      } else {
-        this._middlewares.splice(middlewareIndex - 1, 1)
-      }
-    }
+    sortedUniqueIndexes.forEach((middlewareIndex, index) => {
+      this._middlewares.splice(middlewareIndex - index, 1)
+    })
 
     return this
   }

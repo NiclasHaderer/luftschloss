@@ -39,7 +39,7 @@ export interface Router {
 
   pipe(...middleware: Middleware[]): this
 
-  unPipe(...middleware: Middleware[]): this
+  unPipe(...middleware: (Middleware | string)[]): this
 
   addPathValidator(validator: PathValidator<unknown>): this
 

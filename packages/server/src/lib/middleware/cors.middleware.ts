@@ -40,20 +40,17 @@ class CorsMiddleware implements Middleware {
   public async handle(next: NextFunction, request: LRequest, response: LResponse): Promise<void> {
     try {
       await next(request, response)
-    } catch (e) {
-      if (this.isCorsRequest(request)) this.preflightResponse(request, response)
-      throw e
-    }
-
-    if (this.isCorsRequest(request)) {
-      this.preflightResponse(request, response)
-    } else {
-      this.simpleResponse(request, response)
+    } finally {
+      if (this.isPreflightRequest(request)) {
+        this.preflightResponse(request, response)
+      } else if (request.headers.has("Origin")) {
+        this.simpleResponse(request, response)
+      }
     }
   }
 
-  private isCorsRequest(request: LRequest): boolean {
-    return request.method === "OPTIONS" && request.headers.has("access-control-request-method")
+  private isPreflightRequest(request: LRequest): boolean {
+    return request.method === "OPTIONS" && request.headers.has("Access-Control-Request-Method")
   }
 
   private preflightResponse(request: LRequest, response: LResponse) {
@@ -64,28 +61,24 @@ class CorsMiddleware implements Middleware {
     }
 
     // Add all the default headers
-    for (const [headerName, headerValue] of Object.entries(this.defaultHeaders)) {
-      response.headers.appendAll(headerName, headerValue)
-    }
+    response.headers.mergeIn(this.defaultHeaders)
 
     // Check if the regex or the allowOriginFunction are set and allow the request origin
-    if (this.isAllowedOrigin(request)) {
+    if (this.isInDynamicOrigin(request)) {
       const requestedOrigin = request.headers.get("origin")
       requestedOrigin && response.headers.append("Access-Control-Allow-Origin", requestedOrigin)
     }
   }
 
   private simpleResponse(request: LRequest, response: LResponse) {
-    if (!this.isAllowedOrigin(request)) return
-    const requestedOrigin = request.headers.get("origin")
-    if (!requestedOrigin) return
-    response.headers.append("Access-Control-Allow-Origin", requestedOrigin)
-    for (const [headerName, headerValue] of Object.entries(this.defaultHeaders)) {
-      response.headers.appendAll(headerName, headerValue)
+    if (this.isInDynamicOrigin(request)) {
+      const requestedOrigin = request.headers.get("origin")!
+      response.headers.append("Access-Control-Allow-Origin", requestedOrigin)
     }
+    response.headers.mergeIn(this.defaultHeaders)
   }
 
-  private isAllowedOrigin(request: LRequest): boolean {
+  private isInDynamicOrigin(request: LRequest): boolean {
     if (this.allowOriginRegex) {
       const origin = request.headers.get("Origin")
       return !!(origin ?? this.allowOriginRegex.test(origin!))
@@ -119,6 +112,8 @@ const getDefaultHeaders = (options: CorsMiddlewareOptions): Record<string, strin
 
   if (Array.isArray(options.allowedHeaders)) {
     headers["Access-Control-Allow-Headers"] = options.allowedHeaders
+  } else if (options.allowedHeaders === "*") {
+    headers["Access-Control-Allow-Headers"] = ["*"]
   }
 
   headers["Access-Control-Allow-Credentials"] = [options.allowCredentials.toString()]
@@ -128,14 +123,14 @@ const getDefaultHeaders = (options: CorsMiddlewareOptions): Record<string, strin
 }
 
 // TODO allow plain origin strings
-export const corsMiddleware = (options: Partial<CorsMiddlewareOptions>): Middleware => {
+export const corsMiddleware = (options: Partial<CorsMiddlewareOptions> = {}): Middleware => {
   const completeOptions = withDefaults(options, {
-    allowOrigins: [],
+    allowOrigins: "*",
     exposeHeaders: [],
     allowCredentials: false,
-    allowedMethods: ["GET"],
-    allowedHeaders: [],
-    maxAge: 600,
+    allowedMethods: "*",
+    allowedHeaders: "*",
+    maxAge: 600, // Ten minutes
   })
   const defaultHeaders = getDefaultHeaders(completeOptions)
   return new CorsMiddleware(

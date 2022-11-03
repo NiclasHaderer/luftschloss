@@ -27,11 +27,13 @@ export interface ServerBase extends Pick<GenericEventEmitter<LuftServerEvents>, 
   readonly isStarted: boolean
   readonly isShutdown: boolean
 
+  get address(): URL
+
   listen(port?: number, hostname?: string): Promise<void>
 
   _testBootstrap(): void
 
-  shutdown(options: { gracePeriod: 100 }): Promise<void>
+  shutdown(options?: { gracePeriod: number }): Promise<void>
 
   handleIncomingRequest(req: IncomingMessage, res: ServerResponse): void
 
@@ -56,6 +58,18 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       super(...args)
       // Call *this* routers onMount method, so that the lifecycle chain can begin
       this.onMount(this, undefined, "")
+    }
+
+    public get address(): URL {
+      const address = this.nodeServer.address()
+      if (address === null) {
+        throw new Error("Server is not listening")
+      }
+
+      if (typeof address === "string") {
+        return new URL(address)
+      }
+      return new URL(`http://${address.address}:${address.port}`)
     }
 
     /**

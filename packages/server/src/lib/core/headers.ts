@@ -47,6 +47,23 @@ export class Headers {
     }
   }
 
+  public mergeIn(headers: Headers | Record<string, string[] | string>): void {
+    if (headers instanceof Headers) {
+      for (const [name, value] of headers.entries()) {
+        this.appendAll(name, value)
+      }
+      return
+    }
+
+    for (const [key, value] of Object.entries(headers)) {
+      if (Array.isArray(value)) {
+        this.appendAll(key, value)
+      } else {
+        this.append(key, value)
+      }
+    }
+  }
+
   public delete(name: string): void {
     name = Headers.cleanHeaderName(name)
     this.headers.delete(name)

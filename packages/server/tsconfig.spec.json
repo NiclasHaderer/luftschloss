@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
+    "lib": ["DOM", "ES2021"],
     "module": "commonjs",
     "types": ["jest", "node"]
   },
