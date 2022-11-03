@@ -10,7 +10,7 @@ export const noContentSniff = (): Middleware => ({
   name: "no-content-sniff",
   version: "1.0.0",
   handle: async (next: NextFunction, request: LRequest, response: LResponse) => {
-    await next(request, response)
     response.headers.append("X-Content-Type-Options", "nosniff")
+    await next(request, response)
   },
 })

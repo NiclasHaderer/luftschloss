@@ -38,15 +38,12 @@ class CorsMiddleware implements Middleware {
   ) {}
 
   public async handle(next: NextFunction, request: LRequest, response: LResponse): Promise<void> {
-    try {
-      await next(request, response)
-    } finally {
-      if (this.isPreflightRequest(request)) {
-        this.preflightResponse(request, response)
-      } else if (request.headers.has("Origin")) {
-        this.simpleResponse(request, response)
-      }
+    if (this.isPreflightRequest(request)) {
+      this.preflightResponse(request, response)
+    } else if (request.headers.has("Origin")) {
+      this.simpleResponse(request, response)
     }
+    await next(request, response)
   }
 
   private isPreflightRequest(request: LRequest): boolean {

@@ -10,7 +10,7 @@ export const poweredBy = (): Middleware => ({
   name: "powered-by",
   version: "1.0.0",
   handle: async (next: NextFunction, request: LRequest, response: LResponse) => {
-    await next(request, response)
     response.headers.append("X-Powered-By", "luftschloss")
+    await next(request, response)
   },
 })

@@ -9,7 +9,7 @@ export const loggerMiddleware = (): Middleware => ({
   name: "logger",
   version: "1.0.0",
   handle: async (next, request, response) => {
-    // TODO perhaps subscribe on a non existing complete event the response fires
+    // TODO perhaps subscribe on a non-existing complete event the response fires
     const startTime = Date.now()
     await next(request, response)
     console.log(
