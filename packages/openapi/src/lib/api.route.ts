@@ -123,7 +123,7 @@ export class ApiRoute<
 
   public info(info: DeepPartial<Operation>, mergeIntoCurrent = true): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     const clone = this.clone()
-    clone.infoObject = mergeIntoCurrent ? withDefaults(info, this.infoObject || {}) : info
+    clone.infoObject = mergeIntoCurrent ? withDefaults<Operation>(this.infoObject || {}, info) : info
     return clone
   }
 

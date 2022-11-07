@@ -18,20 +18,23 @@ export const formParser = (
   contentType: string[] | "*" | string = "application/x-www-form-urlencoded",
   options: Partial<FormParserOptions>
 ): Middleware => {
-  const completeOptions = withDefaults<FormParserOptions>(options, {
-    parser: (buffer: Buffer, encoding: BufferEncoding | undefined): UTF8SearchParams => {
-      const str = buffer.toString(encoding)
-      try {
-        return new UTF8SearchParams(str)
-      } catch (e) {
-        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, {
-          message: "Could not parse form data",
-          details: (e as Error).message,
-        })
-      }
+  const completeOptions = withDefaults<FormParserOptions>(
+    {
+      parser: (buffer: Buffer, encoding: BufferEncoding | undefined): UTF8SearchParams => {
+        const str = buffer.toString(encoding)
+        try {
+          return new UTF8SearchParams(str)
+        } catch (e) {
+          throw new HTTPException(Status.HTTP_400_BAD_REQUEST, {
+            message: "Could not parse form data",
+            details: (e as Error).message,
+          })
+        }
+      },
+      maxBodySize: 100,
     },
-    maxBodySize: 100,
-  })
+    options
+  )
 
   return commonFormParserFactory(contentType, {
     ...completeOptions,

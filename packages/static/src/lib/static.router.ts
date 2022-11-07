@@ -71,9 +71,12 @@ export class StaticRouter extends RouterBase implements Router {
 }
 
 export const staticRouter = (folderPath: string, options: Partial<StaticRouterProps> = {}): StaticRouter => {
-  const mergedOptions = withDefaults<StaticRouterProps>(options, {
-    indexFile: "index.html",
-    useIndexFile: false,
-  })
+  const mergedOptions = withDefaults<StaticRouterProps>(
+    {
+      indexFile: "index.html",
+      useIndexFile: false,
+    },
+    options
+  )
   return new StaticRouter(folderPath, mergedOptions)
 }

@@ -13,7 +13,7 @@ const isObject = (value: unknown): value is Record<string, unknown> => value ins
 const defaultExecutor = <T extends Record<string, unknown>>(filledPartial: T, defaultValues: T) => {
   for (const key of Object.keys(defaultValues)) {
     // Key is not filled, so fill it with a default value, can be primitive or object
-    if (filledPartial[key] === undefined) {
+    if (filledPartial[key] === undefined && defaultValues?.[key] !== undefined) {
       ;(filledPartial as Record<string, unknown>)[key] = deepCopy(defaultValues[key])
     }
     // If the not undefined value is an object fill the child object with defaults as well
@@ -24,7 +24,7 @@ const defaultExecutor = <T extends Record<string, unknown>>(filledPartial: T, de
   return filledPartial
 }
 
-export const withDefaults = <T extends Record<string, any>>(partial: Partial<T>, defaults: T): T => {
+export const withDefaults = <T extends Record<string, any>>(defaults: T, partial: DeepPartial<T>): T => {
   partial = deepCopy(partial)
   return defaultExecutor(partial as T, defaults)
 }

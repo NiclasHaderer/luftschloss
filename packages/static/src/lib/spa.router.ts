@@ -31,6 +31,6 @@ class SPARouter extends StaticRouter implements Router {
 }
 
 export const spaRouter = (folderPath: string, options: Partial<SPARouterProps> = saveObject()): SPARouter => {
-  const mergedOptions = withDefaults<SPARouterProps>(options, { indexFile: "index.html" })
+  const mergedOptions = withDefaults<SPARouterProps>({ indexFile: "index.html" }, options)
   return new SPARouter(folderPath, mergedOptions)
 }

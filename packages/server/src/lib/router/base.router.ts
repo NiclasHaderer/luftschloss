@@ -172,7 +172,7 @@ export class RouterBase implements Router {
       throw new Error("Router has been locked. You cannot mount any new routers")
     }
 
-    const completeOptions = withDefaults<MountingOptions>(options, { basePath: "/" })
+    const completeOptions = withDefaults<MountingOptions>({ basePath: "/" }, options)
     this._mountPath = completeOptions.basePath
 
     if (!Array.isArray(routers)) {

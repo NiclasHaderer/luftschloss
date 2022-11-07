@@ -18,13 +18,16 @@ export const textParser = (
   contentType: string[] | "*" | string = "text/plain",
   options: Partial<TextParserOptions>
 ): Middleware => {
-  const completeOptions = withDefaults<TextParserOptions>(options, {
-    parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
-      const str = buffer.toString(encoding)
-      return new UTF8SearchParams(str).encode()
+  const completeOptions = withDefaults<TextParserOptions>(
+    {
+      parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
+        const str = buffer.toString(encoding)
+        return new UTF8SearchParams(str).encode()
+      },
+      maxBodySize: 100,
     },
-    maxBodySize: 100,
-  })
+    options
+  )
 
   return commonFormParserFactory(contentType, {
     ...completeOptions,

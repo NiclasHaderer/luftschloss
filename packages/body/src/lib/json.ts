@@ -18,19 +18,22 @@ export const jsonParser = (
   contentType: string[] | "*" | string = "application/json",
   options: Partial<JsonParserOptions> = {}
 ): Middleware => {
-  const completeOptions = withDefaults<JsonParserOptions>(options, {
-    maxBodySize: 100,
-    parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
-      try {
-        return JSON.parse(buffer.toString(encoding)) as object
-      } catch (e) {
-        throw new HTTPException(Status.HTTP_400_BAD_REQUEST, {
-          message: "Could not parse json",
-          details: (e as Error).message,
-        })
-      }
+  const completeOptions = withDefaults<JsonParserOptions>(
+    {
+      maxBodySize: 100,
+      parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
+        try {
+          return JSON.parse(buffer.toString(encoding)) as object
+        } catch (e) {
+          throw new HTTPException(Status.HTTP_400_BAD_REQUEST, {
+            message: "Could not parse json",
+            details: (e as Error).message,
+          })
+        }
+      },
     },
-  })
+    options
+  )
 
   return commonFormParserFactory(contentType, {
     ...completeOptions,
