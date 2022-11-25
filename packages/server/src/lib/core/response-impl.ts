@@ -107,7 +107,6 @@ export class ResponseImpl implements LResponse {
       await this._end()
     } catch (e) {
       try {
-        // TODO get the error middleware and send it through it
         // Try to complete with the default internal server error handler
         await DefaultErrorHandler.HTTP_500_INTERNAL_SERVER_ERROR(
           HTTPException.wrap(e as Error, Status.HTTP_500_INTERNAL_SERVER_ERROR),

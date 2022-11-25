@@ -23,8 +23,10 @@ type AllowedOrigins =
   | {
       allowOriginFunction: (request: LRequest) => boolean
     }
+  | {
+      allowedOrigins: string[]
+    }
 
-// TODO fix this
 class CorsMiddleware implements Middleware {
   public readonly name = "cors"
   public readonly version = "1.0.0"
@@ -56,15 +58,12 @@ class CorsMiddleware implements Middleware {
       response.headers.appendAll("Access-Control-Allow-Headers", requestedHeaders)
     }
 
-    // Add all the default headers
-    response.headers.mergeIn(this.defaultHeaders)
-
-    this.addOriginResponse(request, response)
+    this.simpleResponse(request, response)
   }
 
   private simpleResponse(request: LRequest, response: LResponse) {
-    this.addOriginResponse(request, response)
     response.headers.mergeIn(this.defaultHeaders)
+    this.addOriginResponse(request, response)
   }
 
   private addOriginResponse(request: LRequest, response: LResponse) {
@@ -100,6 +99,10 @@ const getDefaultHeaders = (options: CorsMiddlewareOptions): Record<string, strin
     }
   }
 
+  if ("allowedOrigins" in options && options.allowedOrigins) {
+    headers["Access-Control-Allow-Origin"] = options.allowedOrigins
+  }
+
   if (options.allowedMethods === "*") {
     headers["Access-Control-Allow-Methods"] = ["*"]
   } else if (options.allowedMethods === "ALL") {
@@ -120,7 +123,6 @@ const getDefaultHeaders = (options: CorsMiddlewareOptions): Record<string, strin
   return headers
 }
 
-// TODO allow plain origin strings
 export const corsMiddleware = (options: Partial<CorsMiddlewareOptions> = {}): Middleware => {
   const completeOptions = withDefaults<CorsMiddlewareOptions>(
     {

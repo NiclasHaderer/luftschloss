@@ -98,7 +98,7 @@ export class LuftTuple<T extends ReadonlyArray<LuftType>> extends LuftType<Extra
 
     const newArray: unknown[] = new Array(schemaLength)
     for (let i = 0; i < data.length; ++i) {
-      context.stepInto(i.toString())
+      context.stepInto(i)
       const validationResult = (this.schema.types[i] as unknown as InternalLuftBaseType<unknown>).run(
         data[i],
         context,

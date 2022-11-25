@@ -68,8 +68,7 @@ export type ValidationHook<ThisArg, VALUE, CONTINUE, BREAK = CONTINUE> = (
   this: ThisArg,
   value: VALUE,
   context: ParsingContext,
-  // TODO improve validator typ in ValidationHook
-  validator: LuftType
+  validator: ThisArg
 ) => HookResult<CONTINUE, BREAK>
 
 export type InternalLuftBaseType<OUT_TYPE> = {

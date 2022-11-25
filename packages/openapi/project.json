@@ -29,5 +29,6 @@
         "passWithNoTests": true
       }
     }
-  }
+  },
+  "name": "openapi"
 }
