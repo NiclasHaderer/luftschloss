@@ -61,7 +61,6 @@ export type OpenApiRouterArgs = {
   openApiUrl?: string
 }
 
-// TODO give option to add example factory
 export const openApiRouter = ({ openApi, openApiUrl = "/openapi" }: OpenApiRouterArgs) => {
   return new OpenApiRouter({ openapi: "3.1.0", ...openApi }, openApiUrl)
 }
