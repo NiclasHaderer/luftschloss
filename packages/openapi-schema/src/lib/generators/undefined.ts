@@ -1,6 +1,5 @@
 import { LuftUndefined } from "@luftschloss/validation"
+import { GeneratedSchema, toGeneratedSchema } from "./type"
 
-// TODO think of a way around this
-export const generateUndefinedJsonSchema = (type: LuftUndefined, schemaPath: string): never => {
-  throw new Error("Undefined cannot be displayed by json schema")
-}
+export const generateUndefinedJsonSchema = (type: LuftUndefined, schemaPath: string): GeneratedSchema =>
+  toGeneratedSchema(type, { type: "null" }, schemaPath, {})

@@ -10,6 +10,7 @@ import { promises as fs } from "fs"
 import path from "path"
 import "./static.middleware"
 import { staticContent } from "./static.middleware"
+import { Stats } from "node:fs"
 
 type StaticRouterProps = { useIndexFile: boolean; indexFile: string }
 
@@ -26,31 +27,73 @@ export class StaticRouter extends RouterBase implements Router {
     )
     // path.resolve has not trailing / at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`
-    // TODO HEAD response
     this.routeCollector.add("{path:path}", "GET", this.handlePath.bind(this))
-    // TODO not modified response https://www.keycdn.com/support/304-not-modified
+    this.routeCollector.add("{path:path}", "HEAD", this.handleHead.bind(this))
+    // TODO if nothing else has to be done: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
   }
 
-  protected async handlePath(request: LRequest, response: LResponse): Promise<void> {
-    // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
-    const filePath: string = request.pathParams<{ path: string }>().path.replace(/^\//, "")
+  protected async hasBeenModifiedSince(request: LRequest, absPath: string): Promise<boolean> {
+    if (!request.headers.has("if-modified-since")) return true
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const notModifiedHeader = request.headers.get("If-Modified-Since")!
+    try {
+      const notModifiedDate = new Date(notModifiedHeader)
+      const fileDate = await fs.stat(absPath).then(stat => stat.mtime)
+      return fileDate > notModifiedDate
+    } catch {
+      return true
+    }
+  }
 
+  protected async handleHead(request: LRequest, response: LResponse): Promise<unknown> {
+    const [exists, absPath, stats] = await this.getFilePath(request)
+    if (!exists) return this.respondWithFileNotFound(request, response, absPath)
+
+    if (!(await this.hasBeenModifiedSince(request, absPath))) {
+      return response.status(Status.HTTP_304_NOT_MODIFIED).header("Content-Length", stats.size.toString())
+    }
+
+    response.empty().header("Content-Length", stats.size.toString())
+  }
+
+  protected async getFilePath(request: LRequest): Promise<[false, string, null] | [true, string, Stats]> {
+    // Get the file path and replace a leading / with noting (folderPath already has a / at the end)
+    const filePath = request.pathParams<{ path: string }>().path.replace(/^\//, "")
     // Convert the file path to an absolute path
     let absPath = this.mergePaths(filePath)
 
+    // Throws if file does not exist, so catch...
+    let stat: Stats
     try {
-      // Throws if file does not exist, so catch...
-      const stat = await fs.lstat(absPath)
+      stat = await fs.lstat(absPath)
+    } catch {
+      return [false, absPath, null]
+    }
 
-      if (stat.isDirectory() && this.options.useIndexFile) {
-        absPath += `${path.sep}${this.options.indexFile}`
-        // Ensure the file system item exists
-        await fs.lstat(absPath)
+    if (stat.isDirectory() && this.options.useIndexFile) {
+      const newAbsPath = `${path.sep}${this.options.indexFile}`
+      // Ensure the file system item exists
+      try {
+        stat = await fs.lstat(newAbsPath)
+        absPath = newAbsPath
+      } catch {
+        return [false, absPath, null]
       }
+    }
+    return [true, absPath, stat]
+  }
 
-      // Respond with a file
+  protected async handlePath(request: LRequest, response: LResponse): Promise<unknown> {
+    const [exists, absPath] = await this.getFilePath(request)
+
+    // If the files has not been modified since the last request, respond with a 304
+    if (!(await this.hasBeenModifiedSince(request, absPath))) {
+      return response.status(Status.HTTP_304_NOT_MODIFIED)
+    }
+
+    if (exists) {
       await this.respondWithFilesystemItem(request, response, absPath)
-    } catch (e) {
+    } else {
       await this.respondWithFileNotFound(request, response, absPath)
     }
   }

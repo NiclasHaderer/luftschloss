@@ -285,14 +285,13 @@ export class RouterBase implements Router {
       }
     }
 
-    // TODO correct options response
-
     // Return wrong method result if there has been one
     if (wrongMethod) {
       return {
         ...wrongMethod,
         middlewares: [...this.middlewares],
-        executor: () => {
+        executor: (_, response) => {
+          response.header("Allow", wrongMethod!.availableMethods)
           throw new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED)
         },
       }

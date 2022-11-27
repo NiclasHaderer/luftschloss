@@ -1,5 +1,5 @@
-// TODO conditionals have been left out https://json-schema.org/understanding-json-schema/reference/conditionals.html
-// TODO vocabulary has been left out https://json-schema.org/understanding-json-schema/reference/schema.html
+// conditionals have been left out https://json-schema.org/understanding-json-schema/reference/conditionals.html
+// vocabulary has been left out https://json-schema.org/understanding-json-schema/reference/schema.html
 
 export interface CommonSchema<SCHEMA extends AllSchemas = AllSchemas> {
   $id?: string

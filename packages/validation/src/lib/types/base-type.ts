@@ -305,6 +305,7 @@ export class LuftUndefined extends LuftType<undefined> {
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
+    if (data === null) return { success: true, data: undefined, usedValidator: this }
     return this._validate(data, context)
   }
 
@@ -324,6 +325,7 @@ export class LuftNull extends LuftType<null> {
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
+    if (data === undefined) return { success: true, data: null, usedValidator: this }
     return this._validate(data, context)
   }
 
