@@ -9,7 +9,7 @@ import { RouterBase } from "./base.router"
 import { Router } from "./router"
 
 export class DefaultRouter extends RouterBase implements Router {
-  public handle(method: HTTP_METHODS | HTTP_METHODS[] | "*", url: string, callback: ROUTE_HANDLER): void {
+  public method(method: HTTP_METHODS | HTTP_METHODS[] | "*", url: string, callback: ROUTE_HANDLER): void {
     if (this.locked) {
       throw new Error("Router has been locked. You cannot add any new routes")
     }
@@ -21,35 +21,35 @@ export class DefaultRouter extends RouterBase implements Router {
   }
 
   public delete(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("DELETE", url, callback)
+    this.method("DELETE", url, callback)
   }
 
   public get(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("GET", url, callback)
+    this.method("GET", url, callback)
   }
 
   public head(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("HEAD", url, callback)
+    this.method("HEAD", url, callback)
   }
 
   public patch(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("PATCH", url, callback)
+    this.method("PATCH", url, callback)
   }
 
   public options(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("OPTIONS", url, callback)
+    this.method("OPTIONS", url, callback)
   }
 
   public post(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("POST", url, callback)
+    this.method("POST", url, callback)
   }
 
   public put(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("PUT", url, callback)
+    this.method("PUT", url, callback)
   }
 
   public all(url: string, callback: ROUTE_HANDLER): void {
-    this.handle("*", url, callback)
+    this.method("*", url, callback)
   }
 }
 

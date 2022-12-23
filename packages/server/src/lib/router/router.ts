@@ -31,9 +31,11 @@ export interface Router {
   readonly server: ServerBase | undefined
   readonly mountPath: string | undefined
   readonly completePath: string | undefined
-  readonly completePathRegex: RegExp | undefined
+  readonly completePathRegex: ((path: string) => boolean) | undefined
 
-  onMount(server: ServerBase, parentRouter: Router | undefined, completePath: string): void
+  onMount(server: ServerBase, parentRouter: Router | undefined, mountPath: string, completePath: string): void
+
+  isMounted(): boolean
 
   mount(router: Router[] | Router, options?: Partial<MountingOptions>): this
 

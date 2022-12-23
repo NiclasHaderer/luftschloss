@@ -8,7 +8,7 @@ import { PathValidator } from "./validator"
 
 const NumberPathValidator: PathValidator<number> = {
   name: "number",
-  regex: /[+-]?(?:[0-9]*[.])?[0-9]+/,
+  regex: /[+-]?(?:[0-9]*\.)?[0-9]+/,
   convert: (value: string) => parseFloat(value),
 }
 

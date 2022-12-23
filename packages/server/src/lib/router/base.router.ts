@@ -4,15 +4,7 @@
  * MIT Licensed
  */
 
-import {
-  ByLazy,
-  escapeRegexString,
-  findIndexes,
-  normalizePath,
-  saveObject,
-  SKIP_CACHE,
-  withDefaults,
-} from "@luftschloss/common"
+import { ByLazy, findIndexes, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -46,16 +38,17 @@ export class RouterBase implements Router {
     [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
   }
 
-  @ByLazy<RegExp | undefined, RouterBase>(self => {
+  @ByLazy<((path: string) => boolean) | undefined, RouterBase>(self => {
     // Setup not complete, do not cache value
     if (!self.completePath) return [SKIP_CACHE, undefined]
     // Does not contain regex, so just return undefined
-    if (!containsRegex(self.completePath)) return new RegExp(escapeRegexString(self.completePath))
+    if (!containsRegex(self.completePath)) return path => self.completePath === path
     // Build the regex with an open end, because the router is not an actual handler. It just has to match the beginning
     // of the requested path.
-    return pathToRegex(self.completePath, self.pathValidators, true)
+    const regex = pathToRegex(self.completePath, self.pathValidators, true)
+    return path => regex.test(path)
   })
-  public readonly completePathRegex: RegExp | undefined
+  public readonly completePathRegex: ((path: string) => boolean) | undefined
 
   public get children(): { router: Router; options: MountingOptions }[] {
     return this.subRouters
@@ -96,10 +89,6 @@ export class RouterBase implements Router {
     return this._server
   }
 
-  public get completeMiddlewares(): ReadonlyMiddlewares {
-    return [...this.parentMiddlewares, ...this.middlewares]
-  }
-
   public get parentMiddlewares(): ReadonlyMiddlewares {
     const parentMiddlewares: Readonly<Middleware>[] = []
 
@@ -128,7 +117,7 @@ export class RouterBase implements Router {
    * @returns True if the router can handle the path, false otherwise
    */
   public canHandle(path: string): boolean {
-    return this.completePathRegex!.test(path)
+    return this.completePathRegex!(path)
   }
 
   private propagateStartup(): void {
@@ -137,6 +126,7 @@ export class RouterBase implements Router {
     this._middlewares.forEach((m, index) => {
       let parentMiddlewares = routerParentMiddlewares
       if (index > 0) {
+        // Tell each middleware the parent middlewares
         parentMiddlewares = [...routerParentMiddlewares, ...this.middlewares.slice(0, index - 1)]
       }
 
@@ -154,16 +144,21 @@ export class RouterBase implements Router {
     return this
   }
 
-  public onMount(server: ServerBase, parentRouter: Router | undefined, completePath: string): void {
+  public isMounted(): boolean {
+    return !!this.server
+  }
+
+  public onMount(server: ServerBase, parentRouter: Router | undefined, mountPath: string, completePath: string): void {
     this._parentRouter = parentRouter
     this._server = server
     this._completePath = completePath
+    this._mountPath = mountPath
 
     // This means that the router has been mounted by the server or has at least a connection to the server through
     // other mounted routers.
     // We can now call the onMount method of all the already mounted sub-routers.
     this.subRouters.forEach(({ router, options }) =>
-      router.onMount(server, this, normalizePath(`${completePath}/${options.basePath}`))
+      router.onMount(server, this, options.basePath, normalizePath(`${completePath}/${options.basePath}`))
     )
   }
 
@@ -173,7 +168,6 @@ export class RouterBase implements Router {
     }
 
     const completeOptions = withDefaults<MountingOptions>({ basePath: "/" }, options)
-    this._mountPath = completeOptions.basePath
 
     if (!Array.isArray(routers)) {
       routers = [routers]
@@ -187,8 +181,13 @@ export class RouterBase implements Router {
 
       // Call the on mount method only if this router has been mounted to the server and the server property is therefore
       // not null. If this is not the case here the uncalled onMount functions will be called in "this" routers onMount method
-      if (this.server && this.completePath) {
-        router.onMount(this.server!, this, normalizePath(`${this.completePath}/${completeOptions.basePath}`))
+      if (this.isMounted()) {
+        router.onMount(
+          this.server!,
+          this,
+          completeOptions.basePath,
+          normalizePath(`${this.completePath}/${completeOptions.basePath}`)
+        )
       }
     }
 
@@ -204,8 +203,7 @@ export class RouterBase implements Router {
       typeof middleware === "object" ? middleware.name : middleware
     )
     const indexes = findIndexes(this._middlewares, m => middlewaresToRemove.includes(m.name))
-    const uniqueIndexes = new Set(indexes)
-    const sortedUniqueIndexes = [...uniqueIndexes].sort()
+    const sortedUniqueIndexes = [...new Set(indexes)].sort()
 
     sortedUniqueIndexes.forEach((middlewareIndex, index) => {
       this._middlewares.splice(middlewareIndex - index, 1)

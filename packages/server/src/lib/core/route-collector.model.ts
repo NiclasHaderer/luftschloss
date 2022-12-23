@@ -33,6 +33,8 @@ export type RouteNotFoundLookupResult = {
 export type MethodNotAllowedLookupResult = {
   status: LookupResultStatus.METHOD_NOT_ALLOWED
   availableMethods: HTTP_METHODS[]
+
+  pathParams: Record<string, unknown>
 }
 
 /**

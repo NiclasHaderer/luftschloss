@@ -57,7 +57,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     public constructor(...args: ARGS) {
       super(...args)
       // Call *this* routers onMount method, so that the lifecycle chain can begin
-      this.onMount(this, undefined, "")
+      this.onMount(this, undefined, "", "")
     }
 
     public get address(): URL {
