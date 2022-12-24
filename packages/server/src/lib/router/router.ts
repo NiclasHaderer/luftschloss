@@ -31,7 +31,7 @@ export interface Router {
   readonly server: ServerBase | undefined
   readonly mountPath: string | undefined
   readonly completePath: string | undefined
-  readonly completePathRegex: ((path: string) => boolean) | undefined
+  readonly completePathRegex: RegExp | undefined
 
   onMount(server: ServerBase, parentRouter: Router | undefined, mountPath: string, completePath: string): void
 
@@ -49,6 +49,12 @@ export interface Router {
 
   resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute
 
+  /**
+   * Check if the router can handle the path. This is done by comparing the base path of the router to the path of the
+   * request
+   * @param path The path of the request
+   * @returns True if the router can handle the path, false otherwise
+   */
   canHandle(path: string): boolean
 
   lock(): void

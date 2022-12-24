@@ -17,12 +17,42 @@ export type PathValidator<T> = {
   convert(this: void, value: string): T
 }
 
-type PathParamName = string
-export type PathConverters = Record<PathParamName, PathValidator<unknown>["convert"]>
-const IS_EXTRACTOR = /^{(\w+)(?::(\w+))?}$/
-const CONTAINS_EXTRACTOR = /(?:\/|^){(\w+)(?::(\w+))?}(?:\/|$)/
+const GET_PATH_SEGMENT_EXTRACTOR = /^{((?<var1>\w+)(?::(?<type1>\w+))?)|((?<var2>\w+)?(?::(?<type2>\w+)))}$/
+const CONTAINS_EXTRACTOR = /(?:\/|^){((\w+)(?::(\w+))?)|((\w+)?(?::(\w+)))}(?:\/|$)/
 
 export const containsRegex = (path: string): boolean => CONTAINS_EXTRACTOR.test(path)
+
+type PathParamName = string
+
+const getParamsFromMath = (
+  match: RegExpMatchArray
+): {
+  pathParamName: string
+  pathParamExtractor: string
+  ignoreVar: boolean
+} => {
+  let varName: string | undefined
+  let type: string | undefined
+  let ignoreVar = false
+  if (match.groups!["var1"]) {
+    // Here the type can be undefined
+    varName = match.groups!["var1"]
+    type = match.groups!["type1"] || DEFAULT_PATH_VALIDATOR_NAME
+  } else {
+    // Here the variable name can be undefined
+    varName = match.groups!["var2"]
+    type = match.groups!["type2"]
+    if (!varName) {
+      ignoreVar = true
+      varName = Math.random().toString()
+    }
+  }
+  return {
+    pathParamName: varName,
+    pathParamExtractor: type,
+    ignoreVar,
+  }
+}
 
 /**
  * Take a certain path and convert it to a regex, which will be used to match the *complete* path
@@ -40,12 +70,9 @@ export const pathToRegex = (path: string, validators: PathValidators, openEnd = 
   const regexString = path
     .split("/")
     .map(value => {
-      const match = value.match(IS_EXTRACTOR)
+      const match = value.match(GET_PATH_SEGMENT_EXTRACTOR)
       if (!match) return escapeRegexString(value)
-      // Get the name of the path validator
-      const pathParamName = match[1]
-      // And get the validation regex. If there is no validation regex, just use the default one
-      const pathParamExtractor = match[2] || DEFAULT_PATH_VALIDATOR_NAME
+      const { pathParamExtractor, pathParamName, ignoreVar } = getParamsFromMath(match)
 
       if (!(pathParamExtractor in validators)) {
         throw new Error(`Path validator with name ${pathParamExtractor} was not found. Please add it to the router.`)
@@ -55,6 +82,10 @@ export const pathToRegex = (path: string, validators: PathValidators, openEnd = 
       const extractor = validators[pathParamExtractor]
       // Save the conversion method
       pathConverters[pathParamName] = extractor.convert
+
+      if (ignoreVar) {
+        return `(?:${extractor.regex.source})`
+      }
       // And build the resulting regex with a regex group, so it is easy to retrieve the extracted name later on after
       // the route match
       return `(?<${pathParamName}>${extractor.regex.source})`

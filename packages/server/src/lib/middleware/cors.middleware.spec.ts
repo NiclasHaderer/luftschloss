@@ -320,7 +320,7 @@ test("CORS: function origin", async () => {
   expect(allowedOptionsHeaders).toStrictEqual({
     "access-control-allow-credentials": "false",
     "access-control-allow-headers": "*",
-    "access-control-allow-origin": "https://google.com, https://youtube.com",
+    "access-control-allow-origin": "https://youtube.com, https://google.com",
     "access-control-max-age": "600",
     "access-control-allow-methods": "*",
   })

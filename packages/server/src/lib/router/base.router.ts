@@ -4,7 +4,15 @@
  * MIT Licensed
  */
 
-import { ByLazy, findIndexes, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/common"
+import {
+  ByLazy,
+  escapeRegexString,
+  findIndexes,
+  normalizePath,
+  saveObject,
+  SKIP_CACHE,
+  withDefaults,
+} from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -38,17 +46,16 @@ export class RouterBase implements Router {
     [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
   }
 
-  @ByLazy<((path: string) => boolean) | undefined, RouterBase>(self => {
+  @ByLazy<RegExp | undefined, RouterBase>(self => {
     // Setup not complete, do not cache value
     if (!self.completePath) return [SKIP_CACHE, undefined]
     // Does not contain regex, so just return undefined
-    if (!containsRegex(self.completePath)) return path => self.completePath === path
+    if (!containsRegex(self.completePath)) return new RegExp(escapeRegexString(self.completePath))
     // Build the regex with an open end, because the router is not an actual handler. It just has to match the beginning
     // of the requested path.
-    const regex = pathToRegex(self.completePath, self.pathValidators, true)
-    return path => regex.test(path)
+    return pathToRegex(self.completePath, self.pathValidators, true)
   })
-  public readonly completePathRegex: ((path: string) => boolean) | undefined
+  public readonly completePathRegex: RegExp | undefined
 
   public get children(): { router: Router; options: MountingOptions }[] {
     return this.subRouters
@@ -110,15 +117,17 @@ export class RouterBase implements Router {
     this.subRouters.map(r => r.router).forEach(r => r.lock())
   }
 
-  /**
-   * Check if the router can handle the path. This is done by comparing the base path of the router to the path of the
-   * request
-   * @param path The path of the request
-   * @returns True if the router can handle the path, false otherwise
-   */
-  public canHandle(path: string): boolean {
-    return this.completePathRegex!(path)
-  }
+  @ByLazy<((path: string) => boolean) | undefined, RouterBase>(self => {
+    // Setup not complete, do not cache value
+    if (!self.completePath) return [SKIP_CACHE, undefined]
+    // Does not contain regex, so just return undefined
+    if (!containsRegex(self.completePath)) return path => self.completePath === path
+    // Build the regex with an open end, because the router is not an actual handler. It just has to match the beginning
+    // of the requested path.
+    const regex = pathToRegex(self.completePath, self.pathValidators, true)
+    return path => regex.test(path)
+  })
+  public canHandle!: (path: string) => boolean
 
   private propagateStartup(): void {
     const routerParentMiddlewares = this.parentMiddlewares
