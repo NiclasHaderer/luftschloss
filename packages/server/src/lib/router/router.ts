@@ -25,6 +25,7 @@ export type ResolvedRoute = {
 
 export interface Router {
   readonly children: Readonly<{ router: Router; options: MountingOptions }[]>
+  readonly routerMiddlewares: ReadonlyMiddlewares
   readonly middlewares: ReadonlyMiddlewares
   readonly locked: boolean
   readonly parentRouter: Router | undefined

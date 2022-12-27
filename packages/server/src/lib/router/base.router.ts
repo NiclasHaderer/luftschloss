@@ -65,8 +65,23 @@ export class RouterBase implements Router {
     return this._locked
   }
 
-  public get middlewares(): ReadonlyMiddlewares {
+  public get routerMiddlewares(): ReadonlyMiddlewares {
     return this._middlewares
+  }
+
+  public get middlewares(): ReadonlyMiddlewares {
+    return [...this.parentMiddlewares, ...this.routerMiddlewares]
+  }
+
+  public get parentMiddlewares(): ReadonlyMiddlewares {
+    const parentMiddlewares: Readonly<Middleware>[] = []
+
+    let parentRouter = this.parentRouter
+    while (parentRouter) {
+      parentMiddlewares.unshift(...parentRouter.routerMiddlewares)
+      parentRouter = parentRouter.parentRouter
+    }
+    return parentMiddlewares
   }
 
   public get routes(): RouteCollector {
@@ -94,17 +109,6 @@ export class RouterBase implements Router {
 
   public get server(): ServerBase | undefined {
     return this._server
-  }
-
-  public get parentMiddlewares(): ReadonlyMiddlewares {
-    const parentMiddlewares: Readonly<Middleware>[] = []
-
-    let parentRouter = this.parentRouter
-    while (parentRouter) {
-      parentMiddlewares.push(...parentRouter.middlewares)
-      parentRouter = parentRouter.parentRouter
-    }
-    return parentMiddlewares
   }
 
   public lock(): void {
@@ -136,7 +140,7 @@ export class RouterBase implements Router {
       let parentMiddlewares = routerParentMiddlewares
       if (index > 0) {
         // Tell each middleware the parent middlewares
-        parentMiddlewares = [...routerParentMiddlewares, ...this.middlewares.slice(0, index - 1)]
+        parentMiddlewares = [...routerParentMiddlewares, ...this.routerMiddlewares.slice(0, index - 1)]
       }
 
       m.onStartup?.(this.server!, this, parentMiddlewares)
@@ -268,10 +272,10 @@ export class RouterBase implements Router {
 
     // In case the route was found here, return
     if (route.status === LookupResultStatus.OK) {
-      return { ...route, middlewares: [...this.middlewares] }
+      return { ...route, middlewares: [...this.routerMiddlewares] }
     } else if (route.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
       // Save the wrong method here
-      wrongMethod = { ...route, middlewares: [...this.middlewares], pathParams: {} }
+      wrongMethod = { ...route, middlewares: [...this.routerMiddlewares], pathParams: {} }
     } else {
       // Iterate over the sub routes and call the resolveRoute method in them
       for (const { router } of this.subRouters) {
@@ -282,11 +286,11 @@ export class RouterBase implements Router {
         const childRoute = router.resolveRoute(path, method)
         if (childRoute.status === LookupResultStatus.OK) {
           // Add the routers own middlewares to the resolution
-          childRoute.middlewares.push(...this.middlewares)
+          childRoute.middlewares.push(...this.routerMiddlewares)
           return childRoute
         } else if (!wrongMethod && childRoute.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
           // Save the route not found result if there has not been a route not found result earlier
-          childRoute.middlewares.push(...this.middlewares)
+          childRoute.middlewares.push(...this.routerMiddlewares)
           wrongMethod = childRoute
         }
       }
@@ -296,7 +300,7 @@ export class RouterBase implements Router {
     if (wrongMethod) {
       return {
         ...wrongMethod,
-        middlewares: [...this.middlewares],
+        middlewares: [...this.routerMiddlewares],
         executor: (_, response) => {
           response.header("Allow", wrongMethod!.availableMethods)
           throw new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -307,7 +311,7 @@ export class RouterBase implements Router {
     // Nothing matched so return the notFound method of this router
     return {
       ...route,
-      middlewares: [...this.middlewares],
+      middlewares: [...this.routerMiddlewares],
       executor: () => {
         throw new HTTPException(Status.HTTP_404_NOT_FOUND)
       },
