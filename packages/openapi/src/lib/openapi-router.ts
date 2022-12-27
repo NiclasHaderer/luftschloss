@@ -18,8 +18,8 @@ export class OpenApiRouter extends RouterBase {
     this.routeCollector.add(this.openApiUrl, "GET", this.handleOpenApi.bind(this))
   }
 
-  public override onMount(server: ServerBase, parentRouter: Router, completePath: string): void {
-    super.onMount(server, parentRouter, completePath)
+  public override onMount(server: ServerBase, parentRouter: Router, mountPath: string, completePath: string): void {
+    super.onMount(server, parentRouter, mountPath, completePath)
     void server.onComplete("start").then(() => this.generateOpenApiSchema())
   }
 
