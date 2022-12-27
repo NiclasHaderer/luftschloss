@@ -125,7 +125,7 @@ export class RouterBase implements Router {
     // Setup not complete, do not cache value
     if (!self.completePath) return [SKIP_CACHE, undefined]
     // Does not contain regex, so just return undefined
-    if (!containsRegex(self.completePath)) return path => self.completePath === path
+    if (!containsRegex(self.completePath)) return path => path.startsWith(self.completePath!)
     // Build the regex with an open end, because the router is not an actual handler. It just has to match the beginning
     // of the requested path.
     const regex = pathToRegex(self.completePath, self.pathValidators, true)
@@ -225,6 +225,11 @@ export class RouterBase implements Router {
     return this
   }
 
+  public unPipeAll(): this {
+    this.unPipe(...this.middlewares.map(m => m.name))
+    return this
+  }
+
   public addPathValidator(validator: PathValidator<unknown>): this {
     if (this.locked) {
       throw new Error("Cannot add new validator after server has been started")
@@ -272,10 +277,10 @@ export class RouterBase implements Router {
 
     // In case the route was found here, return
     if (route.status === LookupResultStatus.OK) {
-      return { ...route, middlewares: [...this.routerMiddlewares] }
+      return { ...route, middlewares: this.middlewares }
     } else if (route.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
       // Save the wrong method here
-      wrongMethod = { ...route, middlewares: [...this.routerMiddlewares], pathParams: {} }
+      wrongMethod = { ...route, middlewares: this.middlewares, pathParams: {} }
     } else {
       // Iterate over the sub routes and call the resolveRoute method in them
       for (const { router } of this.subRouters) {
@@ -285,12 +290,9 @@ export class RouterBase implements Router {
 
         const childRoute = router.resolveRoute(path, method)
         if (childRoute.status === LookupResultStatus.OK) {
-          // Add the routers own middlewares to the resolution
-          childRoute.middlewares.push(...this.routerMiddlewares)
           return childRoute
         } else if (!wrongMethod && childRoute.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
           // Save the route not found result if there has not been a route not found result earlier
-          childRoute.middlewares.push(...this.routerMiddlewares)
           wrongMethod = childRoute
         }
       }
@@ -300,7 +302,7 @@ export class RouterBase implements Router {
     if (wrongMethod) {
       return {
         ...wrongMethod,
-        middlewares: [...this.routerMiddlewares],
+        middlewares: this.middlewares,
         executor: (_, response) => {
           response.header("Allow", wrongMethod!.availableMethods)
           throw new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -311,7 +313,7 @@ export class RouterBase implements Router {
     // Nothing matched so return the notFound method of this router
     return {
       ...route,
-      middlewares: [...this.routerMiddlewares],
+      middlewares: this.middlewares,
       executor: () => {
         throw new HTTPException(Status.HTTP_404_NOT_FOUND)
       },

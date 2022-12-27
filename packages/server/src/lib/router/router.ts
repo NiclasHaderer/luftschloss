@@ -17,7 +17,7 @@ export interface MountingOptions {
 
 export type ResolvedRoute = {
   availableMethods: HTTP_METHODS[]
-  middlewares: Readonly<Middleware>[]
+  middlewares: ReadonlyMiddlewares
   executor: ROUTE_HANDLER
   status: LookupResultStatus
   pathParams: Record<string, unknown>
@@ -43,6 +43,8 @@ export interface Router {
   pipe(...middleware: Middleware[]): this
 
   unPipe(...middleware: (Middleware | string)[]): this
+
+  unPipeAll(): this
 
   addPathValidator(validator: PathValidator<unknown>): this
 
