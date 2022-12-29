@@ -4,15 +4,7 @@
  * MIT Licensed
  */
 
-import {
-  ByLazy,
-  escapeRegexString,
-  findIndexes,
-  normalizePath,
-  saveObject,
-  SKIP_CACHE,
-  withDefaults,
-} from "@luftschloss/common"
+import { ByLazy, findIndexes, normalizePath, saveObject, SKIP_CACHE, withDefaults } from "@luftschloss/common"
 import {
   HTTP_METHODS,
   HTTPException,
@@ -45,17 +37,6 @@ export class RouterBase implements Router {
   protected pathValidators: PathValidators = {
     [DEFAULT_PATH_VALIDATOR_NAME]: defaultPathValidator(),
   }
-
-  @ByLazy<RegExp | undefined, RouterBase>(self => {
-    // Setup not complete, do not cache value
-    if (!self.completePath) return [SKIP_CACHE, undefined]
-    // Does not contain regex, so just return undefined
-    if (!containsRegex(self.completePath)) return new RegExp(escapeRegexString(self.completePath))
-    // Build the regex with an open end, because the router is not an actual handler. It just has to match the beginning
-    // of the requested path.
-    return pathToRegex(self.completePath, self.pathValidators, true)
-  })
-  public readonly completePathRegex: RegExp | undefined
 
   public get children(): { router: Router; options: MountingOptions }[] {
     return this.subRouters

@@ -32,7 +32,6 @@ export interface Router {
   readonly server: ServerBase | undefined
   readonly mountPath: string | undefined
   readonly completePath: string | undefined
-  readonly completePathRegex: RegExp | undefined
 
   onMount(server: ServerBase, parentRouter: Router | undefined, mountPath: string, completePath: string): void
 
