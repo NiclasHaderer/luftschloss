@@ -280,7 +280,7 @@ export class RouterBase implements Router {
       return { ...route, middlewares: this.middlewares }
     } else if (route.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
       // Save the wrong method here
-      wrongMethod = { ...route, middlewares: this.middlewares, pathParams: {} }
+      wrongMethod = { ...route, middlewares: this.middlewares }
     } else {
       // Iterate over the sub routes and call the resolveRoute method in them
       for (const { router } of this.subRouters) {
@@ -302,7 +302,6 @@ export class RouterBase implements Router {
     if (wrongMethod) {
       return {
         ...wrongMethod,
-        middlewares: this.middlewares,
         executor: (_, response) => {
           response.header("Allow", wrongMethod!.availableMethods)
           throw new HTTPException(Status.HTTP_405_METHOD_NOT_ALLOWED)
