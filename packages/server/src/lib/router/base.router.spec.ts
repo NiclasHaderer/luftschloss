@@ -150,6 +150,21 @@ describe("Middleware execution order", () => {
   })
 })
 
-test("Test route resolving", () => {
-  // TODO test for regex in mount path. This could lead to `canHandle` to return false
+test("Test route resolving for router with regex mount path", async () => {
+  const r1 = new RouterBase()
+  r1.routes.add("hello", "GET", (req, res) => res.empty())
+
+  const server = defaultServer().mount(r1, { basePath: "{:number}" })
+
+  expect(r1.canHandle("/33/foo-bar")).toBe(true)
+  const client = testClient(server, {
+    url: {
+      hostname: "127.0.0.1",
+      port: 3000,
+      protocol: "https",
+    },
+  })
+
+  const response = await client.get("33/hello")
+  expect(response.statusCode).toBe(204)
 })
