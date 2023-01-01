@@ -1,4 +1,5 @@
 {
+  "name": "testing",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/testing/src",
   "projectType": "library",
@@ -28,8 +29,13 @@
         "jestConfig": "packages/testing/jest.config.ts",
         "passWithNoTests": true
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
+      }
     }
   },
-  "tags": [],
-  "name": "testing"
+  "tags": []
 }

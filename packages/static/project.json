@@ -1,4 +1,5 @@
 {
+  "name": "static",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/static/src",
   "projectType": "library",
@@ -28,8 +29,13 @@
         "jestConfig": "packages/static/jest.config.ts",
         "passWithNoTests": true
       }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
+      }
     }
   },
-  "tags": [],
-  "name": "static"
+  "tags": []
 }
