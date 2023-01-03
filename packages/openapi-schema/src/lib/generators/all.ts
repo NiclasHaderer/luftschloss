@@ -1,5 +1,4 @@
 import {
-  getTypeOf,
   LuftAny,
   LuftArray,
   LuftBool,
@@ -36,6 +35,7 @@ import { generateRecordJsonSchema } from "./record"
 import { generateObjectJsonSchema } from "./object"
 import { getCustomJsonSchemaGenerator } from "./register-custom"
 import { GeneratedSchema } from "./type"
+import { getTypeOf } from "@luftschloss/common"
 
 export const generateJsonSchema = (validator: LuftType, schemaPath: string): GeneratedSchema => {
   // Null

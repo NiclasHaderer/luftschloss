@@ -1,6 +1,6 @@
-import { getTypeOf } from "../helpers"
 import { ParsingContext } from "../parsing-context"
 import { LuftType } from "./base-type"
+import { getTypeOf } from "@luftschloss/common"
 
 export const logDeprecated = (data: unknown, context: ParsingContext, validator: LuftType) => {
   console.log(`Detected deprecated usage of ${getTypeOf(validator)} at`, context.path)

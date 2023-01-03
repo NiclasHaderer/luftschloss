@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { DeepPartial, normalizePath, Promisable, uniqueList, withDefaults } from "@luftschloss/common"
+import { DeepPartial, getTypeOf, normalizePath, Promisable, uniqueList, withDefaults } from "@luftschloss/common"
 import { Operation } from "@luftschloss/openapi-schema"
 import {
   HTTP_METHODS,
@@ -16,7 +16,6 @@ import {
   Status,
 } from "@luftschloss/server"
 import {
-  getTypeOf,
   LuftArray,
   LuftInfer,
   LuftObject,

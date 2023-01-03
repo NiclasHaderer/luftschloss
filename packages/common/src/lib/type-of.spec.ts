@@ -1,4 +1,4 @@
-import { getTypeOf } from "./helpers"
+import { getTypeOf } from "./type-of"
 
 test("LuftTypeHelpers: Get type of value", () => {
   expect(getTypeOf(null)).toBe("null")

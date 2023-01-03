@@ -1,5 +1,4 @@
 import {
-  getTypeOf,
   LuftAny,
   LuftArray,
   LuftBool,
@@ -36,6 +35,7 @@ import { mockUndefined } from "./undefined"
 import { mockUnion } from "./union"
 import { mockUUID } from "./uuid"
 import { getCustomMock } from "./register-custom"
+import { getTypeOf } from "@luftschloss/common"
 
 export const mockAll = <T extends LuftType | LuftNever>(validator: T, fieldName?: string): LuftInfer<T> => {
   // Null
