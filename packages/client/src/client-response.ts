@@ -1,12 +1,8 @@
 import http from "node:http"
-import { Headers } from "@luftschloss/server"
+import { Headers, UTF8SearchParams } from "@luftschloss/server"
 
 export class ClientResponse {
-  constructor(
-    public readonly raw: http.IncomingMessage,
-    public readonly url: URL,
-    public readonly redirectedFrom: ClientResponse | undefined = undefined
-  ) {}
+  constructor(public readonly raw: http.IncomingMessage, public readonly url: URL) {}
 
   public get status(): number {
     return this.raw.statusCode!
@@ -31,7 +27,11 @@ export class ClientResponse {
   }
 
   public json() {
-    return this.buffer().then(buffer => JSON.parse(buffer.toString()))
+    return this.text().then(text => JSON.parse(text))
+  }
+
+  public form() {
+    return this.text().then(text => new UTF8SearchParams(text))
   }
 
   public text() {

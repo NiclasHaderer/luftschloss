@@ -1,5 +1,6 @@
 import {
   ClientOptions,
+  ClientOptionsWithBody,
   del as delMethod,
   get as getMethod,
   head as headMethod,
@@ -7,17 +8,20 @@ import {
   patch as patchMethod,
   post as postMethod,
   put as putMethod,
+  request as requestMethod,
 } from "./methods"
 
 export const luftClient = (options: ClientOptions = {}) => {
   return {
-    get: (url: string, nweOptions: ClientOptions = {}) => getMethod(url, { ...options, ...nweOptions }),
-    post: (url: string, nweOptions: ClientOptions = {}) => postMethod(url, { ...options, ...nweOptions }),
-    patch: (url: string, nweOptions: ClientOptions = {}) => patchMethod(url, { ...options, ...nweOptions }),
-    head: (url: string, nweOptions: ClientOptions = {}) => headMethod(url, { ...options, ...nweOptions }),
-    options: (url: string, nweOptions: ClientOptions = {}) => optionsMethod(url, { ...options, ...nweOptions }),
-    put: (url: string, nweOptions: ClientOptions = {}) => putMethod(url, { ...options, ...nweOptions }),
-    del: (url: string, nweOptions: ClientOptions = {}) => delMethod(url, { ...options, ...nweOptions }),
+    get: (url: string, newOptions: ClientOptions = {}) => getMethod(url, { ...options, ...newOptions }),
+    head: (url: string, newOptions: ClientOptions = {}) => headMethod(url, { ...options, ...newOptions }),
+    post: (url: string, newOptions: ClientOptionsWithBody = {}) => postMethod(url, { ...options, ...newOptions }),
+    patch: (url: string, newOptions: ClientOptionsWithBody = {}) => patchMethod(url, { ...options, ...newOptions }),
+    options: (url: string, newOptions: ClientOptionsWithBody = {}) => optionsMethod(url, { ...options, ...newOptions }),
+    put: (url: string, newOptions: ClientOptionsWithBody = {}) => putMethod(url, { ...options, ...newOptions }),
+    del: (url: string, newOptions: ClientOptionsWithBody = {}) => delMethod(url, { ...options, ...newOptions }),
+    request: (method: string, url: string, newOptions: ClientOptionsWithBody = {}) =>
+      requestMethod(method, url, { ...options, ...newOptions }),
   } satisfies {
     get: typeof getMethod
     post: typeof postMethod
@@ -26,5 +30,6 @@ export const luftClient = (options: ClientOptions = {}) => {
     options: typeof optionsMethod
     put: typeof putMethod
     del: typeof delMethod
+    request: typeof requestMethod
   }
 }
