@@ -16,7 +16,7 @@ export type FormParserOptions = {
 
 export const formParser = (
   contentType: string[] | "*" | string = "application/x-www-form-urlencoded",
-  options: Partial<FormParserOptions>
+  options: Partial<FormParserOptions> = {}
 ): Middleware => {
   const completeOptions = withDefaults<FormParserOptions>(
     {

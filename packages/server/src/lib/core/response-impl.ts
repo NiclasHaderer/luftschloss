@@ -13,6 +13,8 @@ import type { LRequest } from "./request"
 
 import type { LResponse } from "./response"
 import { Status, toStatus } from "./status"
+import { UTF8SearchParams } from "./utf8-search-params"
+import { URLSearchParams } from "url"
 
 const NOT_COMPLETED = Symbol("NOT_COMPLETED")
 
@@ -38,6 +40,24 @@ export class ResponseImpl implements LResponse {
 
   public buffer(bytes: Buffer): this {
     this.data = bytes
+    return this
+  }
+
+  public form(
+    data:
+      | UTF8SearchParams
+      | URLSearchParams
+      | string
+      | Record<string, string | ReadonlyArray<string>>
+      | Iterable<[string, string]>
+      | ReadonlyArray<[string, string]>
+  ): this {
+    this.headers.append("Content-Type", "application/x-www-form-urlencoded")
+    if (data instanceof UTF8SearchParams || data instanceof URLSearchParams) {
+      this.data = data.toString()
+    } else {
+      this.data = new UTF8SearchParams(data).toString()
+    }
     return this
   }
 
@@ -157,7 +177,9 @@ export class ResponseImpl implements LResponse {
   private async streamResponse(stream: ReadStream | ReadStream[]): Promise<void> {
     if (stream instanceof ReadStream) {
       return new Promise<void>((resolve, reject) => {
-        stream.on("open", () => stream.pipe(this.res))
+        // TODO check if stream open event is needed
+        // TODO destroy stream on error?
+        stream.pipe(this.res)
         stream.on("close", resolve)
         stream.on("error", reject)
       })

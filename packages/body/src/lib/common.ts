@@ -10,8 +10,8 @@ import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./ut
 
 export type CommonParserOptions = {
   maxBodySize: number
-  parser: (body: Buffer, encoding: BufferEncoding | undefined) => object
-  methodName: "json" | "form" | "text"
+  parser: (body: Buffer, encoding: BufferEncoding | undefined) => unknown
+  methodName: "json" | "form" | "text" | "buffer"
   name: string
   version: string
 }
@@ -26,8 +26,8 @@ const commonFormParserMiddleware = (options: InternalCommonParserOptions): Middl
     version: options.version,
     handle: async (next: NextFunction, request: LRequest, response: LResponse) => {
       assertContentLengthHeader(request, options.maxBodySize)
-
-      let parsed: object | null = null
+      // TODO store the buffer in the request object
+      let parsed: unknown | null = null
       request[options.methodName] = async <T>(): Promise<T> => {
         const contentType = getBodyContentType(request)
 

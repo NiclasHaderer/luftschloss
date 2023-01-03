@@ -5,24 +5,23 @@
  */
 
 import { withDefaults } from "@luftschloss/common"
-import { Middleware, UTF8SearchParams } from "@luftschloss/server"
+import { Middleware } from "@luftschloss/server"
 import Buffer from "buffer"
 import { commonFormParserFactory } from "./common"
 
 export type TextParserOptions = {
   maxBodySize: number
-  parser: (body: Buffer, encoding: BufferEncoding | undefined) => object
+  parser: (body: Buffer, encoding: BufferEncoding | undefined) => string
 }
 
 export const textParser = (
   contentType: string[] | "*" | string = "text/plain",
-  options: Partial<TextParserOptions>
+  options: Partial<TextParserOptions> = {}
 ): Middleware => {
   const completeOptions = withDefaults<TextParserOptions>(
     {
       parser: (buffer: Buffer, encoding: BufferEncoding | undefined) => {
-        const str = buffer.toString(encoding)
-        return new UTF8SearchParams(str).encode()
+        return buffer.toString(encoding)
       },
       maxBodySize: 100,
     },

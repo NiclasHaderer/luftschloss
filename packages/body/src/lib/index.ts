@@ -6,6 +6,7 @@
 
 import "./request"
 
+export * from "./buffer"
 export * from "./json"
 export * from "./form"
 export * from "./text"

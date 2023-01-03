@@ -6,11 +6,12 @@
 import { CustomPropertyDescriptor, Func } from "@luftschloss/common"
 import { ReadStream } from "fs"
 import { ServerResponse } from "http"
-import { URL } from "url"
+import { URL, URLSearchParams } from "url"
 import { Headers } from "./headers"
 import { LRequest } from "./request"
 import { ResponseImpl } from "./response-impl"
 import { Status } from "./status"
+import { UTF8SearchParams } from "./utf8-search-params"
 
 export interface LResponse {
   readonly complete: boolean
@@ -27,6 +28,16 @@ export interface LResponse {
   empty(): this
 
   json(object: object | string | null | boolean): this
+
+  form(
+    data:
+      | UTF8SearchParams
+      | URLSearchParams
+      | string
+      | Record<string, string | ReadonlyArray<string>>
+      | Iterable<[string, string]>
+      | ReadonlyArray<[string, string]>
+  ): this
 
   redirect(
     url: string | URL,

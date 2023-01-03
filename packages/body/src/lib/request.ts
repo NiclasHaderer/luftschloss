@@ -14,6 +14,8 @@ declare module "@luftschloss/server" {
     text(): Promise<string>
 
     form(): Promise<UTF8SearchParams>
+
+    buffer(): Promise<{ buffer: Buffer; encoding?: BufferEncoding }>
   }
 
   interface RequestImpl {
@@ -22,6 +24,8 @@ declare module "@luftschloss/server" {
     text(): Promise<string>
 
     form(): Promise<UTF8SearchParams>
+
+    buffer(): Promise<{ buffer: Buffer; encoding?: BufferEncoding }>
   }
 }
 
@@ -40,6 +44,13 @@ addRequestField<LRequest, "text">("text", {
 })
 
 addRequestField<LRequest, "form">("form", {
+  value: () => {
+    throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, "Please the form body parser to use this function")
+  },
+  writable: true,
+})
+
+addRequestField<LRequest, "buffer">("buffer", {
   value: () => {
     throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, "Please the form body parser to use this function")
   },
