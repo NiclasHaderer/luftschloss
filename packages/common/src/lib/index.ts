@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-export * from "./generic-event-emitter"
+export * from "./event-handler"
 export * from "./utils"
 export * from "./case-insensitive-set"
 export * from "./cache"

@@ -18,7 +18,7 @@ export interface LResponse {
   readonly raw: ServerResponse
   readonly request: LRequest
 
-  bytes(bytes: Buffer): this
+  buffer(bytes: Buffer): this
 
   header(name: string, value: string | number | Iterable<string | number>): this
 
@@ -28,7 +28,10 @@ export interface LResponse {
 
   json(object: object | string | null | boolean): this
 
-  redirect(url: string | URL): this
+  redirect(
+    url: string | URL,
+    type?: "301_MOVED_PERMANENTLY" | "302_FOUND" | "307_TEMPORARY_REDIRECT" | "308_PERMANENT_REDIRECT"
+  ): this
 
   getStatus(): Status
 

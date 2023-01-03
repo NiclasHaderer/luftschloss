@@ -14,12 +14,11 @@ import {
 } from "../path-validator"
 import { DefaultRouter } from "../router"
 import { DefaultErrorHandler } from "./error-handler"
-import { ServerBase, withServerBase } from "./server-base"
+import { withServerBase } from "./server-base"
 
-class ServerImpl extends withServerBase(DefaultRouter) {}
+export class ServerImpl extends withServerBase(DefaultRouter) {}
 
-export const defaultServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INTEGER } = {}): ServerBase &
-  DefaultRouter => {
+export const defaultServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INTEGER } = {}): ServerImpl => {
   const server = new ServerImpl()
   server.raw.setTimeout(timeout)
   server.raw.maxConnections = maxConnections

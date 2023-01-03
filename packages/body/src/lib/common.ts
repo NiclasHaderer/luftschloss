@@ -42,7 +42,7 @@ const commonFormParserMiddleware = (options: InternalCommonParserOptions): Middl
         }
 
         if (parsed === null) {
-          const buffer = await getBodyData(request, options.maxBodySize)
+          const buffer = await getBodyData(request.raw, options.maxBodySize)
           parsed = options.parser(buffer, contentType?.encoding)
         }
 

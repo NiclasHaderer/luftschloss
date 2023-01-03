@@ -36,7 +36,7 @@ export class ResponseImpl implements LResponse {
     return this._headers
   }
 
-  public bytes(bytes: Buffer): this {
+  public buffer(bytes: Buffer): this {
     this.data = bytes
     return this
   }
@@ -72,9 +72,17 @@ export class ResponseImpl implements LResponse {
     return this
   }
 
-  public redirect(url: string | URL): this {
-    this.status(Status.HTTP_307_TEMPORARY_REDIRECT)
+  public redirect(
+    url: string | URL,
+    type?: "301_MOVED_PERMANENTLY" | "302_FOUND" | "307_TEMPORARY_REDIRECT" | "308_PERMANENT_REDIRECT"
+  ): this {
+    type = type ?? ("307_TEMPORARY_REDIRECT" as const)
+    const finalType = `HTTP_${type}` as const
+    this.status(Status[finalType])
     this.headers.append("Location", url.toString())
+    if (this.data === NOT_COMPLETED) {
+      this.data = ""
+    }
     return this
   }
 

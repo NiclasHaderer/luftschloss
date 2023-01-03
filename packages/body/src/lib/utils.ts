@@ -6,6 +6,7 @@
 
 import { HTTPException, LRequest, Status } from "@luftschloss/server"
 import * as contentType from "content-type"
+import http from "node:http"
 
 export const assertContentLengthHeader = (request: LRequest, maxBodySize: number): void => {
   let length = parseInt((request.headers.get("Content-Length") as string | null) || "0")
@@ -18,7 +19,7 @@ export const assertContentLengthHeader = (request: LRequest, maxBodySize: number
   }
 }
 
-export const getBodyData = ({ raw }: LRequest, maxBodySize: number) => {
+export const getBodyData = (raw: http.IncomingMessage, maxBodySize: number) => {
   return new Promise<Buffer>(resolve => {
     const buffers: Buffer[] = []
 

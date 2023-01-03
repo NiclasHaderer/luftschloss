@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { Constructor, GenericEventEmitter } from "@luftschloss/common"
+import { Constructor, EventHandler, Subscribable } from "@luftschloss/common"
 import http, { IncomingMessage, Server, ServerResponse } from "http"
 import { Duplex } from "stream"
 import { ReadonlyMiddlewares } from "../middleware"
@@ -22,7 +22,7 @@ export type LuftServerEvents = {
   locked: void
 }
 
-export interface ServerBase extends Pick<GenericEventEmitter<LuftServerEvents>, "onComplete" | "on"> {
+export interface ServerBase extends Pick<Subscribable<LuftServerEvents>, "onComplete" | "on"> {
   readonly raw: Server
   readonly isStarted: boolean
   readonly isShutdown: boolean
@@ -45,7 +45,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
   clazz: Constructor<T, ARGS>
 ): Constructor<T & ServerBase, ARGS> =>
   class extends (clazz as Constructor<Router, ARGS>) implements ServerBase {
-    protected eventDelegate = new GenericEventEmitter<LuftServerEvents>()
+    protected eventDelegate = new EventHandler<LuftServerEvents>()
     public on = this.eventDelegate.on.bind(this.eventDelegate)
     public onComplete = this.eventDelegate.onComplete.bind(this.eventDelegate)
     private readonly startTime = Date.now()

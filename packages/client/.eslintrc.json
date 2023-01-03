@@ -19,6 +19,7 @@
     }
   ],
   "rules": {
+    "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/no-misused-promises": "error"
   }
