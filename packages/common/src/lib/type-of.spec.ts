@@ -6,8 +6,8 @@ test("LuftTypeHelpers: Get type of value", () => {
   // Check all possible types for getTypeOf
   expect(getTypeOf(true)).toBe("boolean");
   expect(getTypeOf(false)).toBe("boolean");
-  expect(getTypeOf(0)).toBe("number");
-  expect(getTypeOf(1)).toBe("number");
+  expect(getTypeOf(0)).toBe("int");
+  expect(getTypeOf(1)).toBe("int");
   expect(getTypeOf(1.1)).toBe("float");
 
   class C {}

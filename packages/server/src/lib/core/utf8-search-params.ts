@@ -9,7 +9,7 @@ import { URLSearchParams } from "url";
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL");
 
-export class UTF8SearchParams extends URLSearchParams {
+export class UTF8SearchParams<T extends Record<string, string[]> = Record<string, string[]>> extends URLSearchParams {
   public [UTF_8_SYMBOL] = true;
 
   public constructor(...init: ConstructorParameters<typeof URLSearchParams>) {
@@ -59,8 +59,8 @@ export class UTF8SearchParams extends URLSearchParams {
     }
   }
 
-  public encode<T extends Record<string, string[]>>(): T {
-    const o = saveObject<T>();
+  public encode<V extends Record<string, string[]> = T>(): V {
+    const o = saveObject<V>();
     for (const key of this.keys()) {
       //eslint-disable-next-line @typescript-eslint/no-extra-semi
       (o as Record<string, string[]>)[key] = this.getAll(key);

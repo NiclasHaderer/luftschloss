@@ -18,7 +18,7 @@ export const getTypeOf = (value: unknown) => {
     } else if ((value as number) % 1 !== 0) {
       return "float" as const;
     } else {
-      return "integer" as const;
+      return "int" as const;
     }
   }
   return type;

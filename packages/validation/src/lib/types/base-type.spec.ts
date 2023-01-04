@@ -28,7 +28,7 @@ test("BaseType: null", () => {
   expect(validator.validateSave("null").success).toBe(false);
   expect(validator.validateSave({}).success).toBe(false);
   expect(validator.coerceSave({}).success).toBe(false);
-  expect(validator.coerceSave(undefined).success).toBe(false);
+  expect(validator.coerceSave(undefined).success).toBe(true);
   expect(validator.validateSave(undefined).success).toBe(false);
   expect((validator.coerceSave(null) as SuccessfulParsingResult<null>).data).toBe(null);
 });

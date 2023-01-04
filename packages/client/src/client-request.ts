@@ -48,7 +48,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
 
   public async send(): Promise<ClientResponse> {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises,no-async-promise-executor
-    const rawResponse = await new Promise<http.IncomingMessage>((resolve, reject) => {
+    const rawResponse = await new Promise<http.IncomingMessage>(async (resolve, reject) => {
       let contentType: string | undefined;
       if (!this.headers.has("content-type") && this.options.data) {
         if (typeof this.options.data === "string") {
@@ -92,6 +92,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
           // TODO check if this is the correct way to handle streams
           data.pipe(message);
           data.on("error", reject);
+          await new Promise<void>(resolve => data.on("end", resolve));
         } else if (typeof this.options.data === "object") {
           message.write(JSON.stringify(this.options.data));
         } else {

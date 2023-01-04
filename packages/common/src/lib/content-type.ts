@@ -13,10 +13,12 @@ const PARAM_REGEXP =
 // eslint-disable-next-line no-control-regex
 const ESCAPED_QUOTES = /\\([\u000b\u0020-\u00ff])/g;
 
-interface ContentType {
-  type: string;
+export interface ContentType {
+  type: string | undefined;
   encoding: BufferEncoding | undefined;
   parameters: Record<string, string>;
+
+  matches(type: string): boolean;
 }
 
 const extractParameters = (params: string | undefined) => {
@@ -52,7 +54,7 @@ const extractParameters = (params: string | undefined) => {
  *
  * @param contentTypeString
  */
-export const parseContentTypes = (contentTypeString: string): ContentType => {
+export const parseContentType = (contentTypeString: string): ContentType => {
   const [contentType, params] = splitFirst(contentTypeString, ";").map(s => s.trim());
   if (!VALID_CONTENT_TYPE.test(contentType)) {
     throw new Error(`Invalid content type: "${contentTypeString}"`);
@@ -64,5 +66,15 @@ export const parseContentTypes = (contentTypeString: string): ContentType => {
     type: contentType.toLowerCase(),
     encoding: encoding,
     parameters: encodedParams,
+    matches(type: string): boolean {
+      if (type === "*/*") return true;
+      if (!this.type) return false;
+      const [contentType, specificType] = type.toLowerCase().split("/");
+      const [thisContentType, thisSpecificType] = this.type.split("/");
+      return (
+        (contentType === "*" || contentType === thisContentType) &&
+        (specificType === "*" || specificType === thisSpecificType)
+      );
+    },
   };
 };

@@ -6,7 +6,7 @@
 
 import { HTTPException, LRequest, Status } from "@luftschloss/server";
 import http from "node:http";
-import { parseContentTypes } from "@luftschloss/common";
+import { parseContentType } from "@luftschloss/common";
 
 export const assertContentLengthHeader = (request: LRequest, maxBodySize: number): void => {
   let length = parseInt((request.headers.get("Content-Length") as string | null) || "0");
@@ -47,5 +47,5 @@ export const getBodyContentType = (
 ): null | { type: string; encoding: BufferEncoding | undefined } => {
   const contentTypeHeader: string | null = request.headers.get("Content-Type");
   if (!contentTypeHeader) return null;
-  return parseContentTypes(contentTypeHeader);
+  return parseContentType(contentTypeHeader) as { type: string; encoding: BufferEncoding | undefined };
 };
