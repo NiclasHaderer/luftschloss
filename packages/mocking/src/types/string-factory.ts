@@ -1,7 +1,7 @@
-import { faker } from "@faker-js/faker"
-import Fuse from "fuse.js"
+import { faker } from "@faker-js/faker";
+import Fuse from "fuse.js";
 
-const DEFAULT_FACTORY: StringFactory = "random"
+const DEFAULT_FACTORY: StringFactory = "random";
 
 // Use the following script to get the methods of faker
 // [...document.querySelector(".root").querySelectorAll("li a")].map(element => element.innerText).join("\n")
@@ -59,8 +59,8 @@ export const StringFactories = {
       "rabbit",
       "rodent",
       "snake",
-    ] as const)
-    return StringFactories[animal]()
+    ] as const);
+    return StringFactories[animal]();
   },
   // Color
   cmyk: () => faker.color.cmyk().join(", "),
@@ -220,8 +220,8 @@ export const StringFactories = {
   verb: () => faker.word.verb(),
   // Random
   random: () => faker.datatype.string(),
-}
-export type StringFactory = keyof typeof StringFactories
+};
+export type StringFactory = keyof typeof StringFactories;
 
 // Exists to quickly check if every factory method returns a string
 //const _: () => string = "" as unknown as typeof StringFactories[StringFactory]
@@ -231,11 +231,11 @@ const FUSE_SEARCH = new Fuse<StringFactory>(Object.keys(StringFactories) as Stri
   shouldSort: true,
   threshold: 0.4,
   isCaseSensitive: false,
-})
+});
 
 export const stringFactory = (fieldName?: string): StringFactory => {
-  if (fieldName === undefined) return DEFAULT_FACTORY
-  const result: Fuse.FuseResult<string>[] = FUSE_SEARCH.search(fieldName)
-  if (result.length === 0) return DEFAULT_FACTORY
-  return result[0].item as StringFactory
-}
+  if (fieldName === undefined) return DEFAULT_FACTORY;
+  const result: Fuse.FuseResult<string>[] = FUSE_SEARCH.search(fieldName);
+  if (result.length === 0) return DEFAULT_FACTORY;
+  return result[0].item as StringFactory;
+};

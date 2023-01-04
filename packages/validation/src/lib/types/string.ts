@@ -4,15 +4,15 @@
  * MIT Licensed
  */
 
-import { createInvalidTypeIssue } from "../helpers"
-import { LuftErrorCodes } from "../validation-error"
-import { InternalParsingResult, LuftType } from "./base-type"
-import { ParsingContext } from "../parsing-context"
-import { deepCopy } from "@luftschloss/common"
+import { createInvalidTypeIssue } from "../helpers";
+import { LuftErrorCodes } from "../validation-error";
+import { InternalParsingResult, LuftType } from "./base-type";
+import { ParsingContext } from "../parsing-context";
+import { deepCopy } from "@luftschloss/common";
 
 export class LuftString extends LuftType<string> {
   public get supportedTypes() {
-    return ["string"]
+    return ["string"];
   }
 
   constructor(
@@ -20,36 +20,36 @@ export class LuftString extends LuftType<string> {
       trim: false,
     }
   ) {
-    super()
+    super();
   }
 
   public clone(): LuftString {
-    return new LuftString({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage))
+    return new LuftString({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage));
   }
 
   public min(minLength: number | undefined): LuftString {
-    const newValidator = this.clone()
-    newValidator.schema.minLength = minLength
-    return newValidator
+    const newValidator = this.clone();
+    newValidator.schema.minLength = minLength;
+    return newValidator;
   }
 
   public max(maxLength: number | undefined): LuftString {
-    const newValidator = this.clone()
-    newValidator.schema.maxLength = maxLength
-    return newValidator
+    const newValidator = this.clone();
+    newValidator.schema.maxLength = maxLength;
+    return newValidator;
   }
 
   public trim(shouldTrim: boolean): LuftString {
-    const newValidator = this.clone()
-    newValidator.schema.trim = shouldTrim
-    return newValidator
+    const newValidator = this.clone();
+    newValidator.schema.trim = shouldTrim;
+    return newValidator;
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
     if (typeof data === "string" && this.schema.trim) {
-      data = data.trim()
+      data = data.trim();
     }
-    return this._validate(data, context)
+    return this._validate(data, context);
   }
 
   protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {
@@ -62,10 +62,10 @@ export class LuftString extends LuftType<string> {
           maxLen: this.schema.maxLength,
           minLen: this.schema.minLength,
           actualLen: data.length,
-        })
+        });
         return {
           success: false,
-        }
+        };
       }
 
       if (this.schema.minLength && data.length < this.schema.minLength) {
@@ -76,22 +76,22 @@ export class LuftString extends LuftType<string> {
           maxLen: this.schema.maxLength,
           minLen: this.schema.minLength,
           actualLen: data.length,
-        })
+        });
         return {
           success: false,
-        }
+        };
       }
 
       return {
         success: true,
         data: data,
         usedValidator: this,
-      }
+      };
     }
 
-    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
     return {
       success: false,
-    }
+    };
   }
 }

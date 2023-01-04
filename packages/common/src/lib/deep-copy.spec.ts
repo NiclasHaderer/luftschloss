@@ -1,4 +1,4 @@
-import { deepCopy } from "./deep-copy"
+import { deepCopy } from "./deep-copy";
 
 test("DeepCopy: shallow object", () => {
   const object = {
@@ -8,12 +8,12 @@ test("DeepCopy: shallow object", () => {
       d: 3,
       e: 4,
     },
-  }
-  const copy = deepCopy(object)
-  expect(copy).toStrictEqual(object)
-  expect(copy).not.toBe(object)
-  expect(copy.c).not.toBe(object.c)
-})
+  };
+  const copy = deepCopy(object);
+  expect(copy).toStrictEqual(object);
+  expect(copy).not.toBe(object);
+  expect(copy.c).not.toBe(object.c);
+});
 
 test("DeepCopy: function", () => {
   const object = {
@@ -24,13 +24,13 @@ test("DeepCopy: function", () => {
       e: 4,
       func: () => "hello",
     },
-  }
-  const copy = deepCopy(object)
-  expect(copy).toStrictEqual(object)
-  expect(copy).not.toBe(object)
-  expect(copy.c).not.toBe(object.c)
-  expect(copy.c.func).toBe(object.c.func)
-})
+  };
+  const copy = deepCopy(object);
+  expect(copy).toStrictEqual(object);
+  expect(copy).not.toBe(object);
+  expect(copy.c).not.toBe(object.c);
+  expect(copy.c.func).toBe(object.c.func);
+});
 
 test("DeepCopy: array", () => {
   const object = {
@@ -42,12 +42,12 @@ test("DeepCopy: array", () => {
       func: () => "hello",
     },
     arr: [1, 2, { d: 3, e: 4, func: () => "hello" }] as const,
-  }
-  const copy = deepCopy(object)
-  expect(copy).toStrictEqual(object)
-  expect(copy).not.toBe(object)
-  expect(copy.c).not.toBe(object.c)
-  expect(copy.arr).not.toBe(object.arr)
-  expect(copy.arr[2].func).toBe(copy.arr[2].func)
-  expect(copy.arr[2].func()).toBe("hello")
-})
+  };
+  const copy = deepCopy(object);
+  expect(copy).toStrictEqual(object);
+  expect(copy).not.toBe(object);
+  expect(copy.c).not.toBe(object.c);
+  expect(copy.arr).not.toBe(object.arr);
+  expect(copy.arr[2].func).toBe(copy.arr[2].func);
+  expect(copy.arr[2].func()).toBe("hello");
+});

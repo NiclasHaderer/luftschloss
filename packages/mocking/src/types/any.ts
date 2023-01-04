@@ -1,8 +1,8 @@
-import { LuftAny, LuftInfer } from "@luftschloss/validation"
-import { faker } from "@faker-js/faker"
-import { StringFactories } from "./string-factory"
+import { LuftAny, LuftInfer } from "@luftschloss/validation";
+import { faker } from "@faker-js/faker";
+import { StringFactories } from "./string-factory";
 
-export const mockAny = (_: LuftAny): LuftInfer<LuftAny> => {
+export const mockAny = (): LuftInfer<LuftAny> => {
   const factories = [
     faker.datatype.number,
     faker.datatype.boolean,
@@ -10,7 +10,7 @@ export const mockAny = (_: LuftAny): LuftInfer<LuftAny> => {
     faker.datatype.datetime,
     faker.datatype.json,
     ...Object.values(StringFactories),
-  ]
+  ];
 
-  return faker.helpers.arrayElement(factories)()
-}
+  return faker.helpers.arrayElement(factories)();
+};

@@ -1,14 +1,14 @@
 export const getBufferEncoding = (encoding: string | undefined): BufferEncoding | undefined => {
-  if (!encoding) return undefined
-  encoding = encoding.toLowerCase()
+  if (!encoding) return undefined;
+  encoding = encoding.toLowerCase();
   if (isBufferEncoding(encoding)) {
-    return encoding.toLowerCase() as BufferEncoding
+    return encoding.toLowerCase() as BufferEncoding;
   }
-  return undefined
-}
+  return undefined;
+};
 
 export const isBufferEncoding = (encoding: string): encoding is BufferEncoding => {
-  encoding = (encoding || "").toLowerCase()
+  encoding = (encoding || "").toLowerCase();
   return (
     encoding === "ascii" ||
     encoding === "ascii" ||
@@ -22,5 +22,5 @@ export const isBufferEncoding = (encoding: string): encoding is BufferEncoding =
     encoding === "latin1" ||
     encoding === "binary" ||
     encoding === "hex"
-  )
-}
+  );
+};

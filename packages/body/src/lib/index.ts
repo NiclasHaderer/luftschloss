@@ -4,11 +4,11 @@
  * MIT Licensed
  */
 
-import "./request"
+import "./request";
 
-export * from "./buffer"
-export * from "./json"
-export * from "./form"
-export * from "./text"
-export * from "./common"
-export { getBodyData } from "./utils"
+export * from "./buffer";
+export * from "./json";
+export * from "./form";
+export * from "./text";
+export * from "./common";
+export { getBodyData } from "./utils";

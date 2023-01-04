@@ -1,5 +1,5 @@
-import { LRequest, LResponse, ResponseImpl } from "../core"
-import { Middleware, NextFunction } from "./middleware"
+import { LRequest, LResponse, ResponseImpl } from "../core";
+import { Middleware, NextFunction } from "./middleware";
 
 const RequestCompleter: Middleware = {
   name: "request-complete",
@@ -8,12 +8,12 @@ const RequestCompleter: Middleware = {
     if (!(response instanceof ResponseImpl)) {
       console.warn(
         `Response is not an instance of ResponseImpl. Cannot complete request. Remove the ${RequestCompleter.name}`
-      )
-      return next(request, response)
+      );
+      return next(request, response);
     }
-    await next(request, response)
-    await response.end()
+    await next(request, response);
+    await response.end();
   },
-}
+};
 
-export const requestCompleter = (): Middleware => RequestCompleter
+export const requestCompleter = (): Middleware => RequestCompleter;

@@ -4,13 +4,13 @@
  * MIT Licensed
  */
 
-import { LRequest, LResponse, RouterBase } from "@luftschloss/server"
+import { LRequest, LResponse, RouterBase } from "@luftschloss/server";
 
 export abstract class OpenApiUiRouter extends RouterBase {
-  protected abstract handleDocs(_: LRequest, response: LResponse): Promise<void> | void
+  protected abstract handleDocs(_: LRequest, response: LResponse): Promise<void> | void;
 
   public constructor(protected docsUrl: string, protected openApiUrl: string) {
-    super()
-    this.routeCollector.add(this.docsUrl, "GET", this.handleDocs.bind(this))
+    super();
+    this.routeCollector.add(this.docsUrl, "GET", this.handleDocs.bind(this));
   }
 }

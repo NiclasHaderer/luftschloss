@@ -1,6 +1,6 @@
-import { LuftLiteral } from "@luftschloss/validation"
-import { deepCopy } from "@luftschloss/common"
-import { GeneratedSchema, toGeneratedSchema } from "./type"
+import { LuftLiteral } from "@luftschloss/validation";
+import { deepCopy } from "@luftschloss/common";
+import { GeneratedSchema, toGeneratedSchema } from "./type";
 
 export const generateLiteralJsonSchema = (type: LuftLiteral<any>, schemaPath: string): GeneratedSchema =>
   toGeneratedSchema(
@@ -10,4 +10,4 @@ export const generateLiteralJsonSchema = (type: LuftLiteral<any>, schemaPath: st
     },
     schemaPath,
     {}
-  )
+  );

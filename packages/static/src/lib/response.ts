@@ -4,16 +4,16 @@
  * MIT Licensed
  */
 
-import { addResponseField, HTTPException, LResponse, Status } from "@luftschloss/server"
-import "@luftschloss/server"
+import { addResponseField, HTTPException, LResponse, Status } from "@luftschloss/server";
+import "@luftschloss/server";
 
 declare module "@luftschloss/server" {
   interface LResponse {
-    file(path: string): Promise<LResponse>
+    file(path: string): Promise<LResponse>;
   }
 
   interface ResponseImpl {
-    file(path: string): Promise<LResponse>
+    file(path: string): Promise<LResponse>;
   }
 }
 
@@ -22,7 +22,7 @@ addResponseField<LResponse, "file">("file", {
     throw new HTTPException(
       Status.HTTP_500_INTERNAL_SERVER_ERROR,
       "Please use one of the static content middleware in order to use that function"
-    )
+    );
   },
   writable: true,
-})
+});

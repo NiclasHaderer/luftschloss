@@ -4,27 +4,27 @@
  * MIT Licensed
  */
 
-import { deepCopy, saveObject } from "@luftschloss/common"
-import { createInvalidTypeIssue } from "../helpers"
-import { ParsingContext } from "../parsing-context"
-import { LuftErrorCodes } from "../validation-error"
-import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType, LuftUnion } from "./base-type"
-import { LuftNumber } from "./number"
-import { LuftRegex } from "./regexp"
-import { LuftString } from "./string"
+import { deepCopy, saveObject } from "@luftschloss/common";
+import { createInvalidTypeIssue } from "../helpers";
+import { ParsingContext } from "../parsing-context";
+import { LuftErrorCodes } from "../validation-error";
+import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType, LuftUnion } from "./base-type";
+import { LuftNumber } from "./number";
+import { LuftRegex } from "./regexp";
+import { LuftString } from "./string";
 
-export type LuftRecordKey = LuftString | LuftNumber | LuftRegex | LuftUnion<(LuftString | LuftNumber | LuftRegex)[]>
+export type LuftRecordKey = LuftString | LuftNumber | LuftRegex | LuftUnion<(LuftString | LuftNumber | LuftRegex)[]>;
 
 export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> extends LuftType<
   Record<LuftInfer<KEY>, LuftInfer<VALUE>>
 > {
-  readonly supportedTypes: string[] = ["object"]
+  readonly supportedTypes: string[] = ["object"];
   public readonly schema: {
-    key: KEY
-    value: VALUE
-    minProperties: number | undefined
-    maxProperties: number | undefined
-  }
+    key: KEY;
+    value: VALUE;
+    minProperties: number | undefined;
+    maxProperties: number | undefined;
+  };
 
   constructor({
     key,
@@ -32,13 +32,13 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     maxProperties,
     minProperties,
   }: {
-    key: KEY
-    value: VALUE
-    minProperties?: number
-    maxProperties?: number
+    key: KEY;
+    value: VALUE;
+    minProperties?: number;
+    maxProperties?: number;
   }) {
-    super()
-    this.schema = { key, value, minProperties, maxProperties }
+    super();
+    this.schema = { key, value, minProperties, maxProperties };
   }
 
   public clone(): LuftRecord<KEY, VALUE> {
@@ -46,32 +46,32 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
       ...this.schema,
       key: this.schema.key.clone() as KEY,
       value: this.schema.value.clone() as VALUE,
-    }).replaceValidationStorage(deepCopy(this.validationStorage))
+    }).replaceValidationStorage(deepCopy(this.validationStorage));
   }
 
   public minProperties(min: number | undefined) {
-    const clone = this.clone()
-    clone.schema.minProperties = min
-    return clone
+    const clone = this.clone();
+    clone.schema.minProperties = min;
+    return clone;
   }
 
   public maxProperties(max: number | undefined) {
-    const clone = this.clone()
-    clone.schema.maxProperties = max
-    return clone
+    const clone = this.clone();
+    clone.schema.maxProperties = max;
+    return clone;
   }
 
   public nonEmpty(nonEmpty: boolean) {
-    const clone = this.clone()
-    clone.schema.minProperties = nonEmpty ? 1 : 0
-    return clone
+    const clone = this.clone();
+    clone.schema.minProperties = nonEmpty ? 1 : 0;
+    return clone;
   }
 
   protected _coerce(
     data: unknown,
     context: ParsingContext
   ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
-    return this._validate(data, context)
+    return this._validate(data, context);
   }
 
   protected _validate(
@@ -79,11 +79,11 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
     context: ParsingContext
   ): InternalParsingResult<Record<LuftInfer<KEY>, LuftInfer<VALUE>>> {
     if (typeof data !== "object" || data === null) {
-      context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context))
-      return { success: false }
+      context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
+      return { success: false };
     }
 
-    const keyCount = Object.keys(data).length
+    const keyCount = Object.keys(data).length;
 
     // To few keys
     if (this.schema.minProperties !== undefined && keyCount < this.schema.minProperties) {
@@ -96,8 +96,8 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
         actual: keyCount,
         maxCompare: "<=",
         minCompare: ">=",
-      })
-      return { success: false }
+      });
+      return { success: false };
     }
 
     // To many keys
@@ -111,28 +111,28 @@ export class LuftRecord<KEY extends LuftRecordKey, VALUE extends LuftType> exten
         actual: keyCount,
         maxCompare: "<=",
         minCompare: ">=",
-      })
-      return { success: false }
+      });
+      return { success: false };
     }
 
-    const newData = saveObject<Record<LuftInfer<KEY>, LuftInfer<VALUE>>>()
-    let failAtEnd = false
+    const newData = saveObject<Record<LuftInfer<KEY>, LuftInfer<VALUE>>>();
+    let failAtEnd = false;
     for (const [key, value] of Object.entries(data)) {
-      context.stepInto(key)
-      const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>).run(key, context, true)
-      const parsedValue = (this.schema.value as unknown as InternalLuftBaseType<unknown>).run(value, context, true)
-      context.stepOut()
+      context.stepInto(key);
+      const parsedKey = (this.schema.key as unknown as InternalLuftBaseType<unknown>).run(key, context, true);
+      const parsedValue = (this.schema.value as unknown as InternalLuftBaseType<unknown>).run(value, context, true);
+      context.stepOut();
 
       if (parsedKey.success && parsedValue.success) {
-        ;(newData as Record<string | number, unknown>)[parsedKey.data as string | number] = parsedValue.data
+        (newData as Record<string | number, unknown>)[parsedKey.data as string | number] = parsedValue.data;
       } else {
-        failAtEnd = true
+        failAtEnd = true;
       }
     }
     if (failAtEnd) {
-      return { success: false }
+      return { success: false };
     }
 
-    return { success: true, data: newData, usedValidator: this }
+    return { success: true, data: newData, usedValidator: this };
   }
 }

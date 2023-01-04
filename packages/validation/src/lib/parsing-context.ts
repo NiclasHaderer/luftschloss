@@ -1,45 +1,45 @@
-import { ValidationError } from "./validation-error"
+import { ValidationError } from "./validation-error";
 
 export class ParsingContext {
-  private _issues: ValidationError[] = []
-  public path: Readonly<string | number[]> = []
+  private _issues: ValidationError[] = [];
+  public path: Readonly<string | number[]> = [];
 
   constructor(public readonly mode: "coerce" | "validate") {}
 
   public addIssue(...issue: ValidationError[]): ParsingContext {
-    this._issues.push(...issue)
-    return this
+    this._issues.push(...issue);
+    return this;
   }
 
   public get hasIssues() {
-    return this._issues.length !== 0
+    return this._issues.length !== 0;
   }
 
   public get issues() {
-    return this._issues
+    return this._issues;
   }
 
   /**
    * @internal
    */
   public stepInto(...path: (string | number)[]): ParsingContext {
-    this.path = [...this.path, ...path] as Readonly<string | number[]>
-    return this
+    this.path = [...this.path, ...path] as Readonly<string | number[]>;
+    return this;
   }
 
   /**
    * @internal
    */
   public stepOut(): ParsingContext {
-    this.path = this.path.slice(0, this.path.length - 1)
-    return this
+    this.path = this.path.slice(0, this.path.length - 1);
+    return this;
   }
 
   public clone() {
-    return new ParsingContext(this.mode).stepInto(...this.path).addIssue(...this._issues.map(i => ({ ...i })))
+    return new ParsingContext(this.mode).stepInto(...this.path).addIssue(...this._issues.map(i => ({ ...i })));
   }
 
   public cloneEmpty() {
-    return new ParsingContext(this.mode).stepInto(...this.path)
+    return new ParsingContext(this.mode).stepInto(...this.path);
   }
 }

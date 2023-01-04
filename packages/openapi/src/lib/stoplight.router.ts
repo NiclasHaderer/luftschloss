@@ -1,5 +1,5 @@
-import { LRequest, LResponse } from "@luftschloss/server"
-import { OpenApiUiRouter } from "./openapi-ui-router"
+import { LRequest, LResponse } from "@luftschloss/server";
+import { OpenApiUiRouter } from "./openapi-ui-router";
 
 export class StoplightRouter extends OpenApiUiRouter {
   protected handleDocs(_: LRequest, response: LResponse) {
@@ -23,16 +23,16 @@ export class StoplightRouter extends OpenApiUiRouter {
 
        </body>
      </html>
-    `
-    response.html(html)
+    `;
+    response.html(html);
   }
 }
 
 export type StoplightRouterArgs = {
-  docsUrl?: string
-  openApiUrl?: string
-}
+  docsUrl?: string;
+  openApiUrl?: string;
+};
 
 export const stoplightRouter = ({ docsUrl = "/stoplight", openApiUrl = "/openapi" }: StoplightRouterArgs = {}) => {
-  return new StoplightRouter(docsUrl, openApiUrl)
-}
+  return new StoplightRouter(docsUrl, openApiUrl);
+};

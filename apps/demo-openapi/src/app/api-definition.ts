@@ -1,5 +1,5 @@
-import { trimIndent } from "@luftschloss/common"
-import { OpenApiRouterArgs } from "@luftschloss/openapi"
+import { trimIndent } from "@luftschloss/common";
+import { OpenApiRouterArgs } from "@luftschloss/openapi";
 
 export const apiDefinition: OpenApiRouterArgs = {
   openApi: {
@@ -43,4 +43,4 @@ export const apiDefinition: OpenApiRouterArgs = {
     },
     openapi: "3.0.3",
   },
-}
+};

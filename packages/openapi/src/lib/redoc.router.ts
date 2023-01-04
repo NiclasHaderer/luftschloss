@@ -1,5 +1,5 @@
-import { LRequest, LResponse } from "@luftschloss/server"
-import { OpenApiUiRouter } from "./openapi-ui-router"
+import { LRequest, LResponse } from "@luftschloss/server";
+import { OpenApiUiRouter } from "./openapi-ui-router";
 
 export class RedocRouter extends OpenApiUiRouter {
   protected async handleDocs(_: LRequest, response: LResponse) {
@@ -22,16 +22,16 @@ export class RedocRouter extends OpenApiUiRouter {
           <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
        </body>
      </html>
-    `
-    await response.html(html)
+    `;
+    await response.html(html);
   }
 }
 
 export type RedorRouterArgs = {
-  docsUrl?: string
-  openApiUrl?: string
-}
+  docsUrl?: string;
+  openApiUrl?: string;
+};
 
 export const redocRouter = ({ docsUrl = "/redoc", openApiUrl = "/openapi" }: RedorRouterArgs = {}) => {
-  return new RedocRouter(docsUrl, openApiUrl)
-}
+  return new RedocRouter(docsUrl, openApiUrl);
+};

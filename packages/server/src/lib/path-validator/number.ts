@@ -4,12 +4,12 @@
  * MIT Licensed
  */
 
-import { PathValidator } from "./validator"
+import { PathValidator } from "./validator";
 
 const NumberPathValidator: PathValidator<number> = {
   name: "number",
   regex: /[+-]?(?:[0-9]*\.)?[0-9]+/,
   convert: (value: string) => parseFloat(value),
-}
+};
 
-export const numberPathValidator = (): typeof NumberPathValidator => NumberPathValidator
+export const numberPathValidator = (): typeof NumberPathValidator => NumberPathValidator;

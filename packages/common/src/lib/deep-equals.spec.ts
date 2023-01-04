@@ -1,13 +1,13 @@
-import { deepCopy } from "./deep-copy"
-import { deepEquals } from "./deep-equals"
+import { deepCopy } from "./deep-copy";
+import { deepEquals } from "./deep-equals";
 
 test("DeepEqual: null and null are equal", () => {
-  expect(deepEquals(null, null)).toBe(true)
-})
+  expect(deepEquals(null, null)).toBe(true);
+});
 
 test("DeepEqual: null and undefined are not equal", () => {
-  expect(deepEquals(null, undefined)).toBe(false)
-})
+  expect(deepEquals(null, undefined)).toBe(false);
+});
 
 test("DeepEqual: equal function dealing with nullable", () => {
   expect(
@@ -23,14 +23,14 @@ test("DeepEqual: equal function dealing with nullable", () => {
         hello: null,
       }
     )
-  ).toBe(false)
-})
+  ).toBe(false);
+});
 
 test("DeepEqual: primitives are equal", () => {
-  expect(deepEquals("my string", "my string")).toBe(true)
-  expect(deepEquals(1, "my string")).toBe(false)
-  expect(deepEquals(1, "my string")).toBe(false)
-})
+  expect(deepEquals("my string", "my string")).toBe(true);
+  expect(deepEquals(1, "my string")).toBe(false);
+  expect(deepEquals(1, "my string")).toBe(false);
+});
 
 test("DeepEqual: complex object", () => {
   const largeJson = {
@@ -104,6 +104,6 @@ test("DeepEqual: complex object", () => {
         msg: null,
       },
     ],
-  }
-  expect(deepEquals(largeJson, deepCopy(largeJson))).toBe(true)
-})
+  };
+  expect(deepEquals(largeJson, deepCopy(largeJson))).toBe(true);
+});

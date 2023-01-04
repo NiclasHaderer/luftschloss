@@ -4,27 +4,27 @@
  * MIT Licensed
  */
 
-import { saveObject } from "@luftschloss/common"
-import { URLSearchParams } from "url"
+import { saveObject } from "@luftschloss/common";
+import { URLSearchParams } from "url";
 
-const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL")
+const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL");
 
 export class UTF8SearchParams extends URLSearchParams {
-  public [UTF_8_SYMBOL] = true
+  public [UTF_8_SYMBOL] = true;
 
   public constructor(...init: ConstructorParameters<typeof URLSearchParams>) {
-    super(...init)
+    super(...init);
   }
 
-  public [Symbol.iterator](): IterableIterator<[string, string]>
-  public [Symbol.iterator](): Iterator<[string, string]>
+  public [Symbol.iterator](): IterableIterator<[string, string]>;
+  public [Symbol.iterator](): Iterator<[string, string]>;
   public [Symbol.iterator](): IterableIterator<[string, string]> | Iterator<[string, string]> {
-    return this.entries()
+    return this.entries();
   }
 
   public override *entries(): IterableIterator<[string, string]> {
     for (const [key, value] of super.entries()) {
-      yield [decodeURIComponent(key), decodeURIComponent(value)]
+      yield [decodeURIComponent(key), decodeURIComponent(value)];
     }
   }
 
@@ -33,38 +33,38 @@ export class UTF8SearchParams extends URLSearchParams {
     thisArg?: TThis
   ) {
     super.forEach((value, name) => {
-      callback.apply(thisArg!, [decodeURIComponent(value), decodeURIComponent(name), this])
-    })
+      callback.apply(thisArg!, [decodeURIComponent(value), decodeURIComponent(name), this]);
+    });
   }
 
   public override get(name: string): string | null {
-    const value = super.get(name)
-    if (value === null) return null
-    return decodeURIComponent(value)
+    const value = super.get(name);
+    if (value === null) return null;
+    return decodeURIComponent(value);
   }
 
   public override getAll(name: string): string[] {
-    return super.getAll(name).map(decodeURIComponent)
+    return super.getAll(name).map(decodeURIComponent);
   }
 
   public override *keys(): IterableIterator<string> {
     for (const key of super.keys()) {
-      yield decodeURIComponent(key)
+      yield decodeURIComponent(key);
     }
   }
 
   public override *values(): IterableIterator<string> {
     for (const value of super.values()) {
-      yield decodeURIComponent(value)
+      yield decodeURIComponent(value);
     }
   }
 
   public encode<T extends Record<string, string[]>>(): T {
-    const o = saveObject<T>()
+    const o = saveObject<T>();
     for (const key of this.keys()) {
       //eslint-disable-next-line @typescript-eslint/no-extra-semi
-      ;(o as Record<string, string[]>)[key] = this.getAll(key)
+      (o as Record<string, string[]>)[key] = this.getAll(key);
     }
-    return o
+    return o;
   }
 }

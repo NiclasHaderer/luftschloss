@@ -1,5 +1,5 @@
-import { array, int, literal, object, string } from "@luftschloss/validation"
-import { Category, Tag } from "./common"
+import { array, int, literal, object, string } from "@luftschloss/validation";
+import { Category, Tag } from "./common";
 
 export const Pet = object({
   id: int().positive(),
@@ -8,4 +8,4 @@ export const Pet = object({
   photoUrls: array(string()),
   tags: array(Tag),
   status: literal(["available", "pending", "sold"]),
-}).named("Pet")
+}).named("Pet");

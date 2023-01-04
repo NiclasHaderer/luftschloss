@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import { ValueOf } from "@luftschloss/common"
-import { HTTPException } from "./http-exception"
+import { ValueOf } from "@luftschloss/common";
+import { HTTPException } from "./http-exception";
 
 /**
  * See https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
@@ -326,21 +326,21 @@ export const Status = {
     message: "Network Authentication Required",
     key: "HTTP_511_NETWORK_AUTHENTICATION_REQUIRED",
   },
-} as const
+} as const;
 
-export type Status = ValueOf<typeof Status>
+export type Status = ValueOf<typeof Status>;
 
 export const toStatus = (code: number | Status): Status => {
-  let codeObject: Status
+  let codeObject: Status;
   if (typeof code === "number") {
-    const tmp = Object.values(Status).find(s => s.code === code)
+    const tmp = Object.values(Status).find(s => s.code === code);
     if (!tmp) {
-      throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, `Status code with status ${code} does not exist`)
+      throw new HTTPException(Status.HTTP_500_INTERNAL_SERVER_ERROR, `Status code with status ${code} does not exist`);
     }
-    codeObject = tmp
+    codeObject = tmp;
   } else {
-    codeObject = code
+    codeObject = code;
   }
 
-  return codeObject
-}
+  return codeObject;
+};

@@ -7,49 +7,49 @@
 /**
  * Every router has to expose a list of middlewares the callbacks in the routes' property will be wrapped in
  */
-import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, ServerBase } from "../core"
-import { Middleware, ReadonlyMiddlewares } from "../middleware"
-import { PathValidator } from "../path-validator"
+import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, ServerBase } from "../core";
+import { Middleware, ReadonlyMiddlewares } from "../middleware";
+import { PathValidator } from "../path-validator";
 
 export interface MountingOptions {
-  basePath: string
+  basePath: string;
 }
 
 export type ResolvedRoute = {
-  availableMethods: HTTP_METHODS[]
-  middlewares: ReadonlyMiddlewares
-  executor: ROUTE_HANDLER
-  status: LookupResultStatus
-  pathParams: Record<string, unknown>
-}
+  availableMethods: HTTP_METHODS[];
+  middlewares: ReadonlyMiddlewares;
+  executor: ROUTE_HANDLER;
+  status: LookupResultStatus;
+  pathParams: Record<string, unknown>;
+};
 
 export interface Router {
-  readonly children: Readonly<{ router: Router; options: MountingOptions }[]>
-  readonly routerMiddlewares: ReadonlyMiddlewares
-  readonly middlewares: ReadonlyMiddlewares
-  readonly locked: boolean
-  readonly parentRouter: Router | undefined
-  readonly server: ServerBase | undefined
-  readonly mountPath: string | undefined
-  readonly completePath: string | undefined
+  readonly children: Readonly<{ router: Router; options: MountingOptions }[]>;
+  readonly routerMiddlewares: ReadonlyMiddlewares;
+  readonly middlewares: ReadonlyMiddlewares;
+  readonly locked: boolean;
+  readonly parentRouter: Router | undefined;
+  readonly server: ServerBase | undefined;
+  readonly mountPath: string | undefined;
+  readonly completePath: string | undefined;
 
-  onMount(server: ServerBase, parentRouter: Router | undefined, mountPath: string, completePath: string): void
+  onMount(server: ServerBase, parentRouter: Router | undefined, mountPath: string, completePath: string): void;
 
-  isMounted(): boolean
+  isMounted(): boolean;
 
-  mount(router: Router[] | Router, options?: Partial<MountingOptions>): this
+  mount(router: Router[] | Router, options?: Partial<MountingOptions>): this;
 
-  pipe(...middleware: Middleware[]): this
+  pipe(...middleware: Middleware[]): this;
 
-  unPipe(...middleware: (Middleware | string)[]): this
+  unPipe(...middleware: (Middleware | string)[]): this;
 
-  unPipeAll(): this
+  unPipeAll(): this;
 
-  addPathValidator(validator: PathValidator<unknown>): this
+  addPathValidator(validator: PathValidator<unknown>): this;
 
-  removePathValidator(validatorOrName: PathValidator<unknown> | string): this
+  removePathValidator(validatorOrName: PathValidator<unknown> | string): this;
 
-  resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute
+  resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute;
 
   /**
    * Check if the router can handle the path. This is done by comparing the base path of the router to the path of the
@@ -57,7 +57,7 @@ export interface Router {
    * @param path The path of the request
    * @returns True if the router can handle the path, false otherwise
    */
-  canHandle(path: string): boolean
+  canHandle(path: string): boolean;
 
-  lock(): void
+  lock(): void;
 }

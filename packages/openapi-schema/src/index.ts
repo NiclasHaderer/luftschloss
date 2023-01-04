@@ -1,2 +1,2 @@
-export * from "./lib/generators"
-export * from "./lib/types"
+export * from "./lib/generators";
+export * from "./lib/types";

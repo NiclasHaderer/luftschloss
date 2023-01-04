@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import { jsonParser } from "@luftschloss/body"
-import { RouterBase } from "@luftschloss/server"
-import { LuftArray, LuftObject, LuftRecord, LuftType } from "@luftschloss/validation"
-import { ApiRoute, CollectedRoute, RouterParams } from "./api.route"
+import { jsonParser } from "@luftschloss/body";
+import { RouterBase } from "@luftschloss/server";
+import { LuftArray, LuftObject, LuftRecord, LuftType } from "@luftschloss/validation";
+import { ApiRoute, CollectedRoute, RouterParams } from "./api.route";
 
 const EMPTY_OBJECT = {
   body: undefined,
@@ -15,11 +15,11 @@ const EMPTY_OBJECT = {
   headers: undefined,
   response: undefined,
   query: undefined,
-}
+};
 
 export class ApiRouter extends RouterBase {
-  public readonly apiRoutes: CollectedRoute[] = []
-  private tags: string[] = []
+  public readonly apiRoutes: CollectedRoute[] = [];
+  private tags: string[] = [];
 
   public build<
     PATH extends LuftObject<any> | undefined = undefined,
@@ -31,21 +31,21 @@ export class ApiRouter extends RouterBase {
     params: Partial<RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>>
   ): ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE> {
     if (this.locked) {
-      throw new Error("Router has been locked. You cannot add any new routes")
+      throw new Error("Router has been locked. You cannot add any new routes");
     }
 
     return new ApiRoute<PATH, QUERY, BODY, HEADERS, RESPONSE>(this, this.routeCollector, this.tags, {
       ...EMPTY_OBJECT,
       ...params,
-    } as RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>)
+    } as RouterParams<PATH, QUERY, BODY, HEADERS, RESPONSE>);
   }
 
   public tag(...tags: string[]): ApiRouter {
-    this.tags = tags
-    return this
+    this.tags = tags;
+    return this;
   }
 }
 
 export const apiRouter = () => {
-  return new ApiRouter().pipe(jsonParser())
-}
+  return new ApiRouter().pipe(jsonParser());
+};

@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-export * from "./types"
-export * from "./factories"
-export * from "./parsing-context"
-export * from "./validation-error"
+export * from "./types";
+export * from "./factories";
+export * from "./parsing-context";
+export * from "./validation-error";

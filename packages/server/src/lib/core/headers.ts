@@ -4,115 +4,115 @@
  * MIT Licensed
  */
 
-import { saveObject } from "@luftschloss/common"
-import { IncomingHttpHeaders } from "http"
+import { saveObject } from "@luftschloss/common";
+import { IncomingHttpHeaders } from "http";
 
 export class Headers {
-  private headers = new Map<string, Set<string>>()
+  private headers = new Map<string, Set<string>>();
 
   public static create(nodeHeaders: IncomingHttpHeaders): Headers {
-    const headers = new Headers()
+    const headers = new Headers();
     for (const [name, value] of Object.entries(nodeHeaders) as [string, string][]) {
-      headers.append(name, value)
+      headers.append(name, value);
     }
 
-    return headers
+    return headers;
   }
 
   private static cleanHeaderName(name: string): string {
-    return name.trim().toLowerCase()
+    return name.trim().toLowerCase();
   }
 
   public append(name: string, value: string | number): void {
-    name = Headers.cleanHeaderName(name)
+    name = Headers.cleanHeaderName(name);
 
     if (!this.headers.has(name)) {
-      this.headers.set(name, new Set())
+      this.headers.set(name, new Set());
     }
 
     const headerValues = value
       .toString()
       .split(",")
       .map(s => s.trim())
-      .filter(s => !!s)
+      .filter(s => !!s);
 
     for (const headerValue of headerValues) {
-      this.headers.get(name)!.add(headerValue)
+      this.headers.get(name)!.add(headerValue);
     }
   }
 
   public appendAll(name: string, value: Iterable<string | number>): void {
     for (const v of value) {
-      this.append(name, v)
+      this.append(name, v);
     }
   }
 
   public mergeIn(headers: Headers | Record<string, string[] | string>): void {
     if (headers instanceof Headers) {
       for (const [name, value] of headers.entries()) {
-        this.appendAll(name, value)
+        this.appendAll(name, value);
       }
-      return
+      return;
     }
 
     for (const [key, value] of Object.entries(headers)) {
       if (Array.isArray(value)) {
-        this.appendAll(key, value)
+        this.appendAll(key, value);
       } else {
-        this.append(key, value)
+        this.append(key, value);
       }
     }
   }
 
   public delete(name: string): void {
-    name = Headers.cleanHeaderName(name)
-    this.headers.delete(name)
+    name = Headers.cleanHeaderName(name);
+    this.headers.delete(name);
   }
 
   public entries(): IterableIterator<[string, Set<string>]> {
-    return this.headers.entries()
+    return this.headers.entries();
   }
 
   public get(name: string): string | null {
-    name = Headers.cleanHeaderName(name)
-    const [first] = this.headers.get(name) || []
-    return first || null
+    name = Headers.cleanHeaderName(name);
+    const [first] = this.headers.get(name) || [];
+    return first || null;
   }
 
   public set(name: string, value: string | string[]): void {
-    name = Headers.cleanHeaderName(name)
-    let valueSet: Set<string>
+    name = Headers.cleanHeaderName(name);
+    let valueSet: Set<string>;
     if (Array.isArray(value)) {
-      valueSet = new Set(value)
+      valueSet = new Set(value);
     } else {
-      valueSet = new Set([value])
+      valueSet = new Set([value]);
     }
-    this.headers.set(name, valueSet)
+    this.headers.set(name, valueSet);
   }
 
   public getAll(name: string): Set<string> | null {
-    name = Headers.cleanHeaderName(name)
-    return this.headers.get(name) || null
+    name = Headers.cleanHeaderName(name);
+    return this.headers.get(name) || null;
   }
 
   public has(name: string): boolean {
-    name = name.toLowerCase()
-    return this.headers.has(name)
+    name = name.toLowerCase();
+    return this.headers.has(name);
   }
 
   public keys(): IterableIterator<string> {
-    return this.headers.keys()
+    return this.headers.keys();
   }
 
   public values(): IterableIterator<Set<string>> {
-    return this.headers.values()
+    return this.headers.values();
   }
 
   public encode(): Record<string, string> {
-    const encodedHeaders: Record<string, string> = saveObject()
+    const encodedHeaders: Record<string, string> = saveObject();
     for (const [name, [...value]] of this.entries()) {
-      encodedHeaders[name] = value.join(", ")
+      encodedHeaders[name] = value.join(", ");
     }
-    return encodedHeaders
+    return encodedHeaders;
   }
 }

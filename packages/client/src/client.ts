@@ -9,7 +9,7 @@ import {
   post as postMethod,
   put as putMethod,
   request as requestMethod,
-} from "./methods"
+} from "./methods";
 
 export const luftClient = (options: ClientOptions = {}) => {
   return {
@@ -23,13 +23,13 @@ export const luftClient = (options: ClientOptions = {}) => {
     request: (method: string, url: string, newOptions: ClientOptionsWithBody = {}) =>
       requestMethod(method, url, { ...options, ...newOptions }),
   } satisfies {
-    get: typeof getMethod
-    post: typeof postMethod
-    patch: typeof patchMethod
-    head: typeof headMethod
-    options: typeof optionsMethod
-    put: typeof putMethod
-    del: typeof delMethod
-    request: typeof requestMethod
-  }
-}
+    get: typeof getMethod;
+    post: typeof postMethod;
+    patch: typeof patchMethod;
+    head: typeof headMethod;
+    options: typeof optionsMethod;
+    put: typeof putMethod;
+    del: typeof delMethod;
+    request: typeof requestMethod;
+  };
+};

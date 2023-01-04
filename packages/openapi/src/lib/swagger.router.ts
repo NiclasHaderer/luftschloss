@@ -1,5 +1,5 @@
-import { LRequest, LResponse } from "@luftschloss/server"
-import { OpenApiUiRouter } from "./openapi-ui-router"
+import { LRequest, LResponse } from "@luftschloss/server";
+import { OpenApiUiRouter } from "./openapi-ui-router";
 
 export class SwaggerRouter extends OpenApiUiRouter {
   protected async handleDocs(_: LRequest, response: LResponse) {
@@ -30,16 +30,16 @@ export class SwaggerRouter extends OpenApiUiRouter {
       </script>
       </body>
       </html>
-    `
-    await response.html(html)
+    `;
+    await response.html(html);
   }
 }
 
 export type SwaggerRouterArgs = {
-  docsUrl?: string
-  openApiUrl?: string
-}
+  docsUrl?: string;
+  openApiUrl?: string;
+};
 
 export const swaggerRouter = ({ docsUrl = "/swagger", openApiUrl = "/openapi" }: SwaggerRouterArgs = {}) => {
-  return new SwaggerRouter(docsUrl, openApiUrl)
-}
+  return new SwaggerRouter(docsUrl, openApiUrl);
+};

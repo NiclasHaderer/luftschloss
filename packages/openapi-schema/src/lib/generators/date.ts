@@ -1,5 +1,5 @@
-import { LuftDate } from "@luftschloss/validation"
-import { GeneratedSchema, toGeneratedSchema } from "./type"
+import { LuftDate } from "@luftschloss/validation";
+import { GeneratedSchema, toGeneratedSchema } from "./type";
 
 export const generateDateJsonSchema = (type: LuftDate, schemaPath: string): GeneratedSchema =>
   toGeneratedSchema(
@@ -10,4 +10,4 @@ export const generateDateJsonSchema = (type: LuftDate, schemaPath: string): Gene
     },
     schemaPath,
     {}
-  )
+  );

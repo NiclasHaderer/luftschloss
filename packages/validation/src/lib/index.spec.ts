@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-import "./index"
+import "./index";
 
 test("LuftIndex: collect code coverage", () => {
-  expect(true).toBe(true)
-})
+  expect(true).toBe(true);
+});

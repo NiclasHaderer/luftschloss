@@ -4,13 +4,13 @@
  * MIT Licensed
  */
 
-import { Middleware } from "@luftschloss/server"
-import { commonFormParserFactory } from "./common"
+import { Middleware } from "@luftschloss/server";
+import { commonFormParserFactory } from "./common";
 
 export type BufferParserOptions = {
-  maxBodySize: number
-  parser: (body: Buffer) => { buffer: Buffer; encoding?: BufferEncoding }
-}
+  maxBodySize: number;
+  parser: (body: Buffer) => { buffer: Buffer; encoding?: BufferEncoding };
+};
 
 export const bufferParser = (
   contentType: string[] | "*" | string = "*",
@@ -20,12 +20,12 @@ export const bufferParser = (
     maxBodySize: 100,
     parser: (buffer: Buffer, encoding?: BufferEncoding) => ({ buffer, encoding }),
     ...options,
-  }
+  };
 
   return commonFormParserFactory(contentType, {
     ...completeOptions,
     methodName: "buffer",
     name: "buffer-parser",
     version: "1.0.0",
-  })
-}
+  });
+};

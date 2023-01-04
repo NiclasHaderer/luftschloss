@@ -1,1 +1,1 @@
-export type __$__ = "todo"
+export type __$__ = "todo";

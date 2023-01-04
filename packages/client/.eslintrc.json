@@ -1,26 +1,45 @@
 {
-  "extends": ["../../.eslintrc.json"],
+  "extends": [
+    "../../.eslintrc.json"
+  ],
   "parserOptions": {
-    "project": ["packages/client/tsconfig.lib.json", "packages/client/tsconfig.spec.json"]
+    "project": [
+      "packages/client/tsconfig.lib.json",
+      "packages/client/tsconfig.spec.json"
+    ]
   },
-  "ignorePatterns": ["!**/*"],
+  "ignorePatterns": [
+    "!**/*"
+  ],
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "files": [
+        "*.ts",
+        "*.tsx",
+        "*.js",
+        "*.jsx"
+      ],
       "rules": {}
     },
     {
-      "files": ["*.ts", "*.tsx"],
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
       "rules": {}
     },
     {
-      "files": ["*.js", "*.jsx"],
+      "files": [
+        "*.js",
+        "*.jsx"
+      ],
       "rules": {}
     }
   ],
   "rules": {
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/no-misused-promises": "error"
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/no-unsafe-assignment": "off"
   }
 }

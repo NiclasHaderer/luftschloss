@@ -1,5 +1,9 @@
-# Add files here to ignore them from prettier formatting
+# Ignore everything recursively
+*
 
-/dist
-/coverage
-yarn.lock
+# But not the .ts files
+!*.ts
+!*.tsx
+!*.js
+!*.jsx
+
