@@ -5,8 +5,8 @@
  */
 
 import { HTTPException, LRequest, Status } from "@luftschloss/server"
-import * as contentType from "content-type"
 import http from "node:http"
+import { parseContentTypes } from "@luftschloss/common"
 
 export const assertContentLengthHeader = (request: LRequest, maxBodySize: number): void => {
   let length = parseInt((request.headers.get("Content-Length") as string | null) || "0")
@@ -47,35 +47,5 @@ export const getBodyContentType = (
 ): null | { type: string; encoding: BufferEncoding | undefined } => {
   const contentTypeHeader: string | null = request.headers.get("Content-Type")
   if (!contentTypeHeader) return null
-  const parsed = contentType.parse(contentTypeHeader)
-
-  return {
-    type: parsed.type.toLowerCase().trim(),
-    encoding: getBufferEncoding(parsed.parameters.encoding),
-  }
-}
-
-const getBufferEncoding = (encoding: string): BufferEncoding | undefined => {
-  if (isBufferEncoding(encoding)) {
-    return encoding.toLowerCase() as BufferEncoding
-  }
-  return undefined
-}
-
-const isBufferEncoding = (encoding: string): encoding is BufferEncoding => {
-  encoding = (encoding || "").toLowerCase()
-  return (
-    encoding === "ascii" ||
-    encoding === "ascii" ||
-    encoding === "utf8" ||
-    encoding === "utf-8" ||
-    encoding === "utf16le" ||
-    encoding === "ucs2" ||
-    encoding === "ucs-8" ||
-    encoding === "base64" ||
-    encoding === "base64url" ||
-    encoding === "latin1" ||
-    encoding === "binary" ||
-    encoding === "hex"
-  )
+  return parseContentTypes(contentTypeHeader)
 }

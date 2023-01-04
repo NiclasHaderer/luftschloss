@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@faker-js/faker": "^7.4.0",
-    "content-type": "^1.0.4",
     "fuse.js": "^6.6.2",
     "light-my-request": "^5.0.0",
     "mime-db": "^1.52.0",
@@ -28,7 +27,6 @@
     "@nrwl/nx-cloud": "15.0.2",
     "@nrwl/web": "15.4.2",
     "@nrwl/workspace": "15.4.2",
-    "@types/content-type": "^1.1.5",
     "@types/jest": "28.1.8",
     "@types/mime-db": "^1.43.1",
     "@types/node": "^18.11.9",
