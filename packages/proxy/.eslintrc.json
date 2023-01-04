@@ -1,25 +1,14 @@
 {
-  "extends": ["../../.eslintrc.json"],
-  "parserOptions": {
-    "project": ["packages/proxy/tsconfig.lib.json", "packages/proxy/tsconfig.spec.json"]
-  },
-  "ignorePatterns": ["!**/*"],
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.js", "*.jsx"],
-      "rules": {}
-    }
+  "extends": [
+    "../../.eslintrc.json"
   ],
-  "rules": {
-    "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/no-misused-promises": "error"
+  "ignorePatterns": [
+    "!**/*"
+  ],
+  "parserOptions": {
+    "project": [
+      "packages/proxy/tsconfig.lib.json",
+      "packages/proxy/tsconfig.spec.json"
+    ]
   }
 }

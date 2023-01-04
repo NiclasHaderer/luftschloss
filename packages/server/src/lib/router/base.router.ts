@@ -12,7 +12,7 @@ import {
   resolveRoute,
   RouteCollector,
   ServerBase,
-  Status,
+  Status
 } from "../core";
 import { Middleware, ReadonlyMiddlewares } from "../middleware";
 import {
@@ -21,7 +21,7 @@ import {
   defaultPathValidator,
   pathToRegex,
   PathValidator,
-  PathValidators,
+  PathValidators
 } from "../path-validator";
 import { MountingOptions, ResolvedRoute, Router } from "./router";
 
@@ -92,14 +92,15 @@ export class RouterBase implements Router {
     return this._server;
   }
 
-  public lock(): void {
+  public async lock(): Promise<void> {
     this._locked = true;
     // Call different startup hooks
-    this.propagateStartup();
+    await this.propagateStartup();
     // Lock the route collector and provide it with the necessary information which it needs to build a lookup table
     this.routeCollector.lock(this._completePath!, this.pathValidators);
     // Call the sub-routers and lock them
-    this.subRouters.map(r => r.router).forEach(r => r.lock());
+    const promises = this.subRouters.map(r => r.router).map(async r => r.lock());
+    await Promise.all(promises);
   }
 
   @ByLazy<((path: string) => boolean) | undefined, RouterBase>(self => {
@@ -114,18 +115,19 @@ export class RouterBase implements Router {
   })
   public canHandle!: (path: string) => boolean;
 
-  private propagateStartup(): void {
+  private async propagateStartup(): Promise<void> {
     const routerParentMiddlewares = this.parentMiddlewares;
     // Server is defined, because only the server can lock the router
-    this._middlewares.forEach((m, index) => {
+    const promises = this._middlewares.map(async (m, index) => {
       let parentMiddlewares = routerParentMiddlewares;
       if (index > 0) {
         // Tell each middleware the parent middlewares
         parentMiddlewares = [...routerParentMiddlewares, ...this.routerMiddlewares.slice(0, index - 1)];
       }
 
-      m.onStartup?.(this.server!, this, parentMiddlewares);
+      await m.onStartup?.(this.server!, this, parentMiddlewares);
     });
+    await Promise.all(promises);
   }
 
   public pipe(...middlewares: Middleware[]): this {

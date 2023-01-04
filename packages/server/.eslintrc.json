@@ -5,39 +5,10 @@
   "ignorePatterns": [
     "!**/*"
   ],
-  "overrides": [
-    {
-      "files": [
-        "*.ts",
-        "*.tsx",
-        "*.js",
-        "*.jsx"
-      ],
-      "rules": {}
-    },
-    {
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
-      "rules": {}
-    },
-    {
-      "files": [
-        "*.js",
-        "*.jsx"
-      ],
-      "rules": {}
-    }
-  ],
-  "rules": {
-    "prefer-const": [
-      "error",
-      {
-        "destructuring": "all"
-      }
-    ],
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-explicit-any": "off"
+  "parserOptions": {
+    "project": [
+      "packages/server/tsconfig.lib.json",
+      "packages/server/tsconfig.spec.json"
+    ]
   }
 }

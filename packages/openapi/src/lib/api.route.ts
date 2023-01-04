@@ -13,7 +13,7 @@ import {
   LResponse,
   ROUTE_HANDLER,
   RouteCollector,
-  Status,
+  Status
 } from "@luftschloss/server";
 import {
   LuftArray,
@@ -24,10 +24,9 @@ import {
   LuftTuple,
   LuftType,
   LuftUnion,
-  ValidationHook,
+  ValidationHook
 } from "@luftschloss/validation";
 import { ApiRouter } from "./api.router";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type OpenApiHandler<
   PATH extends LuftObject<any> | undefined,

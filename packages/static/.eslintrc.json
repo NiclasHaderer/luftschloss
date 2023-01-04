@@ -2,48 +2,13 @@
   "extends": [
     "../../.eslintrc.json"
   ],
+  "ignorePatterns": [
+    "!**/*"
+  ],
   "parserOptions": {
     "project": [
       "packages/static/tsconfig.lib.json",
       "packages/static/tsconfig.spec.json"
-    ]
-  },
-  "ignorePatterns": [
-    "!**/*"
-  ],
-  "overrides": [
-    {
-      "files": [
-        "*.ts",
-        "*.tsx",
-        "*.js",
-        "*.jsx"
-      ],
-      "rules": {}
-    },
-    {
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
-      "rules": {}
-    },
-    {
-      "files": [
-        "*.js",
-        "*.jsx"
-      ],
-      "rules": {}
-    }
-  ],
-  "rules": {
-    "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/no-misused-promises": "error",
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
-      {
-        "args": "none"
-      }
     ]
   }
 }

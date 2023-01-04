@@ -10,7 +10,7 @@ const main = async () => {
       allowCredentials: true,
       allowedHeaders: "*",
       allowedMethods: "*",
-      allowOriginFunction: () => true,
+      allowOriginFunction: () => true
     })
   );
   server.mount(petRouter(), { basePath: "/pet" });
@@ -18,6 +18,6 @@ const main = async () => {
   server.mount(stoplightRouter());
   server.mount(redocRouter());
   server.mount(swaggerRouter());
-  server.listen();
+  void server.listen();
 };
-main();
+void main();

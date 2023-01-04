@@ -14,6 +14,7 @@ import { RequestImpl } from "./request-impl";
 import { LResponse } from "./response";
 import { ResponseImpl } from "./response-impl";
 import { HTTP_METHODS, LookupResultStatus } from "./route-collector.model";
+import * as console from "console";
 
 export type LuftServerEvents = {
   start: void;
@@ -50,6 +51,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     public onComplete = this.eventDelegate.onComplete.bind(this.eventDelegate);
     private readonly startTime = Date.now();
     private readonly openSockets = new Set<Duplex>();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     private readonly nodeServer = http.createServer(this.handleIncomingRequest.bind(this));
     private _isStarted = false;
     private _isShutDown = false;
@@ -142,19 +144,19 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      * After locking the server it is no longer possible to add/remove routes, pathValidators, etc...
      * This has to be done in order to not allow non-reproducible behaviour and to make some optimizations internally.
      */
-    public lock(): void {
+    public async lock(): Promise<void> {
       // Call the routers lock method
-      super.lock();
+      await super.lock();
       this.eventDelegate.emit("locked", undefined);
     }
 
-    public _testBootstrap(): void {
+    public async _testBootstrap(): Promise<void> {
       if (this.locked) {
         throw new Error("Server was already passed to a testing client");
       }
 
-      this.lock();
-      this.eventDelegate.complete("start", undefined);
+      await this.lock();
+      await this.eventDelegate.complete("start", undefined);
     }
 
     /**
@@ -164,13 +166,13 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      */
     public async listen(port = 3200, hostname = "0.0.0.0"): Promise<void> {
       if (this.locked) throw new Error("Server was already started");
-      this.lock();
+      await this.lock();
 
       const runningServer = this.nodeServer.listen(port, hostname, () => {
         console.log(`Server is listening on http://${hostname}:${port}`);
         console.log(`Server startup took ${Date.now() - this.startTime}ms`);
         this._isStarted = true;
-        this.eventDelegate.complete("start", undefined);
+        void this.eventDelegate.complete("start", undefined);
       });
 
       // Collect the sockets, so I can gracefully shut down the server
@@ -178,17 +180,23 @@ export const withServerBase = <T extends Router, ARGS extends []>(
 
       // Wait for a server shutdown
       await new Promise<void>(resolve => {
-        process.on(`SIGINT`, async () => {
-          await this.shutdown();
-          console.log("Server shutdown successfully");
-          this.eventDelegate.complete("shutdown", undefined);
-          resolve();
+        process.on(`SIGINT`, () => {
+          this.shutdown()
+            .then(async () => {
+              console.log("Server shutdown successfully");
+              await this.eventDelegate.complete("shutdown", undefined);
+              resolve();
+            })
+            .catch(console.error);
         });
-        process.on(`exit`, async () => {
-          await this.shutdown();
-          console.log("Server shutdown successfully");
-          this.eventDelegate.complete("shutdown", undefined);
-          resolve();
+        process.on(`exit`, () => {
+          this.shutdown()
+            .then(async () => {
+              console.log("Server shutdown successfully");
+              await this.eventDelegate.complete("shutdown", undefined);
+              resolve();
+            })
+            .catch(console.error);
         });
       });
     }

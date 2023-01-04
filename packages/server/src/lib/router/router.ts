@@ -59,5 +59,5 @@ export interface Router {
    */
   canHandle(path: string): boolean;
 
-  lock(): void;
+  lock(): Promise<void>;
 }

@@ -1,26 +1,14 @@
 {
-  "extends": ["../../.eslintrc.json"],
-  "parserOptions": {
-    "project": ["packages/mocking/tsconfig.lib.json", "packages/mocking/tsconfig.spec.json"]
-  },
-  "ignorePatterns": ["!**/*"],
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.js", "*.jsx"],
-      "rules": {}
-    }
+  "extends": [
+    "../../.eslintrc.json"
   ],
-  "rules": {
-    "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/no-misused-promises": "error",
-    "@typescript-eslint/no-explicit-any": "off"
+  "ignorePatterns": [
+    "!**/*"
+  ],
+  "parserOptions": {
+    "project": [
+      "packages/mocking/tsconfig.lib.json",
+      "packages/mocking/tsconfig.spec.json"
+    ]
   }
 }
