@@ -191,7 +191,7 @@ describe("test invalid configuration", () => {
       expect("function did not throw").toBe(false);
     } catch (e) {
       expect(e).toBe(
-        `Unsupported data type: integer. Accepted data types are: string, Buffer, URLSearchParams, Stream, object`
+        `Unsupported data type: int. Accepted data types are: string, Buffer, URLSearchParams, Stream, object`
       );
     }
   });

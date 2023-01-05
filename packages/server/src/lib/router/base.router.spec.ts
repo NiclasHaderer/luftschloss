@@ -68,7 +68,7 @@ test("Middleware added", () => {
 describe("Middleware execution order", () => {
   let client: TestClient = undefined!;
   let consoleMock: SpyInstance = undefined!;
-  beforeEach(() => {
+  beforeEach(async () => {
     consoleMock = jest.spyOn(console, "log").mockImplementationOnce(() => void 0);
     const server = defaultServer()
       .pipe({
@@ -110,7 +110,7 @@ describe("Middleware execution order", () => {
     r1.mount(r2, { basePath: "hello" });
     server.mount(r1);
 
-    client = testClient(server, {
+    client = await testClient(server, {
       url: {
         hostname: "127.0.0.1",
         port: 3000,
@@ -157,7 +157,7 @@ test("Test route resolving for router with regex mount path", async () => {
   const server = defaultServer().mount(r1, { basePath: "{:number}" });
 
   expect(r1.canHandle("/33/foo-bar")).toBe(true);
-  const client = testClient(server, {
+  const client = await testClient(server, {
     url: {
       hostname: "127.0.0.1",
       port: 3000,
@@ -176,7 +176,7 @@ test("Test route resolving for router with string mount path", async () => {
   const server = defaultServer().mount(r1, { basePath: "33" });
 
   expect(r1.canHandle("/33/foo-bar")).toBe(true);
-  const client = testClient(server, {
+  const client = await testClient(server, {
     url: {
       hostname: "127.0.0.1",
       port: 3000,

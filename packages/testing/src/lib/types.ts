@@ -15,4 +15,4 @@ export interface Options {
 
 export type OptionsWithBody = Options & { body?: Record<string, any> };
 
-export type TestClient = ReturnType<typeof testClient>;
+export type TestClient = Awaited<ReturnType<typeof testClient>>;

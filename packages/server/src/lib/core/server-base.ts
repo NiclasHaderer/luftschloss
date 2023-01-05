@@ -32,7 +32,7 @@ export interface ServerBase extends Pick<Subscribable<LuftServerEvents>, "onComp
 
   listen(port?: number, hostname?: string): Promise<void>;
 
-  _testBootstrap(): void;
+  _testBootstrap(): Promise<void>;
 
   shutdown(options?: { gracePeriod: number }): Promise<void>;
 

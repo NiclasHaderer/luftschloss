@@ -25,8 +25,8 @@ type MergedGlobalOptions = Omit<GlobalOptions, "url"> & {
   url: InjectOptions["url"];
 };
 
-export const testClient = (server: ServerBase, globalClientOptions: GlobalOptions = {}) => {
-  server._testBootstrap();
+export const testClient = async (server: ServerBase, globalClientOptions: GlobalOptions = {}) => {
+  await server._testBootstrap();
 
   return {
     delete(

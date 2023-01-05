@@ -31,13 +31,13 @@ const dropIrrelevantHeaders = (headers: OutgoingHttpHeaders) => {
 };
 
 test("CORS: should return no cors headers", async () => {
-  const client = getClient(corsMiddleware());
+  const client = await getClient(corsMiddleware());
   const headers = await client.post({ pathname: "" }, {}).then(r => dropIrrelevantHeaders(r.headers));
   expect(headers).toStrictEqual({});
 });
 
 test("CORS: should return cors wildcard", async () => {
-  const client = getClient(corsMiddleware());
+  const client = await getClient(corsMiddleware());
 
   const getHeaders = await client
     .post(
@@ -80,7 +80,7 @@ test("CORS: should return cors wildcard", async () => {
 });
 
 test("CORS: allow all headers", async () => {
-  const client = getClient(corsMiddleware({ allowedHeaders: "ALL" }));
+  const client = await getClient(corsMiddleware({ allowedHeaders: "ALL" }));
 
   const getHeaders = await client
     .post(
@@ -123,7 +123,7 @@ test("CORS: allow all headers", async () => {
 });
 
 test("CORS: return all headers", async () => {
-  const client = getClient(corsMiddleware({ allowedHeaders: "ALL" }));
+  const client = await getClient(corsMiddleware({ allowedHeaders: "ALL" }));
 
   const getHeaders = await client
     .post(
@@ -166,7 +166,7 @@ test("CORS: return all headers", async () => {
 });
 
 test("CORS: return all methods", async () => {
-  const client = getClient(corsMiddleware({ allowedMethods: "ALL" }));
+  const client = await getClient(corsMiddleware({ allowedMethods: "ALL" }));
 
   const optionsHeaders = await client
     .options(
@@ -190,7 +190,7 @@ test("CORS: return all methods", async () => {
 });
 
 test("CORS: return allowed methods", async () => {
-  const client = getClient(corsMiddleware({ allowedMethods: ["GET", "DELETE"] }));
+  const client = await getClient(corsMiddleware({ allowedMethods: ["GET", "DELETE"] }));
 
   const optionsHeaders = await client
     .options(
@@ -214,7 +214,7 @@ test("CORS: return allowed methods", async () => {
 });
 
 test("CORS: return allowed headers", async () => {
-  const client = getClient(corsMiddleware({ allowedHeaders: ["my-custom-header", "header-2"] }));
+  const client = await getClient(corsMiddleware({ allowedHeaders: ["my-custom-header", "header-2"] }));
 
   const optionsHeaders = await client
     .options(
@@ -238,7 +238,7 @@ test("CORS: return allowed headers", async () => {
 });
 
 test("CORS: return allowed origin", async () => {
-  const client = getClient(corsMiddleware({ allowOrigins: ["https://google.com"] }));
+  const client = await getClient(corsMiddleware({ allowOrigins: ["https://google.com"] }));
 
   const optionsHeaders = await client
     .options(
@@ -261,7 +261,7 @@ test("CORS: return allowed origin", async () => {
   });
 });
 test("CORS: regex origin", async () => {
-  const client = getClient(corsMiddleware({ allowedOriginRegex: /https:\/\/google\.com/ }));
+  const client = await getClient(corsMiddleware({ allowedOriginRegex: /https:\/\/google\.com/ }));
 
   const allowedOptionsHeaders = await client
     .options(
@@ -300,7 +300,7 @@ test("CORS: regex origin", async () => {
 });
 
 test("CORS: function origin", async () => {
-  const client = getClient(
+  const client = await getClient(
     corsMiddleware({
       allowOrigins: ["https://youtube.com"],
       allowOriginFunction: () => true,
