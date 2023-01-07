@@ -17,7 +17,8 @@ import { HTTP_METHODS, LookupResultStatus } from "./route-collector.model";
 import * as console from "console";
 
 export type LuftServerEvents = {
-  start: void;
+  startup: void;
+  startupComplete: void;
   shutdown: void;
   routerMerged: { router: Router; basePath: string };
   locked: void;
@@ -55,6 +56,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     private readonly nodeServer = http.createServer(this.handleIncomingRequest.bind(this));
     private _isStarted = false;
     private _isShutDown = false;
+    private _shutDownInProgress?: Promise<void>;
 
     public constructor(...args: ARGS) {
       super(...args);
@@ -156,7 +158,8 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       }
 
       await this.lock();
-      await this.eventDelegate.complete("start", undefined);
+      await this.eventDelegate.complete("startup", undefined);
+      await this.eventDelegate.complete("startupComplete", undefined);
     }
 
     /**
@@ -172,7 +175,9 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         console.log(`Server is listening on http://${hostname}:${port}`);
         console.log(`Server startup took ${Date.now() - this.startTime}ms`);
         this._isStarted = true;
-        void this.eventDelegate.complete("start", undefined);
+        void this.eventDelegate
+          .complete("startup", undefined)
+          .then(() => this.eventDelegate.complete("startupComplete", undefined));
       });
 
       // Collect the sockets, so I can gracefully shut down the server
@@ -181,21 +186,23 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       // Wait for a server shutdown
       await new Promise<void>(resolve => {
         process.on(`SIGINT`, () => {
+          if (this._shutDownInProgress) {
+            void this._shutDownInProgress.then(resolve);
+            return;
+          }
           this.shutdown()
-            .then(async () => {
-              console.log("Server shutdown successfully");
-              await this.eventDelegate.complete("shutdown", undefined);
-              resolve();
-            })
+            .then(() => console.log("Server shutdown successfully"))
+            .then(resolve)
             .catch(console.error);
         });
         process.on(`exit`, () => {
+          if (this._shutDownInProgress) {
+            void this._shutDownInProgress.then(resolve);
+            return;
+          }
           this.shutdown()
-            .then(async () => {
-              console.log("Server shutdown successfully");
-              await this.eventDelegate.complete("shutdown", undefined);
-              resolve();
-            })
+            .then(() => console.log("Server shutdown successfully"))
+            .then(resolve)
             .catch(console.error);
         });
       });
@@ -206,23 +213,28 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      * @param gracePeriod How long should the server wait until forcefully shutting down open connections
      */
     public shutdown({ gracePeriod = 1000 } = {}): Promise<void> {
-      return new Promise((resolve, reject) => {
+      if (this._shutDownInProgress) return this._shutDownInProgress;
+
+      this._shutDownInProgress = new Promise<void>((resolve, reject) => {
         if (this._isShutDown) resolve();
         console.log("Shutting down server");
-
+        let timeout: NodeJS.Timeout | undefined = undefined;
         this.nodeServer.close(err => {
           this._isShutDown = true;
+          clearTimeout(timeout!);
           if (err) {
             reject(err);
           } else {
             resolve();
           }
         });
-        setTimeout(() => {
+
+        timeout = setTimeout(() => {
           this.openSockets.forEach(s => s.destroy());
-          resolve(undefined);
+          resolve();
         }, gracePeriod);
-      });
+      }).then(() => this.eventDelegate.complete("shutdown", undefined));
+      return this._shutDownInProgress;
     }
 
     /**

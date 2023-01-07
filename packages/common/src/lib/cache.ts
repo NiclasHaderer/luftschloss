@@ -6,7 +6,7 @@
 
 const FUNC_CACHE_KEY = Symbol("FUNC_CACHE_KEY");
 
-export const Cache = (maxSize = 100) => {
+export const Cache = ({ maxSize = 100 } = {}) => {
   return function (target: object, propertyKey: string, descriptor: PropertyDescriptor) {
     Reflect.defineProperty(target, FUNC_CACHE_KEY, {
       writable: true,

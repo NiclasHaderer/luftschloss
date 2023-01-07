@@ -20,7 +20,7 @@ export class OpenApiRouter extends RouterBase {
 
   public override onMount(server: ServerBase, parentRouter: Router, mountPath: string, completePath: string): void {
     super.onMount(server, parentRouter, mountPath, completePath);
-    void server.onComplete("start").then(() => this.generateOpenApiSchema());
+    void server.onComplete("startup").then(() => this.generateOpenApiSchema());
   }
 
   protected handleOpenApi(_: LRequest, response: LResponse): void {

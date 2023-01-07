@@ -1,5 +1,13 @@
 import http from "node:http";
-import { ByLazy, ContentType, Headers, parseContentType, UTF8SearchParams } from "@luftschloss/common";
+import {
+  ByLazy,
+  Cache,
+  ContentType,
+  ContentTypeString,
+  Headers,
+  parseContentType,
+  UTF8SearchParams,
+} from "@luftschloss/common";
 
 export class ClientResponse {
   @ByLazy<ContentType, ClientResponse>(self => {
@@ -17,7 +25,11 @@ export class ClientResponse {
   })
   public readonly contentType!: ContentType;
 
-  constructor(public readonly raw: http.IncomingMessage, public readonly url: URL) {}
+  constructor(
+    public readonly raw: http.IncomingMessage,
+    public readonly url: URL,
+    public readonly history: ReadonlyArray<ClientResponse>
+  ) {}
 
   public get status(): number {
     return this.raw.statusCode!;
@@ -27,43 +39,40 @@ export class ClientResponse {
     return Headers.create(this.raw.headers);
   }
 
-  public async *chunks(): AsyncGenerator<Buffer> {
-    for await (const chunk of this.raw) {
-      yield chunk;
-    }
-  }
-
-  public async buffer(contentType = "*/*"): Promise<Buffer> {
-    if (!this.contentType.matches(contentType)) {
-      throw new Error(`Wrong content type: Expected ${contentType}, got ${this.contentType.type}`);
-    }
+  @Cache()
+  public async buffer(): Promise<Buffer> {
     const buffers = [];
-    for await (const chunk of this.chunks()) {
+    for await (const chunk of this.raw) {
       buffers.push(chunk);
     }
     return Promise.all(buffers).then(buffers => Buffer.concat(buffers));
   }
 
-  public json<T extends object>(contentType = "application/json"): Promise<T> {
+  public json<T extends object>(contentType: ContentTypeString = "application/json"): Promise<T> {
     if (!this.contentType.matches(contentType)) {
-      throw new Error(`Wrong content type: Expected ${contentType}, got ${this.contentType.type}`);
+      throw new Error(`Wrong content type: Required ${contentType}, got ${this.contentType.type}`);
     }
     return this.text("*/*").then(text => JSON.parse(text));
   }
 
   public form<T extends Record<string, string[]> = Record<string, string[]>>(
-    contentType = "application/x-www-form-urlencoded"
+    contentType: ContentTypeString = "application/x-www-form-urlencoded"
   ): Promise<UTF8SearchParams<T>> {
     if (!this.contentType.matches(contentType)) {
-      throw new Error(`Wrong content type: Expected ${contentType}, got ${this.contentType.type}`);
+      throw new Error(`Wrong content type: Required ${contentType}, got ${this.contentType.type}`);
     }
     return this.text("*/*").then(text => new UTF8SearchParams<T>(text));
   }
 
-  public text(contentType = "text/*"): Promise<string> {
+  public text(contentType: ContentTypeString = "text/*"): Promise<string> {
     if (!this.contentType.matches(contentType)) {
-      throw new Error(`Wrong content type: Expected ${contentType}, got ${this.contentType.type}`);
+      throw new Error(`Wrong content type: Required ${contentType}, got ${this.contentType.type}`);
     }
-    return this.buffer().then(buffer => buffer.toString());
+    return this.buffer().then(buffer => buffer.toString(this.contentType.encoding));
+  }
+
+  public destroy(error?: Error): void {
+    this.history.map(r => r.destroy(error));
+    this.raw.destroy(error);
   }
 }

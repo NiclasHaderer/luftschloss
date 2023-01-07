@@ -1,11 +1,14 @@
 import { Readable } from "node:stream";
-import { defaultServer, ServerImpl } from "@luftschloss/server";
+import { defaultServer, loggerMiddleware, ServerImpl } from "@luftschloss/server";
 import { luftClient } from "./client";
 import { bufferParser, formParser, jsonParser, textParser } from "@luftschloss/body";
 import { UTF8SearchParams } from "@luftschloss/common";
+import "leaked-handles";
 
 const createServer = () => {
-  const server = defaultServer().pipe(jsonParser("*"), formParser("*"), bufferParser("*"), textParser("*"));
+  const server = defaultServer()
+    .unPipe(loggerMiddleware())
+    .pipe(jsonParser("*"), formParser("*"), bufferParser("*"), textParser("*"));
   server.get("/json", (req, res) => res.json({ hello: "world" }));
   server.get("/text", (req, res) => res.text("hello world"));
   server.get("/redirect", (req, res) => res.redirect("http://127.0.0.1:33333/json", "307_TEMPORARY_REDIRECT"));
@@ -41,7 +44,7 @@ describe("Test client with simple get requests", () => {
   beforeAll(async () => {
     server = createServer();
     void server.listen(33333);
-    await server.onComplete("start");
+    await server.onComplete("startupComplete");
   });
 
   afterAll(async () => {
@@ -76,6 +79,7 @@ describe("Test client with simple get requests", () => {
     const response = await client.get("http://127.0.0.1:33333/redirect-external").send();
     expect(response.status).toBe(200);
     expect(response.url.toString()).toEqual("https://www.google.com/");
+    response.destroy();
   });
 
   it("should send a request and not follow redirects using the redirect hook", async () => {
@@ -102,6 +106,11 @@ describe("Test client with simple get requests", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ hello: "world" });
+    expect(response.history.length).toBe(2);
+    expect(response.history[0].url).toStrictEqual(new URL("http://127.0.0.1:33333/2-redirects"));
+    expect(await response.history[0].text("*/*")).toStrictEqual("");
+    expect(response.history[1].url).toStrictEqual(new URL("http://127.0.0.1:33333/redirect"));
+    expect(await response.history[1].text("*/*")).toStrictEqual("");
   });
 
   it("should send a request and not follow redirects", async () => {
@@ -119,12 +128,11 @@ describe("Test client with body", () => {
   beforeAll(async () => {
     server = createServer();
     void server.listen(33333);
-    await server.onComplete("start");
+    await server.onComplete("startupComplete");
+    await new Promise(resolve => setTimeout(resolve, 100));
   });
 
-  afterAll(async () => {
-    await server.shutdown();
-  });
+  afterAll(async () => await server.shutdown());
 
   it("should send a request and parse the json", async () => {
     const response = await client.post("http://127.0.0.1:33333/echo-json", { data: { hello: "world" } }).send();

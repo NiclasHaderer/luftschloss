@@ -1,7 +1,7 @@
 import { Cache } from "./cache";
 
 class CacheTest {
-  @Cache()
+  @Cache({ maxSize: 100 })
   public rand(num: number) {
     return Math.random();
   }

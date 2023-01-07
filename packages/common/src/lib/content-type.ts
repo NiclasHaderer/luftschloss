@@ -13,12 +13,14 @@ const PARAM_REGEXP =
 // eslint-disable-next-line no-control-regex
 const ESCAPED_QUOTES = /\\([\u000b\u0020-\u00ff])/g;
 
+export type ContentTypeString = `${string}/${string}` | "*/*";
+
 export interface ContentType {
-  type: string | undefined;
+  type: ContentTypeString | undefined;
   encoding: BufferEncoding | undefined;
   parameters: Record<string, string>;
 
-  matches(type: string): boolean;
+  matches(type: ContentTypeString): boolean;
 }
 
 const extractParameters = (params: string | undefined) => {
@@ -63,10 +65,10 @@ export const parseContentType = (contentTypeString: string): ContentType => {
   const encodedParams = extractParameters(params);
   const encoding = getBufferEncoding(encodedParams.charset);
   return {
-    type: contentType.toLowerCase(),
+    type: contentType.toLowerCase() as ContentTypeString,
     encoding: encoding,
     parameters: encodedParams,
-    matches(type: string): boolean {
+    matches(type: ContentTypeString): boolean {
       if (type === "*/*") return true;
       if (!this.type) return false;
       const [contentType, specificType] = type.toLowerCase().split("/");

@@ -18,6 +18,9 @@ const main = async () => {
   server.mount(stoplightRouter());
   server.mount(redocRouter());
   server.mount(swaggerRouter());
-  void server.listen();
+  void server.listen(3200, "0.0.0.0");
+  await server.onComplete("startupComplete");
+  // @ts-ignore
+  fetch("http://127.0.0.1:3200").then((response) => response.text()).then(console.log);
 };
 void main();

@@ -16,16 +16,16 @@ interface RequestEvents {
 }
 
 export class ClientRequest extends Subscribable<RequestEvents> {
-  public readonly history: ClientResponse[] = [];
   private executor!: typeof http.request | typeof https.request;
   private redirectCount = 0;
+  private readonly history: ClientResponse[] = [];
   private headers: Headers;
 
   constructor(
     uri: string | URL,
     public readonly method: string,
-    public readonly options: Required<ClientOptions> & Partial<ClientOptionsWithBody>,
-    private readonly userAgent = "node-luftschloss-client"
+    public readonly options: Readonly<Required<ClientOptions> & Partial<ClientOptionsWithBody>>,
+    private readonly userAgent = "@luftschloss/client"
   ) {
     super();
     this.url = uri;
@@ -46,9 +46,9 @@ export class ClientRequest extends Subscribable<RequestEvents> {
     this.executor = this.url.protocol === "https:" ? https.request : http.request;
   }
 
-  public async send(): Promise<ClientResponse> {
+  private getResponse() {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises,no-async-promise-executor
-    const rawResponse = await new Promise<http.IncomingMessage>(async (resolve, reject) => {
+    return new Promise<http.IncomingMessage>(async (resolve, reject) => {
       let contentType: string | undefined;
       if (!this.headers.has("content-type") && this.options.data) {
         if (typeof this.options.data === "string") {
@@ -105,8 +105,11 @@ export class ClientRequest extends Subscribable<RequestEvents> {
       }
       message.end();
     });
+  }
 
-    const wrappedResponse = new ClientResponse(rawResponse, this.url);
+  public async send(): Promise<ClientResponse> {
+    const rawResponse = await this.getResponse();
+    const wrappedResponse = new ClientResponse(rawResponse, this.url, [...this.history]);
 
     if (
       this.options.followRedirects &&
