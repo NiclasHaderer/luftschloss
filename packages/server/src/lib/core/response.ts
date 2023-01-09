@@ -3,15 +3,13 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { CustomPropertyDescriptor, Func } from "@luftschloss/common";
-import { ReadStream } from "fs";
-import { ServerResponse } from "http";
-import { URL, URLSearchParams } from "url";
-import { Headers } from "./headers";
-import { LRequest } from "./request";
-import { ResponseImpl } from "./response-impl";
-import { Status } from "./status";
-import { UTF8SearchParams } from "./utf8-search-params";
+import {CustomPropertyDescriptor, Func, Headers, UTF8SearchParams} from "@luftschloss/common";
+import {ReadStream} from "fs";
+import {ServerResponse} from "http";
+import {URL, URLSearchParams} from "url";
+import {LRequest} from "./request";
+import {ResponseImpl} from "./response-impl";
+import {Status} from "./status";
 
 export interface LResponse {
   readonly complete: boolean;

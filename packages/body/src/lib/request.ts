@@ -4,8 +4,9 @@
  * MIT Licensed
  */
 
-import { addRequestField, HTTPException, LRequest, Status, UTF8SearchParams } from "@luftschloss/server";
+import {addRequestField, HTTPException, LRequest, Status} from "@luftschloss/server";
 import "@luftschloss/server";
+import {UTF8SearchParams} from "@luftschloss/common";
 
 declare module "@luftschloss/server" {
   interface LRequest {

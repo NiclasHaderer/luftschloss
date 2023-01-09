@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import { withDefaults } from "@luftschloss/common";
-import { Middleware } from "@luftschloss/server";
-import Buffer from "buffer";
-import { commonFormParserFactory } from "./common";
+import {withDefaults} from "@luftschloss/common";
+import {Middleware} from "@luftschloss/server";
+import Buffer from "node:buffer";
+import {commonFormParserFactory} from "./common";
 
 export type TextParserOptions = {
   maxBodySize: number;

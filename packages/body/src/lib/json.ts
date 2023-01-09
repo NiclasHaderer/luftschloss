@@ -4,10 +4,10 @@
  * MIT Licensed
  */
 
-import { withDefaults } from "@luftschloss/common";
-import { HTTPException, Middleware, Status } from "@luftschloss/server";
-import * as Buffer from "buffer";
-import { commonFormParserFactory } from "./common";
+import {withDefaults} from "@luftschloss/common";
+import {HTTPException, Middleware, Status} from "@luftschloss/server";
+import * as Buffer from "node:buffer";
+import {commonFormParserFactory} from "./common";
 
 export type JsonParserOptions = {
   maxBodySize: number;

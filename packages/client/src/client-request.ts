@@ -1,10 +1,9 @@
 import http from "node:http";
 import https from "node:https";
 import { ClientResponse } from "./client-response";
-import { getTypeOf, Subscribable } from "@luftschloss/common";
+import { getTypeOf, Headers, Subscribable } from "@luftschloss/common";
 import { ClientOptions, ClientOptionsWithBody } from "./methods";
-import { Headers } from "@luftschloss/server";
-import { Stream } from "stream";
+import { Stream } from "node:stream";
 
 const supportedProtocols = new Set(["http:", "https:"]);
 
@@ -17,10 +16,9 @@ interface RequestEvents {
 }
 
 export class ClientRequest extends Subscribable<RequestEvents> {
-  private _url!: URL;
+  public readonly history: ClientResponse[] = [];
   private executor!: typeof http.request | typeof https.request;
   private redirectCount = 0;
-  public readonly history: ClientResponse[] = [];
   private headers: Headers;
 
   constructor(
@@ -33,6 +31,8 @@ export class ClientRequest extends Subscribable<RequestEvents> {
     this.url = uri;
     this.headers = options.headers instanceof Headers ? options.headers : Headers.create(options.headers);
   }
+
+  private _url!: URL;
 
   public get url(): URL {
     return this._url;

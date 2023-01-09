@@ -3,28 +3,31 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { ReadStream } from "fs";
-import { ServerResponse } from "http";
-import { DefaultErrorHandler } from "./error-handler";
+import {ReadStream} from "fs";
+import {ServerResponse} from "http";
+import {DefaultErrorHandler} from "./error-handler";
 
-import { Headers } from "./headers";
-import { HTTPException } from "./http-exception";
-import type { LRequest } from "./request";
+import {Headers, UTF8SearchParams} from "@luftschloss/common";
+import {HTTPException} from "./http-exception";
+import type {LRequest} from "./request";
 
-import type { LResponse } from "./response";
-import { Status, toStatus } from "./status";
-import { UTF8SearchParams } from "./utf8-search-params";
-import { URLSearchParams } from "url";
+import type {LResponse} from "./response";
+import {Status, toStatus} from "./status";
+import {URLSearchParams} from "url";
 
 const NOT_COMPLETED = Symbol("NOT_COMPLETED");
 
 export class ResponseImpl implements LResponse {
   private _status: Status = Status.HTTP_200_OK;
-  private _headers = new Headers();
-
   private data: ReadStream | ReadStream[] | Buffer | typeof NOT_COMPLETED | string = NOT_COMPLETED;
 
   public constructor(private readonly res: ServerResponse, public readonly request: LRequest) {}
+
+  private _headers = new Headers();
+
+  public get headers(): Headers {
+    return this._headers;
+  }
 
   public get raw(): ServerResponse {
     return this.res;
@@ -32,10 +35,6 @@ export class ResponseImpl implements LResponse {
 
   public get complete(): boolean {
     return this.res.writableEnded;
-  }
-
-  public get headers(): Headers {
-    return this._headers;
   }
 
   public buffer(bytes: Buffer): this {

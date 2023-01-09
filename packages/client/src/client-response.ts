@@ -1,18 +1,7 @@
 import http from "node:http";
-import { Headers, UTF8SearchParams } from "@luftschloss/server";
-import { ByLazy, ContentType, parseContentType } from "@luftschloss/common";
+import { ByLazy, ContentType, Headers, parseContentType, UTF8SearchParams } from "@luftschloss/common";
 
 export class ClientResponse {
-  constructor(public readonly raw: http.IncomingMessage, public readonly url: URL) {}
-
-  public get status(): number {
-    return this.raw.statusCode!;
-  }
-
-  public get headers() {
-    return Headers.create(this.raw.headers);
-  }
-
   @ByLazy<ContentType, ClientResponse>(self => {
     const contentType = self.headers.get("content-type");
     if (contentType) {
@@ -27,6 +16,16 @@ export class ClientResponse {
     }
   })
   public readonly contentType!: ContentType;
+
+  constructor(public readonly raw: http.IncomingMessage, public readonly url: URL) {}
+
+  public get status(): number {
+    return this.raw.statusCode!;
+  }
+
+  public get headers() {
+    return Headers.create(this.raw.headers);
+  }
 
   public async *chunks(): AsyncGenerator<Buffer> {
     for await (const chunk of this.raw) {

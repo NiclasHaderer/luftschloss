@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import { HTTPException, LRequest, LResponse, Middleware, NextFunction, Status } from "@luftschloss/server";
-import Buffer from "buffer";
-import { assertContentLengthHeader, getBodyContentType, getBodyData } from "./utils";
+import {HTTPException, LRequest, LResponse, Middleware, NextFunction, Status} from "@luftschloss/server";
+import Buffer from "node:buffer";
+import {assertContentLengthHeader, getBodyContentType, getBodyData} from "./utils";
 
 export type CommonParserOptions = {
   maxBodySize: number;

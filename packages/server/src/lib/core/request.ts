@@ -4,13 +4,10 @@
  * MIT Licensed
  */
 
-import { CustomPropertyDescriptor, Func } from "@luftschloss/common";
-import { IncomingMessage } from "http";
-import { Headers } from "./headers";
-import { RequestImpl } from "./request-impl";
-import { HTTP_METHODS } from "./route-collector.model";
-import { UTF8SearchParams } from "./utf8-search-params";
-import { UTF8Url } from "./utf8-url";
+import {CustomPropertyDescriptor, Func, Headers, UTF8SearchParams, UTF8Url} from "@luftschloss/common";
+import {IncomingMessage} from "http";
+import {RequestImpl} from "./request-impl";
+import {HTTP_METHODS} from "./route-collector.model";
 
 export interface LRequest<DATA extends Record<string, unknown> = never> {
   readonly data: DATA;

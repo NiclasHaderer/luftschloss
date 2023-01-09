@@ -1,7 +1,8 @@
 import { Readable } from "node:stream";
-import { defaultServer, ServerImpl, UTF8SearchParams } from "@luftschloss/server";
+import { defaultServer, ServerImpl } from "@luftschloss/server";
 import { luftClient } from "./client";
 import { bufferParser, formParser, jsonParser, textParser } from "@luftschloss/body";
+import { UTF8SearchParams } from "@luftschloss/common";
 
 const createServer = () => {
   const server = defaultServer().pipe(jsonParser("*"), formParser("*"), bufferParser("*"), textParser("*"));

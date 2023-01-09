@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import { normalizePath } from "@luftschloss/common";
-import { URL } from "url";
-import { UTF8SearchParams } from "./utf8-search-params";
+import {normalizePath} from "./utils";
+import {URL} from "node:url";
+import {UTF8SearchParams} from "./utf8-search-params";
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL");
 
@@ -99,16 +99,16 @@ export class UTF8Url implements URL {
     this.urlDelegate.hash = value;
   }
 
-  public toString(): string {
-    return decodeURIComponent(this.urlDelegate.toString());
-  }
-
   public get searchParams(): UTF8SearchParams {
     return new UTF8SearchParams(this.urlDelegate.searchParams);
   }
 
   public get origin() {
     return decodeURIComponent(this.urlDelegate.origin);
+  }
+
+  public toString(): string {
+    return decodeURIComponent(this.urlDelegate.toString());
   }
 
   public toJSON(): string {

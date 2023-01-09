@@ -1,5 +1,5 @@
 import { ClientRequest } from "./client-request";
-import { Headers } from "@luftschloss/server";
+import { Headers } from "@luftschloss/common";
 import { IncomingHttpHeaders } from "http";
 
 export interface ClientOptions {
