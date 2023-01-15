@@ -45,7 +45,7 @@ export const getBodyData = (raw: http.IncomingMessage, maxBodySize: number) => {
 export const getBodyContentType = (
   request: LRequest
 ): null | { type: string; encoding: BufferEncoding | undefined } => {
-  const contentTypeHeader: string | null = request.headers.get("Content-Type");
+  const contentTypeHeader = request.headers.get("Content-Type");
   if (!contentTypeHeader) return null;
   return parseContentType(contentTypeHeader) as { type: string; encoding: BufferEncoding | undefined };
 };

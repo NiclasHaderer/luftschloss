@@ -122,7 +122,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
       let follow = true;
       const event = new RedirectEvent(newURL, () => (follow = false));
       await this._emitSync("redirect", event);
-
+      // TODO check if headers should be forwarded
       if (!follow) {
         return wrappedResponse;
       } else {
