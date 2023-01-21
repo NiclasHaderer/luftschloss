@@ -72,7 +72,6 @@ export class ClientResponse {
   }
 
   public destroy(error?: Error): void {
-    this.history.map(r => r.destroy(error));
-    this.raw.destroy(error);
+    this.history.forEach(r => r.raw.destroyed || r.raw.destroy(error));
   }
 }

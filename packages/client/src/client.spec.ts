@@ -3,7 +3,6 @@ import { defaultServer, loggerMiddleware, ServerImpl } from "@luftschloss/server
 import { luftClient } from "./client";
 import { bufferParser, formParser, jsonParser, textParser } from "@luftschloss/body";
 import { UTF8SearchParams } from "@luftschloss/common";
-import "leaked-handles";
 
 const createServer = () => {
   const server = defaultServer()
