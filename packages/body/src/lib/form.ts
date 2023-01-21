@@ -3,11 +3,11 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-
-import {UTF8SearchParams, withDefaults} from "@luftschloss/common";
-import {HTTPException, Middleware, Status} from "@luftschloss/server";
+import { commonFormParserFactory } from "./common";
+import { UTF8SearchParams, withDefaults } from "@luftschloss/common";
+import { HTTPException, Middleware, Status } from "@luftschloss/server";
 import Buffer from "node:buffer";
-import {commonFormParserFactory} from "./common";
+
 
 export type FormParserOptions = {
   maxBodySize: number;
