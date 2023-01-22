@@ -2,7 +2,7 @@ import http from "node:http";
 import https from "node:https";
 import { ClientResponse } from "./client-response";
 import { getTypeOf, Headers, Subscribable } from "@luftschloss/common";
-import { ClientOptions, ClientOptionsWithBody } from "./methods";
+import type { ClientOptionsWithBody } from "./methods";
 import { Stream } from "node:stream";
 
 const supportedProtocols = new Set(["http:", "https:"]);
@@ -21,14 +21,17 @@ export class ClientRequest extends Subscribable<RequestEvents> {
   private executor!: typeof http.request | typeof https.request;
   private readonly history: ClientResponse[] = [];
   private headers: Headers;
-  private data: string | Buffer | NodeJS.ReadableStream | URLSearchParams | object | undefined;
+  private data: ClientOptionsWithBody["data"] | undefined;
   private readonly maxRedirects: number;
-  private readonly followRedirects: boolean;
 
   constructor(
     uri: string | URL,
     private _method: string,
-    options: Readonly<Required<ClientOptions> & Partial<ClientOptionsWithBody>>,
+    options: Readonly<{
+      headers: Headers | http.IncomingHttpHeaders;
+      data: ClientOptionsWithBody["data"] | undefined;
+      maxRedirects: number;
+    }>,
     private readonly userAgent = "@luftschloss/client"
   ) {
     super();
@@ -36,7 +39,6 @@ export class ClientRequest extends Subscribable<RequestEvents> {
     this.headers = options.headers instanceof Headers ? options.headers : Headers.create(options.headers);
     this.data = options.data;
     this.maxRedirects = options.maxRedirects;
-    this.followRedirects = options.followRedirects;
   }
 
   private _url!: URL;
@@ -78,7 +80,6 @@ export class ClientRequest extends Subscribable<RequestEvents> {
   private async warpResponse(rawResponse: http.IncomingMessage): Promise<ClientResponse> {
     const wrappedResponse = new ClientResponse(rawResponse, this.url, [...this.history]);
     if (
-      this.followRedirects &&
       this.redirectCount < this.maxRedirects &&
       redirectStatusCodes.has(wrappedResponse.status) &&
       wrappedResponse.headers.has("location")

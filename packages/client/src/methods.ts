@@ -44,6 +44,9 @@ export const request = (method: string, url: string, options: ClientOptionsWithB
     throw new Error(`${method} requests cannot have a body`);
   }
 
-  const completeOptions = { followRedirects: true, maxRedirects: 4, headers: {}, ...options };
-  return new ClientRequest(url, method, completeOptions);
+  return new ClientRequest(url, method, {
+    data: options.data,
+    headers: options.headers ?? {},
+    maxRedirects: !options.followRedirects ? 0 : options.maxRedirects ?? 4,
+  });
 };

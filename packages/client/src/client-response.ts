@@ -74,4 +74,11 @@ export class ClientResponse {
   public destroy(error?: Error): void {
     this.history.forEach(r => r.raw.destroyed || r.raw.destroy(error));
   }
+
+  public raiseForStatus(): ClientResponse {
+    if (this.status >= 400) {
+      throw new Error(`HTTP Error ${this.status}: ${this.url}`);
+    }
+    return this;
+  }
 }
