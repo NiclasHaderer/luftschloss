@@ -47,6 +47,6 @@ export const request = (method: string, url: string, options: ClientOptionsWithB
   return new ClientRequest(url, method, {
     data: options.data,
     headers: options.headers ?? {},
-    maxRedirects: !options.followRedirects ? 0 : options.maxRedirects ?? 4,
+    maxRedirects: options.followRedirects === false ? 0 : options.maxRedirects ?? 4,
   });
 };
