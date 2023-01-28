@@ -12,9 +12,9 @@ import {
   UTF8SearchParams,
   UTF8Url,
 } from "@luftschloss/common";
-import {IncomingMessage} from "http";
-import {RequestImpl} from "./request-impl";
-import {HTTP_METHODS} from "./route-collector.model";
+import { IncomingMessage } from "http";
+import { RequestImpl } from "./request-impl";
+import { HTTP_METHODS } from "./route-collector.model";
 
 export interface LRequest<DATA extends Record<string, unknown> = never> {
   readonly data: DATA;

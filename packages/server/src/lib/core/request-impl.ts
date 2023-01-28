@@ -17,13 +17,13 @@ import {
   UTF8SearchParams,
   UTF8Url,
 } from "@luftschloss/common";
-import {IncomingMessage} from "http";
-import {AddressInfo} from "net";
+import { IncomingMessage } from "http";
+import { AddressInfo } from "net";
 import * as tls from "tls";
-import {LRequest} from "./request";
-import {HTTP_METHODS} from "./route-collector.model";
-import {HTTPException} from "./http-exception";
-import {Status} from "./status";
+import { LRequest } from "./request";
+import { HTTP_METHODS } from "./route-collector.model";
+import { HTTPException } from "./http-exception";
+import { Status } from "./status";
 
 export class RequestImpl<DATA extends Record<string, unknown> = never> implements LRequest<DATA> {
   @ByLazy<UTF8SearchParams, RequestImpl<DATA>>(self => self.url.searchParams)

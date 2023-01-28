@@ -12,7 +12,7 @@ import {
   resolveRoute,
   RouteCollector,
   ServerBase,
-  Status
+  Status,
 } from "../core";
 import { Middleware, ReadonlyMiddlewares } from "../middleware";
 import {
@@ -21,7 +21,7 @@ import {
   defaultPathValidator,
   pathToRegex,
   PathValidator,
-  PathValidators
+  PathValidators,
 } from "../path-validator";
 import { MountingOptions, ResolvedRoute, Router } from "./router";
 

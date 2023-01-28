@@ -3,17 +3,17 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import {ReadStream} from "fs";
-import {ServerResponse} from "http";
-import {DefaultErrorHandler} from "./error-handler";
+import { ReadStream } from "fs";
+import { ServerResponse } from "http";
+import { DefaultErrorHandler } from "./error-handler";
 
-import {Headers, UTF8SearchParams} from "@luftschloss/common";
-import {HTTPException} from "./http-exception";
-import type {LRequest} from "./request";
+import { Headers, UTF8SearchParams } from "@luftschloss/common";
+import { HTTPException } from "./http-exception";
+import type { LRequest } from "./request";
 
-import type {LResponse} from "./response";
-import {Status, toStatus} from "./status";
-import {URLSearchParams} from "url";
+import type { LResponse } from "./response";
+import { Status, toStatus } from "./status";
+import { URLSearchParams } from "url";
 
 const NOT_COMPLETED = Symbol("NOT_COMPLETED");
 

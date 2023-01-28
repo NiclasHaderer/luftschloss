@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import {RouterBase} from "@luftschloss/server";
-import {LuftArray, LuftObject, LuftRecord, LuftType} from "@luftschloss/validation";
-import {ApiRoute, CollectedRoute, RouterParams} from "./api.route";
+import { RouterBase } from "@luftschloss/server";
+import { LuftArray, LuftObject, LuftRecord, LuftType } from "@luftschloss/validation";
+import { ApiRoute, CollectedRoute, RouterParams } from "./api.route";
 
 const EMPTY_OBJECT = {
   body: undefined,

@@ -4,9 +4,9 @@
  * MIT Licensed
  */
 
-import {normalizePath} from "./utils";
-import {URL} from "node:url";
-import {UTF8SearchParams} from "./utf8-search-params";
+import { normalizePath } from "./utils";
+import { URL } from "node:url";
+import { UTF8SearchParams } from "./utf8-search-params";
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL");
 

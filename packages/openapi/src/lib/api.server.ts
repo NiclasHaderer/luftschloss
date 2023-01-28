@@ -18,7 +18,7 @@ import {
   uuidPathValidator,
   withServerBase,
 } from "@luftschloss/server";
-import {ApiRouter} from "./api.router";
+import { ApiRouter } from "./api.router";
 
 export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {}
 
