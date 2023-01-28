@@ -13,14 +13,16 @@ import {
 
 export const luftClient = (options: ClientOptions = {}) => {
   return {
-    get: (url: string, newOptions: ClientOptions = {}) => getMethod(url, { ...options, ...newOptions }),
-    head: (url: string, newOptions: ClientOptions = {}) => headMethod(url, { ...options, ...newOptions }),
-    post: (url: string, newOptions: ClientOptionsWithBody = {}) => postMethod(url, { ...options, ...newOptions }),
-    patch: (url: string, newOptions: ClientOptionsWithBody = {}) => patchMethod(url, { ...options, ...newOptions }),
-    options: (url: string, newOptions: ClientOptionsWithBody = {}) => optionsMethod(url, { ...options, ...newOptions }),
-    put: (url: string, newOptions: ClientOptionsWithBody = {}) => putMethod(url, { ...options, ...newOptions }),
-    del: (url: string, newOptions: ClientOptionsWithBody = {}) => delMethod(url, { ...options, ...newOptions }),
-    request: (method: string, url: string, newOptions: ClientOptionsWithBody = {}) =>
+    get: (url: string | URL, newOptions: ClientOptions = {}) => getMethod(url, { ...options, ...newOptions }),
+    head: (url: string | URL, newOptions: ClientOptions = {}) => headMethod(url, { ...options, ...newOptions }),
+    post: (url: string | URL, newOptions: ClientOptionsWithBody = {}) => postMethod(url, { ...options, ...newOptions }),
+    patch: (url: string | URL, newOptions: ClientOptionsWithBody = {}) =>
+      patchMethod(url, { ...options, ...newOptions }),
+    options: (url: string | URL, newOptions: ClientOptionsWithBody = {}) =>
+      optionsMethod(url, { ...options, ...newOptions }),
+    put: (url: string | URL, newOptions: ClientOptionsWithBody = {}) => putMethod(url, { ...options, ...newOptions }),
+    del: (url: string | URL, newOptions: ClientOptionsWithBody = {}) => delMethod(url, { ...options, ...newOptions }),
+    request: (method: string, url: string | URL, newOptions: ClientOptionsWithBody = {}) =>
       requestMethod(method, url, { ...options, ...newOptions }),
   } satisfies {
     get: typeof getMethod;

@@ -12,34 +12,34 @@ export interface ClientOptionsWithBody extends ClientOptions {
   data?: string | Buffer | NodeJS.ReadableStream | URLSearchParams | object;
 }
 
-export const get = (url: string, options: ClientOptions = {}): ClientRequest => {
+export const get = (url: string | URL, options: ClientOptions = {}): ClientRequest => {
   return request("GET", url, options);
 };
 
-export const head = (url: string, options: ClientOptions = {}): ClientRequest => {
+export const head = (url: string | URL, options: ClientOptions = {}): ClientRequest => {
   return request("HEAD", url, options);
 };
 
-export const post = (url: string, options: ClientOptionsWithBody = {}): ClientRequest => {
+export const post = (url: string | URL, options: ClientOptionsWithBody = {}): ClientRequest => {
   return request("POST", url, options);
 };
-export const patch = (url: string, options: ClientOptionsWithBody = {}): ClientRequest => {
+export const patch = (url: string | URL, options: ClientOptionsWithBody = {}): ClientRequest => {
   return request("PATCH", url, options);
 };
 
-export const options = (url: string, options: ClientOptionsWithBody = {}): ClientRequest => {
+export const options = (url: string | URL, options: ClientOptionsWithBody = {}): ClientRequest => {
   return request("OPTIONS", url, options);
 };
 
-export const put = (url: string, options: ClientOptionsWithBody = {}): ClientRequest => {
+export const put = (url: string | URL, options: ClientOptionsWithBody = {}): ClientRequest => {
   return request("PUT", url, options);
 };
 
-export const del = (url: string, options: ClientOptionsWithBody = {}): ClientRequest => {
+export const del = (url: string | URL, options: ClientOptionsWithBody = {}): ClientRequest => {
   return request("DELETE", url, options);
 };
 
-export const request = (method: string, url: string, options: ClientOptionsWithBody = {}): ClientRequest => {
+export const request = (method: string, url: string | URL, options: ClientOptionsWithBody = {}): ClientRequest => {
   if (options.data && (method === "GET" || method === "HEAD")) {
     throw new Error(`${method} requests cannot have a body`);
   }
