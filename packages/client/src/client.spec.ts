@@ -1,13 +1,10 @@
 import { Readable } from "node:stream";
 import { defaultServer, loggerMiddleware, ServerImpl } from "@luftschloss/server";
 import { luftClient } from "./client";
-import { bufferParser, formParser, jsonParser, textParser } from "@luftschloss/body";
 import { UTF8SearchParams } from "@luftschloss/common";
 
 const createServer = () => {
-  const server = defaultServer()
-    .unPipe(loggerMiddleware())
-    .pipe(jsonParser("*"), formParser("*"), bufferParser("*"), textParser("*"));
+  const server = defaultServer().unPipe(loggerMiddleware());
   server.get("/json", (req, res) => res.json({ hello: "world" }));
   server.get("/text", (req, res) => res.text("hello world"));
   server.get("/redirect", (req, res) => res.redirect("http://127.0.0.1:33333/json", "307_TEMPORARY_REDIRECT"));
@@ -25,7 +22,7 @@ const createServer = () => {
     res.text(text);
   });
   server.post("/echo-binary", async (req, res) => {
-    const buffer = await req.buffer().then(b => b.buffer);
+    const buffer = await req.buffer();
     res.buffer(buffer);
   });
   server.post("/echo-form", async (req, res) => {

@@ -4,6 +4,7 @@
  * MIT Licensed
  */
 
+export * from "./body";
 export * from "./buffer";
 export * from "./by-lazy";
 export * from "./cache";

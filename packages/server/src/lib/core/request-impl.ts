@@ -4,12 +4,26 @@
  * MIT Licensed
  */
 
-import {ByLazy, Headers, saveObject, UTF8SearchParams, UTF8Url} from "@luftschloss/common";
+import {
+  ByLazy,
+  Cache,
+  ContentType,
+  ContentTypeString,
+  getBodyData,
+  Headers,
+  parseContentType,
+  satisfiesContentLength,
+  saveObject,
+  UTF8SearchParams,
+  UTF8Url,
+} from "@luftschloss/common";
 import {IncomingMessage} from "http";
 import {AddressInfo} from "net";
 import * as tls from "tls";
 import {LRequest} from "./request";
 import {HTTP_METHODS} from "./route-collector.model";
+import {HTTPException} from "./http-exception";
+import {Status} from "./status";
 
 export class RequestImpl<DATA extends Record<string, unknown> = never> implements LRequest<DATA> {
   @ByLazy<UTF8SearchParams, RequestImpl<DATA>>(self => self.url.searchParams)
@@ -31,6 +45,20 @@ export class RequestImpl<DATA extends Record<string, unknown> = never> implement
     return new UTF8Url(`${protocol}${address}:${port}${self.req.url!}`);
   })
   public readonly url!: UTF8Url;
+  @ByLazy<ContentType, RequestImpl<DATA>>(self => {
+    const contentType = self.headers.get("content-type");
+    if (contentType) {
+      return parseContentType(contentType);
+    } else {
+      return {
+        type: undefined,
+        parameters: {},
+        encoding: undefined,
+        matches: (contentType: string) => contentType === "*/*",
+      };
+    }
+  })
+  public readonly contentType!: ContentType;
   private _pathParams!: object;
 
   public constructor(private readonly req: IncomingMessage) {}
@@ -45,6 +73,42 @@ export class RequestImpl<DATA extends Record<string, unknown> = never> implement
 
   public pathParams<T extends object>(): T {
     return this._pathParams as T;
+  }
+
+  @Cache()
+  public async buffer(maxBodySize?: number): Promise<Buffer> {
+    maxBodySize = maxBodySize ?? 1024 * 1024;
+    if (!satisfiesContentLength(this.headers, maxBodySize)) {
+      throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Body is too big");
+    }
+    return getBodyData(this.req, maxBodySize).then(({ success, data }) => {
+      if (!success) throw new HTTPException(Status.HTTP_400_BAD_REQUEST, "Body is too big");
+      return data;
+    });
+  }
+
+  public json<T extends object>(contentType: ContentTypeString = "application/json", maxBodySize?: number): Promise<T> {
+    if (!this.contentType.matches(contentType)) {
+      throw new Error(`Wrong content type: Required ${contentType}, got ${this.contentType.type}`);
+    }
+    return this.text("*/*", maxBodySize).then(text => JSON.parse(text));
+  }
+
+  public form<T extends Record<string, string[]> = Record<string, string[]>>(
+    contentType: ContentTypeString = "application/x-www-form-urlencoded",
+    maxBodySize?: number
+  ): Promise<UTF8SearchParams<T>> {
+    if (!this.contentType.matches(contentType)) {
+      throw new Error(`Wrong content type: Required ${contentType}, got ${this.contentType.type}`);
+    }
+    return this.text("*/*", maxBodySize).then(text => new UTF8SearchParams<T>(text));
+  }
+
+  public text(contentType: ContentTypeString = "text/*", maxBodySize?: number): Promise<string> {
+    if (!this.contentType.matches(contentType)) {
+      throw new Error(`Wrong content type: Required ${contentType}, got ${this.contentType.type}`);
+    }
+    return this.buffer(maxBodySize).then(buffer => buffer.toString(this.contentType.encoding));
   }
 
   /**

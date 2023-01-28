@@ -18,7 +18,6 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "paths": {
-      "@luftschloss/body": ["packages/body/src/index.ts"],
       "@luftschloss/client": ["packages/client/src/index.ts"],
       "@luftschloss/common": ["packages/common/src/index.ts"],
       "@luftschloss/mocking": ["packages/mocking/src/index.ts"],

@@ -4,7 +4,14 @@
  * MIT Licensed
  */
 
-import {CustomPropertyDescriptor, Func, Headers, UTF8SearchParams, UTF8Url} from "@luftschloss/common";
+import {
+  ContentTypeString,
+  CustomPropertyDescriptor,
+  Func,
+  Headers,
+  UTF8SearchParams,
+  UTF8Url,
+} from "@luftschloss/common";
 import {IncomingMessage} from "http";
 import {RequestImpl} from "./request-impl";
 import {HTTP_METHODS} from "./route-collector.model";
@@ -12,7 +19,6 @@ import {HTTP_METHODS} from "./route-collector.model";
 export interface LRequest<DATA extends Record<string, unknown> = never> {
   readonly data: DATA;
   readonly raw: IncomingMessage;
-
   urlParams: UTF8SearchParams;
   readonly path: string;
   readonly method: HTTP_METHODS;
@@ -20,6 +26,17 @@ export interface LRequest<DATA extends Record<string, unknown> = never> {
   readonly headers: Headers;
 
   pathParams<T extends object>(): T;
+
+  text(contentType?: ContentTypeString, maxBodySize?: number): Promise<string>;
+
+  form<T extends Record<string, string[]> = Record<string, string[]>>(
+    contentType?: ContentTypeString,
+    maxBodySize?: number
+  ): Promise<UTF8SearchParams<T>>;
+
+  json<T extends object>(contentType?: ContentTypeString, maxBodySize?: number): Promise<T>;
+
+  buffer(maxBodySize?: number): Promise<Buffer>;
 }
 
 export const addRequestField = <R extends LRequest, KEY extends PropertyKey>(

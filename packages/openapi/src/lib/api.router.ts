@@ -4,10 +4,9 @@
  * MIT Licensed
  */
 
-import { jsonParser } from "@luftschloss/body";
-import { RouterBase } from "@luftschloss/server";
-import { LuftArray, LuftObject, LuftRecord, LuftType } from "@luftschloss/validation";
-import { ApiRoute, CollectedRoute, RouterParams } from "./api.route";
+import {RouterBase} from "@luftschloss/server";
+import {LuftArray, LuftObject, LuftRecord, LuftType} from "@luftschloss/validation";
+import {ApiRoute, CollectedRoute, RouterParams} from "./api.route";
 
 const EMPTY_OBJECT = {
   body: undefined,
@@ -47,5 +46,5 @@ export class ApiRouter extends RouterBase {
 }
 
 export const apiRouter = () => {
-  return new ApiRouter().pipe(jsonParser());
+  return new ApiRouter();
 };

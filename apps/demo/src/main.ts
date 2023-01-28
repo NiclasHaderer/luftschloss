@@ -1,10 +1,9 @@
 import {defaultServer} from "@luftschloss/server";
 import {luftClient} from "@luftschloss/client";
 import {proxyMiddleware} from "@luftschloss/proxy";
-import {textParser} from "@luftschloss/body";
 
 const createServer = () => {
-  const server = defaultServer().pipe(proxyMiddleware(), textParser());
+  const server = defaultServer().pipe(proxyMiddleware());
 
   server.get("/text", async (req, res) => {
     return res.text("Hello World");
@@ -16,7 +15,7 @@ const createServer = () => {
   server.get("/proxy-text", async (req) => {
     await req.proxy("http://127.0.0.1:33333/text");
   });
-  server.post("/proxy-text", async (req, res) => {
+  server.post("/proxy-text", async (req) => {
     await req.proxy("http://127.0.0.1:33333/text");
   });
 
