@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import LightMyRequest, { DispatchFunc, inject, InjectOptions } from "light-my-request";
+import { DispatchFunc, inject, InjectOptions, Response } from "light-my-request";
 import { Options, OptionsWithBody } from "./types";
 import { ServerBase } from "@luftschloss/server";
 import { DeepPartial, withDefaults } from "@luftschloss/common";
@@ -33,7 +33,7 @@ export const testClient = async (server: ServerBase, globalClientOptions: Global
       url: InjectOptions["url"],
       options: OptionsWithBody = {},
       clientOptions: RequestOptions = {}
-    ): Promise<LightMyRequest.Response> {
+    ): Promise<Response> {
       const mergedClientOptions = withDefaults<MergedGlobalOptions>({ ...globalClientOptions, url }, clientOptions);
       return inject(server.handleIncomingRequest.bind(server) as unknown as DispatchFunc, {
         ...mergedClientOptions,
@@ -44,11 +44,7 @@ export const testClient = async (server: ServerBase, globalClientOptions: Global
         cookies: options.cookies,
       }).end();
     },
-    get(
-      url: InjectOptions["url"],
-      options: Options = {},
-      clientOptions: RequestOptions = {}
-    ): Promise<LightMyRequest.Response> {
+    get(url: InjectOptions["url"], options: Options = {}, clientOptions: RequestOptions = {}): Promise<Response> {
       const mergedClientOptions = withDefaults<MergedGlobalOptions>({ ...globalClientOptions, url }, clientOptions);
       return inject(server.handleIncomingRequest.bind(server) as unknown as DispatchFunc, {
         ...mergedClientOptions,
@@ -58,11 +54,7 @@ export const testClient = async (server: ServerBase, globalClientOptions: Global
         cookies: options.cookies,
       }).end();
     },
-    head(
-      url: InjectOptions["url"],
-      options: Options = {},
-      clientOptions: RequestOptions = {}
-    ): Promise<LightMyRequest.Response> {
+    head(url: InjectOptions["url"], options: Options = {}, clientOptions: RequestOptions = {}): Promise<Response> {
       const mergedClientOptions = withDefaults<MergedGlobalOptions>({ ...globalClientOptions, url }, clientOptions);
       return inject(server.handleIncomingRequest.bind(server) as unknown as DispatchFunc, {
         ...mergedClientOptions,
@@ -76,7 +68,7 @@ export const testClient = async (server: ServerBase, globalClientOptions: Global
       url: InjectOptions["url"],
       options: OptionsWithBody = {},
       clientOptions: RequestOptions = {}
-    ): Promise<LightMyRequest.Response> {
+    ): Promise<Response> {
       const mergedClientOptions = withDefaults<MergedGlobalOptions>({ ...globalClientOptions, url }, clientOptions);
       return inject(server.handleIncomingRequest.bind(server) as unknown as DispatchFunc, {
         ...mergedClientOptions,
@@ -91,7 +83,7 @@ export const testClient = async (server: ServerBase, globalClientOptions: Global
       url: InjectOptions["url"],
       options: OptionsWithBody = {},
       clientOptions: RequestOptions = {}
-    ): Promise<LightMyRequest.Response> {
+    ): Promise<Response> {
       const mergedClientOptions = withDefaults<MergedGlobalOptions>({ ...globalClientOptions, url }, clientOptions);
       return inject(server.handleIncomingRequest.bind(server) as unknown as DispatchFunc, {
         ...mergedClientOptions,
@@ -106,7 +98,7 @@ export const testClient = async (server: ServerBase, globalClientOptions: Global
       url: InjectOptions["url"],
       options: OptionsWithBody = {},
       clientOptions: RequestOptions = {}
-    ): Promise<LightMyRequest.Response> {
+    ): Promise<Response> {
       const mergedClientOptions = withDefaults<MergedGlobalOptions>({ ...globalClientOptions, url }, clientOptions);
       return inject(server.handleIncomingRequest.bind(server) as unknown as DispatchFunc, {
         ...mergedClientOptions,

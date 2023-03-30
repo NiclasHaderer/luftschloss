@@ -9,9 +9,7 @@ describe("ContentSniffMiddleware default", () => {
     server = defaultServer().unPipe("logger");
     client = await testClient(server);
   });
-  afterAll(async () => {
-    await server.shutdown();
-  });
+  afterAll(async () => await server.shutdown());
 
   it("should set the header", async () => {
     const response = await client.get("http://localhost:3000/");

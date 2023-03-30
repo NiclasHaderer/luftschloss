@@ -208,7 +208,7 @@ test("Mocking: undefined", () => {
 test("Mocking: union", () => {
   const validator = luft.union([luft.string(), luft.number(), luft.bool()]);
   const result = mockAll(validator);
-  expect(["string", "number", "bool"]).toContain(typeof result);
+  expect(["string", "number", "boolean"]).toContain(typeof result);
 });
 
 test("Mocking: regex", () => {

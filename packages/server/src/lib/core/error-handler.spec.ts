@@ -12,7 +12,7 @@ describe("Default error handlers", () => {
       throw new HTTPException(400, "This is a custom error");
     });
 
-    void server.listen();
+    void server.listen(0);
     await server.onComplete("startupComplete");
   });
 
@@ -21,7 +21,7 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 500", async () => {
-    const res = await fetch("http://localhost:3200/error");
+    const res = await fetch(`${server.address}/error`);
     const resBody = await res.json();
 
     expect(res.status).toEqual(500);
@@ -31,7 +31,7 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 400", async () => {
-    const res = await fetch("http://localhost:3200/custom-error");
+    const res = await fetch(`${server.address}/custom-error`);
     const resBody = await res.json();
 
     expect(res.status).toEqual(400);
@@ -40,7 +40,7 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 404", async () => {
-    const res = await fetch("http://localhost:3200/does-not-exist");
+    const res = await fetch(`${server.address}/does-not-exist`);
     const resBody = await res.json();
 
     expect(res.status).toEqual(404);
@@ -49,7 +49,7 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 405", async () => {
-    const res = await fetch("http://localhost:3200/custom-error", { method: "POST" });
+    const res = await fetch(`${server.address}/custom-error`, { method: "POST" });
     const resBody = await res.json();
 
     expect(res.status).toEqual(405);
@@ -84,7 +84,7 @@ describe("Custom error handlers", () => {
       throw new HTTPException(401, Math.random().toString());
     });
 
-    void server.listen();
+    void server.listen(0);
     await server.onComplete("startupComplete");
   });
 
@@ -93,7 +93,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 500", async () => {
-    const res = await fetch("http://localhost:3200/error");
+    const res = await fetch(`${server.address}/error`);
     const resBody = await res.json();
 
     expect(res.status).toEqual(500);
@@ -103,7 +103,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 400", async () => {
-    const res = await fetch("http://localhost:3200/custom-error");
+    const res = await fetch(`${server.address}/custom-error`);
     const resBody = await res.text();
 
     expect(res.status).toEqual(400);
@@ -111,7 +111,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 404", async () => {
-    const res = await fetch("http://localhost:3200/does-not-exist");
+    const res = await fetch(`${server.address}/does-not-exist`);
     const resBody = await res.text();
 
     expect(res.status).toEqual(404);
@@ -119,7 +119,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 405", async () => {
-    const res = await fetch("http://localhost:3200/custom-error", { method: "POST" });
+    const res = await fetch(`${server.address}/custom-error`, { method: "POST" });
     const resBody = await res.text();
 
     expect(res.status).toEqual(405);
@@ -127,7 +127,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom default error handler for HTTP 401", async () => {
-    const res = await fetch("http://localhost:3200/unauthorized");
+    const res = await fetch(`${server.address}/unauthorized`);
     const resBody = await res.text();
 
     expect(res.status).toEqual(401);

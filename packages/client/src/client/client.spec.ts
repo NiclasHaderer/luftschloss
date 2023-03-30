@@ -7,8 +7,8 @@ const createServer = () => {
   const server = defaultServer().unPipe(loggerMiddleware());
   server.get("/json", (req, res) => res.json({ hello: "world" }));
   server.get("/text", (req, res) => res.text("hello world"));
-  server.get("/redirect", (req, res) => res.redirect("http://127.0.0.1:33333/json", "307_TEMPORARY_REDIRECT"));
-  server.get("/2-redirects", (req, res) => res.redirect("http://127.0.0.1:33333/redirect", "307_TEMPORARY_REDIRECT"));
+  server.get("/redirect", (req, res) => res.redirect(`${server.address}/json`, "307_TEMPORARY_REDIRECT"));
+  server.get("/2-redirects", (req, res) => res.redirect(`${server.address}/redirect`, "307_TEMPORARY_REDIRECT"));
   server.get("/redirect-external", (req, res) => res.redirect("https://google.com", "307_TEMPORARY_REDIRECT"));
   server.get("/buffer", (req, res) => res.buffer(Buffer.from("hello world")));
   server.get("/error/{statusCode:int}", (req, res) =>
@@ -39,7 +39,7 @@ describe("Test client with simple get requests", () => {
 
   beforeAll(async () => {
     server = createServer();
-    void server.listen(33333);
+    void server.listen(0);
     await server.onComplete("startupComplete");
   });
 
@@ -48,73 +48,73 @@ describe("Test client with simple get requests", () => {
   });
 
   it("should send a request and parse the json", async () => {
-    const response = await client.get("http://127.0.0.1:33333/json").send();
+    const response = await client.get(`${server.address}/json`).send();
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ hello: "world" });
   });
 
   it("should send a request and parse the text", async () => {
-    const response = await client.get("http://127.0.0.1:33333/text").send();
+    const response = await client.get(`${server.address}/text`).send();
     expect(response.status).toBe(200);
     expect(await response.text()).toEqual("hello world");
   });
 
   it("should send a request and parse the buffer", async () => {
-    const response = await client.get("http://127.0.0.1:33333/buffer").send();
+    const response = await client.get(`${server.address}/buffer`).send();
     expect(response.status).toBe(200);
     expect(await response.buffer()).toEqual(Buffer.from("hello world"));
   });
 
   it("should send a request and follow redirects", async () => {
-    const response = await client.get("http://127.0.0.1:33333/redirect").send();
+    const response = await client.get(`${server.address}/redirect`).send();
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ hello: "world" });
   });
 
   it("should send a request and follow external redirects", async () => {
-    const response = await client.get("http://127.0.0.1:33333/redirect-external").send();
+    const response = await client.get(`${server.address}/redirect-external`).send();
     expect(response.status).toBe(200);
     expect(response.url.toString()).toEqual("https://www.google.com/");
     response.destroy();
   });
 
   it("should send a request and not follow redirects using the redirect hook", async () => {
-    const request = client.get("http://127.0.0.1:33333/redirect");
+    const request = client.get(`${server.address}/redirect`);
     request.on("redirect", event => event.preventRedirect());
     const response = await request.send();
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toEqual("http://127.0.0.1:33333/json");
+    expect(response.headers.get("location")).toEqual(`${server.address}/json`);
   });
 
   it("should send a request and not exceed the maximum number of redirects", async () => {
-    const request = client.get("http://127.0.0.1:33333/2-redirects", { maxRedirects: 1 });
+    const request = client.get(`${server.address}/2-redirects`, { maxRedirects: 1 });
     request.on("redirect", event => event.preventRedirect());
     const response = await request.send();
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toEqual("http://127.0.0.1:33333/redirect");
+    expect(response.headers.get("location")).toEqual(`${server.address}/redirect`);
   });
 
   it("should send a request and not exceed the maximum number of redirects", async () => {
-    const request = client.get("http://127.0.0.1:33333/2-redirects", { maxRedirects: 2 });
+    const request = client.get(`${server.address}/2-redirects`, { maxRedirects: 2 });
     const response = await request.send();
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ hello: "world" });
     expect(response.history.length).toBe(2);
-    expect(response.history[0].url).toStrictEqual(new URL("http://127.0.0.1:33333/2-redirects"));
+    expect(response.history[0].url).toStrictEqual(new URL(`${server.address}/2-redirects`));
     expect(await response.history[0].text("*/*")).toStrictEqual("");
-    expect(response.history[1].url).toStrictEqual(new URL("http://127.0.0.1:33333/redirect"));
+    expect(response.history[1].url).toStrictEqual(new URL(`${server.address}/redirect`));
     expect(await response.history[1].text("*/*")).toStrictEqual("");
   });
 
   it("should send a request and not follow redirects", async () => {
-    const request = client.get("http://127.0.0.1:33333/redirect", { followRedirects: false });
+    const request = client.get(`${server.address}/redirect`, { followRedirects: false });
     const response = await request.send();
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toEqual("http://127.0.0.1:33333/json");
+    expect(response.headers.get("location")).toEqual(`${server.address}/json`);
   });
 });
 
@@ -123,7 +123,7 @@ describe("Test client with body", () => {
   let server: ServerImpl = undefined!;
   beforeAll(async () => {
     server = createServer();
-    void server.listen(33333);
+    void server.listen(0);
     await server.onComplete("startupComplete");
     await new Promise(resolve => setTimeout(resolve, 100));
   });
@@ -131,21 +131,19 @@ describe("Test client with body", () => {
   afterAll(async () => await server.shutdown());
 
   it("should send a request and parse the json", async () => {
-    const response = await client.post("http://127.0.0.1:33333/echo-json", { data: { hello: "world" } }).send();
+    const response = await client.post(`${server.address}/echo-json`, { data: { hello: "world" } }).send();
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ hello: "world" });
   });
 
   it("should send a request and parse the text", async () => {
-    const response = await client.post("http://127.0.0.1:33333/echo-text", { data: "hello world" }).send();
+    const response = await client.post(`${server.address}/echo-text`, { data: "hello world" }).send();
     expect(await response.text()).toEqual("hello world");
     expect(response.status).toBe(200);
   });
 
   it("should send a request and parse the buffer", async () => {
-    const response = await client
-      .post("http://127.0.0.1:33333/echo-binary", { data: Buffer.from("hello world") })
-      .send();
+    const response = await client.post(`${server.address}/echo-binary`, { data: Buffer.from("hello world") }).send();
     expect(await response.buffer()).toEqual(Buffer.from("hello world"));
     expect(response.status).toBe(200);
   });
@@ -155,8 +153,11 @@ describe("Test client with body", () => {
     stream.push("beep");
     stream.push(null);
     const response = await client
-      .post("http://127.0.0.1:33333/echo-text", {
+      .post(`${server.address}/echo-text`, {
         data: stream,
+        headers: {
+          "content-type": "text/plain",
+        },
       })
       .send();
     expect(await response.text()).toEqual("beep");
@@ -165,7 +166,7 @@ describe("Test client with body", () => {
 
   it("should send a request and parse the form", async () => {
     const response = await client
-      .post("http://127.0.0.1:33333/echo-form", {
+      .post(`${server.address}/echo-form`, {
         data: new UTF8SearchParams({
           hello: "world-äöüß",
         }),

@@ -149,7 +149,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       await this.lock();
 
       const runningServer = this.nodeServer.listen(port, hostname, () => {
-        console.log(`Server is listening on http://${hostname}:${port}`);
+        console.log(`Server is listening on ${this.address}`);
         console.log(`Server startup took ${Date.now() - this.startTime}ms`);
         this._isStarted = true;
 
@@ -203,15 +203,20 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         if (this._isShutDown) resolve();
         console.log("Shutting down server");
         let timeout: NodeJS.Timeout | undefined = undefined;
-        this.nodeServer.close(err => {
-          this._isShutDown = true;
-          clearTimeout(timeout!);
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
+
+        // The server is not really listening if the mock client is used
+        // However shutting down is still necessary to close the open connections, call the shutdown hooks, etc...
+        if (this.nodeServer.listening) {
+          this.nodeServer.close(err => {
+            this._isShutDown = true;
+            clearTimeout(timeout!);
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        }
 
         timeout = setTimeout(() => {
           this.openSockets.forEach(s => s.destroy());
