@@ -1,11 +1,14 @@
 import { ClientRequest } from "./client-request";
 import { Headers } from "@luftschloss/common";
-import { IncomingHttpHeaders } from "http";
+import http, { IncomingHttpHeaders } from "node:http";
+import https from "node:https";
 
 export interface ClientOptions {
   followRedirects?: boolean;
   maxRedirects?: number;
   headers?: IncomingHttpHeaders | Headers;
+  httpAgent?: http.Agent;
+  httpsAgent?: https.Agent;
 }
 
 export interface ClientOptionsWithBody extends ClientOptions {
@@ -48,5 +51,7 @@ export const request = (method: string, url: string | URL, options: ClientOption
     data: options.data,
     headers: options.headers ?? {},
     maxRedirects: options.followRedirects === false ? 0 : options.maxRedirects ?? 4,
+    httpAgent: options.httpAgent,
+    httpsAgent: options.httpsAgent,
   });
 };

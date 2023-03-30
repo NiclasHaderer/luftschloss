@@ -23,6 +23,14 @@ export class ClientRequest extends Subscribable<RequestEvents> {
   private headers: Headers;
   private data: ClientOptionsWithBody["data"] | undefined;
   private readonly maxRedirects: number;
+  private agent: http.Agent | https.Agent | undefined;
+  private httpsAgent: https.Agent | undefined;
+  private httpAgent: http.Agent | undefined;
+
+  private defaultHeaders = {
+    "user-agent": "@luftschloss/client",
+    conection: "keep-alive",
+  };
 
   constructor(
     uri: string | URL,
@@ -31,14 +39,17 @@ export class ClientRequest extends Subscribable<RequestEvents> {
       headers: Headers | http.IncomingHttpHeaders;
       data: ClientOptionsWithBody["data"] | undefined;
       maxRedirects: number;
-    }>,
-    private readonly userAgent = "@luftschloss/client"
+      httpAgent?: http.Agent;
+      httpsAgent?: https.Agent;
+    }>
   ) {
     super();
     this.url = uri;
     this.headers = options.headers instanceof Headers ? options.headers : Headers.create(options.headers);
     this.data = options.data;
     this.maxRedirects = options.maxRedirects;
+    this.httpsAgent = options.httpsAgent;
+    this.httpAgent = options.httpAgent;
   }
 
   private _url!: URL;
@@ -53,6 +64,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
       throw new Error(`Protocol ${this.url.protocol} is not in the supported ${Array.from(supportedProtocols)}`);
     }
     this.executor = this.url.protocol === "https:" ? https.request : http.request;
+    this.agent = this.url.protocol === "https:" ? this.httpsAgent : this.httpAgent;
   }
 
   public get redirectCount(): number {
@@ -147,9 +159,10 @@ export class ClientRequest extends Subscribable<RequestEvents> {
         {
           method: this._method,
           headers: {
-            "user-agent": this.userAgent,
+            ...this.defaultHeaders,
             ...this.headers.encode(),
           },
+          agent: this.agent,
         },
         res => resolve([clientRequest, res])
       )

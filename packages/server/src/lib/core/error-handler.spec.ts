@@ -1,7 +1,9 @@
 import { defaultServer, errorMiddleware, HTTPException, ServerImpl } from "..";
+import { luftClient } from "@luftschloss/client";
 
 describe("Default error handlers", () => {
   let server: ServerImpl;
+  const client = luftClient();
 
   beforeAll(async () => {
     server = defaultServer().unPipe("logger");
@@ -21,8 +23,8 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 500", async () => {
-    const res = await fetch(`${server.address}/error`);
-    const resBody = await res.json();
+    const res = await client.get(`${server.address}/error`).send();
+    const resBody = await res.json<any>();
 
     expect(res.status).toEqual(500);
     expect(resBody.error).toEqual("This is an error");
@@ -31,8 +33,8 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 400", async () => {
-    const res = await fetch(`${server.address}/custom-error`);
-    const resBody = await res.json();
+    const res = await client.get(`${server.address}/custom-error`).send();
+    const resBody = await res.json<any>();
 
     expect(res.status).toEqual(400);
     expect(resBody.error).toEqual("This is a custom error");
@@ -40,8 +42,8 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 404", async () => {
-    const res = await fetch(`${server.address}/does-not-exist`);
-    const resBody = await res.json();
+    const res = await client.get(`${server.address}/does-not-exist`).send();
+    const resBody = await res.json<any>();
 
     expect(res.status).toEqual(404);
     expect(resBody.error).toEqual("Not Found");
@@ -49,8 +51,8 @@ describe("Default error handlers", () => {
   });
 
   it("should use the default error handler for HTTP 405", async () => {
-    const res = await fetch(`${server.address}/custom-error`, { method: "POST" });
-    const resBody = await res.json();
+    const res = await client.post(`${server.address}/custom-error`).send();
+    const resBody = await res.json<any>();
 
     expect(res.status).toEqual(405);
     expect(resBody.error).toEqual("Method Not Allowed");
@@ -60,6 +62,7 @@ describe("Default error handlers", () => {
 
 describe("Custom error handlers", () => {
   let server: ServerImpl;
+  const client = luftClient();
 
   beforeAll(async () => {
     server = defaultServer()
@@ -93,8 +96,8 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 500", async () => {
-    const res = await fetch(`${server.address}/error`);
-    const resBody = await res.json();
+    const res = await client.get(`${server.address}/error`).send();
+    const resBody = await res.json<any>();
 
     expect(res.status).toEqual(500);
     expect(resBody.error).toEqual("This is an error for the custom error handler test");
@@ -111,7 +114,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 404", async () => {
-    const res = await fetch(`${server.address}/does-not-exist`);
+    const res = await client.get(`${server.address}/does-not-exist`).send();
     const resBody = await res.text();
 
     expect(res.status).toEqual(404);
@@ -119,7 +122,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 405", async () => {
-    const res = await fetch(`${server.address}/custom-error`, { method: "POST" });
+    const res = await client.post(`${server.address}/custom-error`).send();
     const resBody = await res.text();
 
     expect(res.status).toEqual(405);
@@ -127,7 +130,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom default error handler for HTTP 401", async () => {
-    const res = await fetch(`${server.address}/unauthorized`);
+    const res = await client.get(`${server.address}/unauthorized`).send();
     const resBody = await res.text();
 
     expect(res.status).toEqual(401);

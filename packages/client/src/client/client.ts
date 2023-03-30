@@ -10,8 +10,13 @@ import {
   put as putMethod,
   request as requestMethod,
 } from "./methods";
+import http from "node:http";
+import https from "node:https";
 
-export const luftClient = (options: ClientOptions = {}) => {
+export const luftClient = ({ ...options }: ClientOptions = {}) => {
+  options.httpAgent = options.httpAgent ?? new http.Agent({ keepAlive: true });
+  options.httpsAgent = options.httpsAgent ?? new https.Agent({ keepAlive: true });
+
   return {
     get: (url: string | URL, newOptions: ClientOptions = {}) => getMethod(url, { ...options, ...newOptions }),
     head: (url: string | URL, newOptions: ClientOptions = {}) => headMethod(url, { ...options, ...newOptions }),

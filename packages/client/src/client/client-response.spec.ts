@@ -1,3 +1,4 @@
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { defaultServer, loggerMiddleware, ServerImpl } from "@luftschloss/server";
 import { luftClient } from "./client";
 
