@@ -106,7 +106,7 @@ describe("Custom error handlers", () => {
   });
 
   it("should use the custom error handler for HTTP 400", async () => {
-    const res = await fetch(`${server.address}/custom-error`);
+    const res = await client.get(`${server.address}/custom-error`).send();
     const resBody = await res.text();
 
     expect(res.status).toEqual(400);
