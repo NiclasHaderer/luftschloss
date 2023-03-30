@@ -7,3 +7,4 @@
 export * from "./lib";
 
 // TODO getting and setting cookies
+// TODO check accepts header
