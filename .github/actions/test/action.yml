@@ -13,4 +13,4 @@ runs:
   steps:
     - name: Test
       shell: bash
-      run: nx affected:test
+      run: node_modules/.bin/nx affected:test
