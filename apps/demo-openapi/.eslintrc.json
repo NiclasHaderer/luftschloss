@@ -1,14 +1,7 @@
 {
-  "extends": [
-    "../../.eslintrc.json"
-  ],
-  "ignorePatterns": [
-    "!**/*"
-  ],
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
   "parserOptions": {
-    "project": [
-      "apps/demo-openapi/tsconfig.app.json",
-      "apps/demo-openapi/tsconfig.spec.json"
-    ]
+    "project": ["apps/demo-openapi/tsconfig.app.json", "apps/demo-openapi/tsconfig.spec.json"]
   }
 }

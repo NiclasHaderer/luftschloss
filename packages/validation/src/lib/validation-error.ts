@@ -17,7 +17,7 @@ export const LuftErrorCodes = {
   PARSING_ISSUE: "PARSING_ISSUE",
 } as const;
 
-export type LuftErrorCodes = typeof LuftErrorCodes[keyof typeof LuftErrorCodes];
+export type LuftErrorCodes = (typeof LuftErrorCodes)[keyof typeof LuftErrorCodes];
 
 type BaseValidationError = {
   code: LuftErrorCodes;

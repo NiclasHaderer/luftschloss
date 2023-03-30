@@ -1,14 +1,7 @@
 {
-  "extends": [
-    "../../.eslintrc.json"
-  ],
-  "ignorePatterns": [
-    "!**/*"
-  ],
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
   "parserOptions": {
-    "project": [
-      "apps/demo/tsconfig.app.json",
-      "apps/demo/tsconfig.spec.json"
-    ]
+    "project": ["apps/demo/tsconfig.app.json", "apps/demo/tsconfig.spec.json"]
   }
 }

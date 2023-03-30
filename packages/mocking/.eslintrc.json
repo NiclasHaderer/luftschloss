@@ -1,14 +1,7 @@
 {
-  "extends": [
-    "../../.eslintrc.json"
-  ],
-  "ignorePatterns": [
-    "!**/*"
-  ],
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
   "parserOptions": {
-    "project": [
-      "packages/mocking/tsconfig.lib.json",
-      "packages/mocking/tsconfig.spec.json"
-    ]
+    "project": ["packages/mocking/tsconfig.lib.json", "packages/mocking/tsconfig.spec.json"]
   }
 }

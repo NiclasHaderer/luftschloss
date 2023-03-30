@@ -1,14 +1,7 @@
 {
-  "extends": [
-    "../../.eslintrc.json"
-  ],
-  "ignorePatterns": [
-    "!**/*"
-  ],
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
   "parserOptions": {
-    "project": [
-      "packages/common/tsconfig.lib.json",
-      "packages/common/tsconfig.spec.json"
-    ]
+    "project": ["packages/common/tsconfig.lib.json", "packages/common/tsconfig.spec.json"]
   }
 }

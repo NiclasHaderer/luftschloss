@@ -13,4 +13,4 @@ runs:
   steps:
     - name: Test
       shell: bash
-      run: node_modules/.bin/nx affected:test
+      run: nx affected -t test --parallel=3 --configuration=ci
