@@ -54,7 +54,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
     private readonly openSockets = new Set<Duplex>();
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     private readonly nodeServer = http.createServer(this.handleIncomingRequest.bind(this));
-    private _isStarted = false;
     private _isShutDown = false;
     private _shutDownInProgress?: Promise<void>;
 
@@ -62,6 +61,12 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       super(...args);
       // Call *this* routers onMount method, so that the lifecycle chain can begin
       this.onMount(this, undefined, "", "");
+    }
+
+    private _isStarted = false;
+
+    public get isStarted() {
+      return this._isStarted;
     }
 
     public get address(): URL {
@@ -81,10 +86,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      */
     public get raw(): Server {
       return this.nodeServer;
-    }
-
-    public get isStarted() {
-      return this._isStarted;
     }
 
     public get isShutdown() {
@@ -115,30 +116,6 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         };
       }
       return route;
-    }
-
-    private async executeRequest(request: RequestImpl, response: ResponseImpl, route: ResolvedRoute) {
-      const middlewareLength = route.middlewares.length;
-      const next = async (
-        request: LRequest,
-        response: LResponse,
-        middlewares: ReadonlyMiddlewares,
-        position: number
-      ) => {
-        if (position >= middlewareLength) {
-          await route.executor(request, response);
-        } else {
-          await middlewares[position].handle(
-            async (req: LRequest, res: LResponse) => {
-              await next(req, res, middlewares, position + 1);
-            },
-            request,
-            response
-          );
-        }
-      };
-
-      await next(request, response, route.middlewares, 0);
     }
 
     /**
@@ -175,9 +152,16 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         console.log(`Server is listening on http://${hostname}:${port}`);
         console.log(`Server startup took ${Date.now() - this.startTime}ms`);
         this._isStarted = true;
-        void this.eventDelegate
-          .complete("startup", undefined)
-          .then(() => this.eventDelegate.complete("startupComplete", undefined));
+
+        // Why is this wrapped in a setTimeout?
+        // Because sometimes the listen callback is called before the server is "really" ready and if you try to send
+        // a request to the server right after the listen callback was called using 'fetch' the request will sometimes
+        // fail...
+        setTimeout(() => {
+          void this.eventDelegate
+            .complete("startup", undefined)
+            .then(() => this.eventDelegate.complete("startupComplete", undefined));
+        });
       });
 
       // Collect the sockets, so I can gracefully shut down the server
@@ -235,6 +219,30 @@ export const withServerBase = <T extends Router, ARGS extends []>(
         }, gracePeriod);
       }).then(() => this.eventDelegate.complete("shutdown", undefined));
       return this._shutDownInProgress;
+    }
+
+    private async executeRequest(request: RequestImpl, response: ResponseImpl, route: ResolvedRoute) {
+      const middlewareLength = route.middlewares.length;
+      const next = async (
+        request: LRequest,
+        response: LResponse,
+        middlewares: ReadonlyMiddlewares,
+        position: number
+      ) => {
+        if (position >= middlewareLength) {
+          await route.executor(request, response);
+        } else {
+          await middlewares[position].handle(
+            async (req: LRequest, res: LResponse) => {
+              await next(req, res, middlewares, position + 1);
+            },
+            request,
+            response
+          );
+        }
+      };
+
+      await next(request, response, route.middlewares, 0);
     }
 
     /**

@@ -3,10 +3,14 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { ErrorHandler, HTTPException, LRequest, LResponse, Status } from "../core";
+import { DefaultErrorHandler, ErrorHandler, HTTPException, LRequest, LResponse, Status } from "../core";
 import { Middleware, NextFunction } from "./middleware";
 
-export const errorMiddleware = (errorHandlers: ErrorHandler): Middleware => {
+export const errorMiddleware = (errorHandlers: Partial<ErrorHandler>): Middleware => {
+  const completeErrorHandlers = {
+    ...DefaultErrorHandler,
+    ...errorHandlers,
+  };
   return {
     name: "error",
     version: "1.0.0",
@@ -21,11 +25,11 @@ export const errorMiddleware = (errorHandlers: ErrorHandler): Middleware => {
         }
         const error = e as HTTPException;
 
-        const statusHandler = errorHandlers[error.status.key];
+        const statusHandler = completeErrorHandlers[error.status.key];
         if (statusHandler) {
           await statusHandler(error, request, response);
         } else {
-          await errorHandlers.DEFAULT(error, request, response);
+          await completeErrorHandlers.DEFAULT(error, request, response);
         }
       }
     },

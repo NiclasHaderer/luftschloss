@@ -134,7 +134,7 @@ export class ResponseImpl implements LResponse {
       await this._end();
     } catch (e) {
       try {
-        // Try to complete with the default internal server error handler
+        // Try to complete with the default internal server error handler in case the custom error handler has a bug
         await DefaultErrorHandler.HTTP_500_INTERNAL_SERVER_ERROR(
           HTTPException.wrap(e as Error, Status.HTTP_500_INTERNAL_SERVER_ERROR),
           this.request,
