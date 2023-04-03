@@ -1,9 +1,9 @@
-import { defaultServer } from "@luftschloss/server";
+import { luftServer } from "@luftschloss/server";
 import { luftClient } from "@luftschloss/client";
 import { proxyMiddleware } from "@luftschloss/proxy";
 
 const createServer = () => {
-  const server = defaultServer().pipe(proxyMiddleware());
+  const server = luftServer().pipe(proxyMiddleware());
 
   server.get("/text", async (req, res) => {
     return res.text("Hello World");
