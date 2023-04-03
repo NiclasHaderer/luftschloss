@@ -18,7 +18,10 @@ import { URLSearchParams } from "url";
 const NOT_COMPLETED = Symbol("NOT_COMPLETED");
 
 export class ResponseImpl implements LResponse {
-  private _status: Status = Status.HTTP_200_OK;
+  private _status: Status = {
+    ...Status.HTTP_200_OK,
+    isDefault: true,
+  } as Status;
   private data: ReadStream | ReadStream[] | Buffer | typeof NOT_COMPLETED | string = NOT_COMPLETED;
 
   public constructor(private readonly res: ServerResponse, public readonly request: LRequest) {}

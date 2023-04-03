@@ -1,9 +1,9 @@
 import { apiRouter, openApiRouter, redocRouter, stoplightRouter, swaggerRouter } from "@luftschloss/openapi";
-import { CreateUrlModel, IDs, UrlModel } from "../models";
-import { mockAll } from "@luftschloss/mocking";
-import { nullFactory, object, string } from "@luftschloss/validation";
+import { CreateUrlModel, IdPath, UrlModel, UrlModels } from "../models";
+import { undefinedFactory } from "@luftschloss/validation";
 import { defaultRouter } from "@luftschloss/server";
 import { apiDefinition } from "../api-definition";
+import { createUrl, deleteUrl, getAllUrls, getUrl, updateUrl } from "../platform/connectors";
 
 export const shortenerRouter = (tag = "shorten") => {
   const router = apiRouter().tag(tag);
@@ -18,56 +18,60 @@ export const shortenerRouter = (tag = "shorten") => {
       summary: "Create a new shortened URL",
       description: "Create a new shortened URL. The ID will be generated automatically.",
     })
-    .post(() => mockAll(UrlModel));
+    .post(({ body }) => createUrl(body.url));
 
   // Delete a shortened URL
   router
     .build({
-      response: nullFactory(),
-      path: object({
-        id: string(),
-      }),
+      response: undefinedFactory(),
+      path: IdPath,
     })
     .info({
       summary: "Delete a stored shortened URL",
     })
-    .delete("{id:string}", () => null);
+    .delete("{id:int}", async ({ path: { id } }) => {
+      await deleteUrl(id);
+      return undefined;
+    });
 
   // Update a shortened URL
   router
     .build({
       body: CreateUrlModel,
       response: UrlModel,
-      path: object({
-        id: string(),
-      }),
+      path: IdPath,
     })
     .info({
       summary: "Update a stored shortened URL",
       description: "Update a stored shortened URL. The ID will stay the same.",
     })
-    .put("{id:string}", () => mockAll(UrlModel));
+    .put("{id:int}", ({ path: { id }, body: { url } }) => updateUrl({ id, url }));
 
   // Get all shortened URL IDs
   router
     .build({
-      response: IDs,
+      response: UrlModels,
     })
     .info({
       summary: "Get all shortened URL IDs",
     })
-    .get(() => mockAll(IDs));
+    .get(() => getAllUrls());
 
   // Get redirected to the url which belongs to the given ID
   router
     .build({
-      response: nullFactory(),
+      response: undefinedFactory(),
+      path: IdPath,
     })
     .info({
       summary: "Redirect to URL",
       description: "Redirect to the URL which belongs to the given ID.",
     })
-    .get("{id:string}", () => null);
+    .get("{id:int}", async ({ path: { id }, response }) => {
+      const urlModel = await getUrl(id);
+      response.redirect(urlModel.url);
+      return undefined;
+    });
 
   return router;
 };

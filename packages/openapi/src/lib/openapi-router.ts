@@ -44,10 +44,21 @@ export class OpenApiRouter extends RouterBase {
 
       if (child instanceof ApiRouter) {
         apiRoutes.push(
-          ...child.apiRoutes.map(route => ({
-            ...route,
-            path: normalizePath(`${child.completePath!}/${route.path}`),
-          }))
+          ...child.apiRoutes.map(route => {
+            let completePath = normalizePath(`${child.completePath!}/${route.path}`);
+            const matchPath = completePath.match(/(?<complete>\{(?<path>\w+):\w+})/);
+            if (matchPath?.groups?.path) {
+              completePath = completePath.replace(
+                matchPath.groups.complete,
+                `{${matchPath.groups.path}}`
+              ) as `/${string}`;
+            }
+
+            return {
+              ...route,
+              path: completePath,
+            };
+          })
         );
       }
     }

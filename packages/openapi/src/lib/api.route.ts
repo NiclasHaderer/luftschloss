@@ -393,7 +393,7 @@ export class ApiRoute<
       } else if (typeof parsedResponseBody === "string") {
         await response.text(parsedResponseBody);
       } else if (parsedResponseBody === undefined || parsedResponseBody === null) {
-        await response.empty();
+        // Do nothing
       } else if (typeof parsedResponseBody === "number") {
         await response.text(parsedResponseBody.toString());
       } else {
@@ -418,9 +418,7 @@ const parseAndError = async <T extends LuftType | undefined>(
   if (!parsedData.success) {
     throw new HTTPException(statusCode, { issues: parsedData.issues, location: location });
   }
-  return { data: parsedData.data, parser: parsedData.usedValidator } as T extends LuftType<infer TYPE>
-    ? TYPE
-    : undefined;
+  return parsedData.data;
 };
 
 const extractArrayElement: ValidationHook<unknown, unknown, unknown> = (value: unknown) => {
