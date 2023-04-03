@@ -12,7 +12,8 @@
     "fuse.js": "^6.6.2",
     "light-my-request": "^5.9.1",
     "mime-db": "^1.52.0",
-    "range-parser": "^1.2.1"
+    "range-parser": "^1.2.1",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.5.1",
@@ -32,6 +33,7 @@
     "@types/node": "^18.11.9",
     "@types/range-parser": "^1.2.4",
     "@types/source-map-support": "^0.5.6",
+    "@types/sqlite3": "^3.1.8",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
     "eslint": "~8.15.0",
