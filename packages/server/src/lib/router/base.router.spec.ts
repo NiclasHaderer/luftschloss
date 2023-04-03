@@ -1,4 +1,4 @@
-import { defaultServer, loggerMiddleware, LRequest, LResponse, NextFunction, RouterBase } from "..";
+import { luftServer, loggerMiddleware, LRequest, LResponse, NextFunction, RouterBase } from "..";
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { testClient, TestClient } from "@luftschloss/testing";
 import SpyInstance = jest.SpyInstance;
@@ -8,7 +8,7 @@ test("OnMount called", () => {
   const r2 = new RouterBase();
   r1.mount(r2, { basePath: "world" });
 
-  defaultServer().mount(r1, { basePath: "hello" });
+  luftServer().mount(r1, { basePath: "hello" });
   const r3 = new RouterBase();
   expect(r3.isMounted()).toBe(false);
   r2.mount(r3);
@@ -27,7 +27,7 @@ test("OnMount called", () => {
 test("Regex mount option", () => {
   const r1 = new RouterBase();
 
-  defaultServer().mount(r1, { basePath: "{:number}" });
+  luftServer().mount(r1, { basePath: "{:number}" });
   expect(r1.canHandle("/33/")).toBe(true);
   expect(r1.canHandle("33")).toBe(false);
   expect(r1.canHandle("/3d3/")).toBe(false);
@@ -55,7 +55,7 @@ test("Middleware added", () => {
   const r1 = new RouterBase().pipe(middlewareStack[1]);
   const r2 = new RouterBase().pipe(middlewareStack[2]);
   r1.mount(r2);
-  const server = defaultServer().mount(r1);
+  const server = luftServer().mount(r1);
   server.unPipeAll().pipe(middlewareStack[0]);
 
   expect(r2.routerMiddlewares.length).toBe(1);
@@ -70,7 +70,7 @@ describe("Middleware execution order", () => {
   let consoleMock: SpyInstance = undefined!;
   beforeEach(async () => {
     consoleMock = jest.spyOn(console, "log").mockImplementationOnce(() => void 0);
-    const server = defaultServer()
+    const server = luftServer()
       .pipe({
         name: "custom-1",
         handle(next: NextFunction, req: LRequest, res: LResponse) {
@@ -154,7 +154,7 @@ test("Test route resolving for router with regex mount path", async () => {
   const r1 = new RouterBase();
   r1.routes.add("hello", "GET", (req, res) => res.empty());
 
-  const server = defaultServer().mount(r1, { basePath: "{:number}" });
+  const server = luftServer().mount(r1, { basePath: "{:number}" });
 
   expect(r1.canHandle("/33/foo-bar")).toBe(true);
   const client = await testClient(server, {
@@ -173,7 +173,7 @@ test("Test route resolving for router with string mount path", async () => {
   const r1 = new RouterBase();
   r1.routes.add("hello", "GET", (req, res) => res.empty());
 
-  const server = defaultServer().mount(r1, { basePath: "33" });
+  const server = luftServer().mount(r1, { basePath: "33" });
 
   expect(r1.canHandle("/33/foo-bar")).toBe(true);
   const client = await testClient(server, {

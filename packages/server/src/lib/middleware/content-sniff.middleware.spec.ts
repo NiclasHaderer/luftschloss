@@ -1,4 +1,4 @@
-import { defaultServer, ServerImpl } from "../core";
+import { luftServer, ServerImpl } from "../core";
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { testClient, TestClient } from "@luftschloss/testing";
 
@@ -6,7 +6,7 @@ describe("ContentSniffMiddleware default", () => {
   let server: ServerImpl;
   let client: TestClient;
   beforeAll(async () => {
-    server = defaultServer().unPipe("logger");
+    server = luftServer().unPipe("logger");
     client = await testClient(server);
   });
   afterAll(async () => await server.shutdown());
@@ -26,7 +26,7 @@ describe("ContentSniffMiddleware removed", () => {
   let server: ServerImpl;
   let client: TestClient;
   beforeAll(async () => {
-    server = defaultServer().unPipe("logger").unPipe("no-content-sniff");
+    server = luftServer().unPipe("logger").unPipe("no-content-sniff");
     client = await testClient(server);
   });
 

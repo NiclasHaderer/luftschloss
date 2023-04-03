@@ -1,4 +1,4 @@
-import { defaultServer } from "../core";
+import { luftServer } from "../core";
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { testClient } from "@luftschloss/testing";
 import { corsMiddleware } from "./cors.middleware";
@@ -7,7 +7,7 @@ import { OutgoingHttpHeaders } from "http";
 import { loggerMiddleware } from "./logger.middleware";
 
 const getClient = (...middlewares: Middleware[]) => {
-  const server = defaultServer()
+  const server = luftServer()
     .pipe(...middlewares)
     .unPipe(loggerMiddleware());
   return testClient(server, {

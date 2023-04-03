@@ -18,7 +18,7 @@ import { withServerBase } from "./server-base";
 
 export class ServerImpl extends withServerBase(DefaultRouter) {}
 
-export const defaultServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INTEGER } = {}): ServerImpl => {
+export const luftServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INTEGER } = {}): ServerImpl => {
   const server = new ServerImpl();
   server.raw.setTimeout(timeout);
   server.raw.maxConnections = maxConnections;

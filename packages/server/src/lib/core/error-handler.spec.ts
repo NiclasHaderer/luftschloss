@@ -1,4 +1,4 @@
-import { defaultServer, errorMiddleware, HTTPException, ServerImpl } from "..";
+import { luftServer, errorMiddleware, HTTPException, ServerImpl } from "..";
 import { luftClient } from "@luftschloss/client";
 
 describe("Default error handlers", () => {
@@ -6,7 +6,7 @@ describe("Default error handlers", () => {
   const client = luftClient();
 
   beforeAll(async () => {
-    server = defaultServer().unPipe("logger");
+    server = luftServer().unPipe("logger");
     server.get("/error", () => {
       throw new Error("This is an error");
     });
@@ -65,7 +65,7 @@ describe("Custom error handlers", () => {
   const client = luftClient();
 
   beforeAll(async () => {
-    server = defaultServer()
+    server = luftServer()
       .unPipe("logger")
       .unPipe("error")
       .pipe(

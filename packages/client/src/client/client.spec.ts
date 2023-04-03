@@ -1,11 +1,11 @@
 import { Readable } from "node:stream";
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import { defaultServer, loggerMiddleware, ServerImpl } from "@luftschloss/server";
+import { luftServer, loggerMiddleware, ServerImpl } from "@luftschloss/server";
 import { luftClient } from "./client";
 import { UTF8SearchParams } from "@luftschloss/common";
 
 const createServer = () => {
-  const server = defaultServer().unPipe(loggerMiddleware());
+  const server = luftServer().unPipe(loggerMiddleware());
   server.get("/json", (req, res) => res.json({ hello: "world" }));
   server.get("/text", (req, res) => res.text("hello world"));
   server.get("/redirect", (req, res) => res.redirect(`${server.address}/json`, "307_TEMPORARY_REDIRECT"));
