@@ -16,6 +16,7 @@ import {
   LuftType,
   LuftUndefined,
   LuftUnion,
+  LuftURL,
   LuftUUIDString,
 } from "@luftschloss/validation";
 import { mockAny } from "./any";
@@ -36,6 +37,7 @@ import { mockUnion } from "./union";
 import { mockUUID } from "./uuid";
 import { getCustomMock } from "./register-custom";
 import { getTypeOf } from "@luftschloss/common";
+import { mockURL } from "./url";
 
 export const mockAll = <T extends LuftType | LuftNever>(validator: T, fieldName?: string): LuftInfer<T> => {
   // Null
@@ -97,6 +99,10 @@ export const mockAll = <T extends LuftType | LuftNever>(validator: T, fieldName?
   // Object
   if (validator.constructor === LuftObject) {
     return mockObject(validator) as LuftInfer<T>;
+  }
+  // URL
+  if (validator.constructor === LuftURL) {
+    return mockURL(validator) as LuftInfer<T>;
   }
   // Any
   if (validator.constructor === LuftAny) {

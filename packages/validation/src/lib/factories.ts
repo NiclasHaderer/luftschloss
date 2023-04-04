@@ -18,13 +18,14 @@ import {
   LuftUndefined,
   LuftUnion,
   LuftUUIDString,
+  LuftURL,
 } from "./types";
 
 export const any = () => new LuftAny();
 export const array = <T extends LuftType>(type: T) => new LuftArray({ type });
 export const bool = () => new LuftBool();
 export const date = () => new LuftDate();
-
+export const url = () => new LuftURL();
 export const int = () => new LuftInt();
 export const literal = <T extends string | number | boolean>(types: ReadonlyArray<T>) => new LuftLiteral({ types });
 export const never = () => new LuftNever();
@@ -58,8 +59,8 @@ export const luft = {
   regex,
   string,
   tuple,
+  url,
   undefined: undefinedFactory,
   union: union,
   uuid: uuid,
 };
-19;

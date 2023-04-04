@@ -1,13 +1,15 @@
-import { array, int, LuftInfer, object, string } from "@luftschloss/validation";
+import { array, int, LuftInfer, object, url } from "@luftschloss/validation";
+
+const _url = url().protocol(["http:", "https:"]);
 
 export const CreateUrlModel = object({
-  url: string(),
+  url: _url,
 });
 
 export type CreateUrlModel = LuftInfer<typeof CreateUrlModel>;
 
 export const UrlModel = object({
-  url: string(),
+  url: _url,
   id: int(),
 });
 export type UrlModel = LuftInfer<typeof UrlModel>;

@@ -12,4 +12,5 @@ export * from "./record";
 export * from "./regexp";
 export * from "./string";
 export * from "./tuple";
+export { LuftURL } from "./url";
 export * from "./uuid-string";

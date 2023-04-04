@@ -15,6 +15,7 @@ import {
   LuftType,
   LuftUndefined,
   LuftUnion,
+  LuftURL,
   LuftUUIDString,
 } from "@luftschloss/validation";
 import { generateNullJsonSchema } from "./null";
@@ -36,6 +37,7 @@ import { generateObjectJsonSchema } from "./object";
 import { getCustomJsonSchemaGenerator } from "./register-custom";
 import { GeneratedSchema } from "./type";
 import { getTypeOf } from "@luftschloss/common";
+import { generateURLJsonSchema } from "./url";
 
 export const generateJsonSchema = (validator: LuftType, schemaPath: string): GeneratedSchema => {
   // Null
@@ -97,6 +99,10 @@ export const generateJsonSchema = (validator: LuftType, schemaPath: string): Gen
   // Object
   if (validator.constructor === LuftObject) {
     return generateObjectJsonSchema(validator, schemaPath);
+  }
+  // URL
+  if (validator.constructor === LuftURL) {
+    return generateURLJsonSchema(validator, schemaPath);
   }
   // Any
   if (validator.constructor === LuftAny) {

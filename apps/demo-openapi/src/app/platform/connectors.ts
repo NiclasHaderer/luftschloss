@@ -2,11 +2,11 @@ import { UrlModel, UrlModels } from "../models";
 import { db } from "./db";
 import { HTTPException } from "@luftschloss/server";
 
-export const createUrl = async (url: string): Promise<UrlModel> => {
+export const createUrl = async (url: URL): Promise<UrlModel> => {
   const id = await getSmallestUnusedId();
   const command = `INSERT INTO urls (url, id)
                    VALUES (?, ?);`;
-  await db.run(command, [url, id]);
+  await db.run(command, [url.toString(), id]);
   return { url, id };
 };
 
@@ -28,7 +28,7 @@ export async function getAllUrls(): Promise<UrlModel[]> {
   const command = `SELECT *
                    FROM urls;`;
   const rows = await db.getAll(command);
-  return UrlModels.validate(rows);
+  return UrlModels.coerce(rows);
 }
 
 export async function updateUrl(urlModel: UrlModel) {
@@ -39,7 +39,7 @@ export async function updateUrl(urlModel: UrlModel) {
     SET url = ?
     WHERE id = ?;`;
 
-  await db.run(command, [urlModel.url, urlModel.id]);
+  await db.run(command, [urlModel.url.toString(), urlModel.id]);
   return urlModel;
 }
 
