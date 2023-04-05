@@ -1,0 +1,276 @@
+[
+  {
+    "_id": "70d90e92-bd38-46dc-9e34-542b3c1bc578",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Create new Redirect",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 20000,
+    "created": "2023-04-05T11:41:25.839Z",
+    "modified": "2023-04-05T11:41:25.839Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"http://misguided-beancurd.net/\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "201"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "schema",
+        "value": " { \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" } } }"
+      }
+    ]
+  },
+  {
+    "_id": "5b1f9e13-80a5-4973-9cd5-62676a86e9d4",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Create new Redirect client error",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 30000,
+    "created": "2023-04-05T11:41:25.840Z",
+    "modified": "2023-04-05T11:41:25.840Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"invalid-url\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "498399d3-df35-4245-93ff-ee734bb89dda",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Get redirect",
+    "url": "http://0.0.0.0:3200/0",
+    "method": "GET",
+    "sortNum": 40000,
+    "created": "2023-04-05T11:41:25.841Z",
+    "modified": "2023-04-05T11:41:25.841Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "301"
+      },
+      {
+        "type": "custom-header",
+        "custom": "location",
+        "action": "istype",
+        "value": "string"
+      }
+    ]
+  },
+  {
+    "_id": "13f9ddfe-16e3-4cdd-84f0-321089fb2074",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Get non-defined redirect",
+    "url": "http://0.0.0.0:3200/-100",
+    "method": "GET",
+    "sortNum": 45000,
+    "created": "2023-04-05T11:41:25.842Z",
+    "modified": "2023-04-05T11:41:25.842Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "404"
+      }
+    ]
+  },
+  {
+    "_id": "9b385b64-c13a-4985-8585-65d429ff6ebb",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Update redirect",
+    "url": "http://0.0.0.0:3200/0",
+    "method": "PUT",
+    "sortNum": 50000,
+    "created": "2023-04-05T11:41:25.843Z",
+    "modified": "2023-04-05T11:41:25.843Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://google.com\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      }
+    ]
+  },
+  {
+    "_id": "c76cba29-2e6f-4264-80ed-298a61dc9930",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Update redirect client error",
+    "url": "http://0.0.0.0:3200/0",
+    "method": "PUT",
+    "sortNum": 50625,
+    "created": "2023-04-05T11:41:25.844Z",
+    "modified": "2023-04-05T11:41:25.844Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"invalid-url\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "d3f464f5-27ef-4ae4-a4ea-f4aac48ea749",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Update non-defined redirect",
+    "url": "http://0.0.0.0:3200/-100",
+    "method": "PUT",
+    "sortNum": 51250,
+    "created": "2023-04-05T11:41:25.845Z",
+    "modified": "2023-04-05T11:41:25.845Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://google.com\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "404"
+      }
+    ]
+  },
+  {
+    "_id": "baccd0d4-dc7c-49d5-ad42-de241bc80c04",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Get all urls Copy",
+    "url": "http://0.0.0.0:3200",
+    "method": "GET",
+    "sortNum": 56250,
+    "created": "2023-04-05T11:41:25.847Z",
+    "modified": "2023-04-05T11:41:25.847Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "schema",
+        "value": "{ \"type\": \"array\", \"items\": { \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\", \"id\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" }, \"id\": { \"type\": \"integer\" } } } }"
+      }
+    ]
+  },
+  {
+    "_id": "aa11d901-b876-49b5-a726-6c479b36b136",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Try delete on root",
+    "url": "http://0.0.0.0:3200",
+    "method": "DELETE",
+    "sortNum": 58125,
+    "created": "2023-04-05T11:41:25.848Z",
+    "modified": "2023-04-05T11:41:25.848Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "405"
+      }
+    ]
+  },
+  {
+    "_id": "7a818ad1-adce-4059-9d8f-2d95d8df9fe2",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Delete url",
+    "url": "http://0.0.0.0:3200/1",
+    "method": "DELETE",
+    "sortNum": 60000,
+    "created": "2023-04-05T11:41:25.849Z",
+    "modified": "2023-04-05T11:41:25.849Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "204"
+      }
+    ]
+  },
+  {
+    "_id": "69b1bdb3-7f47-4353-b935-8258e506f30e",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Delete non-devined url",
+    "url": "http://0.0.0.0:3200/-100",
+    "method": "DELETE",
+    "sortNum": 70000,
+    "created": "2023-04-05T11:41:25.850Z",
+    "modified": "2023-04-05T11:41:25.850Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "404"
+      }
+    ]
+  }
+]
