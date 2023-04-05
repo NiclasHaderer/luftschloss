@@ -21,7 +21,7 @@ export async function getUrl(id: number): Promise<UrlModel> {
   `;
 
   const row = await db.get(command, [id]);
-  return UrlModel.validate(row);
+  return UrlModel.coerce(row);
 }
 
 export async function getAllUrls(): Promise<UrlModel[]> {

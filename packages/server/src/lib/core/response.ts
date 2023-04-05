@@ -23,7 +23,7 @@ export interface LResponse {
 
   html(text: string): this;
 
-  empty(): this;
+  empty(setStatus?: boolean): this;
 
   json(object: object | string | null | boolean): this;
 
@@ -39,7 +39,15 @@ export interface LResponse {
 
   redirect(
     url: string | URL,
-    type?: "301_MOVED_PERMANENTLY" | "302_FOUND" | "307_TEMPORARY_REDIRECT" | "308_PERMANENT_REDIRECT"
+    type?:
+      | typeof Status.HTTP_301_MOVED_PERMANENTLY
+      | typeof Status.HTTP_302_FOUND
+      | typeof Status.HTTP_307_TEMPORARY_REDIRECT
+      | typeof Status.HTTP_308_PERMANENT_REDIRECT
+      | 301
+      | 302
+      | 307
+      | 308
   ): this;
 
   getStatus(): Status;

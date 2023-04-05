@@ -321,13 +321,7 @@ export class ApiRoute<
     return async (request: LRequest, response: LResponse): Promise<void> => {
       // Set the response status code here, so it can be overwritten in the handler
       // Include the custom true to be able to see if the status gets overwritten<
-      const defaultReturnCode =
-        request.method === "POST"
-          ? { ...Status.HTTP_201_CREATED, custom: true }
-          : {
-              ...Status.HTTP_200_OK,
-              custom: true,
-            };
+      const defaultReturnCode = request.method === "POST" ? Status.HTTP_201_CREATED : Status.HTTP_200_OK;
       response.status(defaultReturnCode);
 
       // Path
@@ -370,32 +364,28 @@ export class ApiRoute<
         } else {
           parsedResponseBody = parsedData.data;
 
-          // We know that the user did not set a custom status code (because of the custom in the status object),
-          // so we can set the status code of the response validator
-          if ("custom" in response.getStatus()) {
-            // Try to get the status from the used validator and if the used validator does not have a status code
-            // use the one of the passed validator.
-            // Checking the usedValidator has to be done because only by using this technique we can get the status
-            // that was actually used to validate the data successfully (for example in case of a union first the matching
-            // validator of the union will be checked for a status code and afterwards if this validator does not have a
-            // status code look at the status code of the union).
-            const responseStatus =
-              parsedData.usedValidator.validationStorage.status ?? this.validators.response.validationStorage.status;
-            if (responseStatus !== undefined) {
-              response.status(responseStatus);
-            }
+          // Try to get the status from the used validator and if the used validator does not have a status code
+          // use the one of the passed validator.
+          // Checking the usedValidator has to be done because only by using this technique we can get the status
+          // that was actually used to validate the data successfully (for example in case of a union first the matching
+          // validator of the union will be checked for a status code and afterwards if this validator does not have a
+          // status code look at the status code of the union).
+          const responseStatus =
+            parsedData.usedValidator.validationStorage.status ?? this.validators.response.validationStorage.status;
+          if (responseStatus !== undefined) {
+            response.status(responseStatus);
           }
         }
       }
 
       if (typeof parsedResponseBody === "object" || typeof parsedResponseBody === "boolean") {
-        await response.json(parsedResponseBody);
+        response.json(parsedResponseBody);
       } else if (typeof parsedResponseBody === "string") {
-        await response.text(parsedResponseBody);
+        response.text(parsedResponseBody);
       } else if (parsedResponseBody === undefined || parsedResponseBody === null) {
-        // Do nothing
+        response.text("");
       } else if (typeof parsedResponseBody === "number") {
-        await response.text(parsedResponseBody.toString());
+        response.text(parsedResponseBody.toString());
       } else {
         throw new HTTPException(
           Status.HTTP_500_INTERNAL_SERVER_ERROR,

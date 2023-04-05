@@ -1,7 +1,7 @@
 import { apiRouter, openApiRouter, redocRouter, stoplightRouter, swaggerRouter } from "@luftschloss/openapi";
 import { CreateUrlModel, IdPath, UrlModel, UrlModels } from "../models";
 import { undefinedFactory } from "@luftschloss/validation";
-import { defaultRouter } from "@luftschloss/server";
+import { defaultRouter, Status } from "@luftschloss/server";
 import { apiDefinition } from "../api-definition";
 import { createUrl, deleteUrl, getAllUrls, getUrl, updateUrl } from "../platform/connectors";
 
@@ -23,7 +23,7 @@ export const shortenerRouter = (tag = "shorten") => {
   // Delete a shortened URL
   router
     .build({
-      response: undefinedFactory(),
+      response: undefinedFactory().status(Status.HTTP_204_NO_CONTENT),
       path: IdPath,
     })
     .info({
@@ -60,7 +60,7 @@ export const shortenerRouter = (tag = "shorten") => {
   // Get redirected to the url which belongs to the given ID
   router
     .build({
-      response: undefinedFactory(),
+      response: undefinedFactory().status(Status.HTTP_301_MOVED_PERMANENTLY),
       path: IdPath,
     })
     .info({

@@ -78,9 +78,9 @@ export class ResponseImpl implements LResponse {
     return this;
   }
 
-  public empty(): this {
+  public empty(setStatus = true): this {
     this.data = "";
-    this.status(Status.HTTP_204_NO_CONTENT);
+    setStatus && this.status(Status.HTTP_204_NO_CONTENT);
     return this;
   }
 
@@ -96,11 +96,18 @@ export class ResponseImpl implements LResponse {
 
   public redirect(
     url: string | URL,
-    type?: "301_MOVED_PERMANENTLY" | "302_FOUND" | "307_TEMPORARY_REDIRECT" | "308_PERMANENT_REDIRECT"
+    type?:
+      | typeof Status.HTTP_301_MOVED_PERMANENTLY
+      | typeof Status.HTTP_302_FOUND
+      | typeof Status.HTTP_307_TEMPORARY_REDIRECT
+      | typeof Status.HTTP_308_PERMANENT_REDIRECT
+      | 301
+      | 302
+      | 307
+      | 308
   ): this {
-    type = type ?? ("307_TEMPORARY_REDIRECT" as const);
-    const finalType = `HTTP_${type}` as const;
-    this.status(Status[finalType]);
+    type = type ?? Status.HTTP_307_TEMPORARY_REDIRECT;
+    this.status(toStatus(type));
     this.headers.append("Location", url.toString());
     if (this.data === NOT_COMPLETED) {
       this.data = "";

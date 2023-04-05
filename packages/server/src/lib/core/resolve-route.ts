@@ -18,11 +18,13 @@ import { HTTP_METHODS, LookupResultStatus, ROUTE_HANDLER, RouteLookupResult } fr
  */
 export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedRoutes): RouteLookupResult => {
   let status: LookupResultStatus.NOT_FOUND | LookupResultStatus.METHOD_NOT_ALLOWED = LookupResultStatus.NOT_FOUND;
+  let availableMethods: HTTP_METHODS[] = [];
+  let pathParams = saveObject();
 
   if (path in routes.lookup) {
     const endpoint = routes.lookup[path];
     const handler = endpoint[method];
-    const availableMethods = getAvailableMethods(endpoint);
+    availableMethods = getAvailableMethods(endpoint);
 
     if (handler) {
       return {
@@ -36,8 +38,6 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
     }
   }
 
-  let availableMethods: HTTP_METHODS[] = [];
-  let pathParams = saveObject();
   for (const [routeRegex, endpoint] of routes.regex) {
     const match = path.match(routeRegex);
     if (match) {
@@ -53,6 +53,7 @@ export const resolveRoute = (path: string, method: HTTP_METHODS, routes: MergedR
       } else {
         status = LookupResultStatus.METHOD_NOT_ALLOWED;
         pathParams = extractParamsFromMatch(match);
+        availableMethods = getAvailableMethods(endpoint);
       }
     }
   }
