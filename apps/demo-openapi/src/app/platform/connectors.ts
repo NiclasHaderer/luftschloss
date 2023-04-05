@@ -53,23 +53,37 @@ export const deleteUrl = async (id: number) => {
   await db.run(command, [id]);
 };
 
-const getSmallestUnusedId = async (): Promise<number> => {
-  const ids = await getAllUrls();
+const getTotalUrls = async (): Promise<number> => {
+  const command = `
+    SELECT COUNT(*) as count
+    FROM urls;
+  `;
+  const row = (await db.get<{ count: number }>(command)) ?? { count: 0 };
+  return row.count;
+};
 
-  for (let i = 0; i < ids.length; i++) {
-    if (ids[i].id !== i) {
-      return i;
-    }
-  }
-  return ids.length;
+const getSmallestUnusedId = async (): Promise<number> => {
+  // Join the table on itself, however join the left table on the right table + 1, thereby checking if the next highest
+  // id exists. If this is the case r.id will not be null. Now we filter for all rows where r.id is null and select the
+  // left id - 1, which is the smallest unused id.
+  const smallestId = await db.get<{ id: number }>(
+    `SELECT (l.id - 1) as id
+     from urls l
+            LEFT JOIN urls r ON l.id = r.id + 1
+     WHERE r.id IS NULL
+       and l.id > 0
+     LIMIT 1;`
+  );
+
+  if (smallestId) return smallestId.id;
+  return await getTotalUrls();
 };
 
 const assertExists = async (id: number) => {
   const command = `
     SELECT *
     FROM urls
-    WHERE id = ?
-    LIMIT 1;
+    WHERE id = ?;
   `;
 
   const exists = await db.get(command, [id]).then(r => !!r);
