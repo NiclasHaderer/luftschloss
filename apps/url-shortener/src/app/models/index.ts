@@ -18,6 +18,6 @@ export const UrlModels = array(UrlModel);
 export type UrlModels = LuftInfer<typeof UrlModels>;
 
 export const IdPath = object({
-  id: string(),
+  id: string().max(5).min(5),
 });
 export type IdPath = LuftInfer<typeof IdPath>;

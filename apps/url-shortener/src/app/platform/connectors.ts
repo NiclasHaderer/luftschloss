@@ -18,8 +18,7 @@ export async function getUrl(id: string): Promise<UrlModel> {
   const command = `
     SELECT *
     FROM urls
-    WHERE id = ?
-    LIMIT 1;
+    WHERE id = ? LIMIT 1;
   `;
 
   const row = await db.get(command, [id]);
@@ -57,7 +56,8 @@ export const deleteUrl = async (id: string) => {
 };
 
 export const deleteAllUrls = () => {
-  return db.run(`DELETE FROM urls;`);
+  return db.run(`DELETE
+                 FROM urls;`);
 };
 
 const generateId = (): string => {
@@ -70,10 +70,41 @@ const generateId = (): string => {
 };
 
 const generateCollisionFreeId = async (): Promise<string> => {
+  /**
+   * Can be replaced with the following code if you want to generate numerical ids, which are shorter, but also
+   * sequential. This is not recommended for a production use case, because it is easier to guess the next id.
+   *
+   * // Join the table on itself, however join the left table on the right table + 1, thereby checking if the next highest
+   * // id exists. If this is the case r.id will not be null. Now we filter for all rows where r.id is null and select the
+   * // left id - 1, which is the smallest unused id.
+   * const smallestId = await db.get<{ id: number }>(
+   *   `SELECT (l.id - 1) as id
+   *    from urls l
+   *           LEFT JOIN urls r ON l.id = r.id + 1
+   *    WHERE r.id IS NULL
+   *      and l.id > 0 LIMIT 1;`
+   * );
+   *
+   * if (smallestId) return smallestId.id.toString();
+   *
+   * const row = (await db.get<{ count: number }>(`
+   *     SELECT COUNT(*) as count
+   *     FROM urls;
+   *   `)) ?? { count: 0 };
+   * return row.count.toString();
+   */
+
   let id: string | undefined;
   while (!id) {
     const candidate = generateId();
-    const exists = await db.get<{ id: string }>(`SELECT id FROM urls WHERE id = ?`, [candidate]).then(r => !!r);
+    const exists = await db
+      .get<{ id: string }>(
+        `SELECT id
+         FROM urls
+         WHERE id = ?`,
+        [candidate]
+      )
+      .then(r => !!r);
     if (!exists) id = candidate;
   }
   return id;
@@ -97,6 +128,6 @@ const assertUrlIsReachable = async (url: URL) => {
       throw new HTTPException(400, "Url is not reachable");
     })
     .then(r => {
-      if (!r.ok) throw new HTTPException(400, "Url is not reachable");
+      if (!r.ok) throw new HTTPException(400, "URL returned a non-success status code");
     });
 };
