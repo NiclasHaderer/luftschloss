@@ -5,20 +5,21 @@ import { get } from "@luftschloss/client";
 
 export const createUrl = async (url: URL): Promise<UrlModel> => {
   await assertUrlIsReachable(url);
-  const id = await getSmallestUnusedId();
+  const id = await generateCollisionFreeId();
   const command = `INSERT INTO urls (url, id)
                    VALUES (?, ?);`;
   await db.run(command, [url.toString(), id]);
   return { url, id };
 };
 
-export async function getUrl(id: number): Promise<UrlModel> {
+export async function getUrl(id: string): Promise<UrlModel> {
   await assertExists(id);
 
   const command = `
     SELECT *
     FROM urls
-    WHERE id = ? LIMIT 1;
+    WHERE id = ?
+    LIMIT 1;
   `;
 
   const row = await db.get(command, [id]);
@@ -45,7 +46,7 @@ export async function updateUrl(urlModel: UrlModel) {
   return urlModel;
 }
 
-export const deleteUrl = async (id: number) => {
+export const deleteUrl = async (id: string) => {
   await assertExists(id);
   const command = `
     DELETE
@@ -55,32 +56,30 @@ export const deleteUrl = async (id: number) => {
   await db.run(command, [id]);
 };
 
-const getTotalUrls = async (): Promise<number> => {
-  const command = `
-    SELECT COUNT(*) as count
-    FROM urls;
-  `;
-  const row = (await db.get<{ count: number }>(command)) ?? { count: 0 };
-  return row.count;
+export const deleteAllUrls = () => {
+  return db.run(`DELETE FROM urls;`);
 };
 
-const getSmallestUnusedId = async (): Promise<number> => {
-  // Join the table on itself, however join the left table on the right table + 1, thereby checking if the next highest
-  // id exists. If this is the case r.id will not be null. Now we filter for all rows where r.id is null and select the
-  // left id - 1, which is the smallest unused id.
-  const smallestId = await db.get<{ id: number }>(
-    `SELECT (l.id - 1) as id
-     from urls l
-            LEFT JOIN urls r ON l.id = r.id + 1
-     WHERE r.id IS NULL
-       and l.id > 0 LIMIT 1;`
-  );
-
-  if (smallestId) return smallestId.id;
-  return await getTotalUrls();
+const generateId = (): string => {
+  const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let id = "";
+  for (let i = 0; i < 5; i++) {
+    id += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return id;
 };
 
-const assertExists = async (id: number) => {
+const generateCollisionFreeId = async (): Promise<string> => {
+  let id: string | undefined;
+  while (!id) {
+    const candidate = generateId();
+    const exists = await db.get<{ id: string }>(`SELECT id FROM urls WHERE id = ?`, [candidate]).then(r => !!r);
+    if (!exists) id = candidate;
+  }
+  return id;
+};
+
+const assertExists = async (id: string) => {
   const command = `
     SELECT *
     FROM urls

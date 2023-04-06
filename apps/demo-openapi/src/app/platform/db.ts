@@ -13,7 +13,7 @@ const getDb = async () => {
       CREATE TABLE IF NOT EXISTS urls
       (
         id
-        INTEGER
+        char(5)
         PRIMARY
         KEY,
         url

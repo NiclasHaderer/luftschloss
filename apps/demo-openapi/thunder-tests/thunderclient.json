@@ -8,7 +8,7 @@
     "method": "POST",
     "sortNum": 20000,
     "created": "2023-04-05T11:41:25.839Z",
-    "modified": "2023-04-06T09:14:03.995Z",
+    "modified": "2023-04-06T13:26:12.131Z",
     "headers": [],
     "params": [],
     "body": {
@@ -27,7 +27,13 @@
         "type": "res-body",
         "custom": "",
         "action": "schema",
-        "value": " { \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" } } }"
+        "value": "{ \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" } } }"
+      },
+      {
+        "type": "set-env-var",
+        "custom": "json.id",
+        "action": "setto",
+        "value": "{{url_id}}"
       }
     ]
   },
@@ -62,11 +68,11 @@
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
     "name": "Get redirect",
-    "url": "http://0.0.0.0:3200/0",
+    "url": "http://0.0.0.0:3200/{{url_id}}",
     "method": "GET",
     "sortNum": 40000,
     "created": "2023-04-05T11:41:25.841Z",
-    "modified": "2023-04-05T11:41:25.841Z",
+    "modified": "2023-04-06T13:25:17.222Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -110,11 +116,11 @@
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
     "name": "Update redirect",
-    "url": "http://0.0.0.0:3200/0",
+    "url": "http://0.0.0.0:3200/{{url_id}}",
     "method": "PUT",
     "sortNum": 50000,
     "created": "2023-04-05T11:41:25.843Z",
-    "modified": "2023-04-05T11:41:25.843Z",
+    "modified": "2023-04-06T13:27:31.942Z",
     "headers": [],
     "params": [],
     "body": {
@@ -187,12 +193,12 @@
     "_id": "baccd0d4-dc7c-49d5-ad42-de241bc80c04",
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
-    "name": "Get all urls Copy",
+    "name": "Get all urls",
     "url": "http://0.0.0.0:3200",
     "method": "GET",
     "sortNum": 56250,
     "created": "2023-04-05T11:41:25.847Z",
-    "modified": "2023-04-05T11:41:25.847Z",
+    "modified": "2023-04-06T13:13:22.185Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -206,7 +212,7 @@
         "type": "res-body",
         "custom": "",
         "action": "schema",
-        "value": "{ \"type\": \"array\", \"items\": { \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\", \"id\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" }, \"id\": { \"type\": \"integer\" } } } }"
+        "value": "{ \"type\": \"array\", \"items\": { \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\", \"id\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" }, \"id\": { \"type\": \"string\" } } } }"
       }
     ]
   },
@@ -217,9 +223,9 @@
     "name": "Try delete on root",
     "url": "http://0.0.0.0:3200",
     "method": "DELETE",
-    "sortNum": 58125,
+    "sortNum": 80000,
     "created": "2023-04-05T11:41:25.848Z",
-    "modified": "2023-04-05T11:48:25.125Z",
+    "modified": "2023-04-06T13:28:25.078Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -227,13 +233,7 @@
         "type": "res-code",
         "custom": "",
         "action": "equal",
-        "value": "405"
-      },
-      {
-        "type": "custom-header",
-        "custom": "allow",
-        "action": "equal",
-        "value": "GET, POST, OPTIONS"
+        "value": "404"
       }
     ]
   },
@@ -242,11 +242,11 @@
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
     "name": "Delete url",
-    "url": "http://0.0.0.0:3200/0",
+    "url": "http://0.0.0.0:3200/{{url_id}}",
     "method": "DELETE",
     "sortNum": 60000,
     "created": "2023-04-05T11:41:25.849Z",
-    "modified": "2023-04-06T09:18:27.782Z",
+    "modified": "2023-04-06T13:27:18.329Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -262,7 +262,7 @@
     "_id": "69b1bdb3-7f47-4353-b935-8258e506f30e",
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
-    "name": "Delete non-devined url",
+    "name": "Delete non-defined url",
     "url": "http://0.0.0.0:3200/-100",
     "method": "DELETE",
     "sortNum": 70000,

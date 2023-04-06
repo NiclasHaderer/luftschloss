@@ -3,7 +3,7 @@ import { CreateUrlModel, IdPath, UrlModel, UrlModels } from "../models";
 import { undefinedFactory } from "@luftschloss/validation";
 import { defaultRouter, Status } from "@luftschloss/server";
 import { apiDefinition } from "../api-definition";
-import { createUrl, deleteUrl, getAllUrls, getUrl, updateUrl } from "../platform/connectors";
+import { createUrl, deleteAllUrls, deleteUrl, getAllUrls, getUrl, updateUrl } from "../platform/connectors";
 
 export const shortenerRouter = (tag = "shorten") => {
   const router = apiRouter().tag(tag);
@@ -29,7 +29,7 @@ export const shortenerRouter = (tag = "shorten") => {
     .info({
       summary: "Delete a stored shortened URL",
     })
-    .delete("{id:int}", async ({ path: { id } }) => {
+    .delete("{id:string}", async ({ path: { id } }) => {
       await deleteUrl(id);
       return undefined;
     });
@@ -45,7 +45,7 @@ export const shortenerRouter = (tag = "shorten") => {
       summary: "Update a stored shortened URL",
       description: "Update a stored shortened URL. The ID will stay the same.",
     })
-    .put("{id:int}", ({ path: { id }, body: { url } }) => updateUrl({ id, url }));
+    .put("{id:string}", ({ path: { id }, body: { url } }) => updateUrl({ id, url }));
 
   // Get all shortened URL IDs
   router
@@ -67,9 +67,22 @@ export const shortenerRouter = (tag = "shorten") => {
       summary: "Redirect to URL",
       description: "Redirect to the URL which belongs to the given ID.",
     })
-    .get("{id:int}", async ({ path: { id }, response }) => {
+    .get("{id:string}", async ({ path: { id }, response }) => {
       const urlModel = await getUrl(id);
       response.redirect(urlModel.url);
+      return undefined;
+    });
+
+  router
+    .build({
+      response: undefinedFactory().status(Status.HTTP_404_NOT_FOUND),
+    })
+    .info({
+      summary: "Delete all shortened URLs",
+      description: "Delete all shortened URLs.",
+    })
+    .delete(async () => {
+      await deleteAllUrls();
       return undefined;
     });
 
