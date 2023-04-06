@@ -26,6 +26,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
   private agent: http.Agent | https.Agent | undefined;
   private httpsAgent: https.Agent | undefined;
   private httpAgent: http.Agent | undefined;
+  private timeout: number | undefined;
 
   private defaultHeaders = {
     "user-agent": "@luftschloss/client",
@@ -41,6 +42,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
       maxRedirects: number;
       httpAgent?: http.Agent;
       httpsAgent?: https.Agent;
+      timeout?: number;
     }>
   ) {
     super();
@@ -50,6 +52,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
     this.maxRedirects = options.maxRedirects;
     this.httpsAgent = options.httpsAgent;
     this.httpAgent = options.httpAgent;
+    this.timeout = options.timeout;
   }
 
   private _url!: URL;
@@ -163,6 +166,7 @@ export class ClientRequest extends Subscribable<RequestEvents> {
             ...this.headers.encode(),
           },
           agent: this.agent,
+          timeout: this.timeout,
         },
         res => resolve([clientRequest, res])
       )

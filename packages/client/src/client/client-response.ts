@@ -31,6 +31,10 @@ export class ClientResponse {
     public readonly history: ReadonlyArray<ClientResponse>
   ) {}
 
+  public get ok(): boolean {
+    return this.status >= 200 && this.status < 300;
+  }
+
   public get status(): number {
     return this.raw.statusCode!;
   }

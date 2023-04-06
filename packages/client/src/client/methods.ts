@@ -9,6 +9,7 @@ export interface ClientOptions {
   headers?: IncomingHttpHeaders | Headers;
   httpAgent?: http.Agent;
   httpsAgent?: https.Agent;
+  timeout?: number;
 }
 
 export interface ClientOptionsWithBody extends ClientOptions {
@@ -53,5 +54,6 @@ export const request = (method: string, url: string | URL, options: ClientOption
     maxRedirects: options.followRedirects === false ? 0 : options.maxRedirects ?? 4,
     httpAgent: options.httpAgent,
     httpsAgent: options.httpsAgent,
+    timeout: options.timeout,
   });
 };

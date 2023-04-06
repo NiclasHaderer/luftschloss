@@ -1,8 +1,10 @@
 import { UrlModel, UrlModels } from "../models";
 import { db } from "./db";
 import { HTTPException } from "@luftschloss/server";
+import { get } from "@luftschloss/client";
 
 export const createUrl = async (url: URL): Promise<UrlModel> => {
+  await assertUrlIsReachable(url);
   const id = await getSmallestUnusedId();
   const command = `INSERT INTO urls (url, id)
                    VALUES (?, ?);`;
@@ -16,8 +18,7 @@ export async function getUrl(id: number): Promise<UrlModel> {
   const command = `
     SELECT *
     FROM urls
-    WHERE id = ?
-    LIMIT 1;
+    WHERE id = ? LIMIT 1;
   `;
 
   const row = await db.get(command, [id]);
@@ -33,6 +34,7 @@ export async function getAllUrls(): Promise<UrlModel[]> {
 
 export async function updateUrl(urlModel: UrlModel) {
   await assertExists(urlModel.id);
+  await assertUrlIsReachable(urlModel.url);
 
   const command = `
     UPDATE urls
@@ -71,8 +73,7 @@ const getSmallestUnusedId = async (): Promise<number> => {
      from urls l
             LEFT JOIN urls r ON l.id = r.id + 1
      WHERE r.id IS NULL
-       and l.id > 0
-     LIMIT 1;`
+       and l.id > 0 LIMIT 1;`
   );
 
   if (smallestId) return smallestId.id;
@@ -88,4 +89,15 @@ const assertExists = async (id: number) => {
 
   const exists = await db.get(command, [id]).then(r => !!r);
   if (!exists) throw new HTTPException(404, "Url not found");
+};
+
+const assertUrlIsReachable = async (url: URL) => {
+  await get(url, { timeout: 2000 })
+    .send()
+    .catch(() => {
+      throw new HTTPException(400, "Url is not reachable");
+    })
+    .then(r => {
+      if (!r.ok) throw new HTTPException(400, "Url is not reachable");
+    });
 };

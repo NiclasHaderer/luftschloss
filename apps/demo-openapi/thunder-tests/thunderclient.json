@@ -8,12 +8,12 @@
     "method": "POST",
     "sortNum": 20000,
     "created": "2023-04-05T11:41:25.839Z",
-    "modified": "2023-04-05T11:41:25.839Z",
+    "modified": "2023-04-06T09:14:03.995Z",
     "headers": [],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"url\": \"http://misguided-beancurd.net/\"\n}",
+      "raw": "{\n  \"url\": \"http://google.com/\"\n}",
       "form": []
     },
     "tests": [
@@ -35,7 +35,7 @@
     "_id": "5b1f9e13-80a5-4973-9cd5-62676a86e9d4",
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
-    "name": "Create new Redirect client error",
+    "name": "Create new Redirect invalid url",
     "url": "http://0.0.0.0:3200",
     "method": "POST",
     "sortNum": 30000,
@@ -242,11 +242,11 @@
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
     "name": "Delete url",
-    "url": "http://0.0.0.0:3200/1",
+    "url": "http://0.0.0.0:3200/0",
     "method": "DELETE",
     "sortNum": 60000,
     "created": "2023-04-05T11:41:25.849Z",
-    "modified": "2023-04-05T11:41:25.849Z",
+    "modified": "2023-04-06T09:18:27.782Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -276,6 +276,58 @@
         "custom": "",
         "action": "equal",
         "value": "404"
+      }
+    ]
+  },
+  {
+    "_id": "5acc68a6-7bd0-48cb-b786-87e09b4b4f0e",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Create new Redirect unreachable url 1",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 35000,
+    "created": "2023-04-06T09:14:14.960Z",
+    "modified": "2023-04-06T09:15:54.705Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://www.youtube.com/29fdj44\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "f43cc6b9-0f33-49d8-9d13-6eab52f8fb33",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Create new Redirect unreachable url 2",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 37500,
+    "created": "2023-04-06T09:14:54.476Z",
+    "modified": "2023-04-06T09:16:15.493Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"http://something.local\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
       }
     ]
   }
