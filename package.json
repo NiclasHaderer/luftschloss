@@ -12,7 +12,6 @@
     "fuse.js": "^6.6.2",
     "light-my-request": "^5.9.1",
     "mime-db": "^1.52.0",
-    "range-parser": "^1.2.1",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {

@@ -8,7 +8,7 @@ import { HTTPException, LRequest, LResponse, Middleware, NextFunction, Status } 
 import * as fsSync from "fs";
 import { Stats } from "node:fs";
 import * as path from "path";
-import { addRangeHeaders, getRange } from "./content-range";
+import { addRangeResponseHeaders, getRange } from "./content-range";
 import { getMimeType } from "./lookup-mime";
 
 export type StaticContentOptions =
@@ -56,7 +56,7 @@ const staticContentMiddleware = (options: InternalStaticContentOptions): Middlew
         if (contentRanges.partial) response.status(Status.HTTP_206_PARTIAL_CONTENT);
 
         // Add the response range headers
-        addRangeHeaders(request, response, contentRanges, stat);
+        addRangeResponseHeaders(request, response, contentRanges, stat);
 
         // Extract the requested byte ranges from the file
         const streams = contentRanges.parts.map(range =>
