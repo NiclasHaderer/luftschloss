@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: "demo-openapi",
+  displayName: "url-shortener",
   preset: "../../jest.preset.js",
   globals: {
     "ts-jest": {
@@ -12,5 +12,5 @@ export default {
     "^.+\\.[tj]s$": "ts-jest",
   },
   moduleFileExtensions: ["ts", "js", "html"],
-  coverageDirectory: "../../coverage/apps/demo-openapi",
+  coverageDirectory: "../../coverage/apps/url-shortener",
 };

@@ -1,16 +1,16 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/demo-openapi/src",
+  "sourceRoot": "apps/url-shortener/src",
   "projectType": "application",
   "targets": {
     "build": {
       "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/demo-openapi",
-        "main": "apps/demo-openapi/src/main.ts",
-        "tsConfig": "apps/demo-openapi/tsconfig.app.json",
-        "assets": ["apps/demo-openapi/src/assets"],
+        "outputPath": "dist/apps/url-shortener",
+        "main": "apps/url-shortener/src/main.ts",
+        "tsConfig": "apps/url-shortener/tsconfig.app.json",
+        "assets": ["apps/url-shortener/src/assets"],
         "sourceMap": true,
         "target": "node",
         "compiler": "tsc"
@@ -22,8 +22,8 @@
           "inspect": false,
           "fileReplacements": [
             {
-              "replace": "apps/demo-openapi/src/environments/environment.ts",
-              "with": "apps/demo-openapi/src/environments/environment.prod.ts"
+              "replace": "apps/url-shortener/src/environments/environment.ts",
+              "with": "apps/url-shortener/src/environments/environment.prod.ts"
             }
           ]
         }
@@ -32,11 +32,11 @@
     "serve": {
       "executor": "@nrwl/node:node",
       "options": {
-        "buildTarget": "demo-openapi:build"
+        "buildTarget": "url-shortener:build"
       },
       "configurations": {
         "production": {
-          "buildTarget": "demo-openapi:build:production"
+          "buildTarget": "url-shortener:build:production"
         }
       }
     },
@@ -44,18 +44,18 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/demo-openapi/**/*.ts"]
+        "lintFilePatterns": ["apps/url-shortener/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/demo-openapi"],
+      "outputs": ["{workspaceRoot}/coverage/apps/url-shortener"],
       "options": {
-        "jestConfig": "apps/demo-openapi/jest.config.ts",
+        "jestConfig": "apps/url-shortener/jest.config.ts",
         "passWithNoTests": true
       }
     }
   },
   "tags": [],
-  "name": "demo-openapi"
+  "name": "url-shortener"
 }

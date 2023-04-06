@@ -4,4 +4,4 @@
 **/node_modules
 **/tmp
 *.lock
-apps/demo-openapi/thunder-tests
+apps/url-shortener/thunder-tests

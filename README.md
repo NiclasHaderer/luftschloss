@@ -1,90 +1,59 @@
 # Luftschloss
 
-This project was generated using [Nx](https://nx.dev).
+Luftschloss is a simple, lightweight and dependency-free webserver in Node.js.
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+## Getting started
 
-🔎 **Smart, Fast and Extensible Build System**
+```
+# Install dependencies used for building the project
+yarn install
 
-## Adding capabilities to your workspace
+# Build all projects and apps
+npx nx affected:build --all
+```
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+## Structure of the repository
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+All packages are located in the `packages` folder. The `apps` folder contains all applications that are built on top of
+the packages and can be viewed as a showcase of the packages.
 
-Below are our core plugins:
+### Packages
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+1. `@luftschloss/client`: A http client for Node.js
+2. `@luftschloss/common`: The core package containing common functionality used by most other packages.
+3. `@luftschloss/mocking`: Automatically mock your api calls.
+4. `@luftschloss/openapi`: An openapi extension for the `@luftschloss/server` package. Just write your code and the
+   openapi spec will be generated automatically.
+5. `@luftschloss/openapi-schema`: The schema generation logic for the `@luftschloss/openapi` package.
+6. `@luftschloss/proxy`: A proxy server for the `@luftschloss/server` package built on top of the `@luftschloss/client`
+   package.
+7. `@luftschloss/server`: The luftschloss http server
+8. `@luftschloss/static`: Static file extensions for the `@luftschloss/server` package.
+9. `@luftschloss/testing`: Testing utilities for the `@luftschloss/server` package. Use this to test your server without
+   ever having to start it.
+10. `@luftschloss/validation`: A custom validation library which can be used on the client and server side. It is used
+    by the `@luftschloss/openapi` package.
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+## Demonstration applications
 
-## Generate an application
+## url-shortener
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+The application in `apps/url-shortener` is a simple url shortener application. It uses the `@luftschloss/openapi`
+package in combination
+with the `@luftschloss/server` to automatically generate an openapi spec. The `@luftschloss/client` package is used to
+verify that the urls which should be shortened actually exist and return a _successful_ status code.
 
-> You can use any of the plugins above to generate applications as well.
+```bash
+# Start the application
+npx nx serve url-shortener
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+# Open the openapi spec (choose one of the following)
+open http://127.0.0.1:3200/docs/swagger
+open http://127.0.0.1:3200/docs/stoplight
+open http://127.0.0.1:3200/docs/redoc
 
-## Generate a library
-
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are shareable across libraries and applications. They can be imported from `@luftschloss/mylib`.
-
-## Development server
-
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `nx e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+# Run the thunderclient tests using vs-code
+# Open the thunderclient application and import the thunderclient collection from the `apps/url-shortener` folder
+# (make sure that you have set *Thunder-client: Save To Workspace* to `true` in your vscode settings)
+code apps/url-shortener
+```

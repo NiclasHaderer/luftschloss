@@ -2,6 +2,6 @@
   "extends": ["../../.eslintrc.json"],
   "ignorePatterns": ["!**/*"],
   "parserOptions": {
-    "project": ["apps/demo-openapi/tsconfig.app.json", "apps/demo-openapi/tsconfig.spec.json"]
+    "project": ["apps/url-shortener/tsconfig.app.json", "apps/url-shortener/tsconfig.spec.json"]
   }
 }
