@@ -10,7 +10,7 @@ export type CreateUrlModel = LuftInfer<typeof CreateUrlModel>;
 
 export const UrlModel = object({
   url: _url,
-  id: string(),
+  id: string().max(5).min(5),
 });
 export type UrlModel = LuftInfer<typeof UrlModel>;
 

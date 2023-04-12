@@ -95,11 +95,11 @@
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
     "name": "Get non-defined redirect",
-    "url": "http://0.0.0.0:3200/-100",
+    "url": "http://0.0.0.0:3200/12345",
     "method": "GET",
     "sortNum": 45000,
     "created": "2023-04-05T11:41:25.842Z",
-    "modified": "2023-04-05T11:41:25.842Z",
+    "modified": "2023-04-12T09:04:18.481Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -168,11 +168,11 @@
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
     "name": "Update non-defined redirect",
-    "url": "http://0.0.0.0:3200/-100",
+    "url": "http://0.0.0.0:3200/12345",
     "method": "PUT",
     "sortNum": 51250,
     "created": "2023-04-05T11:41:25.845Z",
-    "modified": "2023-04-05T11:41:25.845Z",
+    "modified": "2023-04-12T09:04:27.759Z",
     "headers": [],
     "params": [],
     "body": {
@@ -263,11 +263,11 @@
     "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
     "containerId": "",
     "name": "Delete non-defined url",
-    "url": "http://0.0.0.0:3200/-100",
+    "url": "http://0.0.0.0:3200/12345",
     "method": "DELETE",
     "sortNum": 70000,
     "created": "2023-04-05T11:41:25.850Z",
-    "modified": "2023-04-05T11:41:25.850Z",
+    "modified": "2023-04-12T09:04:36.800Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -322,6 +322,27 @@
       "raw": "{\n  \"url\": \"http://something.local\"\n}",
       "form": []
     },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "d703d4a9-a9cc-4630-8ab6-a31a63dfbc56",
+    "colId": "0cb8c489-1e38-4972-ab4d-ee8b297d15a1",
+    "containerId": "",
+    "name": "Get redirect - invalid id length",
+    "url": "http://0.0.0.0:3200/1",
+    "method": "GET",
+    "sortNum": 42500,
+    "created": "2023-04-12T09:04:53.322Z",
+    "modified": "2023-04-12T09:05:11.788Z",
+    "headers": [],
+    "params": [],
     "tests": [
       {
         "type": "res-code",

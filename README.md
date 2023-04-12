@@ -5,8 +5,10 @@ Luftschloss is a simple, lightweight and dependency-free webserver in Node.js.
 ## Getting started
 
 ```
+# (If you don't have yarn installed install it with `npm install -g yarn`)
 # Install dependencies used for building the project
 yarn install
+
 
 # Build all projects and apps
 npx nx affected:build --all
