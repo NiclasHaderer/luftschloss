@@ -69,6 +69,13 @@ export const shortenerRouter = (tag = "shorten") => {
     .get("{id:string}", async ({ path: { id }, response }) => {
       const urlModel = await getUrl(id);
       response.redirect(urlModel.url);
+      // Set the cache control headers, so the browser does not cache the redirect indefinitely
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+      response.header("Cache-Control", "no-cache, no-store, must-revalidate");
+      // Set to the past, so the browser does not cache the redirect
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires
+      response.header("Expires", "0");
+
       return undefined;
     });
 
