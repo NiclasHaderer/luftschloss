@@ -1,6 +1,6 @@
 import { Readable } from "node:stream";
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import { luftServer, loggerMiddleware, ServerImpl } from "@luftschloss/server";
+import { luftServer, loggerMiddleware, ServerImpl, Status } from "@luftschloss/server";
 import { luftClient } from "./client";
 import { UTF8SearchParams } from "@luftschloss/common";
 
@@ -8,9 +8,13 @@ const createServer = () => {
   const server = luftServer().unPipe(loggerMiddleware());
   server.get("/json", (req, res) => res.json({ hello: "world" }));
   server.get("/text", (req, res) => res.text("hello world"));
-  server.get("/redirect", (req, res) => res.redirect(`${server.address}/json`, "307_TEMPORARY_REDIRECT"));
-  server.get("/2-redirects", (req, res) => res.redirect(`${server.address}/redirect`, "307_TEMPORARY_REDIRECT"));
-  server.get("/redirect-external", (req, res) => res.redirect("https://google.com", "307_TEMPORARY_REDIRECT"));
+  server.get("/redirect", (req, res) => res.redirect(`${server.address}/json`, Status.HTTP_307_TEMPORARY_REDIRECT));
+  server.get("/2-redirects", (req, res) =>
+    res.redirect(`${server.address}/redirect`, Status.HTTP_307_TEMPORARY_REDIRECT)
+  );
+  server.get("/redirect-external", (req, res) =>
+    res.redirect("https://google.com", Status.HTTP_307_TEMPORARY_REDIRECT)
+  );
   server.get("/buffer", (req, res) => res.buffer(Buffer.from("hello world")));
   server.get("/error/{statusCode:int}", (req, res) =>
     res

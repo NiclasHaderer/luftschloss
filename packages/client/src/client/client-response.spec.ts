@@ -1,11 +1,11 @@
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import { luftServer, loggerMiddleware, ServerImpl } from "@luftschloss/server";
+import { luftServer, loggerMiddleware, ServerImpl, Status } from "@luftschloss/server";
 import { luftClient } from "./client";
 
 const createServer = () => {
   const server = luftServer().unPipe(loggerMiddleware());
   server.get("/ok", (req, res) => res.text("OK"));
-  server.get("/redirect", (req, res) => res.redirect("http://localhost:33333/ok", "307_TEMPORARY_REDIRECT"));
+  server.get("/redirect", (req, res) => res.redirect("http://localhost:33333/ok", Status.HTTP_307_TEMPORARY_REDIRECT));
   return server;
 };
 
