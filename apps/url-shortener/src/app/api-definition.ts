@@ -19,18 +19,17 @@ export const apiDefinition: OpenApiRouterArgs = {
       title: "Swagger Shortened URLs - OpenAPI 3.0",
       version: "1.0.0",
       description: trimIndent`
-        This is a sample server for a shortened URL service. You can find out more about Swagger at
-        [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
+        This is a sample server for a shortened URL service..
       `,
-      termsOfService: "http://swagger.io/terms/",
+      termsOfService: "https://github.com/NiclasHaderer/luftschloss/blob/main/LICENSE",
       license: {
-        name: "Apache 2.0",
-        url: "http://www.apache.org/licenses/LICENSE-2.0.html",
+        name: "MIT",
+        url: "https://opensource.org/licenses/MIT",
       },
     },
     externalDocs: {
-      description: "Find out more about Swagger",
-      url: "http://swagger.io",
+      description: "Find out more about Luftschloss",
+      url: "github.com/NiclasHaderer/luftschloss",
     },
     openapi: "3.0.3",
   },
