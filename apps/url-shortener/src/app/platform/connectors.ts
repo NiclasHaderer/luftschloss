@@ -172,7 +172,7 @@ const assertExists = async (id: string) => {
  * @throws HTTPException if the url is not reachable
  */
 const assertUrlIsReachable = async (url: URL) => {
-  await get(url, { timeout: 2000 })
+  await get(url, { timeout: 2000, followRedirects: true })
     .send()
     .catch(() => {
       throw new HTTPException(400, "Url is not reachable");
