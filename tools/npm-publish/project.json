@@ -1,0 +1,41 @@
+{
+  "name": "npm-publish",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/tools/npm-publish",
+        "main": "tools/npm-publish/src/index.ts",
+        "tsConfig": "tools/npm-publish/tsconfig.lib.json",
+        "assets": [
+          "tools/npm-publish/*.md",
+          {
+            "input": "./tools/npm-publish/src",
+            "glob": "**/!(*.ts)",
+            "output": "./src"
+          },
+          {
+            "input": "./tools/npm-publish/src",
+            "glob": "**/*.d.ts",
+            "output": "./src"
+          },
+          {
+            "input": "./tools/npm-publish",
+            "glob": "generators.json",
+            "output": "."
+          },
+          {
+            "input": "./tools/npm-publish",
+            "glob": "executors.json",
+            "output": "."
+          }
+        ]
+      }
+    }
+  },
+  "tags": []
+}

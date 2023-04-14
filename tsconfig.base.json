@@ -21,6 +21,7 @@
       "@luftschloss/client": ["packages/client/src/index.ts"],
       "@luftschloss/common": ["packages/common/src/index.ts"],
       "@luftschloss/mocking": ["packages/mocking/src/index.ts"],
+      "@luftschloss/npm-publish": ["tools/npm-publish/src/index.ts"],
       "@luftschloss/openapi": ["packages/openapi/src/index.ts"],
       "@luftschloss/openapi-schema": ["packages/openapi-schema/src/index.ts"],
       "@luftschloss/proxy": ["packages/proxy/src/index.ts"],

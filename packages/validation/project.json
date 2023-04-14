@@ -2,8 +2,18 @@
   "name": "validation",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/validation/src",
+  "implicitDependencies": [],
   "projectType": "library",
   "targets": {
+    "publish": {
+      "executor": "@luftschloss/npm-publish:publish",
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "self"
+        }
+      ]
+    },
     "build": {
       "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
