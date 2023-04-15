@@ -5,6 +5,15 @@
   "projectType": "library",
   "implicitDependencies": ["!testing", "!client"],
   "targets": {
+    "publish": {
+      "executor": "@luftschloss/npm-publish:publish",
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "self"
+        }
+      ]
+    },
     "build": {
       "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
