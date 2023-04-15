@@ -11,6 +11,10 @@
         {
           "target": "build",
           "projects": "self"
+        },
+        {
+          "target": "test",
+          "projects": "self"
         }
       ]
     },

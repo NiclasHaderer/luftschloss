@@ -9,6 +9,11 @@
     "dryRun": {
       "type": "boolean",
       "description": "Do not actually publish the package to the registry."
+    },
+    "gitTagRelease": {
+      "type": "boolean",
+      "description": "Create a new git tag.",
+      "default": true
     }
   },
   "required": []

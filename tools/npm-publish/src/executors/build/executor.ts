@@ -28,34 +28,51 @@ async function executeCommand(command: string): Promise<{ success: boolean; stde
   });
 }
 
+async function executeAndPrintCommand(command: string): Promise<boolean> {
+  const result = await executeCommand(command);
+  if (!result.success) {
+    console.error(result.stderr);
+  }
+  console.log(result.stdout);
+  return result.success;
+}
+
 export default async function runExecutor(
   options: BuildExecutorSchema,
   context: ExecutorContext
 ): Promise<{ success: boolean }> {
+  options.dryRun = true;
   const outDir = context.workspace.projects[context.projectName!].targets!.build.options.outputPath;
   const packageJson = JSON.parse(fs.readFileSync(`${outDir}/package.json`, "utf-8"));
-  const packageName = packageJson.name;
+  const npmPackageName = packageJson.name;
 
-  const remotePackageVersion = await getRemotePackageVersions(packageName);
+  const remotePackageVersion = await getRemotePackageVersions(npmPackageName);
   const localPackageVersion = packageJson.version.trim();
   if (remotePackageVersion.includes(localPackageVersion)) {
-    console.log(`Package ${packageName} is already published with version ${localPackageVersion}`);
+    console.log(`Package ${npmPackageName} is already published with version ${localPackageVersion}`);
     return {
       success: true,
     };
   }
 
+  const NPM_COMMAND = `npm publish ${outDir} --access public`;
+  const GIT_TAG_COMMAND = `git tag ${context.projectName}@${localPackageVersion}`;
+
   if (!options.dryRun) {
-    const result = await executeCommand(`npm publish ${outDir} --access public`);
-    if (!result.success) {
-      console.error("Failed to publish package", packageName);
-      console.error(result.stderr);
-      return {
-        success: false,
-      };
+    // Tag the release
+    if (options.gitTagRelease) {
+      const success = await executeAndPrintCommand(GIT_TAG_COMMAND);
+      if (!success) return { success: false };
     }
-    console.log(result.stdout);
-    console.log("Successfully published package", packageName);
+
+    // Publish the package
+    const success = await executeAndPrintCommand(NPM_COMMAND);
+    if (!success) return { success: false };
+  } else {
+    if (options.gitTagRelease) {
+      console.log(`Dry run: skipping "${GIT_TAG_COMMAND}"`);
+    }
+    console.log(`Dry run: skipping "${NPM_COMMAND}"`);
   }
 
   return {
