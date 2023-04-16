@@ -4,15 +4,17 @@ import * as fs from "fs";
 import { exec } from "child_process";
 
 async function getRemotePackageVersions(packageName: string): Promise<string[]> {
-  const response = await fetch(`https://registry.npmjs.org/${packageName}`).then(r => {
-    if (r.status === 404) {
-      return { versions: {} };
+  const response = await fetch(`https://registry.npmjs.org/${packageName}`).then<{ versions: Record<string, unknown> }>(
+    r => {
+      if (r.status === 404) {
+        return { versions: {} };
+      }
+      if (!r.ok) {
+        throw new Error(`Failed to fetch package version for ${packageName}`);
+      }
+      return r.json();
     }
-    if (!r.ok) {
-      throw new Error(`Failed to fetch package version for ${packageName}`);
-    }
-    return r.json();
-  });
+  );
   return Object.keys(response.versions).map(v => v.trim());
 }
 
@@ -41,7 +43,6 @@ export default async function runExecutor(
   options: BuildExecutorSchema,
   context: ExecutorContext
 ): Promise<{ success: boolean }> {
-  options.dryRun = true;
   const outDir = context.workspace.projects[context.projectName!].targets!.build.options.outputPath;
   const packageJson = JSON.parse(fs.readFileSync(`${outDir}/package.json`, "utf-8"));
   const npmPackageName = packageJson.name;
