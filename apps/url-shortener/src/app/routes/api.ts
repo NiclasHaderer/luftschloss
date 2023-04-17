@@ -31,10 +31,7 @@ export const shortenerRouter = (tag = "shorten") => {
       summary: "Delete a stored shortened URL",
       security: [{ BearerAuth: [] }],
     })
-    .delete("{id:string}", async ({ path: { id }, request }) => {
-      await deleteUrl(id, request.data.userId);
-      return undefined;
-    });
+    .delete("{id:string}", async ({ path: { id }, request }) => deleteUrl(id, request.data.userId));
 
   // Update a shortened URL
   securedRouter
@@ -63,17 +60,14 @@ export const shortenerRouter = (tag = "shorten") => {
 
   securedRouter
     .build({
-      response: undefinedFactory().status(Status.HTTP_404_NOT_FOUND),
+      response: undefinedFactory(),
     })
     .info({
       summary: "Delete all shortened URLs",
       description: "Delete all shortened URLs.",
       security: [{ BearerAuth: [] }],
     })
-    .delete(async ({ request }) => {
-      await deleteAllUrls(request.data.userId);
-      return undefined;
-    });
+    .delete(async ({ request }) => deleteAllUrls(request.data.userId));
 
   const router = apiRouter().tag(tag);
 
@@ -96,8 +90,6 @@ export const shortenerRouter = (tag = "shorten") => {
       // Set to the past, so the browser does not cache the redirect
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires
       response.header("Expires", "0");
-
-      return undefined;
     });
   router.mount(securedRouter);
   return router;

@@ -41,7 +41,13 @@ export type OpenApiHandler<
   headers: HEADERS extends LuftType ? LuftInfer<HEADERS> : undefined;
   request: LRequest;
   response: LResponse;
-}) => Promisable<RESPONSE extends LuftType<infer T> ? T : undefined>;
+}) => Promisable<
+  RESPONSE extends LuftType<infer T>
+    ? T extends null | undefined
+      ? null | undefined | void
+      : T
+    : undefined | void | null
+>;
 
 export interface RouterParams<
   PATH extends LuftObject<any> | undefined,
