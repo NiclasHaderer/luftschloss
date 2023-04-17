@@ -7,7 +7,7 @@
 export const SKIP_CACHE = Symbol("SKIP_CACHE");
 
 export const ByLazy = <VALUE, TARGET extends object = never>(
-  factory: (self: TARGET) => VALUE | [typeof SKIP_CACHE, VALUE]
+  factory: (this: TARGET, self: TARGET) => VALUE | [typeof SKIP_CACHE, VALUE]
 ) => {
   return (target: TARGET, propertyKey: string) => {
     const cacheDataSymbol = Symbol(`CACHE_DATA_${propertyKey}`);
@@ -20,7 +20,7 @@ export const ByLazy = <VALUE, TARGET extends object = never>(
         const isSet = (): boolean => this[cacheDataSymbol] !== cacheNotSetDataSymbol;
         const getValue = (): VALUE => this[cacheDataSymbol];
         const setValue = (): VALUE => {
-          const value = factory(this as TARGET);
+          const value = factory.apply(this, [this as TARGET]);
           // Do not cache the value, but skip it
           if (Array.isArray(value) && value[0] === SKIP_CACHE) {
             // Still return the returned value of the factory, just don't save it for later

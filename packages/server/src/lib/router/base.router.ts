@@ -264,20 +264,20 @@ export class RouterBase implements Router {
     } else if (route.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
       // Save the wrong method here
       wrongMethod = { ...route, middlewares: this.middlewares };
-    } else {
-      // Iterate over the sub routes and call the resolveRoute method in them
-      for (const { router } of this.subRouters) {
-        // If the request path does not start with the complete path of the router we can skip it.
-        const skipRouter = !router.canHandle(path);
-        if (skipRouter) continue;
+    }
 
-        const childRoute = router.resolveRoute(path, method);
-        if (childRoute.status === LookupResultStatus.OK) {
-          return childRoute;
-        } else if (!wrongMethod && childRoute.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
-          // Save the route not found result if there has not been a route not found result earlier
-          wrongMethod = childRoute;
-        }
+    // Iterate over the sub routes and call the resolveRoute method in them
+    for (const { router } of this.subRouters) {
+      // If the request path does not start with the complete path of the router we can skip it.
+      const skipRouter = !router.canHandle(path);
+      if (skipRouter) continue;
+
+      const childRoute = router.resolveRoute(path, method);
+      if (childRoute.status === LookupResultStatus.OK) {
+        return childRoute;
+      } else if (!wrongMethod && childRoute.status === LookupResultStatus.METHOD_NOT_ALLOWED) {
+        // Save the route not found result if there has not been a route not found result earlier
+        wrongMethod = childRoute;
       }
     }
 

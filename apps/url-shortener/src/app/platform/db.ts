@@ -1,7 +1,8 @@
 import { Database } from "sqlite3";
+import { environment } from "../../environments/environment";
 
 const DBConfig = {
-  name: "url_shortener.db",
+  name: environment.db.name,
 };
 
 let _db: Database;
@@ -13,13 +14,15 @@ const getDb = async () => {
       CREATE TABLE IF NOT EXISTS urls
       (
         id
-        char(5)
-        PRIMARY
-        KEY,
+          char(5)
+          PRIMARY
+            KEY,
         url
-        TEXT
-        NOT
-        NULL
+          TEXT
+          NOT
+            NULL,
+        user
+          CHARACTER(20)
       );
     `);
   }

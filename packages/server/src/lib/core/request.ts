@@ -16,7 +16,7 @@ import { IncomingMessage } from "http";
 import { RequestImpl } from "./request-impl";
 import { HTTP_METHODS } from "./route-collector.model";
 
-export interface LRequest<DATA extends Record<string, unknown> = never> {
+export interface LRequest<DATA extends Record<string, unknown> | unknown = any> {
   readonly data: DATA;
   readonly raw: IncomingMessage;
   urlParams: UTF8SearchParams;

@@ -1,14 +1,15 @@
 import { apiRouter } from "@luftschloss/openapi";
 import { CreateUrlModel, IdPath, UrlModel, UrlModels } from "../models";
-import { createUrl, deleteAllUrls, deleteUrl, getAllUrls, getUrl, updateUrl } from "../platform/connectors";
+import { createUrl, deleteAllUrls, deleteUrl, getAllUrlsForUser, getUrl, updateUrl } from "../platform/route-handlers";
 import { undefinedFactory } from "@luftschloss/validation";
 import { Status } from "@luftschloss/server";
+import { JwtMiddleware } from "../middlewares/jwt.middleware";
 
 export const shortenerRouter = (tag = "shorten") => {
-  const router = apiRouter().tag(tag);
+  const securedRouter = apiRouter().tag(tag).pipe(new JwtMiddleware());
 
   // Create a new shortened URL
-  router
+  securedRouter
     .build({
       body: CreateUrlModel,
       response: UrlModel,
@@ -16,25 +17,27 @@ export const shortenerRouter = (tag = "shorten") => {
     .info({
       summary: "Create a new shortened URL",
       description: "Create a new shortened URL. The ID will be generated automatically.",
+      security: [{ BearerAuth: [] }],
     })
-    .post(({ body }) => createUrl(body.url));
+    .post(({ body, request }) => createUrl(body.url, request.data.userId));
 
   // Delete a shortened URL
-  router
+  securedRouter
     .build({
       response: undefinedFactory().status(Status.HTTP_204_NO_CONTENT),
       path: IdPath,
     })
     .info({
       summary: "Delete a stored shortened URL",
+      security: [{ BearerAuth: [] }],
     })
-    .delete("{id:string}", async ({ path: { id } }) => {
-      await deleteUrl(id);
+    .delete("{id:string}", async ({ path: { id }, request }) => {
+      await deleteUrl(id, request.data.userId);
       return undefined;
     });
 
   // Update a shortened URL
-  router
+  securedRouter
     .build({
       body: CreateUrlModel,
       response: UrlModel,
@@ -43,18 +46,36 @@ export const shortenerRouter = (tag = "shorten") => {
     .info({
       summary: "Update a stored shortened URL",
       description: "Update a stored shortened URL. The ID will stay the same.",
+      security: [{ BearerAuth: [] }],
     })
-    .put("{id:string}", ({ path: { id }, body: { url } }) => updateUrl({ id, url }));
+    .put("{id:string}", ({ path: { id }, body: { url }, request }) => updateUrl({ id, url }, request.data.userId));
 
   // Get all shortened URL IDs
-  router
+  securedRouter
     .build({
       response: UrlModels,
     })
     .info({
       summary: "Get all shortened URL IDs",
+      security: [{ BearerAuth: [] }],
     })
-    .get(() => getAllUrls());
+    .get(({ request }) => getAllUrlsForUser(request.data.userId));
+
+  securedRouter
+    .build({
+      response: undefinedFactory().status(Status.HTTP_404_NOT_FOUND),
+    })
+    .info({
+      summary: "Delete all shortened URLs",
+      description: "Delete all shortened URLs.",
+      security: [{ BearerAuth: [] }],
+    })
+    .delete(async ({ request }) => {
+      await deleteAllUrls(request.data.userId);
+      return undefined;
+    });
+
+  const router = apiRouter().tag(tag);
 
   // Get redirected to the url which belongs to the given ID
   router
@@ -78,19 +99,6 @@ export const shortenerRouter = (tag = "shorten") => {
 
       return undefined;
     });
-
-  router
-    .build({
-      response: undefinedFactory().status(Status.HTTP_404_NOT_FOUND),
-    })
-    .info({
-      summary: "Delete all shortened URLs",
-      description: "Delete all shortened URLs.",
-    })
-    .delete(async () => {
-      await deleteAllUrls();
-      return undefined;
-    });
-
+  router.mount(securedRouter);
   return router;
 };

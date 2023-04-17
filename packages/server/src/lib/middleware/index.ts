@@ -4,6 +4,7 @@
  * MIT Licensed
  */
 
+export * from "./auth-middleware";
 export * from "./content-sniff.middleware";
 export * from "./cors.middleware";
 export * from "./error.middleware";

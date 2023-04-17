@@ -3,6 +3,7 @@ import { OpenApiRouterArgs } from "@luftschloss/openapi";
 
 export const apiDefinition: OpenApiRouterArgs = {
   openApi: {
+    openapi: "3.0.3",
     tags: [
       {
         name: "shorten",
@@ -16,7 +17,7 @@ export const apiDefinition: OpenApiRouterArgs = {
       },
     ],
     info: {
-      title: "Swagger Shortened URLs - OpenAPI 3.0",
+      title: "Swagger Shortened URLs - OpenAPI 3.x",
       version: "1.0.0",
       description: trimIndent`
         This is a sample server for a shortened URL service..
@@ -31,6 +32,13 @@ export const apiDefinition: OpenApiRouterArgs = {
       description: "Find out more about Luftschloss",
       url: "github.com/NiclasHaderer/luftschloss",
     },
-    openapi: "3.0.3",
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+        },
+      },
+    },
   },
 };
