@@ -6,7 +6,7 @@ import { Status } from "@luftschloss/server";
 import { JwtMiddleware } from "../middlewares/jwt.middleware";
 
 export const shortenerRouter = (tag = "shorten") => {
-  const securedRouter = apiRouter().tag(tag).pipe(new JwtMiddleware());
+  const securedRouter = apiRouter().tag(tag).pipe(new JwtMiddleware("TODO"));
 
   // Create a new shortened URL
   securedRouter

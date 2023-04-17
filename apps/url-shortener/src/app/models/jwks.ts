@@ -1,7 +1,8 @@
-import { LuftInfer, object, record, string } from "@luftschloss/validation";
+import { array, LuftInfer, object, string } from "@luftschloss/validation";
 
 export const JWK = object({
   kty: string(),
+  alg: string(),
   use: string(),
   kid: string(),
   n: string(),
@@ -10,7 +11,7 @@ export const JWK = object({
 export type JWK = LuftInfer<typeof JWK>;
 
 export const JWKsResponse = object({
-  keys: record(string(), JWK),
+  keys: array(JWK),
 });
 
 export type JWKsResponse = LuftInfer<typeof JWKsResponse>;
