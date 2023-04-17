@@ -7,8 +7,8 @@ const main = async () => {
   server.pipe(
     corsMiddleware({
       allowCredentials: true,
-      allowedHeaders: "*",
-      allowedMethods: "*",
+      allowedHeaders: "ALL",
+      allowedMethods: "ALL",
       allowOriginFunction: () => true,
     })
   );

@@ -16,6 +16,7 @@ export * from "./event-handler";
 export * from "./find-indexes";
 export * from "./headers";
 export * from "./index";
+export * from "./singleton";
 export * from "./string";
 export * from "./trim-indent";
 export * from "./type-of";

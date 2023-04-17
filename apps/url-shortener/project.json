@@ -26,17 +26,27 @@
               "with": "apps/url-shortener/src/environments/environment.prod.ts"
             }
           ]
+        },
+        "development": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": []
         }
       }
     },
     "serve": {
       "executor": "@nrwl/node:node",
+      "defaultConfiguration": "development",
       "options": {
         "buildTarget": "url-shortener:build"
       },
       "configurations": {
         "production": {
           "buildTarget": "url-shortener:build:production"
+        },
+        "development": {
+          "buildTarget": "url-shortener:build:development"
         }
       }
     },

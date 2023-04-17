@@ -1,0 +1,162 @@
+[
+  {
+    "_id": "469849a6-77a1-4005-9aba-271f12cbfa06",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Create user",
+    "url": "http://127.0.0.1:3300/users",
+    "method": "POST",
+    "sortNum": 10000,
+    "created": "2023-04-17T15:01:38.787Z",
+    "modified": "2023-04-17T15:11:35.674Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-long-password\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "201"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "e9835eaa-9b40-4ee3-93b1-455e3cb62543",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Delete user",
+    "url": "http://127.0.0.1:3300/users",
+    "method": "DELETE",
+    "sortNum": 20000,
+    "created": "2023-04-17T15:10:28.028Z",
+    "modified": "2023-04-17T15:16:20.489Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-long-password-2\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "4628b35f-2341-4c50-b5ef-6a97e1ea7782",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Update user password",
+    "url": "http://127.0.0.1:3300/users",
+    "method": "PUT",
+    "sortNum": 18750,
+    "created": "2023-04-17T15:12:00.941Z",
+    "modified": "2023-04-17T15:14:02.791Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"oldPassword\": \"very-long-password\",\n  \"newPassword\": \"very-long-password-2\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "9c60eca7-f644-4559-a409-b93102a9d87d",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Get user JWT",
+    "url": "http://127.0.0.1:3300/users/login",
+    "method": "POST",
+    "sortNum": 17500,
+    "created": "2023-04-17T15:13:12.822Z",
+    "modified": "2023-04-17T15:13:49.532Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-long-password\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "40c984c6-04b0-4f7c-8635-6a0678a31ce8",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Get JWKS",
+    "url": "http://127.0.0.1:3300/.well-known/jwks.json",
+    "method": "GET",
+    "sortNum": 30000,
+    "created": "2023-04-17T15:16:59.392Z",
+    "modified": "2023-04-17T15:18:48.255Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-long-password-2\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "schema",
+        "value": "{ \"type\": \"object\", \"additionalProperties\": true, \"required\": [ \"keys\" ], \"properties\": { \"keys\": { \"type\": \"array\", \"items\": { \"type\": \"object\", \"additionalProperties\": true, \"required\": [ \"kty\", \"use\", \"kid\", \"n\", \"e\" ], \"properties\": { \"kty\": { \"type\": \"string\" }, \"use\": { \"type\": \"string\" }, \"kid\": { \"type\": \"string\" }, \"n\": { \"type\": \"string\" }, \"e\": { \"type\": \"string\" } } } } } }"
+      }
+    ]
+  }
+]

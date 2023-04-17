@@ -1,5 +1,5 @@
 import * as crypto from "crypto";
-import { JWTResponse } from "../models";
+import { KeyPairHolder } from "./key";
 
 interface Header {
   alg: string;
@@ -14,7 +14,7 @@ interface Payload {
   exp: number;
 }
 
-export const createJWT = (username: string, privateKey: string): JWTResponse => {
+export const createJWT = (username: string): string => {
   const header: Header = {
     alg: "RS256",
     typ: "JWT",
@@ -28,16 +28,13 @@ export const createJWT = (username: string, privateKey: string): JWTResponse => 
     exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
   };
 
-  //https://techdocs.akamai.com/iot-token-access-control/docs/generate-jwt-rsa-keys
-  const headerString = JSON.stringify(header);
-  const payloadString = JSON.stringify(payload);
+  const headerBase64 = atob(JSON.stringify(header));
+  const payloadBase64 = atob(JSON.stringify(payload));
+  const headerPayloadBase64 = `${headerBase64}.${payloadBase64}`;
 
-  const headerBase64 = Buffer.from(headerString).toString("base64");
-  const payloadBase64 = Buffer.from(payloadString).toString("base64");
-  const Y = headerBase64 + "." + payloadBase64;
+  const keyPair = new KeyPairHolder();
 
-  const signature = crypto.sign("RSA256", Buffer.from(Y), privateKey);
+  const signature = crypto.sign("RSA256", Buffer.from(headerPayloadBase64), keyPair.privateKey());
   const signatureBase64 = signature.toString("base64");
-
-  return Y + "." + signatureBase64;
+  return `${headerPayloadBase64}.${signatureBase64}`;
 };

@@ -1,29 +1,16 @@
 import { Database } from "sqlite3";
-
-const DBConfig = {
-  name: "users.db",
-};
+import { environment } from "../../environments/environment";
 
 let _db: Database;
 
 const getDb = async () => {
   if (!_db) {
-    _db = new Database(DBConfig.name);
+    _db = new Database(environment.db.name);
     await db.run(`
       CREATE TABLE IF NOT EXISTS users
       (
-        id
-        char(5)
-        PRIMARY
-        KEY AUTOINCREMENT,
-        username
-        TEXT
-        NOT
-        NULL,
-        password
-        TEXT
-        NOT
-        NULL
+        username TEXT PRIMARY KEY,
+        password TEXT NOT NULL
       );
     `);
   }

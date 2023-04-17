@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^7.6.0",
+    "argon2": "^0.30.3",
     "fuse.js": "^6.6.2",
     "light-my-request": "^5.9.1",
     "mime-db": "^1.52.0",

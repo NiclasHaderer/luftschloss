@@ -1,34 +1,33 @@
-import { LuftInfer, object, array, string } from "@luftschloss/validation";
+import { array, LuftInfer, object, string } from "@luftschloss/validation";
 
-export const CreateUserModel = object({
+export const CreateUser = object({
   username: string().min(3).max(20),
   password: string().min(8).max(20),
 });
 
-export type CreateUserModel = LuftInfer<typeof CreateUserModel>;
+export type CreateUser = LuftInfer<typeof CreateUser>;
 
-export const UpdateUserModel = object({
+export const UpdatePassword = object({
   username: string().min(3).max(20),
   oldPassword: string().min(8).max(20),
   newPassword: string().min(8).max(20),
 });
 
-export type UpdateUserModel = LuftInfer<typeof UpdateUserModel>;
+export type UpdatePassword = LuftInfer<typeof UpdatePassword>;
 
-export const JWKSModel = object({
+export const JWK = object({
   kty: string(),
   use: string(),
   kid: string(),
   n: string(),
   e: string(),
 });
+export type JWK = LuftInfer<typeof JWK>;
 
-export type JWKSModel = LuftInfer<typeof JWKSModel>;
-
-export const JWKSResponse = object({ keys: array(JWKSModel) });
+export const JWKSResponse = object({ keys: array(JWK) });
 
 export type JWKSResponse = LuftInfer<typeof JWKSResponse>;
 
-export const JWTResponse = string();
-
-export type JWTResponse = LuftInfer<typeof JWTResponse>;
+export const JWTResponse = object({
+  token: string(),
+});

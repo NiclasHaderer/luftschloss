@@ -1,6 +1,6 @@
 import { apiRouter } from "@luftschloss/openapi";
-import { CreateUserModel, JWTResponse, JWKSResponse, UpdateUserModel } from "../models";
-import { createUser, getJWT, getJWKS, updateUser } from "../plattform/connectors";
+import { CreateUser, JWKSResponse, JWTResponse, UpdatePassword } from "../models";
+import { createUser, deleteUser, getJWKS, getJWT, updateUser } from "../plattform/connectors";
 
 export const authenticateRouter = (tag = "authenticate") => {
   const router = apiRouter().tag(tag);
@@ -8,41 +8,51 @@ export const authenticateRouter = (tag = "authenticate") => {
   // Create a new user
   router
     .build({
-      body: CreateUserModel,
+      body: CreateUser,
     })
     .info({
-      summary: "",
-      description: "",
+      summary: "Create a new user",
     })
     .post("/users", async ({ body }) => {
       await createUser(body.username, body.password);
-      return undefined;
+    });
+
+  router
+    .build({
+      body: CreateUser,
+    })
+    .info({
+      summary: "Delete a user",
+    })
+    .delete("/users", async ({ body }) => {
+      await deleteUser(body.username, body.password);
     });
 
   // Update the password of a user
   router
     .build({
-      body: UpdateUserModel,
+      body: UpdatePassword,
     })
     .info({
-      summary: "",
-      description: "",
+      summary: "Update the password of a user",
     })
     .put("/users", async ({ body }) => {
       await updateUser(body.username, body.oldPassword, body.newPassword);
-      return undefined;
     });
 
   //
   router
     .build({
-      body: CreateUserModel,
+      body: CreateUser,
       response: JWTResponse,
     })
     .info({
-      summary: "Get all shortened URL IDs",
+      summary: "Login a user",
+      description: "Login a user and return a JWT token",
     })
-    .post("/users/login", ({ body }) => getJWT(body.username, body.password));
+    .post("/users/login", async ({ body }) => ({
+      token: await getJWT(body.username, body.password),
+    }));
 
   //JWKS endpoint
   router
@@ -50,9 +60,9 @@ export const authenticateRouter = (tag = "authenticate") => {
       response: JWKSResponse,
     })
     .info({
-      summary: "Get JWKS",
+      summary: "Get JWKS used for JWT validation",
     })
-    .get("/get-jwks", () => getJWKS());
+    .get(".well-known/jwks.json", () => getJWKS());
 
   return router;
 };

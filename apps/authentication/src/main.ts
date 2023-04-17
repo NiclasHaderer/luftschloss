@@ -1,11 +1,21 @@
+import { KeyPairHolder } from "./app/plattform/key";
 import { apiServer } from "@luftschloss/openapi";
-import { authenticateRouter } from "./app/routes/api";
-import { generateKey } from "./app/plattform/key";
+import { authenticateRouter, docsRouter } from "./app/routes";
+import { corsMiddleware } from "@luftschloss/server";
 
 const main = async () => {
+  await new KeyPairHolder().init();
   const server = apiServer();
+  server.pipe(
+    corsMiddleware({
+      allowCredentials: true,
+      allowedHeaders: "ALL",
+      allowedMethods: "ALL",
+      allowOriginFunction: () => true,
+    })
+  );
   server.mount(authenticateRouter(), { basePath: "/" });
-  await generateKey();
-  void server.listen(3200, "0.0.0.0");
+  server.mount(docsRouter(), { basePath: "/docs" });
+  void server.listen(3300, "0.0.0.0");
 };
 void main();
