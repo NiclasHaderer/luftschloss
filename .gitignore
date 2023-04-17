@@ -39,3 +39,7 @@ testem.log
 Thumbs.db
 migrations.json
 *.db
+
+/apps/authentication/src/config
+
+*.pem
