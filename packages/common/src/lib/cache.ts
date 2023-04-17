@@ -18,7 +18,7 @@ export const Cache = ({ maxSize = 100 } = {}) => {
         cache = new Map();
         (this as any)[FUNC_CACHE_KEY] = cache;
       }
-      const cacheKey = JSON.stringify(args);
+      const cacheKey = JSON.stringify([args, propertyKey]);
       if (!cache.has(cacheKey)) {
         if (cache.size >= maxSize) {
           cache.delete(cache.keys().next().value);

@@ -2,32 +2,19 @@ import { AuthMiddleware, HTTPException, LRequest, ValidToken } from "@luftschlos
 import { Cache } from "@luftschloss/common";
 import { JWKsResponse, JWT, JwtHeader, JwtPayload } from "../models";
 import * as crypto from "crypto";
-
-const DEMO_JWKS = {
-  keys: [
-    {
-      kty: "RSA",
-      e: "AQAB",
-      use: "sig",
-      kid: "luftschloss",
-      alg: "RS256",
-      n: "lzRszUeQ4WiSqvmYxMP10ngm8ALIoUwMH7Oa8vrZgD5pqalPjetPAxeVcAv2gTyDlOwtB0fGvlQo6n78pd9pTbgrzUjhmFuYN6OCfT6eN_2wu0LmwryFS2mbh7_1DTiKd2tZaRalskPECXTKkeks85HVqanB0860BYlGvQvfgrvhCWXXFJJeXvNwYNFYdDdrFQhoeOAEvRDKg9DdHZf6XzSR6Qk3w51FKn2b7imen_G52itD_kIen1hqqB2Jwt9SWyX5MSGySY2QwC18F6Dfs8L-t0mwCo6grGW9264Z5vlO0PWssEqGIX_ez6nk1ZdHXhoXwJ0W-6QzeQlUN8jNoQ",
-    },
-  ],
-};
+import { get } from "@luftschloss/client";
 
 export class JwtMiddleware extends AuthMiddleware<JWT, string> {
-  constructor(private jwksEndpoint: string) {
+  constructor(private authService: string) {
     super();
   }
 
   @Cache()
-  public jwksResponse(): JWKsResponse {
-    return JWKsResponse.coerce(DEMO_JWKS);
-    // const jwksResponse = get(this.jwksEndpoint)
-    //   .send()
-    //   .then(r => r.json());
-    // return JWKsResponse.coerce(jwksResponse);
+  public async jwksResponse(): Promise<JWKsResponse> {
+    const jwksResponse = await get(`${this.authService}/.well-known/jwks.json`)
+      .send()
+      .then(r => r.json());
+    return JWKsResponse.coerce(jwksResponse);
   }
 
   public async extractToken(req: LRequest): Promise<JWT> {
@@ -75,12 +62,7 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
         e: key.e,
       },
     });
-    return crypto.verify(
-      "RSA-SHA256",
-      toArrayBufferView(`${header}.${payload}`),
-      publicKey,
-      toArrayBufferView(signature)
-    );
+    return crypto.verify("RSA-SHA256", Buffer.from(`${header}.${payload}`), publicKey, Buffer.from(signature));
   }
 
   public extractUserId(req: LRequest, token: JWT): Promise<string> | string {
@@ -94,7 +76,3 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
     };
   }
 }
-
-const toArrayBufferView = (str: string): Uint8Array => {
-  return new Uint8Array(new TextEncoder().encode(str));
-};

@@ -4,9 +4,10 @@ import { createUrl, deleteAllUrls, deleteUrl, getAllUrlsForUser, getUrl, updateU
 import { undefinedFactory } from "@luftschloss/validation";
 import { Status } from "@luftschloss/server";
 import { JwtMiddleware } from "../middlewares/jwt.middleware";
+import { environment } from "../../environments/environment";
 
 export const shortenerRouter = (tag = "shorten") => {
-  const securedRouter = apiRouter().tag(tag).pipe(new JwtMiddleware("TODO"));
+  const securedRouter = apiRouter().tag(tag).pipe(new JwtMiddleware(environment.authServiceUrl));
 
   // Create a new shortened URL
   securedRouter

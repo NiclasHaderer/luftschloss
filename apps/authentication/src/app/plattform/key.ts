@@ -49,6 +49,9 @@ export class KeyPairHolder {
     ) {
       await this.generateNewKeyPair();
     }
+    // Load the keys in memory
+    this.publicKey();
+    this.privateKey();
   }
 
   private async generateNewKeyPair() {

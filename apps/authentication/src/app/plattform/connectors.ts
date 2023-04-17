@@ -63,7 +63,8 @@ export async function getJWT(username: string, password: string): Promise<string
 }
 
 export async function getJWKS(): Promise<JWKsResponse> {
-  const jwk = new KeyPairHolder().jwk();
+  const keyHolder = new KeyPairHolder();
+  const jwk = keyHolder.jwk();
   return {
     keys: [jwk],
   };
