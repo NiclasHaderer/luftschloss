@@ -1,0 +1,7 @@
+{
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
+  "parserOptions": {
+    "project": ["apps/authentication/tsconfig.app.json", "apps/authentication/tsconfig.spec.json"]
+  }
+}
