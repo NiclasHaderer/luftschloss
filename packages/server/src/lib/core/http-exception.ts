@@ -34,11 +34,15 @@ export class HTTPException extends Error {
    * @param status The status this exception should correspond to
    * @returns The error wrapped in a HTTPException
    */
-  public static wrap(error: Error, status: Status | number): HTTPException {
+  public static wrap(error: unknown, status: Status | number): HTTPException {
     if (error instanceof HTTPException) return error;
 
-    const e = new HTTPException(status, error.message);
-    e.stack = error.stack;
-    return e;
+    if (error instanceof Error) {
+      const e = new HTTPException(status, error.message);
+      e.stack = error.stack;
+      return e;
+    }
+
+    return new HTTPException(status, error?.toString());
   }
 }

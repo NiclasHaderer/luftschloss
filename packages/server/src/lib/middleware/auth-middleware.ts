@@ -1,7 +1,7 @@
 import { Middleware, NextFunction } from "./middleware";
 import { HTTPException, LRequest, LResponse } from "../core";
 
-export type ValidToken = { isValid: true; reason?: never } | { isValid: false; reason: string };
+export type ValidToken = { isValid: true; reason?: string } | { isValid: false; reason: string };
 
 export abstract class AuthMiddleware<TOKEN, ID extends string | number> implements Middleware {
   readonly name = "AuthMiddleware";
