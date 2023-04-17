@@ -23,7 +23,10 @@ export class KeyPairHolder {
 
   @Cache()
   privateKeyObject() {
-    return crypto.createPrivateKey(this.privateKey());
+    return crypto.createPrivateKey({
+      key: this.privateKey(),
+      passphrase: "top secret",
+    });
   }
 
   @Cache()

@@ -28,13 +28,18 @@ export const createJWT = (username: string): string => {
     exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
   };
 
-  const headerBase64 = atob(JSON.stringify(header));
-  const payloadBase64 = atob(JSON.stringify(payload));
+  const headerBase64 = toBase64Url(JSON.stringify(header));
+  const payloadBase64 = toBase64Url(JSON.stringify(payload));
   const headerPayloadBase64 = `${headerBase64}.${payloadBase64}`;
 
   const keyPair = new KeyPairHolder();
 
-  const signature = crypto.sign("RSA256", Buffer.from(headerPayloadBase64), keyPair.privateKey());
-  const signatureBase64 = signature.toString("base64");
+  const signature = crypto.sign("RSA-SHA256", Buffer.from(headerPayloadBase64), keyPair.privateKeyObject());
+  const signatureBase64 = toBase64Url(signature);
   return `${headerPayloadBase64}.${signatureBase64}`;
+};
+
+export const toBase64Url = (str: string | Buffer): string => {
+  const base64 = Buffer.from(str).toString("base64");
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 };
