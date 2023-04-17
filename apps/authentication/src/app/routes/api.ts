@@ -1,5 +1,5 @@
 import { apiRouter } from "@luftschloss/openapi";
-import { CreateUser, JWKSResponse, JWTResponse, UpdatePassword } from "../models";
+import { CreateUser, JWKsResponse, JWTResponse, UpdatePassword } from "../models";
 import { createUser, deleteUser, getJWKS, getJWT, updateUser } from "../plattform/connectors";
 
 export const authenticateRouter = (tag = "authenticate") => {
@@ -57,7 +57,7 @@ export const authenticateRouter = (tag = "authenticate") => {
   //JWKS endpoint
   router
     .build({
-      response: JWKSResponse,
+      response: JWKsResponse,
     })
     .info({
       summary: "Get JWKS used for JWT validation",

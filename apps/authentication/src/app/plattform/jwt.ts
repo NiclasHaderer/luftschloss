@@ -1,27 +1,15 @@
 import * as crypto from "crypto";
 import { KeyPairHolder } from "./key";
-
-interface Header {
-  alg: string;
-  typ: string;
-  kid: string;
-}
-
-interface Payload {
-  sub: string;
-  iat: number;
-  iss: string;
-  exp: number;
-}
+import { JwtHeader, JwtPayload } from "../models";
 
 export const createJWT = (username: string): string => {
-  const header: Header = {
+  const header: JwtHeader = {
     alg: "RS256",
     typ: "JWT",
     kid: "luftschloss",
   };
 
-  const payload: Payload = {
+  const payload: JwtPayload = {
     sub: username,
     iat: Math.floor(Date.now() / 1000),
     iss: "luftschloss",

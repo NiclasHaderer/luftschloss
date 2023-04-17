@@ -1,9 +1,9 @@
 import { db } from "./db";
 import { HTTPException } from "@luftschloss/server";
 import { createJWT } from "./jwt";
-import { JWKSResponse } from "../models";
 import { KeyPairHolder } from "./key";
 import * as argon2 from "argon2";
+import { JWKsResponse } from "../models";
 
 /**
  * Creates a new user with username and password and store it in the database.
@@ -62,18 +62,10 @@ export async function getJWT(username: string, password: string): Promise<string
   return createJWT(username);
 }
 
-export async function getJWKS(): Promise<JWKSResponse> {
+export async function getJWKS(): Promise<JWKsResponse> {
   const jwk = new KeyPairHolder().jwk();
   return {
-    keys: [
-      {
-        kty: jwk.kty!,
-        e: jwk.e!,
-        use: "sign",
-        kid: "luftschloss",
-        n: jwk.n!,
-      },
-    ],
+    keys: [jwk],
   };
 }
 

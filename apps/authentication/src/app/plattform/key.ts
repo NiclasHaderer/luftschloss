@@ -33,11 +33,12 @@ export class KeyPairHolder {
   jwk(): JWK {
     const jwk = crypto.createPublicKey(this.publicKey()).export({ format: "jwk" });
     return {
-      kty: jwk.kty!,
+      kty: "RSA",
+      n: jwk.n!,
       e: jwk.e!,
       use: "sign",
       kid: "luftschloss",
-      n: jwk.n!,
+      alg: "RS256",
     };
   }
 
