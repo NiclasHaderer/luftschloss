@@ -62,7 +62,12 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
         e: key.e,
       },
     });
-    return crypto.verify("RSA-SHA256", Buffer.from(`${header}.${payload}`), publicKey, Buffer.from(signature));
+    return crypto.verify(
+      "RSA-SHA256",
+      Buffer.from(`${header}.${payload}`),
+      publicKey,
+      Buffer.from(signature, "base64")
+    );
   }
 
   public extractUserId(req: LRequest, token: JWT): Promise<string> | string {

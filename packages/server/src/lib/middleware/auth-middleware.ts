@@ -8,6 +8,7 @@ export abstract class AuthMiddleware<TOKEN, ID extends string | number> implemen
   readonly version = "1.0.0";
 
   async handle(next: NextFunction, req: LRequest<{ userId: string | number }>, res: LResponse): Promise<void> {
+    if (req.method === "OPTIONS") return next(req, res);
     const token = await this.extractToken(req);
     const { isValid, reason } = await this.validateToken(token);
     if (!isValid) throw new HTTPException(403, reason);
