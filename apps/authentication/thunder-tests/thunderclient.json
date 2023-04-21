@@ -70,9 +70,9 @@
     "name": "Update user password",
     "url": "http://127.0.0.1:3300/users",
     "method": "PUT",
-    "sortNum": 18750,
+    "sortNum": 15625,
     "created": "2023-04-17T15:12:00.941Z",
-    "modified": "2023-04-17T15:14:02.791Z",
+    "modified": "2023-04-21T16:39:03.007Z",
     "headers": [],
     "params": [],
     "body": {
@@ -104,12 +104,12 @@
     "method": "POST",
     "sortNum": 17500,
     "created": "2023-04-17T15:13:12.822Z",
-    "modified": "2023-04-17T15:13:49.532Z",
+    "modified": "2023-04-21T17:32:43.238Z",
     "headers": [],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-long-password\"\n}",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-long-password-2\"\n}",
       "form": []
     },
     "tests": [
@@ -118,12 +118,6 @@
         "custom": "",
         "action": "equal",
         "value": "200"
-      },
-      {
-        "type": "res-body",
-        "custom": "",
-        "action": "equal",
-        "value": ""
       }
     ]
   },
@@ -156,6 +150,437 @@
         "custom": "",
         "action": "schema",
         "value": "{ \"type\": \"object\", \"additionalProperties\": true, \"required\": [ \"keys\" ], \"properties\": { \"keys\": { \"type\": \"array\", \"items\": { \"type\": \"object\", \"additionalProperties\": true, \"required\": [ \"kty\", \"use\", \"kid\", \"n\", \"e\" ], \"properties\": { \"kty\": { \"type\": \"string\" }, \"use\": { \"type\": \"string\" }, \"kid\": { \"type\": \"string\" }, \"n\": { \"type\": \"string\" }, \"e\": { \"type\": \"string\" } } } } } }"
+      }
+    ]
+  },
+  {
+    "_id": "1e91c289-e359-4d76-a300-b3a605fe8638",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Duplicate user",
+    "url": "http://127.0.0.1:3300/users",
+    "method": "POST",
+    "sortNum": 13750,
+    "created": "2023-04-21T16:37:28.012Z",
+    "modified": "2023-04-21T16:38:44.048Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-long-password\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "409"
+      }
+    ]
+  },
+  {
+    "_id": "6962c6d4-6f42-4e9d-a4ae-5210120840e8",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Wrong user password ",
+    "url": "http://127.0.0.1:3300/users",
+    "method": "PUT",
+    "sortNum": 16562.5,
+    "created": "2023-04-21T16:40:43.630Z",
+    "modified": "2023-04-21T17:02:27.219Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"oldPassword\": \"very-wrong-password\",\n  \"newPassword\": \"very-wrong-password-\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "403"
+      }
+    ]
+  },
+  {
+    "_id": "eb9f99a7-f65e-4a11-9029-0685f0c48bce",
+    "colId": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
+    "containerId": "",
+    "name": "Failed login get user JWT",
+    "url": "http://127.0.0.1:3300/users/login",
+    "method": "POST",
+    "sortNum": 18750,
+    "created": "2023-04-21T16:52:04.614Z",
+    "modified": "2023-04-21T16:53:32.721Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\": \"user-1\",\n  \"password\": \"very-wrong-password\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "403"
+      }
+    ]
+  },
+  {
+    "_id": "c74f8b35-54d5-4b71-b5a7-e8340e55b018",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Create new Redirect",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 20000,
+    "created": "2023-04-21T17:18:26.999Z",
+    "modified": "2023-04-21T17:18:26.999Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"http://google.com/\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "201"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "schema",
+        "value": "{ \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" } } }"
+      },
+      {
+        "type": "set-env-var",
+        "custom": "json.id",
+        "action": "setto",
+        "value": "{{url_id}}"
+      }
+    ]
+  },
+  {
+    "_id": "b7728018-04c3-4318-adc8-55e52930221e",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Create new Redirect invalid url",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 30000,
+    "created": "2023-04-21T17:18:27.007Z",
+    "modified": "2023-04-21T17:18:27.007Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"invalid-url\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "f68d161d-8c17-45f3-8b73-d25e8394000c",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Create new Redirect unreachable url 1",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 35000,
+    "created": "2023-04-21T17:18:27.008Z",
+    "modified": "2023-04-21T17:18:27.008Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://www.youtube.com/29fdj44\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "49362695-6cc8-4288-b0fc-107f2c65a1c3",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Create new Redirect unreachable url 2",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 37500,
+    "created": "2023-04-21T17:18:27.009Z",
+    "modified": "2023-04-21T17:18:27.009Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"http://something.local\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "8239ed8d-dc93-4b05-9963-e90a86bb3ae5",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Get redirect",
+    "url": "http://0.0.0.0:3200/{{url_id}}",
+    "method": "GET",
+    "sortNum": 40000,
+    "created": "2023-04-21T17:18:27.010Z",
+    "modified": "2023-04-21T17:18:27.010Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "301"
+      },
+      {
+        "type": "custom-header",
+        "custom": "location",
+        "action": "istype",
+        "value": "string"
+      }
+    ]
+  },
+  {
+    "_id": "46e958a2-c524-4a56-895d-288da4ce221c",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Get redirect - invalid id length",
+    "url": "http://0.0.0.0:3200/1",
+    "method": "GET",
+    "sortNum": 42500,
+    "created": "2023-04-21T17:18:27.011Z",
+    "modified": "2023-04-21T17:18:27.011Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "58126549-a4df-4583-9d5e-8c8b5d6bdb7c",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Get non-defined redirect",
+    "url": "http://0.0.0.0:3200/12345",
+    "method": "GET",
+    "sortNum": 45000,
+    "created": "2023-04-21T17:18:27.012Z",
+    "modified": "2023-04-21T17:18:27.012Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "404"
+      }
+    ]
+  },
+  {
+    "_id": "2402cd24-2985-4f2f-9f15-0552b83a188d",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Update redirect",
+    "url": "http://0.0.0.0:3200/{{url_id}}",
+    "method": "PUT",
+    "sortNum": 50000,
+    "created": "2023-04-21T17:18:27.013Z",
+    "modified": "2023-04-21T17:18:27.013Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://google.com\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      }
+    ]
+  },
+  {
+    "_id": "ef0a6c5b-3ba9-452c-a3eb-1f50021b5f4c",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Update redirect client error",
+    "url": "http://0.0.0.0:3200/0",
+    "method": "PUT",
+    "sortNum": 50625,
+    "created": "2023-04-21T17:18:27.014Z",
+    "modified": "2023-04-21T17:18:27.014Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"invalid-url\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      }
+    ]
+  },
+  {
+    "_id": "b87e6908-0fb3-42bf-aec7-3154688b0b77",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Update non-defined redirect",
+    "url": "http://0.0.0.0:3200/12345",
+    "method": "PUT",
+    "sortNum": 51250,
+    "created": "2023-04-21T17:18:27.015Z",
+    "modified": "2023-04-21T17:18:27.015Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://google.com\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "404"
+      }
+    ]
+  },
+  {
+    "_id": "efbaf458-4421-4273-ab3a-d7e7e0861aeb",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Get all urls",
+    "url": "http://0.0.0.0:3200",
+    "method": "GET",
+    "sortNum": 56250,
+    "created": "2023-04-21T17:18:27.016Z",
+    "modified": "2023-04-21T17:18:27.016Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "schema",
+        "value": "{ \"type\": \"array\", \"items\": { \"type\": \"object\", \"additionalProperties\": true, \"required\": [\"url\", \"id\"], \"properties\": { \"url\": { \"type\": \"string\", \"format\": \"uri\" }, \"id\": { \"type\": \"string\" } } } }"
+      }
+    ]
+  },
+  {
+    "_id": "52b2df3c-3146-47e7-a795-3a6886c9d61f",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Delete url",
+    "url": "http://0.0.0.0:3200/{{url_id}}",
+    "method": "DELETE",
+    "sortNum": 60000,
+    "created": "2023-04-21T17:18:27.017Z",
+    "modified": "2023-04-21T17:18:27.017Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "204"
+      }
+    ]
+  },
+  {
+    "_id": "11112df6-93c1-4eee-ae46-65edc793fa4c",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Delete non-defined url",
+    "url": "http://0.0.0.0:3200/12345",
+    "method": "DELETE",
+    "sortNum": 70000,
+    "created": "2023-04-21T17:18:27.018Z",
+    "modified": "2023-04-21T17:18:27.018Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "404"
+      }
+    ]
+  },
+  {
+    "_id": "05668221-3ef2-4b18-a03f-51a1d6704489",
+    "colId": "9b51deae-8269-43de-92d5-bb426283e5d1",
+    "containerId": "",
+    "name": "Try delete on root",
+    "url": "http://0.0.0.0:3200",
+    "method": "DELETE",
+    "sortNum": 80000,
+    "created": "2023-04-21T17:18:27.019Z",
+    "modified": "2023-04-21T17:18:27.019Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "404"
       }
     ]
   }

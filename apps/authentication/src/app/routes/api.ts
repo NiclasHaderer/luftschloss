@@ -1,6 +1,7 @@
 import { apiRouter } from "@luftschloss/openapi";
 import { CreateUser, JWKsResponse, JWTResponse, UpdatePassword } from "../models";
 import { createUser, deleteUser, getJWKS, getJWT, updateUser } from "../plattform/connectors";
+import { Status } from "@luftschloss/server";
 
 export const authenticateRouter = (tag = "authenticate") => {
   const router = apiRouter().tag(tag);
@@ -44,7 +45,7 @@ export const authenticateRouter = (tag = "authenticate") => {
   router
     .build({
       body: CreateUser,
-      response: JWTResponse,
+      response: JWTResponse.status(Status.HTTP_200_OK),
     })
     .info({
       summary: "Login a user",
