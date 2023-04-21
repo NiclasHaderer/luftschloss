@@ -59,6 +59,7 @@ export const shortenerRouter = (tag = "shorten") => {
     })
     .get(({ request }) => getAllUrlsForUser(request.data.userId));
 
+  // Delete all shortened URLs
   securedRouter
     .build({
       response: undefinedFactory(),
