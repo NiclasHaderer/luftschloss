@@ -24,7 +24,7 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
     try {
       return await this.decodeJwt(authHeader.substring("Bearer ".length));
     } catch (e) {
-      throw HTTPException.wrap(e, 400);
+      throw HTTPException.wrap(e, 403);
     }
   }
 
@@ -42,14 +42,14 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
 
   protected async decodeJwt(jwtStr: string): Promise<JWT> {
     const jwtParts = jwtStr.split(".");
-    if (jwtParts.length !== 3) throw new HTTPException(400, "Invalid JWT format");
+    if (jwtParts.length !== 3) throw new HTTPException(403, "Invalid JWT format");
     const [header, payload, signature] = jwtParts;
     const decodedHeader = JwtHeader.tryParseString(true).coerce(atob(header));
     const decodedPayload = JwtPayload.tryParseString(true).coerce(atob(payload));
     const jwt = { header: decodedHeader, payload: decodedPayload };
     const isValid = await this.isSignatureValid(jwt, header, payload, signature);
     if (!isValid) {
-      throw new HTTPException(400, "JWT signature invalid");
+      throw new HTTPException(403, "JWT signature invalid");
     }
     return jwt;
   }
@@ -63,7 +63,7 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
     }
 
     const key = jwks.keys.find(e => e.kid === jwt.header.kid && e.alg === "RS256");
-    if (!key) throw new HTTPException(400, `No key found for kid ${jwt.header.kid}`);
+    if (!key) throw new HTTPException(403, `No key found for kid ${jwt.header.kid}`);
 
     // Create the RSA public key
     const publicKey = crypto.createPublicKey({
