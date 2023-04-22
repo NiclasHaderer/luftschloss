@@ -1,14 +1,14 @@
 [
   {
     "_id": "11a4e036-8367-4ac0-89e4-6ec4aa06f9f3",
-    "colName": "Authentication",
+    "colName": "authentication",
     "created": "2023-04-17T14:52:01.823Z",
     "sortNum": 10000,
     "folders": []
   },
   {
     "_id": "e2e881f2-9cd4-451f-ab53-ea0fdb0980b6",
-    "colName": "Url-redirect",
+    "colName": "url-redirect",
     "created": "2023-04-21T18:26:17.454Z",
     "sortNum": 15000,
     "folders": []

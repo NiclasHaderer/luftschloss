@@ -38,17 +38,23 @@ the packages and can be viewed as a showcase of the packages.
 
 ## Demonstration applications
 
-## url-shortener
-
-The application in `apps/url-shortener` is a simple url shortener application. It uses the `@luftschloss/openapi`
-package in combination
-with the `@luftschloss/server` to automatically generate an openapi spec. The `@luftschloss/client` package is used to
-verify that the urls which should be shortened actually exist and return a _successful_ status code.
-
 > :warning:
 >
 > 1. make sure that you have set _Thunder-client: Save To Workspace_ to `true` in your vscode settings
 > 2. make sure that you disable _Thunder-client: Follow Redirect_ in the thunderclient settings
+> 3. make sure you delete the `shortener.db` file and the `users.db` file before starting the application to make sure
+
+     that the database is empty
+
+## url-shortener
+
+The application in `apps/url-shortener` is a simple url shortener application. It uses the `@luftschloss/openapi`
+package in combination with the `@luftschloss/server` to automatically generate an openapi spec.
+The `@luftschloss/client` package is used to verify that the urls which should be shortened actually exist and return a
+_successful_ status code.
+
+Be aware of the fact that without a JWT you will not be able to shorten urls. Obtain an JWT by making a request to the
+authentication service. The authentication service has to be running for the url-shortener to work.
 
 ```bash
 # Start the application
@@ -58,8 +64,23 @@ npx nx serve url-shortener
 open http://127.0.0.1:3200/docs/swagger
 open http://127.0.0.1:3200/docs/stoplight
 open http://127.0.0.1:3200/docs/redoc
+```
 
-# Run the thunderclient tests using vs-code
-# Open the thunderclient application and import the thunderclient collection from the `apps/url-shortener` folder
-code apps/url-shortener
+# authentication
+
+The application in `apps/authentication` is a simple authentication application. It uses the `@luftschloss/openapi` and
+`@luftschloss/server` packages to automatically generate an openapi spec.
+
+```
+# Start the application
+npx nx serve authentication
+
+# Open the openapi spec (choose one of the following)
+open http://127.0.0.1:3300/docs/swagger
+open http://127.0.0.1:3300/docs/stoplight
+open http://127.0.0.1:3300/docs/redoc
+
+# Open vs-code and open the thunderclient extension
+# 1. Run the *authentication* collection before the *url-redirect* collection
+code apps/authentication
 ```
