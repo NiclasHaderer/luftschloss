@@ -1,5 +1,5 @@
 import { apiRouter } from "@luftschloss/openapi";
-import { CreateUser, JWKsResponse, JWTResponse, UpdatePassword } from "../models";
+import { CreateUser, JWKsResponse, JWTResponse, LoginUser, UpdatePassword } from "../models";
 import { createUser, deleteUser, getJWKS, getJWT, updateUser } from "../plattform/connectors";
 import { Status } from "@luftschloss/server";
 
@@ -20,7 +20,7 @@ export const authenticateRouter = (tag = "authenticate") => {
 
   router
     .build({
-      body: CreateUser,
+      body: LoginUser,
     })
     .info({
       summary: "Delete a user",
@@ -44,7 +44,7 @@ export const authenticateRouter = (tag = "authenticate") => {
   //
   router
     .build({
-      body: CreateUser,
+      body: LoginUser,
       response: JWTResponse.status(Status.HTTP_200_OK),
     })
     .info({
