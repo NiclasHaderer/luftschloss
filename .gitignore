@@ -43,3 +43,4 @@ migrations.json
 /apps/authentication/src/config
 
 *.pem
+package-lock.json

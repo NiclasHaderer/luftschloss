@@ -28,6 +28,18 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
     }
   }
 
+  public extractUserId(req: LRequest, token: JWT): Promise<string> | string {
+    return token.payload.sub;
+  }
+
+  public validateToken(token: JWT): ValidToken {
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    return {
+      isValid: token.payload.exp > currentTimestamp,
+      reason: "Token expired",
+    };
+  }
+
   protected async decodeJwt(jwtStr: string): Promise<JWT> {
     const jwtParts = jwtStr.split(".");
     if (jwtParts.length !== 3) throw new HTTPException(400, "Invalid JWT format");
@@ -68,16 +80,5 @@ export class JwtMiddleware extends AuthMiddleware<JWT, string> {
       publicKey,
       Buffer.from(signature, "base64")
     );
-  }
-
-  public extractUserId(req: LRequest, token: JWT): Promise<string> | string {
-    return token.payload.sub;
-  }
-
-  public validateToken(token: JWT): ValidToken {
-    return {
-      isValid: token.payload.exp < Date.now(),
-      reason: "Token expired",
-    };
   }
 }

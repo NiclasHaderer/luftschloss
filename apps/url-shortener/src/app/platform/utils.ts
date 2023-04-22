@@ -43,11 +43,11 @@ export const assertIsRightUser = async (id: string, userId: string) => {
   const { user: dbUser } = await db
     .get<{ user: string }>(
       `
-      SELECT user
-      from urls
-      where id = ?
-    `,
-      [userId]
+        SELECT user
+        from urls
+        where id = ?
+      `,
+      [id]
     )
     .then(r => r!);
   if (dbUser !== userId) throw new HTTPException(403, "Wrong user ID");

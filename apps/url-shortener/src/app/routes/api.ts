@@ -62,7 +62,7 @@ export const shortenerRouter = (tag = "shorten") => {
   // Delete all shortened URLs
   securedRouter
     .build({
-      response: undefinedFactory(),
+      response: undefinedFactory().status(404),
     })
     .info({
       summary: "Delete all shortened URLs",

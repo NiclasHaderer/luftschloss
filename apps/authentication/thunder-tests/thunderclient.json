@@ -345,7 +345,7 @@
     "method": "GET",
     "sortNum": 80000,
     "created": "2023-04-21T18:36:40.125Z",
-    "modified": "2023-04-21T19:05:14.884Z",
+    "modified": "2023-04-22T07:17:10.272Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -353,7 +353,13 @@
         "type": "res-code",
         "custom": "",
         "action": "equal",
-        "value": "200"
+        "value": "301"
+      },
+      {
+        "type": "custom-header",
+        "custom": "Location",
+        "action": "contains",
+        "value": "https://www.youtube.com/"
       }
     ]
   },
@@ -408,11 +414,11 @@
     "method": "PUT",
     "sortNum": 120000,
     "created": "2023-04-21T18:39:17.558Z",
-    "modified": "2023-04-21T19:05:27.734Z",
+    "modified": "2023-04-22T07:18:21.882Z",
     "headers": [
       {
         "name": "Authorization",
-        "value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imx1ZnRzY2hsb3NzIn0.eyJzdWIiOiJ1c2VyLTEiLCJpYXQiOjE2ODIxMDI5MzIsImlzcyI6Imx1ZnRzY2hsb3NzIiwiZXhwIjoxNjgyMTA2NTMyfQ.l-pi8N3NDhRNYfapbJDw9kGaTxCY0Un8DNyQLwmTZQZwjSwq6-eGWv9XknYy7m6yMv8pIjgevNn_WxlIeev7oGMM7C5ZxPYX1BtOGTHJ7LhFqnr-YyQh6Ui-dWWWheeSuXqinMdehIyC9Gv5AWfRZsS_WEFv2rFa6GJ98ioS3DBZRsDUuZh7QgReTQ7gT4573rhFrYFuxYcLoRSkQujaFsMQmjkpAMwWa727BZ5zHOnPp7Q7Vn7uWXLWwupJ2p_RVaOslIOx7f2b0FWGB4FI0aFq3dHe4ymri7-QBuqmWsiR7DBEc8Q8glepIwdqmHZ7Z0x1BVT0SUIqj6dP5X8mqsX7HA2nXi2gG6QU6RyNS2VcDY0_gz0FCCQ8mq5ORzTJcg379XtuD4AMR0YodV2JNtQvzRGrfchw7UGrUZ_YWj3GeaLXmC6zv7l3qFr9CgszgltPeReiqV6zlHpn9sL_dIJ0RtE4YUgVbfmhhZEBxbXn9JVsOUFfFOTLGrnoXUQIHZDVyRpIAcWK1p_0EjrvOIDfgZ8-UFiLp2_hIVqhsR5Y4GC3Eni3PuEJyVVy6v3yEJFslw8fqfWHVmIf2xFFHSEAH61sbB9d2URI3ddLqaryAyP1nuVGC7Dc-GjodZZjoPaNMf_2RPHREQAsgcEXF56mAKOcl1_cPc-8rEG58_s"
+        "value": "Bearer {{authentication.jwt}}"
       }
     ],
     "params": [],
@@ -683,6 +689,80 @@
         "custom": "",
         "action": "equal",
         "value": "403"
+      }
+    ]
+  },
+  {
+    "_id": "fad0022f-0a1a-41f5-bd42-651687da11f4",
+    "colId": "e2e881f2-9cd4-451f-ab53-ea0fdb0980b6",
+    "containerId": "",
+    "name": "Create new Redirect url - invalid JWT",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 25000,
+    "created": "2023-04-22T07:29:33.620Z",
+    "modified": "2023-04-22T07:30:21.532Z",
+    "headers": [
+      {
+        "name": "Authorization",
+        "value": "Bearer {{authentication.jwt}}d"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://www.youtube.com/\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.error",
+        "action": "equal",
+        "value": "JWT signature invalid"
+      }
+    ]
+  },
+  {
+    "_id": "da3a2191-9486-4a93-ab4f-d9ab7a10d217",
+    "colId": "e2e881f2-9cd4-451f-ab53-ea0fdb0980b6",
+    "containerId": "",
+    "name": "Create new Redirect url - expired JWT",
+    "url": "http://0.0.0.0:3200",
+    "method": "POST",
+    "sortNum": 27500,
+    "created": "2023-04-22T07:33:21.286Z",
+    "modified": "2023-04-22T07:37:45.144Z",
+    "headers": [
+      {
+        "name": "Authorization",
+        "value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imx1ZnRzY2hsb3NzIn0.eyJzdWIiOiJ1c2VyLTEiLCJpYXQiOjE2ODIxNDg3NjksImlzcyI6Imx1ZnRzY2hsb3NzIiwiZXhwIjoxNjgyMTQ0MzY5fQ.N3ia0dUID4I0snJZrpAXCAxB4tU5w5sltZ9OcRLAgbekWULx5TsD3KqJbJ_2JcyFMmchBDcazyCtoKvAiGafk08O-1Y7JhgZl29wxbIggNC2Qmlt0RsSRhmqz9YaXLXCs9Z6iDA7U7ka_DeIV0FyKuuRCksEj_rdGtGwGvWm56FfTEPHwiCYlZQBT8KhQMMWxtim6ivg_K5eSwYdlLGyrmysCkkPPbHBMroIrtXLSjAXzT_UB9OsmB_b84ohUt5_keDGRrV8A08cmGOzCVBBhjHaT9r4WWDBFtc-YxYxBntpa4kXlRpO4RbJABT3KTLigc0D0C-a36ExwpQtMkDx7YX3o9LeBqFLhrk_gAgdSUl23Dxt5Pm1qvVrYrud41IEQpFYB6EhPUTdH_fSD1sU7-p_-Yx39HfmWYDFtMuq030zDKcoqbLAlD9hwODqBh855YFWYxjej3dBole2LfBmuIXWneaarXwLzqloyeIM5bztty9G72tDK2wu8cOKk8Ok0GquE03PKtDjZFxaBIGyxnyK5brcSKhaaEK2836lKG_G-QyN-8U6EgV9KZOhtbyVXX5XXMFQL8tikF6HzKOU4s8ZDhZ7sqbzXpB8OQ2-juPtuftXS1ZDjVar8ulOBgIwISNn0XQ4rxbjZ4DU3rO3bVadPNeMkk-7Mi-rZAAT28A"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"url\": \"https://www.youtube.com/\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "403"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.error",
+        "action": "equal",
+        "value": "Token expired"
       }
     ]
   }
