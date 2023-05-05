@@ -91,7 +91,19 @@ code apps/authentication
 # Build the docker images
 nx container url-shortener
 nx container authentication
+```
 
+```bash
+# Tag the docker images
+docker tag luftschloss/url-shortener:main andfaxle/wscbs:url-shortener
+docker tag luftschloss/authentication:main andfaxle/wscbs:authentication
+
+# Push the docker images to docker hub to repo andfaxle/wscbs
+docker push andfaxle/wscbs:url-shortener
+docker push andfaxle/wscbs:authentication
+```
+
+```bach
 # Start the docker images
 docker run -p 3200:3200 luftschloss/url-shortener:main
 docker run -p 3300:3300 luftschloss/authentication:main

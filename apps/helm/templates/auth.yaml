@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: bhargavshah86/kube-test:v0.1
+          image: andfaxle/wscbs:authentication
           ports:
             - containerPort: 3300
 
