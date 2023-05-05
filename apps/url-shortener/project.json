@@ -17,6 +17,7 @@
         "target": "node",
         "compiler": "tsc"
       },
+      "defaultConfiguration": "production",
       "configurations": {
         "production": {
           "optimization": true,

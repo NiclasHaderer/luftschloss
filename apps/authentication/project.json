@@ -12,10 +12,12 @@
         "main": "apps/authentication/src/main.ts",
         "tsConfig": "apps/authentication/tsconfig.app.json",
         "assets": ["apps/authentication/src/assets"],
+        "generatePackageJson": true,
         "sourceMap": true,
         "target": "node",
         "compiler": "tsc"
       },
+      "defaultConfiguration": "production",
       "configurations": {
         "production": {
           "optimization": true,
@@ -64,6 +66,24 @@
       "options": {
         "jestConfig": "apps/authentication/jest.config.ts",
         "passWithNoTests": true
+      }
+    },
+    "container": {
+      "executor": "@nx-tools/nx-container:build",
+      "dependsOn": ["build"],
+      "options": {
+        "engine": "docker",
+        "metadata": {
+          "images": ["luftschloss/authentication"],
+          "load": true,
+          "tags": [
+            "type=schedule",
+            "type=ref,event=branch",
+            "type=ref,event=tag",
+            "type=ref,event=pr",
+            "type=sha,prefix=sha-"
+          ]
+        }
       }
     }
   },

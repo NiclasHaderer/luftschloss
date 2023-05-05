@@ -1,6 +1,7 @@
+// todo get location of auth service from env variable for kubernetes
 export const environment = {
   production: true,
-  authServiceUrl: "http://0.0.0.0:3300",
+  authServiceUrl: process.env.AUTH_SERVICE_URL,
   db: {
     name: "shortener.db",
   },

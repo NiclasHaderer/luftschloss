@@ -94,6 +94,7 @@ nx container authentication
 
 # Start the docker images
 docker run -p 3200:3200 luftschloss/url-shortener:main
+docker run -p 3300:3300 luftschloss/authentication:main
 
 # Add a new docker build target to an application
 nx g @nx-tools/nx-container:init <app-name>

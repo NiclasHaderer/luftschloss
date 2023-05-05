@@ -1,7 +1,7 @@
 export const environment = {
   keypair: {
-    publicKeyLocation: "/config/publicKey.pem",
-    privateKeyLocation: "/config/privateKey.pem",
+    publicKeyLocation: "publicKey.pem",
+    privateKeyLocation: "privateKey.pem",
   },
   db: {
     name: "users.db",
