@@ -95,12 +95,15 @@ nx container authentication
 
 ```bash
 # Tag the docker images
-docker tag luftschloss/url-shortener:main andfaxle/wscbs:url-shortener
-docker tag luftschloss/authentication:main andfaxle/wscbs:authentication
+docker tag luftschloss/url-shortener:main andfaxle/url-shortener:latest
+docker tag luftschloss/authentication:main andfaxle/authentication:latest
+```
+
+```bash
 
 # Push the docker images to docker hub to repo andfaxle/wscbs
-docker push andfaxle/wscbs:url-shortener
-docker push andfaxle/wscbs:authentication
+docker push andfaxle/url-shortener:latest
+docker push andfaxle/authentication:latest
 ```
 
 ```bash

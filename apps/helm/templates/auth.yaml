@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: andfaxle/wscbs:authentication:latest
+          image: andfaxle/authentication:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3300
