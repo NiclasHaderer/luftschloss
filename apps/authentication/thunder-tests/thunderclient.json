@@ -242,11 +242,11 @@
     "colId": "e2e881f2-9cd4-451f-ab53-ea0fdb0980b6",
     "containerId": "",
     "name": "Create new Redirect url",
-    "url": "http://0.0.0.0:3200",
+    "url": "http://145.100.135.226:30082/",
     "method": "POST",
     "sortNum": 20000,
     "created": "2023-04-21T18:26:44.862Z",
-    "modified": "2023-04-21T19:05:03.249Z",
+    "modified": "2023-05-05T13:24:59.322Z",
     "headers": [
       {
         "name": "Authorization",

@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: shortener
-          image: andfaxle/wscbs:url-shortener
+          image: andfaxle/wscbs:url-shortener:latest
+          imagePullPolicy: Always
           env:
             - name: AUTH_SERVICE_URL
               value: "http://145.100.135.226:30081"

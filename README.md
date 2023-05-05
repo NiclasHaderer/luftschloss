@@ -103,7 +103,7 @@ docker push andfaxle/wscbs:url-shortener
 docker push andfaxle/wscbs:authentication
 ```
 
-```bach
+```bash
 # Start the docker images
 docker run -p 3200:3200 luftschloss/url-shortener:main
 docker run -p 3300:3300 luftschloss/authentication:main

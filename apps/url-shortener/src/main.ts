@@ -1,8 +1,11 @@
 import { apiServer } from "@luftschloss/openapi";
 import { docsRouter, shortenerRouter } from "./app/routes";
 import { corsMiddleware } from "@luftschloss/server";
-
+import { environment } from "./environments/environment";
 const main = async () => {
+  // Log whether the server is running in production mode or not
+  console.log(`Running in ${environment.production ? "production" : "development"} mode`);
+
   const server = apiServer();
   server.pipe(
     corsMiddleware({
