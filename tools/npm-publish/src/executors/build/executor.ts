@@ -43,7 +43,7 @@ export default async function runExecutor(
   options: BuildExecutorSchema,
   context: ExecutorContext
 ): Promise<{ success: boolean }> {
-  const outDir = context.workspace.projects[context.projectName!].targets!.build.options.outputPath;
+  const outDir = context.workspace!.projects[context.projectName!].targets!.build.options.outputPath;
   const packageJson = JSON.parse(fs.readFileSync(`${outDir}/package.json`, "utf-8"));
   const npmPackageName = packageJson.name;
 

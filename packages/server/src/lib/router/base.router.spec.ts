@@ -1,5 +1,5 @@
 import { luftServer, loggerMiddleware, LRequest, LResponse, NextFunction, RouterBase } from "..";
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { testClient, TestClient } from "@luftschloss/testing";
 import SpyInstance = jest.SpyInstance;
 

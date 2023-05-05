@@ -1,5 +1,5 @@
 import { luftServer } from "../core";
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { testClient } from "@luftschloss/testing";
 import { corsMiddleware } from "./cors.middleware";
 import { Middleware } from "./middleware";

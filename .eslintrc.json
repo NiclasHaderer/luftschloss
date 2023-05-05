@@ -1,9 +1,9 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nrwl/nx"],
+  "plugins": ["@nx"],
   "rules": {
-    "@nrwl/nx/enforce-module-boundaries": [
+    "@nx/enforce-module-boundaries": [
       "error",
       {
         "enforceBuildableLibDependency": true,
@@ -36,7 +36,7 @@
       }
     ]
   },
-  "extends": ["plugin:@nrwl/nx/typescript"],
+  "extends": ["plugin:@nx/typescript"],
   "overrides": [
     {
       "files": "*.json",

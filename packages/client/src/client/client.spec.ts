@@ -1,5 +1,5 @@
 import { Readable } from "node:stream";
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { luftServer, loggerMiddleware, ServerImpl, Status } from "@luftschloss/server";
 import { luftClient } from "./client";
 import { UTF8SearchParams } from "@luftschloss/common";

@@ -1,10 +1,11 @@
 {
+  "name": "authentication",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/authentication/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/webpack:webpack",
+      "executor": "@nx/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/authentication",
@@ -36,7 +37,7 @@
       }
     },
     "serve": {
-      "executor": "@nrwl/node:node",
+      "executor": "@nx/node:node",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "authentication:build"
@@ -51,14 +52,14 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/authentication/**/*.ts"]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/authentication"],
       "options": {
         "jestConfig": "apps/authentication/jest.config.ts",
@@ -66,6 +67,5 @@
       }
     }
   },
-  "tags": [],
-  "name": "authentication"
+  "tags": []
 }
