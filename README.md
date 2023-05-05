@@ -84,3 +84,14 @@ open http://127.0.0.1:3300/docs/redoc
 # 1. Run the *authentication* collection before the *url-redirect* collection
 code apps/authentication
 ```
+
+## Build the docker images
+
+```bash
+# Build the docker images
+nx container url-shortener
+nx container authentication
+
+# Start the docker images
+docker run -p 3200:3200 luftschloss/url-shortener:main
+```

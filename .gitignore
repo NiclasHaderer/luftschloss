@@ -44,3 +44,5 @@ migrations.json
 
 *.pem
 package-lock.json
+
+.nx-container

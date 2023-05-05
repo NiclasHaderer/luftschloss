@@ -30,6 +30,8 @@
     "@nrwl/nx-plugin": "15.4.2",
     "@nrwl/web": "15.4.2",
     "@nrwl/workspace": "15.4.2",
+    "@nx-tools/container-metadata": "^4.0.3",
+    "@nx-tools/nx-container": "^4.0.3",
     "@swc-node/register": "^1.4.2",
     "@swc/cli": "~0.1.55",
     "@swc/core": "^1.2.173",

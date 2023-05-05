@@ -1,4 +1,5 @@
 {
+  "name": "url-shortener",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/url-shortener/src",
   "projectType": "application",
@@ -11,6 +12,7 @@
         "main": "apps/url-shortener/src/main.ts",
         "tsConfig": "apps/url-shortener/tsconfig.app.json",
         "assets": ["apps/url-shortener/src/assets"],
+        "generatePackageJson": true,
         "sourceMap": true,
         "target": "node",
         "compiler": "tsc"
@@ -64,8 +66,25 @@
         "jestConfig": "apps/url-shortener/jest.config.ts",
         "passWithNoTests": true
       }
+    },
+    "container": {
+      "executor": "@nx-tools/nx-container:build",
+      "dependsOn": ["build"],
+      "options": {
+        "engine": "docker",
+        "metadata": {
+          "images": ["luftschloss/url-shortener"],
+          "load": true,
+          "tags": [
+            "type=schedule",
+            "type=ref,event=branch",
+            "type=ref,event=tag",
+            "type=ref,event=pr",
+            "type=sha,prefix=sha-"
+          ]
+        }
+      }
     }
   },
-  "tags": [],
-  "name": "url-shortener"
+  "tags": []
 }
