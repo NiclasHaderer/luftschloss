@@ -34,6 +34,15 @@ spec:
         - name: auth-data
           persistentVolumeClaim:
             claimName: auth-pvc
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - kubeclass-227
 
 ---
 apiVersion: v1
