@@ -14,7 +14,11 @@ WORKDIR /usr/src/app
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=deps /usr/src/app/package.json ./package.json
 COPY dist/apps/url-shortener .
-RUN chown -R node:node .
-USER node
+# RUN chown -R node:node .
+
+# create mount folder for volume at the root of the filesystem and change the owner to node user
+# RUN mkdir /mounts && chown -R node:node /mounts
+
+# USER node
 EXPOSE 3200
 CMD ["dumb-init", "node", "main.js"]

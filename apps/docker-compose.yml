@@ -1,0 +1,32 @@
+# docker compose file for the url-shortener app
+
+services:
+  auth:
+    image: andfaxle/authentication:latest
+    ports:
+      - "3300:3300"
+    networks:
+      - url-shortener-network
+    volumes:
+      - auth-data:/auth-data
+    environment:
+      - DB_PATH=/auth-data/auth.db
+
+  shortener:
+    image: andfaxle/url-shortener:latest
+    ports:
+      - "3200:3200"
+    networks:
+      - url-shortener-network
+    volumes:
+      - shortener-data:/shortener-data
+    environment:
+      - AUTH_SERVICE_URL=http://auth:3300
+      - DB_PATH=/shortener-data/shortener.db
+
+networks:
+  url-shortener-network:
+
+volumes:
+  auth-data:
+  shortener-data:

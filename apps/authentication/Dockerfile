@@ -14,8 +14,8 @@ WORKDIR /usr/src/app
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=deps /usr/src/app/package.json ./package.json
 COPY dist/apps/authentication .
-# create a config folder for public and private keys
-RUN chown -R node:node .
-USER node
+
+# RUN chown -R node:node .
+# USER node
 EXPOSE 3300
 CMD ["dumb-init", "node", "main.js"]

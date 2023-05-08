@@ -4,7 +4,7 @@ export const environment = {
     privateKeyLocation: "privateKey.pem",
   },
   db: {
-    name: "users.db",
+    name: process.env.DB_PATH,
   },
   production: true,
 };

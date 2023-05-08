@@ -20,6 +20,16 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3300
+          volumeMounts:
+            - name: auth-data
+              mountPath: /mount
+          env:
+            - name: DB_PATH
+              value: "/mount/auth.db"
+      volumes:
+        - name: auth-data
+          persistentVolumeClaim:
+          claimName: auth-pvc
 
 ---
 apiVersion: v1
@@ -35,3 +45,15 @@ spec:
       targetPort: 3300
       nodePort: 30081
   type: NodePort
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: auth-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
