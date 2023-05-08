@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: auth
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -26,6 +26,10 @@ spec:
           env:
             - name: DB_PATH
               value: "/mount/auth.db"
+            - name: PUBLIC_KEY_PATH
+              value: "/mount/public.pem"
+            - name: PRIVATE_KEY_PATH
+              value: "/mount/private.pem"
       volumes:
         - name: auth-data
           persistentVolumeClaim:

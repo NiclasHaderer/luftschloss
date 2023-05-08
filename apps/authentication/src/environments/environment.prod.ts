@@ -1,7 +1,9 @@
+import * as process from "process";
+
 export const environment = {
   keypair: {
-    publicKeyLocation: "publicKey.pem",
-    privateKeyLocation: "privateKey.pem",
+    publicKeyLocation: process.env.PUBLIC_KEY_PATH,
+    privateKeyLocation: process.env.PRIVATE_KEY_PATH,
   },
   db: {
     name: process.env.DB_PATH,

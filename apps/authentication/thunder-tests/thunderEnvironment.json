@@ -2,7 +2,7 @@
   {
     "_id": "ff4f1cf9-554b-4f4d-a64e-a213c82677e1",
     "name": "authentication-cluster",
-    "default": false,
+    "default": true,
     "sortNum": 20000,
     "created": "2023-04-21T18:03:57.127Z",
     "modified": "2023-04-21T18:03:57.127Z",
@@ -13,7 +13,7 @@
       },
       {
         "name": "authentication.jwt",
-        "value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imx1ZnRzY2hsb3NzIn0.eyJzdWIiOiJ1c2VyLTEiLCJpYXQiOjE2ODM1NDEzMDMsImlzcyI6Imx1ZnRzY2hsb3NzIiwiZXhwIjoxNjgzNTQ0OTAzfQ.QLDh1PeQqB8vT3fAxTa3RfkX1LUO6jujQa8l7jxMoZ3jg1xe7oEEisKwwE1TaWk6KcQdVUpNbWknyowOliddlA6m_m247R6cvM27VEKBRzTpO0lVcMWyBHTYUa2rJWRNW-wBEDsjLHNFpSUl23TiB4c3q3OoQRCpyoz7V0I1TzyqREMA3xEs9KfGOb-urDAxDVvMx3zkpQclEOekBMA-ggrDEt3_p4NJSAyf0_3gmZWFUvTE_lmFHs_nmCls3ZWu5z2yTnTmjirfj-aioQkoKP0L0qSWvpAmT8uetS-HI-6WPbNbsjiZGvVQjoFlu6WumedxeJS5-9iJI2NE9F8fW1iXX1y9NB2FcnPvECzetEabp3UHF53jrxNdw2EZXX-OWV2vjl-jE42YYfCuOJMHUZrcD-xnXl5sqp12C_TJwFsFmEby9cFTILL1j6E2PTd3AEr6fAkaFDTGWqHBR9P2c6JjSzfR4sUCGr9dfcyx_69671ZIfsxrx6MuJuW__kF9IxDL_xi_quDRmQY7g7HAuA4y3U0db90yeW006xnr1eic1h_IwGjtAMcwTZK1m2UIr_xqVPA10uUu9BiDGa5obj2ejNnBq1T8LySnWg_UzGGRrntchTER-n0lKyNCp-HuzdxBfLRkXTAMU3p6EV7tDsTWT4CtOlp--TJJWQvV0w8"
+        "value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Imx1ZnRzY2hsb3NzIn0.eyJzdWIiOiJ1c2VyLTEiLCJpYXQiOjE2ODM1NTA3NTQsImlzcyI6Imx1ZnRzY2hsb3NzIiwiZXhwIjoxNjgzNTU0MzU0fQ.X7p364avvWvhCnHPSk-hIHwZGPCXzz5n9y4q6Edad6OJpVnfOMA7-SG7e19aN3rCgL8oZv7nk3kvkq7F2arESFDwIYKZlSN7w1t-LunuLuoyV4pypihd5TANzFDtbAN0ij3TWp2bxwZZsVHhEGaR42UWRhdCSx5fEE468eLnkTaZhz0S2rLMaL8sk8ugZ-d_Z_1trRXIeCkTr3UD5W8X5Ua2RJ7TL0UCcp_2prXjUoybnpd-Pr1Y_vi9KzXcZdMh0Q2fWQkF3bogISSmWe6Ympsi7MGlf0bddwcCm8dWPaSMk0NQvAOnafsfcKUu0ylYFlIE58T1W4y7mJUmMscKqv2HXBuEleFq0s7M3Q6hxGp3tIJc8z_oN90tSpSg-SA5Ee1UZhkxyPpV-VSD7WH2Q3h60AjUWdBi0qffDkI-j9f3kBzv2e8IckHwLU7SV0jd43w11oOW0kSX_AUmiAYO2AZJnYntEMY5s1kwye2ecZ7V4-XG5iDh6no7fb-hWxAQTAmtG6QQxwPnKliLxHIAlTGM_FL1jtK_w7j0aoTz3VTgqmh7csDUtpG0TBI85FmtnjJ-sIXtNhp24qddrg9ly0DWgssemBHG63woNmQutsIJfW4XVj_TpoU3-rUCZ0ji5OuGn4acnkUQY2m1nergN99C12-p4AInbuxBRhY3qKM"
       },
       {
         "name": "url_id",
@@ -36,7 +36,7 @@
   {
     "_id": "ed109fab-8473-44b2-a008-430e05b26692",
     "name": "authentication-local",
-    "default": true,
+    "default": false,
     "sortNum": 30000,
     "created": "2023-05-08T10:21:53.971Z",
     "modified": "2023-05-08T10:21:53.971Z",

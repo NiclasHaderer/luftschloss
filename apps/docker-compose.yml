@@ -11,6 +11,8 @@ services:
       - auth-data:/auth-data
     environment:
       - DB_PATH=/auth-data/auth.db
+      - PUBLIC_KEY_PATH=/auth-data/public.pem
+      - PRIVATE_KEY_PATH=/auth-data/private.pem
 
   shortener:
     image: andfaxle/url-shortener:latest
