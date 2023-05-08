@@ -472,11 +472,11 @@
     "colId": "e2e881f2-9cd4-451f-ab53-ea0fdb0980b6",
     "containerId": "",
     "name": "Update non-defined redirect",
-    "url": "{{SHORTNER_ADDRESS}}",
+    "url": "{{SHORTNER_ADDRESS}}/12345",
     "method": "PUT",
     "sortNum": 150000,
     "created": "2023-04-21T19:07:33.032Z",
-    "modified": "2023-05-08T10:14:48.357Z",
+    "modified": "2023-05-08T13:31:23.591Z",
     "headers": [
       {
         "name": "Authorization",
@@ -655,11 +655,11 @@
     "colId": "e2e881f2-9cd4-451f-ab53-ea0fdb0980b6",
     "containerId": "",
     "name": "Delete on root - missing jwt",
-    "url": "http://145.100.135.226:30082",
+    "url": "{{SHORTNER_ADDRESS}}",
     "method": "DELETE",
     "sortNum": 230000,
     "created": "2023-04-21T19:18:26.491Z",
-    "modified": "2023-05-05T14:07:28.687Z",
+    "modified": "2023-05-08T13:31:46.784Z",
     "headers": [],
     "params": [],
     "tests": [
