@@ -7,7 +7,7 @@
 import { PathValidator } from "./validator";
 
 const PathPathValidator: PathValidator<string> = {
-  name: "uuid",
+  name: "path",
   regex: /.*/,
   convert: value => value,
 };

@@ -25,7 +25,7 @@ export class StaticRouter extends RouterBase implements Router {
         allowOutsideBasePath: false,
       })
     );
-    // path.resolve has not trailing / at the end, so add it
+    // path.resolve has not trailing "/" at the end, so add it
     this.folderPath = `${path.resolve(folderPath)}${path.sep}`;
     this.routeCollector.add("{path:path}", "GET", this.handlePath.bind(this));
     this.routeCollector.add("{path:path}", "HEAD", this.handleHead.bind(this));
@@ -86,7 +86,7 @@ export class StaticRouter extends RouterBase implements Router {
   protected async handlePath(request: LRequest, response: LResponse): Promise<unknown> {
     const [exists, absPath] = await this.getFilePath(request);
 
-    // If the files has not been modified since the last request, respond with a 304
+    // If the files have not been modified since the last request, respond with a 304
     if (!(await this.hasBeenModifiedSince(request, absPath))) {
       return response.status(Status.HTTP_304_NOT_MODIFIED);
     }
@@ -108,8 +108,8 @@ export class StaticRouter extends RouterBase implements Router {
   }
 
   protected mergePaths(filePath: string): string {
-    // Simply join the strings. path.join would resolve ".." and you would be able to step out of the folder
-    return `${this.folderPath}${path.normalize(filePath)}`;
+    // Simply join the strings with path.join would resolve ".." and you would be able to step out of the folder
+    return `${this.folderPath}${path.sep}${path.normalize(filePath)}`;
   }
 }
 
