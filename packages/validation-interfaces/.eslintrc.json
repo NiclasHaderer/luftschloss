@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "../../.eslintrc.json"
+  ],
+  "ignorePatterns": [
+    "!**/*"
+  ],
+  "parserOptions": {
+    "project": [
+      "packages/validation-interfaces/tsconfig.lib.json",
+      "packages/validation-interfaces/tsconfig.spec.json"
+    ]
+  }
+}

@@ -28,7 +28,8 @@
       "@luftschloss/server": ["packages/server/src/index.ts"],
       "@luftschloss/static": ["packages/static/src/index.ts"],
       "@luftschloss/testing": ["packages/testing/src/index.ts"],
-      "@luftschloss/validation": ["packages/validation/src/index.ts"]
+      "@luftschloss/validation": ["packages/validation/src/index.ts"],
+      "@luftschloss/validation-interfaces": ["packages/validation-interfaces/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
