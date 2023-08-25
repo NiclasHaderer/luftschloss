@@ -192,7 +192,7 @@ const getParameters = (
         schema: subSchemas.root,
         in: position,
         required: !value.validationStorage.default.isSet,
-        deprecated: value.validationStorage.deprecated,
+        deprecated: value.validationStorage.deprecated.isSet,
         description: value.validationStorage.description,
       },
       subSchemas: subSchemas.named,

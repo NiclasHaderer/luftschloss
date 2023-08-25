@@ -46,7 +46,10 @@ export interface LuftValidationStorage<RETURN_TYPE = any> {
         value: RETURN_TYPE;
       }
     | { isSet: false; value: undefined };
-  deprecated: boolean;
+  deprecated: {
+    isSet: boolean;
+    message?: string;
+  };
   description: string | undefined;
   name: string | undefined;
 }
@@ -85,7 +88,10 @@ export abstract class LuftType<RETURN_TYPE = any> {
     afterValidateHooks: [],
     afterCoerceHooks: [],
     default: { isSet: false, value: undefined },
-    deprecated: false,
+    deprecated: {
+      isSet: false,
+      message: undefined,
+    },
     description: undefined,
     name: undefined,
   };
@@ -102,15 +108,11 @@ export abstract class LuftType<RETURN_TYPE = any> {
     return this;
   }
 
-  protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>;
-
-  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>;
-
   public abstract clone(): LuftType<RETURN_TYPE>;
 
-  public deprecated(deprecated: boolean): this {
+  public deprecated(deprecated: boolean, message?: string): this {
     const copy = this.clone();
-    copy.validationStorage.deprecated = deprecated;
+    copy.validationStorage.deprecated = { isSet: deprecated, message };
     return copy.beforeHook(logDeprecated) as this;
   }
 
@@ -139,53 +141,6 @@ export abstract class LuftType<RETURN_TYPE = any> {
     return this.run(data, context, false);
   }
 
-  private run(data: unknown, context: ParsingContext, skipContextValidation: boolean): ParsingResult<RETURN_TYPE> {
-    const hookAccess = ({ validate: "Validate", coerce: "Coerce" } as const)[context.mode];
-    for (const beforeHook of this.validationStorage[`before${hookAccess}Hooks`]) {
-      const result = beforeHook.call(this, data, context, this);
-
-      if (result.action === "abort") {
-        return this.checkDataAndReturn(context, { success: false }, skipContextValidation);
-      } else if (result.action === "continue") {
-        data = result.data;
-      } else if (result.action === "break") {
-        return this.checkDataAndReturn(
-          context,
-          {
-            success: true,
-            data: result.data,
-            usedValidator: this,
-          },
-          skipContextValidation
-        );
-      }
-    }
-
-    const validationResult = this[`_${context.mode}`](data, context);
-    if (!validationResult.success) return this.checkDataAndReturn(context, validationResult, skipContextValidation);
-
-    for (const afterHook of this.validationStorage[`after${hookAccess}Hooks`]) {
-      const result = afterHook.call(this, validationResult.data, context, this);
-      if (result.action === "abort") {
-        return this.checkDataAndReturn(context, { success: false }, skipContextValidation);
-      } else if (result.action === "continue") {
-        validationResult.data = result.data;
-      } else if (result.action === "break") {
-        return this.checkDataAndReturn(
-          context,
-          {
-            success: true,
-            data: result.data,
-            usedValidator: this,
-          },
-          skipContextValidation
-        );
-      }
-    }
-
-    return this.checkDataAndReturn(context, validationResult, skipContextValidation);
-  }
-
   public coerce(data: unknown): RETURN_TYPE {
     const result = this.coerceSave(data);
     if (result.success) {
@@ -197,41 +152,6 @@ export abstract class LuftType<RETURN_TYPE = any> {
   public coerceSave(data: unknown): ParsingResult<RETURN_TYPE> {
     const context = new ParsingContext("coerce");
     return this.run(data, context, false);
-  }
-
-  private checkDataAndReturn(
-    context: ParsingContext,
-    resultData: InternalParsingResult<RETURN_TYPE>,
-    skipContextValidation: boolean
-  ): ParsingResult<RETURN_TYPE> {
-    if (!skipContextValidation) {
-      // Issues, but no success
-      if (context.hasIssues && resultData.success) {
-        throw new LuftValidationUsageError(
-          "Context has issues, but the parsing result is marked as valid. Please check if your parser added issues if he returned false"
-        );
-      }
-      // No success, but also no issues
-      else if (!context.hasIssues && !resultData.success) {
-        throw new LuftValidationUsageError(
-          "Context does not have issues, but the parsing result is marked as valid. Please add issues if the result is not valid."
-        );
-      }
-    }
-
-    // Successful
-    if (resultData.success) {
-      return {
-        success: true,
-        data: resultData.data,
-        usedValidator: resultData.usedValidator,
-      };
-    }
-    // Not successful
-    return {
-      success: false,
-      issues: context.issues,
-    };
   }
 
   public optional(): LuftUnion<[this, LuftUndefined]> {
@@ -293,6 +213,92 @@ export abstract class LuftType<RETURN_TYPE = any> {
     if (!hasCb) copy.validationStorage.afterCoerceHooks.push(callback);
     return copy as this;
   }
+
+  protected abstract _validate(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>;
+
+  protected abstract _coerce(data: unknown, context: ParsingContext): InternalParsingResult<RETURN_TYPE>;
+
+  private run(data: unknown, context: ParsingContext, skipContextValidation: boolean): ParsingResult<RETURN_TYPE> {
+    const hookAccess = ({ validate: "Validate", coerce: "Coerce" } as const)[context.mode];
+    for (const beforeHook of this.validationStorage[`before${hookAccess}Hooks`]) {
+      const result = beforeHook.call(this, data, context, this);
+
+      if (result.action === "abort") {
+        return this.checkDataAndReturn(context, { success: false }, skipContextValidation);
+      } else if (result.action === "continue") {
+        data = result.data;
+      } else if (result.action === "break") {
+        return this.checkDataAndReturn(
+          context,
+          {
+            success: true,
+            data: result.data,
+            usedValidator: this,
+          },
+          skipContextValidation
+        );
+      }
+    }
+
+    const validationResult = this[`_${context.mode}`](data, context);
+    if (!validationResult.success) return this.checkDataAndReturn(context, validationResult, skipContextValidation);
+
+    for (const afterHook of this.validationStorage[`after${hookAccess}Hooks`]) {
+      const result = afterHook.call(this, validationResult.data, context, this);
+      if (result.action === "abort") {
+        return this.checkDataAndReturn(context, { success: false }, skipContextValidation);
+      } else if (result.action === "continue") {
+        validationResult.data = result.data;
+      } else if (result.action === "break") {
+        return this.checkDataAndReturn(
+          context,
+          {
+            success: true,
+            data: result.data,
+            usedValidator: this,
+          },
+          skipContextValidation
+        );
+      }
+    }
+
+    return this.checkDataAndReturn(context, validationResult, skipContextValidation);
+  }
+
+  private checkDataAndReturn(
+    context: ParsingContext,
+    resultData: InternalParsingResult<RETURN_TYPE>,
+    skipContextValidation: boolean
+  ): ParsingResult<RETURN_TYPE> {
+    if (!skipContextValidation) {
+      // Issues, but no success
+      if (context.hasIssues && resultData.success) {
+        throw new LuftValidationUsageError(
+          "Context has issues, but the parsing result is marked as valid. Please check if your parser added issues if he returned false"
+        );
+      }
+      // No success, but also no issues
+      else if (!context.hasIssues && !resultData.success) {
+        throw new LuftValidationUsageError(
+          "Context does not have issues, but the parsing result is marked as valid. Please add issues if the result is not valid."
+        );
+      }
+    }
+
+    // Successful
+    if (resultData.success) {
+      return {
+        success: true,
+        data: resultData.data,
+        usedValidator: resultData.usedValidator,
+      };
+    }
+    // Not successful
+    return {
+      success: false,
+      issues: context.issues,
+    };
+  }
 }
 
 export class LuftUndefined extends LuftType<undefined> {
@@ -341,14 +347,14 @@ export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftType<LuftI
     super();
   }
 
+  public get supportedTypes() {
+    return uniqueList(this.schema.types.flatMap(s => s.supportedTypes));
+  }
+
   public clone(): LuftUnion<T> {
     return new LuftUnion({
       types: this.schema.types.map(type => type.clone()) as unknown as T,
     }).replaceValidationStorage(deepCopy(this.validationStorage));
-  }
-
-  public get supportedTypes() {
-    return uniqueList(this.schema.types.flatMap(s => s.supportedTypes));
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<LuftInfer<T[number]>> {

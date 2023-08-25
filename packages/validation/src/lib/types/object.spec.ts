@@ -16,7 +16,10 @@ const getObjectValidator = () =>
         },
       }),
     },
-  });
+  })
+    .named("ObjectType")
+    .description("ObjectType description")
+    .deprecated(true, "IDK why");
 
 test("ObjectType: valid object", () => {
   const validator = getObjectValidator();
@@ -26,13 +29,24 @@ test("ObjectType: valid object", () => {
 });
 
 test("ObjectType: missing keys", () => {
-  const validator = getObjectValidator();
+  const validator = getObjectValidator().treatMissingKeyAs("error");
+  validator.schema.type.nested = validator.schema.type.nested.treatMissingKeyAs("error");
   const result = validator.validateSave({ hello: "hello", world: 1, nested: { hello: "nested hello" } });
   expect(result.success).toBe(false);
   const unsuccessful = result as UnsuccessfulParsingResult;
   expect(unsuccessful.issues.length).toBe(1);
   expect(unsuccessful.issues[0].code).toBe(LuftErrorCodes.MISSING_KEYS);
   expect((unsuccessful.issues[0] as MissingKeysError).missingKeys).toEqual(["world"]);
+
+  const validator2 = new LuftObject({
+    type: {
+      hello: new LuftString().optional(),
+      world: new LuftNumber().optional(),
+    },
+  });
+
+  expect(() => validator2.treatMissingKeyAs("error").coerce({})).toThrow(LuftValidationError);
+  expect(validator2.coerce({})).toEqual({ hello: undefined, world: undefined });
 });
 
 test("ObjectType: to many keys", () => {
@@ -74,18 +88,6 @@ test("ObjectType: string parsing", () => {
   });
 
   expect(() => validator.coerce("not-parsable")).toThrow(LuftValidationError);
-});
-
-test("ObjectType: missing keys", () => {
-  const validator = new LuftObject({
-    type: {
-      hello: new LuftString().optional(),
-      world: new LuftNumber().optional(),
-    },
-  });
-
-  expect(() => validator.coerce({})).toThrow(LuftValidationError);
-  expect(validator.treatMissingKeyAs("undefined").coerce({})).toEqual({ hello: undefined, world: undefined });
 });
 
 test("ObjectType: omit", () => {

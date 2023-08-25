@@ -3,7 +3,14 @@ import { LuftType } from "./base-type";
 import { getTypeOf } from "@luftschloss/common";
 
 export const logDeprecated = (data: unknown, context: ParsingContext, validator: LuftType) => {
-  console.log(`Detected deprecated usage of ${getTypeOf(validator)} at`, context.path);
+  if (!validator.validationStorage.deprecated.isSet) return { action: "continue", data } as const;
+  console.log(
+    `Detected deprecated usage of ${validator.validationStorage.name ?? getTypeOf(validator)} at`,
+    Array.isArray(context.path) ? context.path.join(".") : context.path
+  );
+  if (validator.validationStorage.deprecated.message) {
+    console.log(`Deprecation message: ${validator.validationStorage.deprecated.message}`);
+  }
   return { action: "continue", data: data } as const;
 };
 

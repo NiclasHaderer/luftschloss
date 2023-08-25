@@ -10,6 +10,7 @@ import {
 } from "./base-type";
 import { LuftString } from "./string";
 import { LuftNumber } from "./number";
+import { LuftObject } from "./object";
 
 test("BaseType: undefined", () => {
   const validator = new LuftUndefined();
@@ -147,16 +148,28 @@ test("BaseType: invalid hooks", () => {
 });
 
 test("BaseType: deprecated", () => {
-  const validator = new LuftString().deprecated(true);
-  let loggedValue;
+  const validator = new LuftString().deprecated(true, "Try using char arrays instead");
+  const loggedValues: any[] = [];
 
   // Mock console to get the error message printed to the console
   const oldLog = global.console.log;
   global.console.log = (...args: any[]) => {
-    loggedValue = args;
+    loggedValues.push(args);
   };
   expect(validator.validateSave("hello").success).toBe(true);
-  expect(loggedValue).toStrictEqual(["Detected deprecated usage of LuftString at", []]);
+  expect(loggedValues).toStrictEqual([
+    ["Detected deprecated usage of LuftString at", ""],
+    ["Deprecation message: Try using char arrays instead"],
+  ]);
+
+  loggedValues.length = 0;
+  const objectValidator = new LuftObject({
+    type: {
+      name: new LuftString().deprecated(true),
+    },
+  });
+  expect(objectValidator.validateSave({ name: "hello" }).success).toBe(true);
+  expect(loggedValues).toStrictEqual([["Detected deprecated usage of LuftString at", "name"]]);
   global.console.log = oldLog;
 });
 

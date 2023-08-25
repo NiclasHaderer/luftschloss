@@ -15,6 +15,7 @@ import {
   LuftType,
   LuftUndefined,
   LuftUnion,
+  LuftValidationStorage,
 } from "./base-type";
 
 type ExtractType<T extends Record<string, LuftType>> = {
@@ -46,12 +47,33 @@ const copyValidatorObject = <T extends Record<string, LuftType>>(object: T): T =
   return newObject as T;
 };
 
+const copyTrivialValidationStorage = (
+  object: LuftValidationStorage,
+  modifierStart: string,
+  modifierEnd: string
+): LuftValidationStorage => {
+  const name = object.name ? `${modifierStart}${object.name}${modifierEnd}` : undefined;
+  const description = object.description ? `${modifierStart}${object.description}${modifierEnd}` : undefined;
+
+  return {
+    afterValidateHooks: [],
+    afterCoerceHooks: [],
+    beforeCoerceHooks: [],
+    beforeValidateHooks: [],
+    default: { isSet: false, value: undefined },
+    // Modified
+    deprecated: object.deprecated,
+    name,
+    description,
+  };
+};
+
 export class LuftObject<T extends Record<string, LuftType>> extends LuftType<ExtractType<T>> {
   public readonly supportedTypes = ["object"];
   public schema: { type: T } & LuftObjectConstructor;
 
   public constructor({
-    treatMissingKeyAs = "error",
+    treatMissingKeyAs = "undefined",
     ignoreUnknownKeys = true,
     tryParseString = false,
     type,
@@ -95,7 +117,9 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Ext
     return new LuftObject<Pick<T, KEY>>({
       ...this.schema,
       type: finishedObject as Pick<T, KEY>,
-    });
+    }).replaceValidationStorage(
+      copyTrivialValidationStorage(this.validationStorage, "Pick<", `${keys.map(key => `'${key}'`).join(" | ")}>`)
+    );
   }
 
   public get<KEY extends keyof T & string>(key: KEY): T[KEY] {
@@ -112,7 +136,9 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Ext
     return new LuftObject<ObjectPartial<T>>({
       ...this.schema,
       type: newType as ObjectPartial<T>,
-    }).treatMissingKeyAs("undefined");
+    })
+      .treatMissingKeyAs("undefined")
+      .replaceValidationStorage(copyTrivialValidationStorage(this.validationStorage, "Partial<", ">"));
   }
 
   public clone(): LuftObject<T> {
@@ -190,7 +216,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Ext
       }
     }
 
-    // This tracks if missing tracks have already been detected
+    // This tracks if missing keys have already been detected
     // This stops the issue being added twice
     let detectedMissingKeys = false;
 
