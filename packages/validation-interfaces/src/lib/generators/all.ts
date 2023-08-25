@@ -18,10 +18,29 @@ import {
   LuftURL,
   LuftUUIDString,
 } from "@luftschloss/validation";
+import { getTypeOf } from "@luftschloss/common";
+import { getCustomInterfaceGenerator } from "../custom";
+import { generateInterfaceForNull } from "./null";
+import { generateInterfaceForUndefined } from "./undefined";
+import { generateInterfaceForInt } from "./int";
+import { generateInterfaceForNumber } from "./number";
+import { generateInterfaceForUUIDString } from "./uuid";
+import { generateInterfaceForString } from "./string";
+import { generateInterfaceForUnion } from "./union";
+import { generateInterfaceForTuple } from "./touple";
+import { generateInterfaceForNever } from "./never";
+import { generateInterfaceForLiteral } from "./literal";
+import { generateInterfaceForDate } from "./date";
+import { generateInterfaceForArray } from "./array";
+import { generateInterfaceForBool } from "./bool";
+import { generateInterfaceForRecord } from "./record";
+import { generateInterfaceForObject } from "./object";
+import { generateInterfaceForURL } from "./url";
+import { generateInterfaceForAny } from "./any";
 
-type LuftInterface =
+export type LuftInterface = (
   | {
-      named: boolean;
+      named: true;
       name: string;
       inlined: boolean;
       schema: string;
@@ -31,139 +50,108 @@ type LuftInterface =
       name?: undefined;
       inlined: true;
       schema: string;
-    };
+    }
+) & {
+  reference(): string;
+};
 
-export const generateInterfaceForNull = (type: LuftNull): LuftInterface => ({
-  named: false,
-  inlined: true,
-  schema: "null",
-});
+export type GenerateSubType = (type: LuftType) => LuftInterface;
 
-export const generateInterfaceForUndefined = (type: LuftUndefined): LuftInterface => ({
-  named: false,
-  inlined: true,
-  schema: "undefined",
-});
+export type GeneratedInterfaces = {
+  main: LuftInterface;
+  all: LuftInterface[];
+};
 
-export const generateInterfaceForInt = (type: LuftInt): LuftInterface => ({
-  named: false,
-  inlined: true,
-  schema: "int",
-});
+export const generateInterfaceFor = (type: LuftType, generateSubType?: GenerateSubType): GeneratedInterfaces => {
+  const interfaces: { main?: LuftInterface; all: LuftInterface[] } = {
+    main: undefined,
+    all: [],
+  };
 
-export const generateInterfaceForNumber = (type: LuftNumber): LuftInterface => ({
-  named: false,
-  inlined: true,
-  schema: "number",
-});
+  generateSubType =
+    generateSubType ??
+    ((type: LuftType) => {
+      const subInterfaces = generateInterfaceFor(type, generateSubType);
+      interfaces.all.push(...subInterfaces.all);
+      return subInterfaces.main;
+    });
 
-export const generateInterfaceForUUIDString = (type: LuftUUIDString): LuftInterface => ({
-  named: false,
-  inlined: true,
-  schema: "`${string}-${string}-${string}-${string}-${string}`",
-});
-
-export const generateInterfaceForString = (type: LuftString): LuftInterface => ({
-  named: false,
-  inlined: true,
-  schema: "string",
-});
-
-export const generateInterfaceForUnion = (type: LuftUnion<any>) =>
-  ({
-    named: type.validationStorage.name !== undefined,
-    name: type.validationStorage.name,
-    inlined: type.validationStorage.name !== undefined,
-    schema: type.schema.types.flatMap(generateInterfaceFor).join(" | "),
-  } as LuftInterface);
-
-export const generateInterfaceForTuple = (type: LuftTuple<any>): LuftInterface : LuftInterface  => {};
-
-export const generateInterfaceForNever = (type: LuftNever): LuftInterface  => {};
-
-export const generateInterfaceForLiteral = (type: LuftLiteral<any>): LuftInterface  => {};
-
-export const generateInterfaceForDate = (type: LuftDate): LuftInterface  => {};
-
-export const generateInterfaceForAny = (type: LuftAny): LuftInterface  => {};
-
-export const generateInterfaceForArray = (type: LuftArray<any>): LuftInterface  => {};
-
-export const generateInterfaceForBool = (type: LuftBool): LuftInterface  => {};
-
-export const generateInterfaceForRecord = (type: LuftRecord<any, any>): LuftInterface  => {};
-
-export const generateInterfaceForObject = (type: LuftObject<any>): LuftInterface  => {};
-
-export const generateInterfaceForURL = (type: LuftURL): LuftInterface  => {};
-
-export const generateInterfaceFor = (type: LuftType): LuftInterface => {
   // Null
   if (type.constructor === LuftNull) {
-    return generateInterfaceForNull(type);
+    interfaces.all.push(generateInterfaceForNull(type));
   }
   // Undefined
-  if (type.constructor === LuftUndefined) {
-    return generateInterfaceForUndefined(type);
+  else if (type.constructor === LuftUndefined) {
+    interfaces.all.push(generateInterfaceForUndefined(type));
   }
   // Int
-  if (type.constructor === LuftInt) {
-    return generateInterfaceForInt(type);
+  else if (type.constructor === LuftInt) {
+    interfaces.all.push(generateInterfaceForInt(type));
   }
   // Number
-  if (type.constructor === LuftNumber) {
-    return generateInterfaceForNumber(type);
+  else if (type.constructor === LuftNumber) {
+    interfaces.all.push(generateInterfaceForNumber(type));
   }
   // UUID
-  if (type.constructor === LuftUUIDString) {
-    return generateInterfaceForUUIDString(type);
+  else if (type.constructor === LuftUUIDString) {
+    interfaces.all.push(generateInterfaceForUUIDString(type));
   }
   // String
-  if (type.constructor === LuftString) {
-    return generateInterfaceForString(type);
+  else if (type.constructor === LuftString) {
+    interfaces.all.push(generateInterfaceForString(type));
   }
   // Union
-  if (type.constructor === LuftUnion) {
-    return generateInterfaceForUnion(type);
+  else if (type.constructor === LuftUnion) {
+    interfaces.all.push(generateInterfaceForUnion(type, generateSubType));
   }
   // Tuple
-  if (type.constructor === LuftTuple) {
-    return generateInterfaceForTuple(type);
+  else if (type.constructor === LuftTuple) {
+    interfaces.all.push(generateInterfaceForTuple(type, generateSubType));
   }
   // Never
-  if (type.constructor === LuftNever) {
-    return generateInterfaceForNever(type);
+  else if (type.constructor === LuftNever) {
+    interfaces.all.push(generateInterfaceForNever(type));
   }
   // Literal
-  if (type.constructor === LuftLiteral) {
-    return generateInterfaceForLiteral(type);
+  else if (type.constructor === LuftLiteral) {
+    interfaces.all.push(generateInterfaceForLiteral(type));
   }
   // Date
-  if (type.constructor === LuftDate) {
-    return generateInterfaceForDate(type);
+  else if (type.constructor === LuftDate) {
+    interfaces.all.push(generateInterfaceForDate(type));
   }
   // Array
-  if (type.constructor === LuftArray) {
-    return generateInterfaceForArray(type);
+  else if (type.constructor === LuftArray) {
+    interfaces.all.push(generateInterfaceForArray(type, generateSubType));
   }
   // Bool
-  if (type.constructor === LuftBool) {
-    return generateInterfaceForBool(type);
+  else if (type.constructor === LuftBool) {
+    interfaces.all.push(generateInterfaceForBool(type));
   }
   // Record
-  if (type.constructor === LuftRecord) {
-    return generateInterfaceForRecord(type);
+  else if (type.constructor === LuftRecord) {
+    interfaces.all.push(generateInterfaceForRecord(type, generateSubType));
   }
   // Object
-  if (type.constructor === LuftObject) {
-    return generateInterfaceForObject(type);
+  else if (type.constructor === LuftObject) {
+    interfaces.all.push(generateInterfaceForObject(type, generateSubType));
   }
   // URL
-  if (type.constructor === LuftURL) {
-    return generateInterfaceForURL(type);
+  else if (type.constructor === LuftURL) {
+    interfaces.all.push(generateInterfaceForURL(type));
   }
   // Any
-  if (type.constructor === LuftAny) {
-    return generateInterfaceForAny(type);
+  else if (type.constructor === LuftAny) {
+    interfaces.all.push(generateInterfaceForAny(type));
+  } else {
+    const customGenerator = getCustomInterfaceGenerator(type);
+    if (!customGenerator)
+      throw new Error(
+        `No interface generator found for ${getTypeOf(type)}. Add one yourself with \`registerInterfaceGenerator\``
+      );
+    interfaces.all.push(customGenerator(type, generateSubType));
   }
+  interfaces.main = interfaces.all.at(-1);
+
+  return interfaces as GeneratedInterfaces;
 };
