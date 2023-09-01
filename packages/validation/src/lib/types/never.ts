@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { InternalParsingResult, LuftType } from "./base-type";
+import { InternalParsingResult, LuftType } from "./base-types";
 import { createInvalidTypeIssue } from "../helpers";
 import { ParsingContext } from "../parsing-context";
 import { deepCopy } from "@luftschloss/common";

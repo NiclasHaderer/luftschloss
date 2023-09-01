@@ -7,7 +7,7 @@
 import { CaseInsensitiveSet, deepCopy } from "@luftschloss/common";
 import { ParsingContext } from "../parsing-context";
 import { LuftErrorCodes } from "../validation-error";
-import { InternalParsingResult, LuftType } from "./base-type";
+import { InternalParsingResult, LuftType } from "./base-types";
 
 export class LuftLiteral<T extends ReadonlyArray<string | number | boolean>> extends LuftType<T[number]> {
   private nonSensitiveSchema: CaseInsensitiveSet<T[number]>;

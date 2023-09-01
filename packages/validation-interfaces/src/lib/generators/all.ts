@@ -4,6 +4,7 @@ import {
   LuftBool,
   LuftDate,
   LuftInt,
+  LuftLazy,
   LuftLiteral,
   LuftNever,
   LuftNull,
@@ -37,6 +38,7 @@ import { generateInterfaceForRecord } from "./record";
 import { generateInterfaceForObject } from "./object";
 import { generateInterfaceForURL } from "./url";
 import { generateInterfaceForAny } from "./any";
+import { generateInterfaceForLazy } from "./lazy";
 
 export type LuftInterface = (
   | {
@@ -139,6 +141,10 @@ export const generateInterfaceFor = (type: LuftType, generateSubType?: GenerateS
   // URL
   else if (type.constructor === LuftURL) {
     interfaces.all.push(generateInterfaceForURL(type));
+  }
+  // Lazy
+  else if (type.constructor === LuftLazy) {
+    interfaces.all.push(generateInterfaceForLazy(type, generateSubType));
   }
   // Any
   else if (type.constructor === LuftAny) {

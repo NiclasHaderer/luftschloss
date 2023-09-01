@@ -1,5 +1,5 @@
 import { AdditionalKeysError, LuftErrorCodes, LuftValidationError, MissingKeysError } from "../validation-error";
-import { UnsuccessfulParsingResult } from "./base-type";
+import { UnsuccessfulParsingResult } from "./base-types";
 import { LuftNumber } from "./number";
 import { LuftObject } from "./object";
 import { LuftString } from "./string";
@@ -147,4 +147,14 @@ test("ObjectType: extend", () => {
   );
 
   expect(validator.validate({ newKey: "newKey" })).toEqual({ newKey: "newKey" });
+});
+
+test("ObjectType: null instead of undefined", () => {
+  const validator = new LuftObject({
+    type: {
+      hello: new LuftString().optional(),
+    },
+  });
+
+  expect(validator.validateSave({ hello: null }).success).toBe(false);
 });

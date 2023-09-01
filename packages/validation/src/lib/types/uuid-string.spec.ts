@@ -5,7 +5,7 @@
  */
 
 import { LuftUUIDString } from "./uuid-string";
-import { UnsuccessfulParsingResult } from "./base-type";
+import { UnsuccessfulParsingResult } from "./base-types";
 import { InvalidTypeError, LuftErrorCodes } from "../validation-error";
 
 test("UUIDType: validation", () => {

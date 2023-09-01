@@ -5,6 +5,6 @@ import { GenerateSubType, LuftInterface } from "./all";
 export const generateInterfaceForObject = (type: LuftObject<any>, generateSubType: GenerateSubType): LuftInterface =>
   interfaceWithName(type, {
     schema: `{ ${Object.entries(type.schema)
-      .map(([key, value]) => `${key}: ${value.reference()}`)
+      .map(([key, value]) => `${key}: ${generateSubType(value).reference()}`)
       .join(", ")} }`,
   });

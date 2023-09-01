@@ -1,4 +1,4 @@
-import { InternalParsingResult, LuftType } from "./base-type";
+import { InternalParsingResult, LuftType } from "./base-types";
 import { ParsingContext } from "../parsing-context";
 import { createInvalidTypeIssue } from "../helpers";
 import { deepCopy } from "@luftschloss/common";

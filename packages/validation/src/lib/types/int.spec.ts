@@ -1,5 +1,5 @@
 import { LuftInt } from "./int";
-import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type";
+import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-types";
 import { InvalidTypeError, LuftErrorCodes, LuftValidationError } from "../validation-error";
 
 test("IntType: float", () => {

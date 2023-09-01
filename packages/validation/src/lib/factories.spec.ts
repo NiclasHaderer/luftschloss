@@ -5,6 +5,7 @@ import {
   LuftBool,
   LuftDate,
   LuftInt,
+  LuftLazy,
   LuftLiteral,
   LuftNever,
   LuftNumber,
@@ -35,4 +36,8 @@ test("LuftFactories: different factories return the same as the default construc
     new LuftTuple({ types: [new LuftString(), new LuftNumber()] })
   );
   expect(luft.uuid()).toStrictEqual(new LuftUUIDString());
+
+  const lazy = luft.lazy(() => luft.string());
+  expect(lazy.constructor).toBe(LuftLazy);
+  expect(lazy.schema.typeFactory().constructor).toBe(LuftString);
 });

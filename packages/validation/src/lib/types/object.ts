@@ -16,7 +16,7 @@ import {
   LuftUndefined,
   LuftUnion,
   LuftValidationStorage,
-} from "./base-type";
+} from "./base-types";
 
 type ExtractType<T extends Record<string, LuftType>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>;

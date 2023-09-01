@@ -7,7 +7,7 @@ import {
   LuftUnion,
   SuccessfulParsingResult,
   UnsuccessfulParsingResult,
-} from "./base-type";
+} from "./base-types";
 import { LuftString } from "./string";
 import { LuftNumber } from "./number";
 import { LuftObject } from "./object";

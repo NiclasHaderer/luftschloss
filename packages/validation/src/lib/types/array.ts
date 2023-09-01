@@ -7,7 +7,7 @@
 import { createInvalidTypeIssue } from "../helpers";
 import { ParsingContext } from "../parsing-context";
 import { LuftErrorCodes } from "../validation-error";
-import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType } from "./base-type";
+import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType } from "./base-types";
 import { deepCopy } from "@luftschloss/common";
 
 type LuftArrayConstructor = {

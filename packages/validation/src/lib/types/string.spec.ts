@@ -1,5 +1,5 @@
 import { LuftString } from "./string";
-import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-type";
+import { SuccessfulParsingResult, UnsuccessfulParsingResult } from "./base-types";
 import { InvalidLengthError, InvalidTypeError, LuftErrorCodes } from "../validation-error";
 
 test("StringType: validation", () => {

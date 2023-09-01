@@ -4,6 +4,7 @@ import {
   LuftBool,
   LuftDate,
   LuftInt,
+  LuftLazy,
   LuftLiteral,
   LuftNever,
   LuftNull,
@@ -17,8 +18,8 @@ import {
   LuftType,
   LuftUndefined,
   LuftUnion,
-  LuftUUIDString,
   LuftURL,
+  LuftUUIDString,
 } from "./types";
 
 export const any = () => new LuftAny();
@@ -27,6 +28,7 @@ export const bool = () => new LuftBool();
 export const date = () => new LuftDate();
 export const url = () => new LuftURL();
 export const int = () => new LuftInt();
+export const lazy = <T>(factory: () => LuftType<T>) => new LuftLazy<T>(factory);
 export const literal = <T extends string | number | boolean>(types: ReadonlyArray<T>) => new LuftLiteral({ types });
 export const never = () => new LuftNever();
 export const nullFactory = () => new LuftNull();
@@ -49,6 +51,7 @@ export const luft = {
   array,
   bool,
   date,
+  lazy,
   int,
   literal,
   never,

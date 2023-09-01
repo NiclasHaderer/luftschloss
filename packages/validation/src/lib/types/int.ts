@@ -6,7 +6,7 @@
 
 import { createInvalidTypeIssue } from "../helpers";
 import { ParsingContext } from "../parsing-context";
-import { InternalParsingResult } from "./base-type";
+import { InternalParsingResult } from "./base-types";
 import { LuftNumber, LuftNumberSchema } from "./number";
 import { deepCopy } from "@luftschloss/common";
 

@@ -8,7 +8,7 @@ import { deepCopy, saveObject } from "@luftschloss/common";
 import { createInvalidTypeIssue } from "../helpers";
 import { ParsingContext } from "../parsing-context";
 import { LuftErrorCodes } from "../validation-error";
-import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType, LuftUnion } from "./base-type";
+import { InternalLuftBaseType, InternalParsingResult, LuftInfer, LuftType, LuftUnion } from "./base-types";
 import { LuftNumber } from "./number";
 import { LuftRegex } from "./regexp";
 import { LuftString } from "./string";

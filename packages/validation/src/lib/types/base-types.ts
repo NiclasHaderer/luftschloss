@@ -4,11 +4,11 @@
  * MIT Licensed
  */
 
-import { deepCopy, getTypeOf, uniqueList } from "@luftschloss/common";
-import { createInvalidTypeIssue } from "../helpers";
 import { ParsingContext } from "../parsing-context";
 import { LuftErrorCodes, LuftValidationError, LuftValidationUsageError, ValidationError } from "../validation-error";
 import { logDeprecated, returnDefault } from "./base-validation-functions";
+import { deepCopy, getTypeOf, uniqueList } from "@luftschloss/common";
+import { createInvalidTypeIssue } from "../helpers";
 
 export type LuftInfer<T extends LuftType | LuftType<never>> = T extends LuftType<infer U> ? U : never;
 
@@ -301,46 +301,7 @@ export abstract class LuftType<RETURN_TYPE = any> {
   }
 }
 
-export class LuftUndefined extends LuftType<undefined> {
-  public readonly schema = {};
-
-  public supportedTypes = ["undefined"];
-
-  public clone(): LuftUndefined {
-    return new LuftUndefined().replaceValidationStorage(deepCopy(this.validationStorage));
-  }
-
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
-    if (data === null) return { success: true, data: undefined, usedValidator: this };
-    return this._validate(data, context);
-  }
-
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
-    if (data === undefined) return { success: true, data, usedValidator: this };
-    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
-    return { success: false };
-  }
-}
-
-export class LuftNull extends LuftType<null> {
-  public supportedTypes = ["null"];
-  public readonly schema = {};
-
-  public clone(): LuftNull {
-    return new LuftNull().replaceValidationStorage(deepCopy(this.validationStorage));
-  }
-
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
-    if (data === undefined) return { success: true, data: null, usedValidator: this };
-    return this._validate(data, context);
-  }
-
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<null> {
-    if (data === null) return { success: true, data, usedValidator: this };
-    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
-    return { success: false };
-  }
-}
+/***********************************************************************************************************************/
 
 export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftType<LuftInfer<T[number]>> {
   public constructor(public readonly schema: { types: T }) {
@@ -387,6 +348,51 @@ export class LuftUnion<T extends ReadonlyArray<LuftType>> extends LuftType<LuftI
       errors: newErrors,
     });
 
+    return { success: false };
+  }
+}
+
+/***********************************************************************************************************************/
+
+export class LuftNull extends LuftType<null> {
+  public supportedTypes = ["null"];
+  public readonly schema = {};
+
+  public clone(): LuftNull {
+    return new LuftNull().replaceValidationStorage(deepCopy(this.validationStorage));
+  }
+
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<null> {
+    if (data === undefined) return { success: true, data: null, usedValidator: this };
+    return this._validate(data, context);
+  }
+
+  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<null> {
+    if (data === null) return { success: true, data, usedValidator: this };
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
+    return { success: false };
+  }
+}
+
+/***********************************************************************************************************************/
+
+export class LuftUndefined extends LuftType<undefined> {
+  public readonly schema = {};
+
+  public supportedTypes = ["undefined"];
+
+  public clone(): LuftUndefined {
+    return new LuftUndefined().replaceValidationStorage(deepCopy(this.validationStorage));
+  }
+
+  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
+    if (data === null) return { success: true, data: undefined, usedValidator: this };
+    return this._validate(data, context);
+  }
+
+  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<undefined> {
+    if (data === undefined) return { success: true, data, usedValidator: this };
+    context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
     return { success: false };
   }
 }

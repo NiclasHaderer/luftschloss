@@ -1,5 +1,5 @@
 import { ParsingContext } from "../parsing-context";
-import { LuftType } from "./base-type";
+import { LuftType } from "./base-types";
 import { getTypeOf } from "@luftschloss/common";
 
 export const logDeprecated = (data: unknown, context: ParsingContext, validator: LuftType) => {

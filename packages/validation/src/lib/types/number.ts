@@ -7,7 +7,7 @@
 import { createInvalidTypeIssue } from "../helpers";
 import { ParsingContext } from "../parsing-context";
 import { LuftErrorCodes } from "../validation-error";
-import { InternalParsingResult, LuftType } from "./base-type";
+import { InternalParsingResult, LuftType } from "./base-types";
 import { deepCopy, floatSafeModulo } from "@luftschloss/common";
 
 export type LuftNumberSchema = {

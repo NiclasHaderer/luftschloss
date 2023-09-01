@@ -1,4 +1,4 @@
-import { LuftInfer, SuccessfulParsingResult } from "./base-type";
+import { LuftInfer, SuccessfulParsingResult } from "./base-types";
 import { LuftNumber } from "./number";
 import { LuftValidationError } from "../validation-error";
 
