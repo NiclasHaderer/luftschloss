@@ -18,7 +18,7 @@ import {
   LuftValidationStorage,
 } from "./base-types";
 
-type ExtractType<T extends Record<string, LuftType>> = {
+export type InferObjectType<T extends Record<string, LuftType>> = {
   [KEY in keyof T]: LuftInfer<T[KEY]>;
 };
 
@@ -68,9 +68,11 @@ const copyTrivialValidationStorage = (
   };
 };
 
-export class LuftObject<T extends Record<string, LuftType>> extends LuftType<ExtractType<T>> {
+export class LuftObject<T extends Record<string, LuftType>> extends LuftType<InferObjectType<T>> {
   public readonly supportedTypes = ["object"];
-  public schema: { type: T } & LuftObjectConstructor;
+  public schema: {
+    type: T;
+  } & LuftObjectConstructor;
 
   public constructor({
     treatMissingKeyAs = "undefined",
@@ -170,7 +172,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Ext
     return newValidator;
   }
 
-  protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<ExtractType<T>> {
+  protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<InferObjectType<T>> {
     if (this.schema.tryParseString && typeof data === "string") {
       try {
         data = JSON.parse(data);
@@ -187,7 +189,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Ext
     return this._validate(data, context);
   }
 
-  protected override _validate(data: unknown, context: ParsingContext): InternalParsingResult<ExtractType<T>> {
+  protected override _validate(data: unknown, context: ParsingContext): InternalParsingResult<InferObjectType<T>> {
     // Wrong type
     if (typeof data !== "object" || data === null) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
@@ -221,7 +223,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Ext
     let detectedMissingKeys = false;
 
     // The object for the new data
-    const parsedObject = saveObject<ExtractType<T>>();
+    const parsedObject = saveObject<InferObjectType<T>>();
     // Iterate over the schema
     for (const [key, validator] of Object.entries(this.schema.type)) {
       // The key is not in the data and missingKeys should be treated as error and not as undefined
