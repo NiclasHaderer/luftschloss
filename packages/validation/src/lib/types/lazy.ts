@@ -1,8 +1,10 @@
 import { InternalLuftBaseType, InternalParsingResult, LuftType } from "./base-types";
 import { ParsingContext } from "../parsing-context";
 
-export class LuftLazy<T = unknown> extends LuftType<T> {
-  public override readonly schema: { typeFactory: () => LuftType<T> };
+export class LuftLazy<T> extends LuftType<T> {
+  public override readonly schema: {
+    typeFactory: () => LuftType<T>;
+  };
 
   constructor(typeFactory: () => LuftType<T>) {
     super();

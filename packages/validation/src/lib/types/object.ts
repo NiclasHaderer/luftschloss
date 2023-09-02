@@ -17,12 +17,13 @@ import {
   LuftUnion,
   LuftValidationStorage,
 } from "./base-types";
+import type { LuftLazy } from "./lazy";
 
 export type InferObjectType<T extends Record<string, LuftType>> = {
-  [KEY in keyof T]: LuftInfer<T[KEY]>;
+  [KEY in keyof T]: T[KEY] extends LuftLazy<infer L> ? L : LuftInfer<T[KEY]>;
 };
 
-type ObjectPartial<T extends Record<string, LuftType>> = {
+type LuftPartial<T extends Record<string, LuftType>> = {
   [KEY in keyof T]: LuftUnion<[LuftUndefined, T[KEY]]>;
 };
 
@@ -128,16 +129,16 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Inf
     return this.schema.type[key].clone() as T[KEY];
   }
 
-  public partial(): LuftObject<ObjectPartial<T>> {
+  public partial(): LuftObject<LuftPartial<T>> {
     const type = this.schema.type;
     const newType = Object.keys(this.schema.type).reduce((acc, key) => {
       acc[key] = type[key].optional();
       return acc;
     }, saveObject<Record<string, LuftType>>());
 
-    return new LuftObject<ObjectPartial<T>>({
+    return new LuftObject<LuftPartial<T>>({
       ...this.schema,
-      type: newType as ObjectPartial<T>,
+      type: newType as LuftPartial<T>,
     })
       .treatMissingKeyAs("undefined")
       .replaceValidationStorage(copyTrivialValidationStorage(this.validationStorage, "Partial<", ">"));
