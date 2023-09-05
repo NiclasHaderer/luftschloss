@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-import { deepCopy, isArray } from "@luftschloss/common";
+import { deepCopy } from "@luftschloss/common";
 import { createInvalidTypeIssue } from "../helpers";
 import { ParsingContext } from "../parsing-context";
 import { LuftErrorCodes } from "../validation-error";
@@ -75,7 +75,7 @@ export class LuftTuple<T extends ReadonlyArray<LuftType>> extends LuftType<Extra
     context: ParsingContext,
     mode: "_validate" | "_coerce" = "_validate"
   ): InternalParsingResult<ExtractType<T>> {
-    if (!isArray(data)) {
+    if (!Array.isArray(data)) {
       context.addIssue(createInvalidTypeIssue(data, this.supportedTypes, context));
       return { success: false };
     }

@@ -1,6 +1,5 @@
 import { Headers } from "./headers";
-import http from "node:http";
-import { Buffer } from "node:buffer";
+import type http from "node:http";
 
 export const satisfiesContentLength = (headers: Headers, maxBodySize: number): boolean => {
   const length = parseInt(headers.get("Content-Length") || "0");

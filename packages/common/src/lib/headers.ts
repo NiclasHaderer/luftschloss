@@ -5,12 +5,13 @@
  */
 
 import { saveObject } from "./utils";
-import { IncomingHttpHeaders } from "http";
+
+type IncomingHttpHeaders = string | string[] | undefined;
 
 export class Headers {
   private headers = new Map<string, Set<string>>();
 
-  public static create(nodeHeaders: IncomingHttpHeaders): Headers {
+  public static create(nodeHeaders: Record<string, IncomingHttpHeaders>): Headers {
     const headers = new Headers();
     for (const [name, value] of Object.entries(nodeHeaders) as [string, string][]) {
       headers.append(name, value);

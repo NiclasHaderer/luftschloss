@@ -1,4 +1,3 @@
-import { isArray } from "@luftschloss/common";
 import { luft } from "@luftschloss/validation";
 import { mockAll } from "./types/all";
 
@@ -14,7 +13,7 @@ test("Mocking: array generation 1", () => {
   const validator = luft.array(luft.bool()).maxLength(10).minLength(5);
   for (let i = 0; i < 100; i++) {
     const result = mockAll(validator);
-    expect(isArray(result)).toBe(true);
+    expect(Array.isArray(result)).toBe(true);
     expect(result.length >= 5).toBe(true);
     expect(result.length <= 10).toBe(true);
     expect(result.every(item => typeof item === "boolean")).toBe(true);

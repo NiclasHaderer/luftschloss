@@ -1,9 +1,7 @@
-import { isArray } from "./utils";
-
 export const getTypeOf = (value: unknown) => {
   const type = typeof value;
   if (type === "object") {
-    if (isArray(value)) return "array" as const;
+    if (Array.isArray(value)) return "array" as const;
     if (value === null) return "null" as const;
     if ((value as object).constructor.name === "Object") return "object" as const;
     return (value as object).constructor.name;

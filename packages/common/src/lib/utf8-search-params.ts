@@ -5,7 +5,6 @@
  */
 
 import { saveObject } from "./utils";
-import { URLSearchParams } from "url";
 
 const UTF_8_SYMBOL = Symbol("UTF_8_SYMBOL");
 
