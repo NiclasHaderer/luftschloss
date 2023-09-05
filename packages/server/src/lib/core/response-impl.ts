@@ -13,7 +13,6 @@ import type { LRequest } from "./request";
 
 import type { LResponse } from "./response";
 import { Status, toStatus } from "./status";
-import { URLSearchParams } from "url";
 
 const NOT_COMPLETED = Symbol("NOT_COMPLETED");
 
