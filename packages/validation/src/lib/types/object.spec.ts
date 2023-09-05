@@ -158,3 +158,18 @@ test("ObjectType: null instead of undefined", () => {
 
   expect(validator.validateSave({ hello: null }).success).toBe(false);
 });
+
+test("ObjectType: check if undefined is left out", () => {
+  const validator1 = new LuftObject({
+    type: {
+      hello: new LuftString().optional(),
+    },
+  });
+
+  const data1 = validator1.validate({});
+  expect(data1).toStrictEqual({});
+
+  const validator2 = validator1.omitUndefinedKeys(false);
+  const data2 = validator2.validate({});
+  expect(data2).toStrictEqual({ hello: undefined });
+});

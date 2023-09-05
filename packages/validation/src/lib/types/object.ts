@@ -30,6 +30,7 @@ type LuftPartial<T extends Record<string, LuftType>> = {
 type LuftObjectConstructor = {
   treatMissingKeyAs: "error" | "undefined";
   ignoreUnknownKeys: boolean;
+  omitUndefinedKeys: boolean;
   tryParseString: boolean;
 };
 
@@ -77,6 +78,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Inf
 
   public constructor({
     treatMissingKeyAs = "undefined",
+    omitUndefinedKeys = true,
     ignoreUnknownKeys = true,
     tryParseString = false,
     type,
@@ -86,6 +88,7 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Inf
     super();
     this.schema = {
       treatMissingKeyAs,
+      omitUndefinedKeys,
       ignoreUnknownKeys,
       type,
       tryParseString,
@@ -164,6 +167,12 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Inf
   public treatMissingKeyAs(treatAs: "error" | "undefined"): LuftObject<T> {
     const newValidator = this.clone();
     newValidator.schema.treatMissingKeyAs = treatAs;
+    return newValidator;
+  }
+
+  public omitUndefinedKeys(omit: boolean): LuftObject<T> {
+    const newValidator = this.clone();
+    newValidator.schema.omitUndefinedKeys = omit;
     return newValidator;
   }
 
@@ -254,7 +263,10 @@ export class LuftObject<T extends Record<string, LuftType>> extends LuftType<Inf
       context.stepOut();
 
       if (result.success) {
-        // Save the (potentially) coerced value in the new object
+        // Skip undefined values if the schema says so
+        if (this.schema.omitUndefinedKeys && result.data === undefined) continue;
+
+        // Save the (potentially) validated value in the new object
         (parsedObject as Record<string, unknown>)[key] = result.data;
       } else {
         failAtEnd = true;
