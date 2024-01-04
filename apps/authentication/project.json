@@ -15,7 +15,8 @@
         "generatePackageJson": true,
         "sourceMap": true,
         "target": "node",
-        "compiler": "tsc"
+        "compiler": "tsc",
+        "webpackConfig": "apps/authentication/webpack.config.js"
       },
       "defaultConfiguration": "production",
       "configurations": {
@@ -39,7 +40,7 @@
       }
     },
     "serve": {
-      "executor": "@nx/node:node",
+      "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "authentication:build"
@@ -54,18 +55,14 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/authentication/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/authentication"],
       "options": {
-        "jestConfig": "apps/authentication/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/authentication/jest.config.ts"
       }
     },
     "container": {

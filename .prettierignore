@@ -5,3 +5,5 @@
 **/tmp
 *.lock
 apps/url-shortener/thunder-tests
+
+/.nx/cache

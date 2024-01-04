@@ -46,3 +46,5 @@ migrations.json
 package-lock.json
 
 .nx-container
+
+.nx/cache

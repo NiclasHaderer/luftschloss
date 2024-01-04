@@ -26,18 +26,14 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["packages/openapi-schema/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/packages/openapi-schema"],
       "options": {
-        "jestConfig": "packages/openapi-schema/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "packages/openapi-schema/jest.config.ts"
       }
     },
     "version": {

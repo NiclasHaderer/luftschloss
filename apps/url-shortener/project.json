@@ -15,7 +15,8 @@
         "generatePackageJson": true,
         "sourceMap": true,
         "target": "node",
-        "compiler": "tsc"
+        "compiler": "tsc",
+        "webpackConfig": "apps/url-shortener/webpack.config.js"
       },
       "defaultConfiguration": "production",
       "configurations": {
@@ -39,7 +40,7 @@
       }
     },
     "serve": {
-      "executor": "@nx/node:node",
+      "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "url-shortener:build"
@@ -54,18 +55,14 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/url-shortener/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/url-shortener"],
       "options": {
-        "jestConfig": "apps/url-shortener/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/url-shortener/jest.config.ts"
       }
     },
     "container": {

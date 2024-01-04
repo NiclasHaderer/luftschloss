@@ -1,6 +1,6 @@
 {
   "extends": ["../../.eslintrc.json"],
-  "ignorePatterns": ["!**/*"],
+  "ignorePatterns": ["!**/*", "*.json"],
   "parserOptions": {
     "project": ["packages/openapi-schema/tsconfig.lib.json", "packages/openapi-schema/tsconfig.spec.json"]
   }

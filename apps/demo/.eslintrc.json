@@ -1,6 +1,6 @@
 {
   "extends": ["../../.eslintrc.json"],
-  "ignorePatterns": ["!**/*"],
+  "ignorePatterns": ["!**/*", "*.json", "webpack.config.js"],
   "parserOptions": {
     "project": ["apps/demo/tsconfig.app.json", "apps/demo/tsconfig.spec.json"]
   }

@@ -27,18 +27,14 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["packages/validation/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/packages/validation"],
       "options": {
-        "jestConfig": "packages/validation/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "packages/validation/jest.config.ts"
       }
     },
     "version": {

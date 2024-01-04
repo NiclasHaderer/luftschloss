@@ -27,18 +27,14 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["packages/proxy/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/packages/proxy"],
       "options": {
-        "jestConfig": "packages/proxy/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "packages/proxy/jest.config.ts"
       }
     },
     "version": {
