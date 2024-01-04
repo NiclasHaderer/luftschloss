@@ -11,7 +11,7 @@ yarn install
 
 
 # Build all projects and apps
-npx nx affected:build --all
+npx nx run-many -t build --all
 ```
 
 ## Structure of the repository
