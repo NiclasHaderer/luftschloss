@@ -44,15 +44,7 @@ export class ResponseImpl implements LResponse {
     return this;
   }
 
-  public form(
-    data:
-      | UTF8SearchParams
-      | URLSearchParams
-      | string
-      | Record<string, string | ReadonlyArray<string>>
-      | Iterable<[string, string]>
-      | ReadonlyArray<[string, string]>
-  ): this {
+  public form(data: ConstructorParameters<typeof URLSearchParams>[0]): this {
     this.headers.append("Content-Type", "application/x-www-form-urlencoded");
     if (data instanceof UTF8SearchParams || data instanceof URLSearchParams) {
       this.data = data.toString();

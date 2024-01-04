@@ -3,7 +3,7 @@
  * Copyright (c) 2022. Niclas
  * MIT Licensed
  */
-import { CustomPropertyDescriptor, Func, Headers, UTF8SearchParams } from "@luftschloss/common";
+import { CustomPropertyDescriptor, Func, Headers } from "@luftschloss/common";
 import { ReadStream } from "fs";
 import { ServerResponse } from "http";
 import { LRequest } from "./request";
@@ -26,15 +26,7 @@ export interface LResponse {
 
   json(object: object | string | null | boolean): this;
 
-  form(
-    data:
-      | UTF8SearchParams
-      | URLSearchParams
-      | string
-      | Record<string, string | ReadonlyArray<string>>
-      | Iterable<[string, string]>
-      | ReadonlyArray<[string, string]>
-  ): this;
+  form(data: ConstructorParameters<typeof URLSearchParams>[0]): this;
 
   redirect(
     url: string | URL,
