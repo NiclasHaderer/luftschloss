@@ -27,7 +27,7 @@ export class UTF8SearchParams<T extends Record<string, string[]> = Record<string
     }
   }
 
-  public forEach<TThis = this>(
+  public override forEach<TThis = this>(
     callback: (this: TThis, value: string, name: string, searchParams: this) => void,
     thisArg?: TThis
   ) {

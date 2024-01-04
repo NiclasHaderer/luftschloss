@@ -11,7 +11,7 @@ import { LuftString } from "./string";
 import { deepCopy } from "@luftschloss/common";
 
 export class LuftRegex extends LuftString {
-  public readonly schema: { regex: RegExp; minLength?: number; maxLength?: number; trim: boolean };
+  public override readonly schema: { regex: RegExp; minLength?: number; maxLength?: number; trim: boolean };
 
   public constructor({
     regex,
@@ -28,27 +28,22 @@ export class LuftRegex extends LuftString {
     this.schema = { regex, minLength, maxLength, trim };
   }
 
-  public get supportedTypes() {
+  public override get supportedTypes() {
     return [`/${this.schema.regex.source}/${this.schema.regex.flags}`, "string"];
   }
 
-  public set supportedTypes(_: string[]) {
-    // Only reading is supported
-    throw new Error("Setting of supported types is not allowed");
-  }
-
-  public clone(): LuftRegex {
+  public override clone(): LuftRegex {
     return new LuftRegex({
       ...this.schema,
       regex: new RegExp(this.schema.regex.source, this.schema.regex.flags),
     }).replaceValidationStorage(deepCopy(this.validationStorage));
   }
 
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
+  protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<string> {
     return super._coerce(data, context);
   }
 
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {
+  protected override _validate(data: unknown, context: ParsingContext): InternalParsingResult<string> {
     const result = super._validate(data, context);
     if (!result.success) return result;
 

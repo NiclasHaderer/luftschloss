@@ -15,7 +15,7 @@ type LuftIntSchema = LuftNumberSchema & {
 };
 
 export class LuftInt extends LuftNumber {
-  public readonly supportedTypes = ["int"];
+  public override readonly supportedTypes = ["int"];
   public override readonly schema: LuftIntSchema;
 
   constructor(
@@ -34,51 +34,51 @@ export class LuftInt extends LuftNumber {
     this.schema = schema;
   }
 
-  public clone(): LuftInt {
+  public override clone(): LuftInt {
     return new LuftInt({ ...this.schema }).replaceValidationStorage(deepCopy(this.validationStorage));
   }
 
-  public parseString(parse: boolean): LuftInt {
+  public override parseString(parse: boolean): LuftInt {
     return super.parseString(parse) as LuftInt;
   }
 
-  public allowNaN(allow: boolean): LuftInt {
+  public override allowNaN(allow: boolean): LuftInt {
     return super.allowNaN(allow) as LuftInt;
   }
 
-  public min(number: number | undefined): LuftInt {
+  public override min(number: number | undefined): LuftInt {
     return super.min(number) as LuftInt;
   }
 
-  public minEq(number: number | undefined): LuftInt {
+  public override minEq(number: number | undefined): LuftInt {
     return super.minEq(number) as LuftInt;
   }
 
-  public max(number: number | undefined): LuftInt {
+  public override max(number: number | undefined): LuftInt {
     return super.max(number) as LuftInt;
   }
 
-  public maxEq(number: number | undefined): LuftInt {
+  public override maxEq(number: number | undefined): LuftInt {
     return super.maxEq(number) as LuftInt;
   }
 
-  public positive(): LuftInt {
+  public override positive(): LuftInt {
     return super.positive() as LuftInt;
   }
 
-  public nonNegative(): LuftInt {
+  public override nonNegative(): LuftInt {
     return super.nonNegative() as LuftInt;
   }
 
-  public negative(): LuftInt {
+  public override negative(): LuftInt {
     return super.negative() as LuftInt;
   }
 
-  public nonPositive(): LuftInt {
+  public override nonPositive(): LuftInt {
     return super.nonPositive() as LuftInt;
   }
 
-  public multipleOf(number: number): LuftInt {
+  public override multipleOf(number: number): LuftInt {
     return super.multipleOf(number) as LuftInt;
   }
 
@@ -88,7 +88,7 @@ export class LuftInt extends LuftNumber {
     return newValidator;
   }
 
-  protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
+  protected override _coerce(data: unknown, context: ParsingContext): InternalParsingResult<number> {
     if (typeof data === "string" && this.schema.parseString) {
       data = Number(data);
     }
@@ -99,7 +99,7 @@ export class LuftInt extends LuftNumber {
     return this._validate(data, context);
   }
 
-  protected _validate(data: unknown, context: ParsingContext): InternalParsingResult<number> {
+  protected override _validate(data: unknown, context: ParsingContext): InternalParsingResult<number> {
     const result = super._validate(data, context);
     if (!result.success) return result;
 

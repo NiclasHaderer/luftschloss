@@ -45,12 +45,13 @@ export class StaticRouter extends RouterBase implements Router {
     }
   }
 
-  protected async handleHead(request: LRequest, response: LResponse): Promise<unknown> {
+  protected async handleHead(request: LRequest, response: LResponse): Promise<void> {
     const [exists, absPath, stats] = await this.getFilePath(request);
     if (!exists) return this.respondWithFileNotFound(request, response, absPath);
 
     if (!(await this.hasBeenModifiedSince(request, absPath))) {
-      return response.status(Status.HTTP_304_NOT_MODIFIED).header("Content-Length", stats.size.toString());
+      response.status(Status.HTTP_304_NOT_MODIFIED).header("Content-Length", stats.size.toString());
+      return;
     }
 
     response.empty().header("Content-Length", stats.size.toString());
@@ -83,12 +84,13 @@ export class StaticRouter extends RouterBase implements Router {
     return [true, absPath, stat];
   }
 
-  protected async handlePath(request: LRequest, response: LResponse): Promise<unknown> {
+  protected async handlePath(request: LRequest, response: LResponse): Promise<void> {
     const [exists, absPath] = await this.getFilePath(request);
 
     // If the files have not been modified since the last request, respond with a 304
     if (!(await this.hasBeenModifiedSince(request, absPath))) {
-      return response.status(Status.HTTP_304_NOT_MODIFIED);
+      response.status(Status.HTTP_304_NOT_MODIFIED);
+      return;
     }
 
     if (exists) {
@@ -98,11 +100,11 @@ export class StaticRouter extends RouterBase implements Router {
     }
   }
 
-  protected async respondWithFilesystemItem(request: LRequest, response: LResponse, absPath: string): Promise<void> {
+  protected async respondWithFilesystemItem(_: LRequest, response: LResponse, absPath: string): Promise<void> {
     await response.file(absPath);
   }
 
-  protected async respondWithFileNotFound(request: LRequest, response: LResponse, absPath: string): Promise<void> {
+  protected async respondWithFileNotFound(_: LRequest, __: LResponse, absPath: string): Promise<void> {
     const message = isProduction() ? "Requested file was not found" : `Requested file was not found at ${absPath}`;
     throw new HTTPException(Status.HTTP_404_NOT_FOUND, message);
   }

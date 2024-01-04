@@ -20,8 +20,3 @@ test("RegexType: clone", () => {
   expect(clone).not.toBe(validator);
   expect(clone.schema).toEqual(validator.schema);
 });
-
-test("RegexType: `supportedTypes` modification not possible", () => {
-  const validator = new LuftRegex({ regex: /^\d$/ });
-  expect(() => (validator.supportedTypes = ["asdf"])).toThrow(new Error("Setting of supported types is not allowed"));
-});

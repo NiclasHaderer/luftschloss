@@ -106,7 +106,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
       await this.executeRequest(request, response, route);
     }
 
-    public resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute {
+    public override resolveRoute(path: string, method: HTTP_METHODS): ResolvedRoute {
       const route = super.resolveRoute(path, method);
       if (method === "OPTIONS" && route.status !== LookupResultStatus.OK) {
         return {
@@ -123,7 +123,7 @@ export const withServerBase = <T extends Router, ARGS extends []>(
      * After locking the server it is no longer possible to add/remove routes, pathValidators, etc...
      * This has to be done in order to not allow non-reproducible behaviour and to make some optimizations internally.
      */
-    public async lock(): Promise<void> {
+    public override async lock(): Promise<void> {
       // Call the routers lock method
       await super.lock();
       this.eventDelegate.emit("locked", undefined);

@@ -9,7 +9,7 @@ import { InternalParsingResult, LuftType } from "./base-types";
 import { ParsingContext } from "../parsing-context";
 import { deepCopy } from "@luftschloss/common";
 
-export class LuftAny extends LuftType<any> {
+export class LuftAny extends LuftType {
   readonly supportedTypes = ["any"];
   public readonly schema = {};
 
