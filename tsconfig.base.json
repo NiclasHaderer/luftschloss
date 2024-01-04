@@ -17,6 +17,11 @@
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "paths": {
       "@luftschloss/client": ["packages/client/src/index.ts"],
       "@luftschloss/common": ["packages/common/src/index.ts"],
@@ -29,7 +34,8 @@
       "@luftschloss/static": ["packages/static/src/index.ts"],
       "@luftschloss/testing": ["packages/testing/src/index.ts"],
       "@luftschloss/validation": ["packages/validation/src/index.ts"],
-      "@luftschloss/validation-interfaces": ["packages/validation-interfaces/src/index.ts"]
+      "@luftschloss/validation-interfaces": ["packages/validation-interfaces/src/index.ts"],
+      "router": ["packages/router/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
