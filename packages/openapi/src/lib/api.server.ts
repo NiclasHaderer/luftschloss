@@ -19,8 +19,11 @@ import {
   withServerBase,
 } from "@luftschloss/server";
 import { ApiRouter } from "./api.router";
+import type { Constructor } from "@luftschloss/common";
 
-export class ApiServer extends withServerBase(ApiRouter) implements ServerBase {}
+// Workaround for messed up imports
+export const ApiServer: Constructor<ApiRouter & ServerBase, []> = withServerBase(ApiRouter);
+export type ApiServer = InstanceType<typeof ApiServer>;
 
 export const apiServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INTEGER } = {}) => {
   const server = new ApiServer();

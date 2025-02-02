@@ -2,7 +2,6 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
-    "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
@@ -21,6 +20,7 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "inlineSourceMap": true,
     "paths": {
       "@luftschloss/client": ["packages/client/src/index.ts"],
       "@luftschloss/common": ["packages/common/src/index.ts"],

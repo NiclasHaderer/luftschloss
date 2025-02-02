@@ -14,9 +14,12 @@ import {
 } from "../path-validator";
 import { DefaultRouter } from "../router";
 import { DefaultErrorHandler } from "./error-handler";
-import { withServerBase } from "./server-base";
+import { ServerBase, withServerBase } from "./server-base";
+import type { Constructor } from "@luftschloss/common";
 
-export class ServerImpl extends withServerBase(DefaultRouter) {}
+// Workaround for messed up imports
+export const ServerImpl: Constructor<DefaultRouter & ServerBase, []> = withServerBase(DefaultRouter);
+export type ServerImpl = InstanceType<typeof ServerImpl>;
 
 export const luftServer = ({ timeout = 5000, maxConnections = Number.MAX_SAFE_INTEGER } = {}): ServerImpl => {
   const server = new ServerImpl();

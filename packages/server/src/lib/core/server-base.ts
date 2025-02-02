@@ -43,7 +43,7 @@ export interface ServerBase extends Pick<Subscribable<LuftServerEvents>, "onComp
 }
 
 // noinspection JSPotentiallyInvalidUsageOfThis
-export const withServerBase = <T extends Router, ARGS extends []>(
+export const withServerBase = <T extends Router, ARGS extends any[]>(
   clazz: Constructor<T, ARGS>
 ): Constructor<T & ServerBase, ARGS> =>
   class extends (clazz as Constructor<Router, ARGS>) implements ServerBase {
