@@ -6,8 +6,8 @@ test("BoolType: valid bool types", () => {
   expect(validator.validate(true)).toBe(true);
   expect(validator.validate(false)).toBe(false);
 
-  expect(() => validator.validate("true")).toThrowError(LuftValidationError);
-  expect(() => validator.validate("false")).toThrowError(LuftValidationError);
+  expect(() => validator.coerce("true")).toThrowError(LuftValidationError);
+  expect(() => validator.coerce("false")).toThrowError(LuftValidationError);
 });
 
 test("BoolType: parse bool string", () => {
@@ -17,6 +17,12 @@ test("BoolType: parse bool string", () => {
   expect(validator.coerce("false")).toBe(false);
   expect(validator.coerce("False")).toBe(false);
   expect(() => validator.coerce("Falsee")).toThrowError(LuftValidationError);
+
+  // Test with numbers
+  expect(validator.parseNumbers(true).coerce("1")).toBe(true);
+  expect(validator.parseNumbers(true).coerce("0")).toBe(false);
+  expect(() => new LuftBool().parseNumbers(true).coerce("0")).toThrowError(LuftValidationError);
+  expect(() => new LuftBool().parseNumbers(true).coerce("1")).toThrowError(LuftValidationError);
 });
 
 test("BoolType: clone", () => {
