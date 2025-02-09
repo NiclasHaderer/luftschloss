@@ -23,11 +23,11 @@ export class LuftBool extends LuftType<boolean> {
   }
 
   protected _coerce(data: unknown, context: ParsingContext): InternalParsingResult<boolean> {
-    if (typeof data === "string") {
+    if (this.schema.parseString && typeof data === "string") {
       const lower = data.toLowerCase();
-      if (lower === "true" || lower === "false") {
+      if (lower === "true" || lower === "false" || lower === "1" || lower === "0") {
         return {
-          data: lower === "true",
+          data: lower === "true" || lower === "1",
           success: true,
           usedValidator: this,
         };
